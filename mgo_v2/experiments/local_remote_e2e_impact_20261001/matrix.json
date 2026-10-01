@@ -1,0 +1,83 @@
+{
+  "experiment": "local_remote_e2e_impact_20261001",
+  "validated_runtime_commit": "40a63d8ba22d16684a358d4546bdae4783931e5e",
+  "frozen_policy": {
+    "substitution": "expert_level_gate0.20_sim0.65",
+    "eviction": "coverage_w128_k1_lambda2",
+    "hard_balanced_quota": true,
+    "same_support": 64,
+    "same_alpha": 0.25,
+    "path_support": 64,
+    "path_eta": 0.5,
+    "replication": false,
+    "migration": false
+  },
+  "stage_A": {
+    "worlds": [
+      4,
+      8
+    ],
+    "local_batch": 8,
+    "zero_h2d_in_timed_range": true,
+    "locality_modes": [
+      "LOCAL_MAX",
+      "LOCAL_HIGH",
+      "LOCAL_MID",
+      "LOCAL_LOW",
+      "REMOTE_MAX"
+    ],
+    "timed_iterations": 20,
+    "primary_x": "remote_pair_fraction",
+    "primary_y": "moe_layer_latency"
+  },
+  "stage_B": {
+    "cells": [
+      {
+        "ranks": 4,
+        "local_batch": 8,
+        "global_batch": 32,
+        "cache_pct": 30
+      },
+      {
+        "ranks": 8,
+        "local_batch": 8,
+        "global_batch": 64,
+        "cache_pct": 30
+      },
+      {
+        "ranks": 8,
+        "local_batch": 4,
+        "global_batch": 32,
+        "cache_pct": 30
+      }
+    ],
+    "policies": [
+      "C0_balanced_random",
+      "C1_hungarian_current",
+      "C2_hungarian_same_path"
+    ],
+    "optional_diagnostic_policy": "H3_swap",
+    "fixed_decode_steps": 64,
+    "optional_confirmation_steps": 128,
+    "repeats": 5,
+    "timing": "uninstrumented_primary",
+    "posthoc_profiles": [
+      "C0_balanced_random",
+      "C2_hungarian_same_path"
+    ]
+  },
+  "primary_metrics": [
+    "ttft_seconds",
+    "tpot_seconds",
+    "generation_seconds",
+    "output_tokens_per_second",
+    "remote_pair_fraction",
+    "local_pair_fraction",
+    "remote_token_rank_pairs",
+    "peer_payload_tx_bytes",
+    "actual_expert_h2d_bytes",
+    "decode_fetches",
+    "controller_seconds",
+    "rank_token_cv"
+  ]
+}
