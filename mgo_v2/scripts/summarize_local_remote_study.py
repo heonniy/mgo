@@ -30,6 +30,7 @@ def summarize(root, output, partial=False):
     state = json.loads((root / "status.json").read_text())
     package = Path(__file__).resolve().parents[1]
     binding = json.loads((package / "experiments/local_remote_e2e_impact_20261001/measurement_manifest.json").read_text())
+    extended = bool(binding.get("user_requested_extension"))
     for name, digest in state["source_hashes"].items():
         assert hashlib.sha256((package / name).read_bytes()).hexdigest() == digest, "source changed during study: " + name
     extension, = (package.parent / "MoE-Infinity-EP-archer-coslot/moe_infinity").glob("_store*.so")
@@ -110,7 +111,17 @@ def summarize(root, output, partial=False):
 
         directory = root / f"stage_b_r{world}"
         manifest = read(root / f"cells_r{world}.json")
+        jobs = [(directory, root / f"cells_r{world}.json")]
+        directories = {cell["name"]: directory for cell in manifest}
+        if extended and world == 8:
+            extra = read(root / "cells_r8_extended.json")
+            assert len(extra) == 6 and {cell["batch"] for cell in extra} == {16, 32}
+            extra_directory = root / "stage_b_r8_extended"
+            directories.update({cell["name"]: extra_directory for cell in extra})
+            manifest += extra
+            jobs.append((extra_directory, root / "cells_r8_extended.json"))
         for cell in manifest:
+            directory = directories[cell["name"]]
             reference_by_rank = {}
             for repeat in range(5):
                 paths = [directory / f"{cell['name']}-rep{repeat}-rank{rank}.json" for rank in range(world)]
@@ -173,24 +184,33 @@ def summarize(root, output, partial=False):
                     rank_token_max_mean=metrics["mean_event_rank_token_max_mean"]))
             completeness.append(dict(stage="B", world=world, cell=cell["name"], repeats=len(reference_by_rank) and
                                      sum(row["world"] == world and row["cell"] == cell["name"] for row in b_rows)))
-        provenance_paths = [directory / f"provenance-rank{rank}.json" for rank in range(world)]
-        for rank, path in enumerate(provenance_paths):
-            if path.exists():
-                provenance = read(path)
-                assert provenance["world"] == world and provenance["rank"] == rank
-                assert not provenance["instrumented"] and provenance["steps"] == 65 and provenance["repeats"] == 5
-                assert provenance["code_sha256"] == expected_fingerprint
-                assert provenance["checkpoint"] == binding["validated_checkpoint_identity"]
-                assert provenance["versions"] == binding["expected_versions"]
-                for input_path, digest in binding["input_hashes"].items():
-                    key = {"screen_workload.json": "workload", "similarity.npy": "similarity", "affinity.npz": "affinity"}[Path(input_path).name]
-                    assert provenance["input_sha256"][key] == digest
-                assert provenance["input_sha256"]["cells"] == hashlib.sha256((root / f"cells_r{world}.json").read_bytes()).hexdigest()
+        for directory, manifest_path in jobs:
+            provenance_paths = [directory / f"provenance-rank{rank}.json" for rank in range(world)]
+            for rank, path in enumerate(provenance_paths):
+                if path.exists():
+                    provenance = read(path)
+                    assert provenance["world"] == world and provenance["rank"] == rank
+                    assert not provenance["instrumented"] and provenance["steps"] == 65 and provenance["repeats"] == 5
+                    assert provenance["code_sha256"] == expected_fingerprint
+                    assert provenance["checkpoint"] == binding["validated_checkpoint_identity"]
+                    assert provenance["versions"] == binding["expected_versions"]
+                    for input_path, digest in binding["input_hashes"].items():
+                        key = {"screen_workload.json": "workload", "similarity.npy": "similarity", "affinity.npz": "affinity"}[Path(input_path).name]
+                        assert provenance["input_sha256"][key] == digest
+                    assert provenance["input_sha256"]["cells"] == hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     if not partial:
-        assert len(b_rows) == 45 and len(a_rows) == 30 and len(rank_rows) == 300
+        assert len(b_rows) == (75 if extended else 45) and len(a_rows) == 30
+        assert len(rank_rows) == (540 if extended else 300)
         assert state["status"] == "TIMING_COMPLETE"
         assert [run["name"] for run in state["runs"]] == ["stage_a_r8", "stage_b_r8", "stage_a_r4", "stage_b_r4"]
         assert all(run["exit_code"] == 0 for run in state["runs"])
+        if extended:
+            extension = read(root / "extension_status.json")
+            pause = read(root / "scheduling_pause.json")
+            assert extension["status"] == "PASS" and extension["exit_code"] == 0
+            assert pause["status"] == "RESUMED_AFTER_R8_EXTENSION"
+            assert extension["finished_unix"] <= state["runs"][2]["started_unix"]
+            assert extension["original_r8_process_finished_unix"] <= extension["started_unix"]
     write_table(output, "local_remote_sensitivity", a_rows)
     write_table(output, "local_remote_iterations", a_iterations)
     write_table(output, "e2e_repeats", b_rows)
@@ -198,6 +218,7 @@ def summarize(root, output, partial=False):
     (output / "local_remote_sensitivity.json").write_text(json.dumps(dict(rows=a_rows, iterations=a_iterations), indent=2) + "\n")
     (output / "e2e_repeats.json").write_text(json.dumps(dict(rows=b_rows, ranks=rank_rows), indent=2) + "\n")
     audit = dict(status="PARTIAL" if partial else "PASS", stage_a_cells=len(a_rows), stage_b_repeats=len(b_rows),
+                 user_requested_extended_batches=extended,
                  runtime_fingerprint=expected_fingerprint, extension_sha256=binding["extension_sha256"],
                  rank_receipts=len(rank_rows), completeness=completeness, source_sha256=evidence,
                  scopes={"peer_payload": "Submitted dispatch+native-order-return tensors, excludes routing/count collectives and wire overhead",

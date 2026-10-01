@@ -38,7 +38,8 @@ def main():
     policies = ("random", "hungarian_current", "hungarian_same_path")
     labels = ("Random", "Hungarian current", "Hungarian same+path")
     colors = ("#586f7c", "#db9d47", "#167d8d")
-    cells = ((8, 8), (8, 4), (4, 8))
+    available = {(row["world"], row["local_batch"]) for row in b}
+    cells = [cell for cell in ((8, 8), (8, 4), (8, 16), (8, 32), (4, 8)) if cell in available]
     summaries = []
     numeric = [key for key in b[0] if isinstance(b[0][key], (int, float)) and key not in ("world", "local_batch", "global_batch", "repeat")]
     for world, batch in cells:
@@ -65,7 +66,7 @@ def main():
                 fetch_change=changed["fetches_median"] / baseline["fetches_median"] - 1))
     table(root, "comparisons", comparisons)
     plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
-    fig, axes = plt.subplots(2, 3, figsize=(13, 7), squeeze=False)
+    fig, axes = plt.subplots(2, len(cells), figsize=(4.3 * len(cells), 7), squeeze=False)
     for column, (world, batch) in enumerate(cells):
         for rowidx, metric in enumerate(("tpot_seconds", "generation_seconds")):
             ax = axes[rowidx, column]
@@ -104,7 +105,7 @@ def main():
 
     fig, axes = plt.subplots(1, 3, figsize=(14, 4.5))
     for cellidx, (world, batch) in enumerate(cells):
-        marker = ("o", "s", "^")[cellidx]
+        marker = ("o", "s", "^", "D", "v")[cellidx]
         for policy, label, color in zip(policies, labels, colors):
             rows = [r for r in b if (r["world"], r["local_batch"], r["policy"]) == (world, batch, policy)]
             for ax, xkey, ykey, scale in ((axes[0], "decode_remote_pair_fraction", "tpot_seconds", 1),
@@ -130,8 +131,8 @@ def main():
         for offset, policy, label, color in ((-.17, "random", "Random", colors[0]), (.17, "hungarian_same_path", "Same+path", colors[2])):
             rows = [next(r for r in summaries if (r["world"], r["local_batch"], r["policy"]) == (*cell, policy)) for cell in cells]
             values = [r[key + "_median"] / scale for r in rows]
-            ax.bar(np.arange(3) + offset, values, width=.32, label=label, color=color)
-        ax.set_xticks(range(3), [f"R{w}/B{batch}" for w, batch in cells])
+            ax.bar(np.arange(len(cells)) + offset, values, width=.32, label=label, color=color)
+        ax.set_xticks(range(len(cells)), [f"R{w}/B{batch}" for w, batch in cells])
         ax.set_title(title)
         ax.grid(axis="y", alpha=.2)
         ax.legend(fontsize=8)
@@ -146,7 +147,7 @@ def main():
     design = np.column_stack((np.ones(len(b)), predictors))
     coefficients, _, rank, singular = np.linalg.lstsq(design, y, rcond=None)
     fit = design @ coefficients
-    regression = dict(n=len(b), distinct_conditions=9, matrix_rank=int(rank),
+    regression = dict(n=len(b), distinct_conditions=len(summaries), matrix_rank=int(rank),
         coefficients=dict(zip(("intercept_seconds", "remote_pairs_per_million", "expert_h2d_gib", "controller_seconds", "rank_cv"), coefficients.tolist())),
         r_squared=float(1 - np.sum((y - fit)**2) / np.sum((y - y.mean())**2)),
         condition_number=float(singular[0] / singular[-1]),

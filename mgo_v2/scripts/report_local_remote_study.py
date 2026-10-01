@@ -22,6 +22,8 @@ def main():
     comparisons = read_csv(root / "comparisons.csv")
     stage_a = json.loads((root / "local_remote_sensitivity.json").read_text())["rows"]
     anchors = [r for r in comparisons if r["policy"] == "hungarian_same_path" and int(r["local_batch"]) == 8]
+    assert len(anchors) == 2
+    repeat_count, rank_count = audit["stage_b_repeats"], audit["rank_receipts"]
     passed = all(float(r["tpot_speedup"]) > 1 and float(r["remote_fraction_change"]) < 0 for r in anchors)
     outcome = ("The prespecified directional TPOT/locality gate passes in both primary anchors. "
                "This is a bounded five-repeat observation, not a significance or production-serving claim." if passed else
@@ -33,19 +35,22 @@ def main():
         "`/home/hwlee/mgo-results/local_remote_e2e_impact_20261001`.", "",
         "Execution followed the owner's R8 → R4 order. Stage A has 30 event/map cells, "
         "600 uninstrumented resident iterations and 600 separate CUDA-event diagnostic iterations. "
-        "Stage B has nine conditions × five repeats (45 generations, 300 rank receipts). "
+        f"Stage B has {len(rows)} conditions × five repeats ({repeat_count} generations, {rank_count} rank receipts). "
         "The two preselected R8/B8 posthoc profiles ran only after all primary timing completed.", "",
         "## Fixed protocol", "",
         "Qwen3-30B-A3B-Instruct-2507 BF16 on H100 NVSwitch; cache30; Coverage W128/k1/lambda2; "
         "expert-level gate .20/similarity .65 substitution; support64/alpha=.25, "
         "path support64/eta=.5; seed42; hard quotas, one residency controller, no migration/replication. "
         "Every repeat resets logical/physical expert cache and policy history. "
-        "Dense weights and CUDA allocator/kernel caches stay loaded. No concurrent GPU jobs ran.", "",
+        "Dense weights and CUDA allocator/kernel caches stay loaded. All study GPU jobs ran sequentially.", "",
         "64 decode steps are **one prefill plus 64 decode forwards, producing 65 fixed-work tokens**. "
         "EOS ends answer scoring, while timed computation continues. TPOT is the average of "
         "max-rank decode step wall times; generation time is the max-rank continuous wall interval. "
         "This is fixed-work generation, not production serving throughput or long-horizon task quality. "
-        "The R8/B4 control uses the same first 32 questions as R4/B8; R8/B8 uses 64 questions.", "",
+        "The R8/B4 control uses the same first 32 questions as R4/B8; R8/B8 uses 64 questions. "
+        "The owner-requested R8/B16 and B32 expansion uses 128 and 256 questions, respectively, "
+        "and ran before the R4 jobs with identical policy coefficients and decode length. "
+        "The original B8 acceptance anchors and preselected two profiles were retained.", "",
         "[Execution binding](EXECUTION_BINDING.md) specifies selection, solver, timer and byte definitions. "
         "[Manifest](measurement_manifest.json) binds the inputs and implementation.", "",
         "## Stage B: all five repeats", "",
@@ -112,8 +117,9 @@ def main():
         "TPOT is plotted against decode-only remote-pair fraction; generation panels use "
         "whole-generation counters. [Regression support](regression_support.csv) and "
         "[OLS coefficients](descriptive_regression.json) implement the prespecified descriptive "
-        "model with remote pairs, expert H2D, controller time and rank CV. The 45 rows comprise "
-        "nine repeated conditions; predictors are correlated and workload/world effects remain. "
+        "model with remote pairs, expert H2D, controller time and rank CV. "
+        "Predictors are correlated and workload/world effects remain. "
+        f"There are {repeat_count} rows from {len(rows)} repeated conditions. "
         "No p-values, causal attribution or independent-sample generalization are claimed.", "",
         "## Two posthoc profiles", "",
         "Nsight Systems 2025.6.1 uses the previously validated configuration, with periodic stack "
@@ -138,7 +144,7 @@ def main():
         "the unchanged compute/cache/collective implementation. New real-event incidence "
         "checks independently validate locality counters; actual submitted Stage-A tensors "
         "match dispatch+return byte formulas. All five repeats have identical full token "
-        "sequences and semantic/cache counters in every rank. All 300 Stage-B physical-fetch "
+        f"sequences and semantic/cache counters in every rank. All {rank_count} Stage-B physical-fetch "
         "receipts pass. [Validation](validation.json) includes source receipt hashes and the "
         "runtime fingerprint; [profile transfer audit](profile_transfer_audit.json) binds observed H2D.", "",
         "Submitted peer bytes exclude self traffic, router/count all-gather metadata and wire "

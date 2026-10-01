@@ -5,7 +5,8 @@ Validated runtime: `40a63d8ba22d16684a358d4546bdae4783931e5e`.
 Raw root: `/home/hwlee/mgo-results/local_remote_e2e_impact_20261001`.
 
 The owner explicitly requests **R8 before R4**. Execute Stage A/R8, Stage B/R8
-(local B8 then B4), Stage A/R4, Stage B/R4. Only after all primary timings,
+(local B8 then B4, followed by the user-requested B16 then B32 extension),
+Stage A/R4, Stage B/R4. Only after all primary timings,
 collect exactly two full-model Nsight repeats: R8/B8 C0 and C2, repeat 0.
 The representative profile cell is fixed here before timing outcomes exist.
 Optional 128-step confirmation is omitted to keep this bounded primary study
@@ -51,7 +52,7 @@ the latter include stream/launch waits and are not isolated NCCL kernel time.
 
 ## Stage B
 
-Five repeats for each of nine cell/policy combinations, no profiler/CUDA-event
+Five repeats for each of fifteen cell/policy combinations, no profiler/CUDA-event
 instrumentation. Two warmup forward calls per worker job, then fresh logical
 and physical cache/history before each measured repeat. Dense weights and
 allocator/kernel caches stay loaded; expert cache persists within a repeat.
@@ -81,3 +82,20 @@ and completion receipt. Runtime hashes are stored before launch and checked
 against per-worker provenance. Report all repeats and median/min/max; publish
 negative outcomes. Profiled times are diagnostic only. Stop for owner review
 after the required reports and two profiles, without automatic retuning.
+
+## User-requested expansion during execution
+
+The owner explicitly requested R8 local B16 and B32 in addition to the original
+B8 and B4 cells. Each additional batch uses all three frozen policies, five
+repeats and 64 decode steps: 30 additional generations, 75 total. The original
+R8/B8 and R4/B8 acceptance anchors and the two preselected R8/B8 profiles remain
+unchanged. B16 and B32 use the first 128 and 256 questions from the same bound
+workload; no new calibration, coefficients or policy search is introduced.
+
+Only the scheduling parent is paused while the existing R8 workers finish.
+The extension waits for successful torchrun termination and empty GPUs, runs
+the new R8 cells, then resumes scheduling of R4. The original R8 launcher's
+outer wait includes this scheduling pause; individual generation timers do not.
+`scheduling_pause.json` and `extension_status.json` preserve this transition.
+An independent fresh worker job supplies the same two-call warmup for the
+extension. Runtime source and compiled-binary fingerprints stay unchanged.

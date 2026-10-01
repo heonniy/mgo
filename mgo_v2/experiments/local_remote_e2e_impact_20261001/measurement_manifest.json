@@ -123,5 +123,22 @@
     "torch": "2.11.0+cu128",
     "transformers": "4.57.6",
     "numpy": "2.5.2"
+  },
+  "user_requested_extension": {
+    "world": 8,
+    "local_batches": [
+      16,
+      32
+    ],
+    "policies": [
+      "random",
+      "hungarian_current",
+      "hungarian_same_path"
+    ],
+    "repeats": 5,
+    "decode_steps": 64,
+    "additional_generations": 30,
+    "order": "After original R8 B8/B4, before all R4 jobs",
+    "authorization": "User explicitly selected adding both B16 and B32 during ongoing execution; no coefficient or runtime changes."
   }
 }
