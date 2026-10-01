@@ -41,6 +41,11 @@ def summarize(root, output, partial=False):
     package = Path(__file__).resolve().parents[1]
     binding = json.loads((package / "experiments/local_remote_e2e_impact_20261001/measurement_manifest.json").read_text())
     extended = bool(binding.get("user_requested_extension"))
+    gpu_maps = binding.get("physical_gpus_by_world", {"8": list(range(8)), "4": list(range(4))})
+    def check_boot(boot, world, rank):
+        assert boot["local_rank"] == rank
+        assert boot["visible_gpu"] == str(gpu_maps[str(world)][rank]), "physical GPU selection mismatch"
+        assert boot["strict_numa"] and boot["numa_policy"] == "membind-strict"
     for name, digest in state["source_hashes"].items():
         assert hashlib.sha256((package / name).read_bytes()).hexdigest() == digest, "source changed during study: " + name
     extension, = (package.parent / "MoE-Infinity-EP-archer-coslot/moe_infinity").glob("_store*.so")
@@ -69,6 +74,7 @@ def summarize(root, output, partial=False):
             assert selected_events["pool"] == 384
             for rank, receipt in enumerate(ranks):
                 assert receipt["status"] == "PASS" and receipt["rank"] == rank and receipt["world"] == world
+                check_boot(receipt["boot"], world, rank)
                 assert receipt["counter_oracle_events"] == 432
                 assert receipt["checkpoint"] == binding["validated_checkpoint_identity"]
                 assert len(receipt["results"]) == 15
@@ -146,12 +152,14 @@ def summarize(root, output, partial=False):
                 records = [read(path) for path in paths]
                 for rank, row in enumerate(records):
                     assert row["status"] == "PASS" and row["world"] == world and row["rank"] == rank
+                    assert row["name"] == cell["name"]
                     assert row["repeat"] == repeat and row["local_batch"] == cell["batch"]
                     assert "collectives" not in row, "instrumented timing cannot enter primary results"
                     for key, value in cell["config"].items():
                         assert row["config"][key] == value, (cell["name"], key)
                     assert row["config"]["same_layer_alpha"] == .25 and row["config"]["path_eta"] == .5
                     assert len(row["rank_step_seconds"]) == 65
+                    assert len(row["generated_token_ids"]) == len(row["prompt_tokens"]) == cell["batch"]
                     assert all(len(ids) == 65 for ids in row["generated_token_ids"])
                     assert row["metrics"] == records[0]["metrics"]
                     assert row["prefill"]["metrics"] == records[0]["prefill"]["metrics"]
@@ -176,8 +184,14 @@ def summarize(root, output, partial=False):
                 assert sum(r["prefill"]["cache_stats"][3] for r in records) == prefill["fetches"]
                 max_steps = [max(row["rank_step_seconds"][i] for row in records) for i in range(65)]
                 assert first["global_max_step_seconds"] == max_steps
+                assert first["ttft_seconds"] == max_steps[0]
                 assert first["tpot_seconds"] == sum(max_steps[1:]) / 64
                 assert first["global_max_generation_seconds"] == max(row["rank_generation_seconds"] for row in records)
+                assert first["fixed_step_output_tokens_per_second"] == world * cell["batch"] * 65 / first["global_max_generation_seconds"]
+                for row in records:
+                    for key in ("global_max_step_seconds", "ttft_seconds", "tpot_seconds",
+                                "global_max_generation_seconds", "fixed_step_output_tokens_per_second"):
+                        assert row[key] == first[key], (world, cell["name"], repeat, key)
                 control, decode_control = control_payload(world, cell["batch"], max(sum(row["prompt_tokens"]) for row in records))
                 b_rows.append(dict(world=world, local_batch=cell["batch"], global_batch=world * cell["batch"],
                     policy=cell["config"]["admission"], cell=cell["name"], repeat=repeat,
@@ -203,10 +217,13 @@ def summarize(root, output, partial=False):
                                      sum(row["world"] == world and row["cell"] == cell["name"] for row in b_rows)))
         for directory, manifest_path in jobs:
             provenance_paths = [directory / f"provenance-rank{rank}.json" for rank in range(world)]
+            if not partial:
+                assert all(path.exists() for path in provenance_paths), f"missing provenance: {directory}"
             for rank, path in enumerate(provenance_paths):
                 if path.exists():
                     provenance = read(path)
                     assert provenance["world"] == world and provenance["rank"] == rank
+                    check_boot(provenance["boot"], world, rank)
                     assert not provenance["instrumented"] and provenance["steps"] == 65 and provenance["repeats"] == 5
                     assert provenance["code_sha256"] == expected_fingerprint
                     assert provenance["checkpoint"] == binding["validated_checkpoint_identity"]
@@ -224,6 +241,12 @@ def summarize(root, output, partial=False):
         integrated_order = ["stage_a_r8", "stage_b_r8", "stage_b_r8_extended", "stage_a_r4", "stage_b_r4"]
         assert names == original_order or (extended and names == integrated_order)
         assert all(run["exit_code"] == 0 for run in state["runs"])
+        if binding.get("user_requested_r4_devices"):
+            for run in state["runs"]:
+                if run["name"].endswith("r4"):
+                    assert run["physical_gpus"] == gpu_maps["4"]
+            change = read(root / "r4_device_change.json")
+            assert change["physical_gpus"] == gpu_maps["4"]
         if extended and names == original_order:
             extension = read(root / "extension_status.json")
             pause = read(root / "scheduling_pause.json")
@@ -240,6 +263,7 @@ def summarize(root, output, partial=False):
     audit = dict(status="PARTIAL" if partial else "PASS", stage_a_cells=len(a_rows), stage_b_repeats=len(b_rows),
                  user_requested_extended_batches=extended,
                  runtime_fingerprint=expected_fingerprint, extension_sha256=binding["extension_sha256"],
+                 physical_gpus_by_world=gpu_maps,
                  rank_receipts=len(rank_rows), completeness=completeness, source_sha256=evidence,
                  scopes={"peer_payload": "Submitted dispatch+native-order-return tensors, excludes routing/count collectives and wire overhead",
                          "all_submitted_peer": "Dispatch+return plus router/count all-gather tensor copies; excludes wire overhead",

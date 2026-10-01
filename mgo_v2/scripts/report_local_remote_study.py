@@ -43,6 +43,9 @@ def main():
         "path support64/eta=.5; seed42; hard quotas, one residency controller, no migration/replication. "
         "Every repeat resets logical/physical expert cache and policy history. "
         "Dense weights and CUDA allocator/kernel caches stay loaded. All study GPU jobs ran sequentially.", "",
+        "R8 uses physical GPUs 0–7. At the owner's request, both R4 stages use physical GPUs "
+        "0, 1, 4, 5 (logical ranks 0, 1, 2, 3 respectively). Every worker's recorded visibility "
+        "and strict NUMA binding are checked before accepting its results.", "",
         "64 decode steps are **one prefill plus 64 decode forwards, producing 65 fixed-work tokens**. "
         "EOS ends answer scoring, while timed computation continues. TPOT is the average of "
         "max-rank decode step wall times; generation time is the max-rank continuous wall interval. "

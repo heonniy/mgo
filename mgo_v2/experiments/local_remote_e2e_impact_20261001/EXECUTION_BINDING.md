@@ -115,3 +115,12 @@ For a fresh reproduction, `scripts/run_local_remote_study.py` now includes
 R8/B16 and B32 by default and schedules them before R4 directly, without a
 scheduling pause. `--dry-run` writes all three cell manifests and the job order
 without creating a CUDA context. Use a fresh output directory for new runs.
+
+The owner subsequently specified physical GPUs **0,1,4,5** before any R4 job
+started. Both R4 stages use that order (logical ranks 0,1,2,3). R8 remains on
+physical GPUs 0–7. The obsolete scheduling parents are superseded only after
+the ongoing R8 extension exits successfully; a replacement launcher resumes
+from the three completed R8 job receipts. No active GPU worker is interrupted.
+`r4_device_change.json` records the request and handoff. Worker bootstrap
+receipts independently validate GPU visibility and strict NUMA binding.
+Fresh reproductions default to `--r4-gpus 0 1 4 5`.

@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "checked_unix": 1790863216.4355934,
+  "physical_gpus_by_world": {
+    "8": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "4": [
+      0,
+      1,
+      4,
+      5
+    ]
+  },
+  "checks": [
+    "Dry-run job order keeps all three R8 jobs before both R4 jobs",
+    "Both R4 dry-run jobs select physical GPUs 0,1,4,5",
+    "All three cell manifests remain byte-identical to active experiment inputs",
+    "Synthetic completed-job resume fixture skipped all five jobs without GPU launch, retaining original start and source hashes",
+    "Existing 47 generations and 376 rank receipts pass strengthened token/timer/bootstrap audit"
+  ],
+  "scope": "Orchestration checks before R4 begins; final receipt audit separately verifies actual worker visibility.",
+  "source_sha256": {
+    "scripts/run_local_remote_study.py": "e7b562661c5484aa4b21ca31a70398a752542a665d841f44e0d948786b40500d",
+    "scripts/resume_study_device_selection.py": "8a1f3c5ff0e14993e66200f95b1bbb4735f8f5c6f7e1e59ccaa6d5b73fa6fcde",
+    "scripts/summarize_local_remote_study.py": "1ebb6a841284388a355c50e47ae8c533d8e1c07ade3be1ea25de27396e5a09c2"
+  }
+}
