@@ -9,6 +9,7 @@ import statistics
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 
 
@@ -87,19 +88,24 @@ def main():
     fig.tight_layout()
     save(fig, root, "e2e_timing")
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
-    for ax, world in zip(axes, (8, 4)):
-        for event, color in zip(("low", "median", "high"), colors):
-            rows = sorted([r for r in a if r["world"] == world and r["event"] == event], key=lambda r: r["remote_pair_fraction"])
-            x = [r["remote_pair_fraction"] for r in rows]
-            y = [r["moe_seconds_median"] * 1000 for r in rows]
-            ax.plot(x, y, "o-", color=color, label=f"{event} active experts")
-            ax.vlines(x, [r["moe_seconds_min"] * 1000 for r in rows], [r["moe_seconds_max"] * 1000 for r in rows], color=color, alpha=.4)
-        ax.set(title=f"R{world} / local B8", xlabel="Remote token-rank pair fraction", ylabel="Resident MoE latency (ms)")
-        ax.legend(fontsize=8)
-        ax.grid(alpha=.2)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    for column, world in enumerate((8, 4)):
+        for rowidx, metric, scale, ylabel in (
+                (0, "moe_seconds", 1000, "Resident MoE latency (ms)"),
+                (1, "diagnostic_nccl_ms", 1, "Diagnostic collective interval (ms)")):
+            ax = axes[rowidx, column]
+            for event, color in zip(("low", "median", "high"), colors):
+                rows = sorted([r for r in a if r["world"] == world and r["event"] == event], key=lambda r: r["remote_pair_fraction"])
+                x = [r["remote_pair_fraction"] for r in rows]
+                y = [r[metric + "_median"] * scale for r in rows]
+                ax.plot(x, y, "o-", color=color, label=f"{event} active experts")
+                ax.vlines(x, [r[metric + "_min"] * scale for r in rows], [r[metric + "_max"] * scale for r in rows], color=color, alpha=.4)
+            ax.set(title=f"R{world} / local B8", xlabel="Remote token-rank pair fraction", ylabel=ylabel)
+            ax.legend(fontsize=8)
+            ax.grid(alpha=.2)
     fig.suptitle("Fixed real events, resident experts: 20 iterations per owner map")
-    fig.text(.5, -.03, "Same tokens, experts and hard quotas • median with min/max • no timed expert fetches • heuristic owner maps", ha="center", fontsize=9)
+    fig.text(.5, -.035, "Top: uninstrumented latency. Bottom: separate CUDA-event diagnostics, including stream/launch waits.\n"
+             "Same tokens, experts and hard quotas • median with min/max • no timed expert fetches • heuristic owner maps", ha="center", fontsize=9)
     fig.tight_layout()
     save(fig, root, "locality_sensitivity")
 
@@ -118,7 +124,11 @@ def main():
     axes[2].set(xlabel="Expert H2D (GiB; fetch accounting)", ylabel="Generation (s)")
     for ax in axes:
         ax.grid(alpha=.2)
-    axes[2].legend(fontsize=6, loc="best")
+    handles = [Line2D([], [], marker="o", linestyle="", color=color, label=label)
+               for color, label in zip(colors, labels)]
+    handles += [Line2D([], [], marker=marker, linestyle="", color="#555555", label=f"R{world}/B{batch}")
+                for (world, batch), marker in zip(cells, ("o", "s", "^", "D", "v"))]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(.5, -.02), ncol=4, fontsize=8)
     fig.suptitle("End-to-end relationships (descriptive; generation panels include prefill)")
     fig.tight_layout()
     save(fig, root, "e2e_relationships")

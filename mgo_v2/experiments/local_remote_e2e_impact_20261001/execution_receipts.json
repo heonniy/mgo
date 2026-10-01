@@ -1,0 +1,698 @@
+{
+  "primary": {
+    "status": "TIMING_COMPLETE",
+    "started_unix": 1790855588.0705967,
+    "runs": [
+      {
+        "name": "stage_a_r8",
+        "exit_code": 0,
+        "started_unix": 1790855588.0728042,
+        "finished_unix": 1790855863.4036925
+      },
+      {
+        "name": "stage_b_r8",
+        "exit_code": 0,
+        "started_unix": 1790855863.4062371,
+        "finished_unix": 1790860002.6044,
+        "physical_gpus": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "completion_observation": "Successful torchrun zombie exit status and all rank receipts; scheduler was paused."
+      },
+      {
+        "name": "stage_b_r8_extended",
+        "exit_code": 0,
+        "started_unix": 1790860002.8448799,
+        "finished_unix": 1790865467.6138732,
+        "physical_gpus": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "completion_observation": "Successful torchrun zombie exit status and all rank receipts; scheduler was paused."
+      },
+      {
+        "name": "stage_a_r4",
+        "exit_code": 0,
+        "started_unix": 1790865467.6966543,
+        "finished_unix": 1790865815.480251,
+        "physical_gpus": [
+          0,
+          1,
+          4,
+          5
+        ]
+      },
+      {
+        "name": "stage_b_r4",
+        "exit_code": 0,
+        "started_unix": 1790865815.4820507,
+        "finished_unix": 1790868148.9436436,
+        "physical_gpus": [
+          0,
+          1,
+          4,
+          5
+        ]
+      }
+    ],
+    "world_order": [
+      8,
+      4
+    ],
+    "fixed_decode_steps": 64,
+    "generated_tokens": 65,
+    "r8_extra_batches": [
+      16,
+      32
+    ],
+    "same_support": 64,
+    "same_alpha": 0.25,
+    "path_support": 64,
+    "path_eta": 0.5,
+    "plan_commit": "1a98d10ac17557e7a9112e12ad36d07fe5d5be27",
+    "source_hashes": {
+      "mgo_v2/__init__.py": "c236dd96681ca74f2ee0d5cb52b107c48a3839fb7c567d33a09fe46cf89cd186",
+      "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+      "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+      "mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+      "mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+      "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+      "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+      "mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+      "mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+      "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+      "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+      "mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+      "mgo_v2/controller.py": "df23ccb0251a3c4949852377f75a69260ad99de59f1cb0e401d31015aa78d5c4",
+      "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+      "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+      "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+      "mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+      "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+      "mgo_v2/cache.py": "bdd242d2fb4bb296711062bed3a020e9b817f0286029ae9f9294ffa5505c915f",
+      "examples/benchmark_model.py": "5f8ec4d0f5f022f2653023c9f1ca3188185d5473a55ce0d20bb75b763f159e7c",
+      "examples/study_stage_a.py": "8a231554e58d2e7893088bdfe3f0cf1671f41f416bfc5b2ec64499cfa10b8c9c",
+      "examples/locality_maps.py": "0a171a1642e7209a1d31c106b8c3e109683f0e2e624de17f00922d8350b1883a"
+    },
+    "resumed_unix": 1790865467.6961439,
+    "physical_gpus_by_world": {
+      "8": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        4,
+        5
+      ]
+    },
+    "current": "stage_b_r4",
+    "command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=4",
+      "/home/hwlee/mgo/mgo_v2/examples/benchmark_model.py",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "--offload-dir",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/expert_store",
+      "--similarity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+      "--affinity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz",
+      "--workload",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json",
+      "--output",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/stage_b_r4",
+      "--cells",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/cells_r4.json",
+      "--steps",
+      "65",
+      "--repeats",
+      "5"
+    ],
+    "current_physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "finished_unix": 1790868148.9442046
+  },
+  "r8_extension": {
+    "status": "PASS",
+    "requested_batches": [
+      16,
+      32
+    ],
+    "world": 8,
+    "repeats": 5,
+    "decode_steps": 64,
+    "parent_pid": 11146,
+    "active_torchrun_pid": 15349,
+    "requested_unix": 1790859747.58231,
+    "original_r8_process_finished_unix": 1790860002.6044,
+    "started_unix": 1790860002.8448799,
+    "command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=8",
+      "/home/hwlee/mgo/mgo_v2/examples/benchmark_model.py",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "--offload-dir",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/expert_store",
+      "--similarity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+      "--affinity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz",
+      "--workload",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json",
+      "--cells",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/cells_r8_extended.json",
+      "--output",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/stage_b_r8_extended",
+      "--steps",
+      "65",
+      "--repeats",
+      "5"
+    ],
+    "exit_code": 0,
+    "finished_unix": 1790865467.6138732,
+    "scheduler_handoff": "Replacement launcher preserves R8 completion and selects R4 physical GPUs 0,1,4,5"
+  },
+  "scheduling_pause": {
+    "status": "SUPERSEDED_FOR_R4_DEVICE_SELECTION",
+    "parent_pid": 11146,
+    "active_torchrun_pid": 15349,
+    "pause_unix": 1790859671.9291196,
+    "parent_command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-u",
+      "scripts/run_local_remote_study.py",
+      "--root",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001",
+      "--inputs",
+      "/home/hwlee/mgo-results/runtime_validation_20261001",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      ""
+    ],
+    "child_command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=8",
+      "/home/hwlee/mgo/mgo_v2/examples/benchmark_model.py",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "--offload-dir",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/expert_store",
+      "--similarity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+      "--affinity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz",
+      "--workload",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json",
+      "--output",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/stage_b_r8",
+      "--cells",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/cells_r8.json",
+      "--steps",
+      "65",
+      "--repeats",
+      "5",
+      ""
+    ],
+    "reason": "User requested adding R8 B16/B32 before transition to R4; only scheduler parent is paused, not GPU workers.",
+    "superseded_unix": 1790865467.6138732
+  },
+  "r4_device_selection": {
+    "status": "PASS",
+    "requested_unix": 1790862972.2685037,
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "rank_to_physical_gpu": {
+      "0": 0,
+      "1": 1,
+      "2": 4,
+      "3": 5
+    },
+    "reason": "Owner explicitly requested physical GPUs 0,1,4,5 for the later four-rank study. Both scheduling parents paused; R8 GPU workers continue.",
+    "original_parent_pid": 11146,
+    "extension_parent_pid": 60856,
+    "extension_torchrun_pid": 76962,
+    "resumed_unix": 1790865467.615805,
+    "command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-u",
+      "scripts/run_local_remote_study.py",
+      "--root",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001",
+      "--inputs",
+      "/home/hwlee/mgo-results/runtime_validation_20261001",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "--resume",
+      "--r4-gpus",
+      "0",
+      "1",
+      "4",
+      "5"
+    ],
+    "exit_code": 0,
+    "finished_unix": 1790868148.9630804
+  },
+  "posthoc": {
+    "status": "PASS",
+    "phase": "COMPLETE",
+    "started_unix": 1790868151.8938138,
+    "command": [
+      "/home/hwlee/mgo/.build-deps/nsys-2025.6/opt/nvidia/nsight-systems/2025.6.1/bin/nsys",
+      "profile",
+      "--trace=cuda,nvtx",
+      "--sample=none",
+      "--cpuctxsw=none",
+      "--cuda-event-trace=false",
+      "--flush-on-cudaprofilerstop=false",
+      "--capture-range=cudaProfilerApi",
+      "--capture-range-end=stop",
+      "--output",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/profile",
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=8",
+      "/home/hwlee/mgo/mgo_v2/examples/profile_model_worker.py",
+      "--model",
+      "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "--offload-dir",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/expert_store",
+      "--similarity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+      "--affinity",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz",
+      "--workload",
+      "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json",
+      "--cells",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/profile_cells.json",
+      "--output",
+      "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/profile_receipts",
+      "--steps",
+      "65",
+      "--repeats",
+      "1",
+      "--profile"
+    ],
+    "nsys_version": "NVIDIA Nsight Systems version 2025.6.1.190-256136895201v0",
+    "wrapper_sha256": "4a7cad04e949de3014f0d8a90c107ea5f8861b64ce3f7e7b9c2ddc5f62718e64",
+    "profile_finished_unix": 1790869374.8280659,
+    "export_finished_unix": 1790869659.6415977,
+    "finished_unix": 1790870410.8269644
+  },
+  "completion_pipeline": {
+    "status": "PASS",
+    "completed_unix": 1790870414.501896,
+    "commands": [
+      [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "scripts/summarize_local_remote_study.py",
+        "--root",
+        "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001",
+        "--output",
+        "/home/hwlee/mgo/mgo_v2/experiments/local_remote_e2e_impact_20261001"
+      ],
+      [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "scripts/profile_local_remote_study.py",
+        "--root",
+        "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001",
+        "--inputs",
+        "/home/hwlee/mgo-results/runtime_validation_20261001",
+        "--model",
+        "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "--nsys",
+        "/home/hwlee/mgo/.build-deps/nsys-2025.6/opt/nvidia/nsight-systems/2025.6.1/bin/nsys",
+        "--output",
+        "/home/hwlee/mgo/mgo_v2/experiments/local_remote_e2e_impact_20261001"
+      ],
+      [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "scripts/plot_local_remote_study.py",
+        "--root",
+        "/home/hwlee/mgo/mgo_v2/experiments/local_remote_e2e_impact_20261001"
+      ],
+      [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "scripts/report_local_remote_study.py",
+        "--root",
+        "/home/hwlee/mgo/mgo_v2/experiments/local_remote_e2e_impact_20261001"
+      ]
+    ]
+  },
+  "gpu_release": {
+    "unix": 1790869443.009999,
+    "compute_processes": "",
+    "scope": "After all primary and posthoc GPU worker exits; CPU trace export/analysis remains."
+  },
+  "phase_completions": {
+    "stage_a_r4.complete.json": {
+      "name": "stage_a_r4",
+      "exit_code": 0,
+      "started_unix": 1790865467.6966543,
+      "finished_unix": 1790865815.480251,
+      "physical_gpus": [
+        0,
+        1,
+        4,
+        5
+      ]
+    },
+    "stage_a_r8.complete.json": {
+      "name": "stage_a_r8",
+      "exit_code": 0,
+      "started_unix": 1790855588.0728042,
+      "finished_unix": 1790855863.4036925
+    },
+    "stage_b_r4.complete.json": {
+      "name": "stage_b_r4",
+      "exit_code": 0,
+      "started_unix": 1790865815.4820507,
+      "finished_unix": 1790868148.9436436,
+      "physical_gpus": [
+        0,
+        1,
+        4,
+        5
+      ]
+    },
+    "stage_b_r8.complete.json": {
+      "name": "stage_b_r8",
+      "exit_code": 0,
+      "started_unix": 1790855863.4062371,
+      "finished_unix": 1790860002.6044,
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "completion_observation": "Successful torchrun zombie exit status and all rank receipts; scheduler was paused."
+    },
+    "stage_b_r8_extended.complete.json": {
+      "name": "stage_b_r8_extended",
+      "exit_code": 0,
+      "started_unix": 1790860002.8448799,
+      "finished_unix": 1790865467.6138732,
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "completion_observation": "Successful torchrun zombie exit status and all rank receipts; scheduler was paused."
+    }
+  },
+  "source_sha256": {
+    "status.json": "f25a379bd939eb203f3cf51246eb2772c71cfb2053f828f3c923bc4eca4d141c",
+    "extension_status.json": "bed7dba597b290304fdd4fe60cb61ffd6c851edeb27e932c61ce01139255b0ef",
+    "scheduling_pause.json": "cf6eef77a13cf1f5a7f780ff8bf27099a13468b871b9c84786b00f162a4b50f0",
+    "r4_device_change.json": "5bb11464442150a87d1d409718fef7e6a947af1f1997a428854b4cb358c9584f",
+    "profile_status.json": "ad6a4507eba44903e3d3dfe8226989aff8e93ae0b35ffbb8c0a5dd44c25cf7c2",
+    "completion_pipeline.json": "5543e179b04b94994775ac3a9f144e4f15a674936db6a565e24b048cdfbca27b",
+    "gpu_release_receipt.json": "e9579104b3be42d427d9aade6c0d05ed69ee0dcd1d84cd37b62ebc12e97477d7",
+    "cells_r8.json": "d41ad63a86168b6e517d35d3ac631078dcbd69dc60d19efd81a0b7a02f65f006",
+    "cells_r8_extended.json": "69e0b5fa345ee310e5688609fded267bb30bd1d6730db87fff735a3929561390",
+    "cells_r4.json": "78493e9564dbbf9f0177453a7ae523423b345b4e253707c3337591cd82bc6e9c",
+    "profile_cells.json": "0c13b6542a99922d30d87bc8bf1b5c665d23f64bf406e3240645d9dda5a2c75b"
+  },
+  "cell_manifests": {
+    "cells_r8.json": [
+      {
+        "name": "b8_C0_balanced_random",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b8_C1_hungarian_current",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_current"
+        }
+      },
+      {
+        "name": "b8_C2_hungarian_same_path",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      },
+      {
+        "name": "b4_C0_balanced_random",
+        "batch": 4,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b4_C1_hungarian_current",
+        "batch": 4,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_current"
+        }
+      },
+      {
+        "name": "b4_C2_hungarian_same_path",
+        "batch": 4,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      }
+    ],
+    "cells_r8_extended.json": [
+      {
+        "name": "b16_C0_balanced_random",
+        "batch": 16,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b16_C1_hungarian_current",
+        "batch": 16,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_current"
+        }
+      },
+      {
+        "name": "b16_C2_hungarian_same_path",
+        "batch": 16,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      },
+      {
+        "name": "b32_C0_balanced_random",
+        "batch": 32,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b32_C1_hungarian_current",
+        "batch": 32,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_current"
+        }
+      },
+      {
+        "name": "b32_C2_hungarian_same_path",
+        "batch": 32,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      }
+    ],
+    "cells_r4.json": [
+      {
+        "name": "b8_C0_balanced_random",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b8_C1_hungarian_current",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_current"
+        }
+      },
+      {
+        "name": "b8_C2_hungarian_same_path",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      }
+    ],
+    "profile_cells.json": [
+      {
+        "name": "b8_C0_balanced_random",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "random"
+        }
+      },
+      {
+        "name": "b8_C2_hungarian_same_path",
+        "batch": 8,
+        "config": {
+          "global_cache_ratio": 0.3,
+          "substitution_enabled": true,
+          "eviction": "coverage",
+          "same_layer_alpha": 0.25,
+          "path_eta": 0.5,
+          "seed": 42,
+          "admission": "hungarian_same_path"
+        }
+      }
+    ]
+  }
+}

@@ -29,7 +29,19 @@ def main():
                "This is a bounded five-repeat observation, not a significance or production-serving claim." if passed else
                "The prespecified C-policy E2E acceptance gate does not pass in both primary anchors. "
                "Do not claim a general communication-aware E2E speedup from this study.")
+    expanded = [r for r in comparisons if r["policy"] == "hungarian_same_path"
+                and int(r["world"]) == 8 and int(r["local_batch"]) in (16, 32)]
+    expanded_summary = "Owner-requested larger-batch results, C2 versus Random: " + "; ".join(
+        f"R8/B{r['local_batch']} median TPOT {100 * (1 / float(r['tpot_speedup']) - 1):+.2f}% "
+        f"and generation time {-100 * float(r['e2e_reduction']):+.2f}%"
+        for r in expanded) + ". Positive changes mean slower. These additional cells do not replace the original B8 acceptance anchors."
+    anchor_summary = "Primary anchor medians, C2 versus Random: " + "; ".join(
+        f"R{r['world']}/B8 TPOT {100 * (1 / float(r['tpot_speedup']) - 1):+.2f}% "
+        f"and generation time {-100 * float(r['e2e_reduction']):+.2f}%"
+        for r in anchors) + ". Positive changes mean slower; these are descriptive five-repeat medians."
     text = ["# Physical local/remote TPOT and E2E results", "", outcome, "",
+        anchor_summary, "",
+        *([expanded_summary, ""] if expanded else []),
         "Plan commit: `1a98d10ac17557e7a9112e12ad36d07fe5d5be27`. "
         "Measurement implementation: `e8458d4`. Raw evidence: "
         "`/home/hwlee/mgo-results/local_remote_e2e_impact_20261001`.", "",
@@ -113,7 +125,16 @@ def main():
             fractions = [r["remote_pair_fraction"] for r in selected]
             seconds = [r["moe_seconds_median"] * 1000 for r in selected]
             text.append(f"| R{world} | {event} | {selected[0]['active_experts']} | {min(fractions):.3f}–{max(fractions):.3f} | {min(seconds):.3f}–{max(seconds):.3f} |")
-    text += ["", "![Resident sensitivity](locality_sensitivity.png)", "",
+    spreads = {world: [] for world in (8, 4)}
+    for world in spreads:
+        for event in ("low", "median", "high"):
+            times = [r["moe_seconds_median"] for r in stage_a if r["world"] == world and r["event"] == event]
+            spreads[world].append(100 * (max(times) / min(times) - 1))
+    text += ["", "Across the five owner maps, within-event median latency spreads (max/min − 1) are "
+        f"{min(spreads[8]):.2f}–{max(spreads[8]):.2f}% at R8 and {min(spreads[4]):.2f}–{max(spreads[4]):.2f}% at R4. "
+        "The plotted fixed events do not show a uniform monotonic latency increase with remote fraction. "
+        "These bounded ranges must be read together with per-rank load redistribution and iteration variability.", "",
+        "![Resident sensitivity](locality_sensitivity.png)", "",
         "[Cell summaries](local_remote_sensitivity.csv) and [all iterations](local_remote_iterations.csv) "
         "publish achieved fractions, route-local fractions, loads, payload and timing. "
         "MoE wall times are uninstrumented. Separate diagnostic CUDA-event intervals around "

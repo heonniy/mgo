@@ -247,6 +247,12 @@ def summarize(root, output, partial=False):
                     assert run["physical_gpus"] == gpu_maps["4"]
             change = read(root / "r4_device_change.json")
             assert change["physical_gpus"] == gpu_maps["4"]
+            observations = read(root / "physical_device_observations.json")
+            for stage in ("stage_a_r4", "stage_b_r4"):
+                observed = observations[stage]
+                assert observed["status"] == "PASS"
+                assert [row["rank"] for row in observed["ranks"]] == list(range(4))
+                assert [row["physical_index"] for row in observed["ranks"]] == gpu_maps["4"]
         if extended and names == original_order:
             extension = read(root / "extension_status.json")
             pause = read(root / "scheduling_pause.json")
