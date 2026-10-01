@@ -1,0 +1,34 @@
+# Qwen3-30B-A3B-Base — smaller test target.
+# 48 layers x 128 experts x top-8, hidden=2048, moe_intermediate=768.
+# Expert weight ~9.4 MB; total experts ~58 GB (fits NUMA replication in 500 GB cgroup).
+parallel:
+  ep_size: 0   # auto = world_size
+
+model:
+  path: /home/work/hyewon.lee/model/Qwen3-30B-A3B-Base
+  arch: qwen3_moe
+
+offload:
+  # Per-rank suffix `_rank{N}` is appended by entry.py for NUMA-replicated load.
+  path: /home/work/hyewon.lee/cache/moe_offload_qwen3_30b
+  device_memory_ratio: 0.75
+  # host_memory_ratio: now ACTIVELY propagated to archer via
+  # MOE_INFINITY_HOST_MEMORY_RATIO env in distributed_engine._sync_archer_host_ratio_env
+  # (Round 3 fix, 2026-05-26). archer's _effective_host_capacity() additionally
+  # clamps to cgroup memory.max × 0.8 / world_size, so this knob sets the
+  # ratio_share ceiling. On this 988GB-per-NUMA box: 0.30 × 988 ≈ 296GB which
+  # comfortably contains the ~58GB model.
+  host_memory_ratio: 0.30
+
+  # cache_capacity_per_rank or sparse_hbm_ratio omitted → unlimited fallback
+  # (num_layers × num_experts = 6144 slots). _resolve_capacity hard-clips to
+  # HBM × 0.9 / per_expert_bytes; for 30B that's ~7660 slots so no clip fires.
+  # Full model fits in GPU cache → eviction rate = 0 after warmup.
+
+policies:
+  fetch_dispatch: naive
+  placement: naive_token_route
+
+instrumentation:
+  enabled: true
+  trace_path: /tmp/moe_ep_traces

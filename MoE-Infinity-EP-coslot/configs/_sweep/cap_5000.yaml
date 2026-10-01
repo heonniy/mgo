@@ -1,0 +1,18 @@
+execution:
+  enable_prefetch: false
+instrumentation:
+  enabled: true
+  trace_path: /tmp/moe_ep_traces
+model:
+  arch: qwen3_moe
+  path: /home/work/hyewon.lee/model/Qwen3-30B-A3B-Base
+offload:
+  cache_capacity_per_rank: 5000
+  device_memory_ratio: 0.75
+  host_memory_ratio: 0.05
+  path: /home/work/hyewon.lee/cache/moe_offload_qwen3_30b
+parallel:
+  ep_size: 0
+policies:
+  fetch_dispatch: naive
+  placement: naive_token_route

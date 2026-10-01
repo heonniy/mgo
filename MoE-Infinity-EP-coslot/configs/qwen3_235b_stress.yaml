@@ -1,0 +1,17 @@
+parallel:
+  ep_size: 0
+model:
+  path: /home/work/hyewon.lee/model/Qwen3-235B-A22B
+  arch: qwen3_moe
+offload:
+  path: /home/work/hyewon.lee/cache/moe_offload_qwen3_235b
+  device_memory_ratio: 0.75
+  host_memory_ratio: 0.05
+  sparse_hbm_ratio: 0.4
+  cache_capacity_per_rank: 16
+policies:
+  fetch_dispatch: naive
+  placement: naive_token_route
+instrumentation:
+  enabled: true
+  trace_path: /tmp/moe_ep_traces

@@ -1,0 +1,38 @@
+# Unified EP: every rank = one EP group of size world_size, each rank holds
+# its own batch shard. No separate DP slabs.
+# Qwen3-235B-A22B: 94 layers × 128 experts × top-8, hidden=4096, moe_intermediate=1536.
+# Expert weight ~36 MB; total ~433 GB → uses NUMA-shm host pool.
+parallel:
+  ep_size: 0   # 0 = auto = world_size
+
+model:
+  path: /home/work/hyewon.lee/model/Qwen3-235B-A22B
+  arch: qwen3_moe
+
+offload:
+  # Point at pre-existing offload cache to skip first-time 422GB write.
+  path: /home/work/hyewon.lee/cache/moe_offload_qwen3_235b
+  # cgroup memory.max ≈ 500GB on this host; host_memory_ratio is the
+  # archer host-cache budget per rank. With 2 ranks this must be << 0.25
+  # so the per-rank ratio_share doesn't dominate the cgroup. archer's
+  # _effective_host_capacity additionally clamps to cgroup × 0.8 / WS.
+  # host_memory_ratio is ACTIVELY propagated via MOE_INFINITY_HOST_MEMORY_RATIO
+  # (Round 3 fix 2026-05-26) — not inert.
+  device_memory_ratio: 0.75
+  host_memory_ratio: 0.05
+
+  # M11 fix (2026-05-27): explicit sparse_hbm_ratio.
+  # cache size = sparse_hbm_ratio × HBM (per-GPU); 0.9×HBM is a hard ceiling
+  # that must hold sparse-cache + dense + KV + workspace together.  On 4×H100
+  # 80GB, 235B dense is replicated per rank (~16 GB) + KV, so the sparse cache
+  # must leave that much headroom.  0.75 left only ~12 GB for dense+KV → OOM.
+  # 0.40 → ~32 GB sparse (≈ 906 expert slots), ~40 GB left for dense+KV+wks.
+  sparse_hbm_ratio: 0.4
+
+policies:
+  fetch_dispatch: naive
+  placement: naive_token_route
+
+instrumentation:
+  enabled: true
+  trace_path: /tmp/moe_ep_traces
