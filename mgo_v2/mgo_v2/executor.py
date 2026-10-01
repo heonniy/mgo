@@ -9,8 +9,9 @@ from .communicator import ReceivedBatch
 class LegacySlotExecutorAdapter:
     """Rank-local adapter for the controller-owned legacy C++ slot executor.
 
-    One torchrun process should expose exactly one CUDA device to this adapter.
-    The legacy C++ object then sees local GPU index 0.
+    One torchrun process should expose one logical local CUDA device to this
+    adapter. Multi-rank communication belongs to torch.distributed, not the
+    legacy RPC executor.
     """
 
     def __init__(
@@ -29,6 +30,7 @@ class LegacySlotExecutorAdapter:
         layer: int,
         batch: ReceivedBatch,
         plan: LocalExecPlan,
+        is_decode: bool,
     ) -> torch.Tensor:
         n = batch.hidden_states.shape[0]
         device = batch.hidden_states.device
@@ -49,11 +51,7 @@ class LegacySlotExecutorAdapter:
             weights.index_put_((rows, experts), vals, accumulate=True)
 
         self.dispatcher.set_inputs(
-            batch.hidden_states, mask, weights, True
+            batch.hidden_states, mask, weights, is_decode
         )
-        self.dispatcher.submit_plan(
-            0,
-            plan.hit_ops,
-            plan.miss_ops,
-        )
+        self.dispatcher.submit_plan(0, plan.hit_ops, plan.miss_ops)
         return self.dispatcher.wait_layer_done()
