@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from summarize_slot_trace import merge
+from summarize_local_remote_study import control_payload
 
 
 def duration(intervals):
@@ -113,10 +114,15 @@ def main():
         metrics = receipts[0]["metrics"]
         derived = metrics["remote_token_rank_pairs"] * (2048 * 2 + 88) + metrics["remote_expert_routes"] * (2048 * 2 + 16)
         assert submitted == derived
+        actual_control = sum(r["collectives"]["peer_payload_tx_bytes"]["router_metadata"] +
+                             r["collectives"]["peer_payload_tx_bytes"]["counts"] for r in receipts)
+        expected_control, _ = control_payload(8, 8, max(sum(r["prompt_tokens"]) for r in receipts))
+        assert actual_control == expected_control
         h2d = sum(r["expert_h2d_union_ms"] for r in records)
         overlap = sum(r["h2d_gemm_overlap_ms"] for r in records)
         rows.append(dict(world=8, local_batch=8, cell=cell, repeat=0,
             submitted_peer_payload_tx_bytes=submitted,
+            routing_and_count_tx_bytes=actual_control, all_submitted_peer_tx_bytes=submitted + actual_control,
             actual_expert_h2d_bytes=sum(r["actual_expert_h2d_bytes"] for r in records),
             logical_expert_h2d_bytes=sum(r["logical_expert_h2d_bytes"] for r in records),
             full_expert_d2d_bytes=sum(r["full_expert_d2d_bytes"] for r in records),

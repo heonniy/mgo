@@ -25,6 +25,16 @@ def payload(metrics):
             + metrics["remote_expert_routes"] * (2048 * 2 + 16))
 
 
+def control_payload(world, batch, prefill_max_rows, decode_steps=64):
+    # Per event: router IDs(int64), weights(BF16), probabilities(fp32),
+    # one scalar-count all-gather and two world-length count all-gathers.
+    peer_copies = world * (world - 1)
+    per_event_counts = 8 + 16 * world
+    decode = 48 * peer_copies * decode_steps * (batch * 592 + per_event_counts)
+    prefill = 48 * peer_copies * (prefill_max_rows * 592 + per_event_counts)
+    return prefill + decode, decode
+
+
 def summarize(root, output, partial=False):
     output.mkdir(parents=True, exist_ok=True)
     state = json.loads((root / "status.json").read_text())
@@ -88,14 +98,17 @@ def summarize(root, output, partial=False):
                     actual_payload = sum(sum(row["collectives"]["peer_payload_tx_bytes"].get(k, 0) for k in kinds)
                                          for row in profiled)
                     assert actual_payload == payload(cell["accounting"]), (world, cell["mode"], actual_payload)
-                    interval = max(sum(row["collectives"]["cuda_interval_ms"].get(k, 0) for k in kinds)
+                    count_bytes = sum(row["collectives"]["peer_payload_tx_bytes"].get("counts", 0) for row in profiled)
+                    assert count_bytes == 16 * world * world * (world - 1)
+                    interval = max(sum(row["collectives"]["cuda_interval_ms"].values())
                                    for row in profiled)
                     timings.append(maximum)
                     diagnostic_intervals.append(interval)
                     a_iterations.append(dict(world=world, event=cell["event"], mode=cell["mode"], iteration=iteration,
                         remote_pair_fraction=cell["accounting"]["remote_pair_fraction"],
                         moe_layer_seconds=maximum, diagnostic_nccl_interval_ms=interval,
-                        peer_payload_tx_bytes=actual_payload, expert_h2d_bytes=0))
+                        peer_payload_tx_bytes=actual_payload, all_submitted_peer_tx_bytes=actual_payload + count_bytes,
+                        expert_h2d_bytes=0))
                 counts = cell["accounting"]
                 a_rows.append(dict(world=world, event=cell["event"], mode=cell["mode"],
                     layer=cell["selection"]["layer"], active_experts=cell["selection"]["active"],
@@ -103,7 +116,8 @@ def summarize(root, output, partial=False):
                     route_local_fraction=counts["route_local_fraction"], local_pairs=counts["local_token_rank_pairs"],
                     remote_pairs=counts["remote_token_rank_pairs"], rank_token_cv=counts["rank_token_cv"],
                     rank_token_max_mean=counts["rank_token_max_mean"],
-                    peer_payload_tx_bytes=payload(counts), expert_h2d_bytes=0,
+                    peer_payload_tx_bytes=payload(counts),
+                    all_submitted_peer_tx_bytes=payload(counts) + 16 * world * world * (world - 1), expert_h2d_bytes=0,
                     moe_seconds_median=statistics.median(timings), moe_seconds_min=min(timings), moe_seconds_max=max(timings),
                     diagnostic_nccl_ms_median=statistics.median(diagnostic_intervals),
                     diagnostic_nccl_ms_min=min(diagnostic_intervals), diagnostic_nccl_ms_max=max(diagnostic_intervals)))
@@ -164,6 +178,7 @@ def summarize(root, output, partial=False):
                 assert first["global_max_step_seconds"] == max_steps
                 assert first["tpot_seconds"] == sum(max_steps[1:]) / 64
                 assert first["global_max_generation_seconds"] == max(row["rank_generation_seconds"] for row in records)
+                control, decode_control = control_payload(world, cell["batch"], max(sum(row["prompt_tokens"]) for row in records))
                 b_rows.append(dict(world=world, local_batch=cell["batch"], global_batch=world * cell["batch"],
                     policy=cell["config"]["admission"], cell=cell["name"], repeat=repeat,
                     ttft_seconds=first["ttft_seconds"], tpot_seconds=first["tpot_seconds"],
@@ -179,6 +194,8 @@ def summarize(root, output, partial=False):
                     local_pairs=metrics["local_token_rank_pairs"], remote_pairs=metrics["remote_token_rank_pairs"],
                     decode_remote_pair_fraction=decode["remote_token_rank_pairs"] / (decode["remote_token_rank_pairs"] + decode["local_token_rank_pairs"]),
                     decode_remote_pairs=decode["remote_token_rank_pairs"], peer_payload_tx_bytes=payload(metrics),
+                    routing_and_count_tx_bytes=control, all_submitted_peer_tx_bytes=payload(metrics) + control,
+                    decode_all_submitted_peer_tx_bytes=payload(decode) + decode_control,
                     decode_peer_payload_tx_bytes=payload(decode), rank_token_cv=metrics["mean_event_rank_token_cv"],
                     decode_rank_token_cv=decode["rank_token_cv_sum"] / decode["events"],
                     rank_token_max_mean=metrics["mean_event_rank_token_max_mean"]))
@@ -202,9 +219,12 @@ def summarize(root, output, partial=False):
         assert len(b_rows) == (75 if extended else 45) and len(a_rows) == 30
         assert len(rank_rows) == (540 if extended else 300)
         assert state["status"] == "TIMING_COMPLETE"
-        assert [run["name"] for run in state["runs"]] == ["stage_a_r8", "stage_b_r8", "stage_a_r4", "stage_b_r4"]
+        names = [run["name"] for run in state["runs"]]
+        original_order = ["stage_a_r8", "stage_b_r8", "stage_a_r4", "stage_b_r4"]
+        integrated_order = ["stage_a_r8", "stage_b_r8", "stage_b_r8_extended", "stage_a_r4", "stage_b_r4"]
+        assert names == original_order or (extended and names == integrated_order)
         assert all(run["exit_code"] == 0 for run in state["runs"])
-        if extended:
+        if extended and names == original_order:
             extension = read(root / "extension_status.json")
             pause = read(root / "scheduling_pause.json")
             assert extension["status"] == "PASS" and extension["exit_code"] == 0
@@ -222,6 +242,7 @@ def summarize(root, output, partial=False):
                  runtime_fingerprint=expected_fingerprint, extension_sha256=binding["extension_sha256"],
                  rank_receipts=len(rank_rows), completeness=completeness, source_sha256=evidence,
                  scopes={"peer_payload": "Submitted dispatch+native-order-return tensors, excludes routing/count collectives and wire overhead",
+                         "all_submitted_peer": "Dispatch+return plus router/count all-gather tensor copies; excludes wire overhead",
                          "h2d": "Physical dispatcher fetch accounting; actual trace observation is in profile_summary",
                          "stage_a": "Uninstrumented resident layer latency; separate CUDA-event diagnostic intervals include waits"})
     (output / "validation.json").write_text(json.dumps(audit, indent=2) + "\n")

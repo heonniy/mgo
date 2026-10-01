@@ -51,6 +51,11 @@ def main():
         "The owner-requested R8/B16 and B32 expansion uses 128 and 256 questions, respectively, "
         "and ran before the R4 jobs with identical policy coefficients and decode length. "
         "The original B8 acceptance anchors and preselected two profiles were retained.", "",
+        "W128 counts global routed-token rows, not decode steps. R8/B16 fills the window "
+        "with one decode event. At R8/B32, all 256 tokens execute but the rank-major history "
+        "retains only the last 128 rows (ranks 4–7) for gate-history scoring. This frozen "
+        "implementation behavior limits interpreting B32 as a uniform all-rank history experiment; "
+        "the window and row order were not retuned.", "",
         "[Execution binding](EXECUTION_BINDING.md) specifies selection, solver, timer and byte definitions. "
         "[Manifest](measurement_manifest.json) binds the inputs and implementation.", "",
         "## Stage B: all five repeats", "",
@@ -148,7 +153,9 @@ def main():
         "receipts pass. [Validation](validation.json) includes source receipt hashes and the "
         "runtime fingerprint; [profile transfer audit](profile_transfer_audit.json) binds observed H2D.", "",
         "Submitted peer bytes exclude self traffic, router/count all-gather metadata and wire "
-        "protocol overhead. Both full-generation and decode-only accounting are preserved. "
+        "protocol overhead. Supplementary `all_submitted_peer_tx_bytes` adds router/count "
+        "all-gather tensor copies and is independently checked against posthoc submission counters. "
+        "Both full-generation and decode-only accounting are preserved. "
         "The OS exposes only NUMA node 0: no physical remote-NUMA or PCIe-only conclusion follows. "
         "Two warmup calls and five sequential repeats do not remove all clock, allocator or "
         "temporal variability. The optional 128-step confirmation was not run; the primary "

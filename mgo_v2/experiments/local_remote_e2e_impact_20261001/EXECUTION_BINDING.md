@@ -70,6 +70,11 @@ protocol: dispatch = remote pairs × (2048×2 + 8 + 8×(8+2)); native-order retu
 remote effective expert routes × (2048×2 + 16). This excludes self traffic,
 router/count all-gather metadata and NCCL wire/protocol overhead. Diagnostic
 Stage-A CollectiveStats verifies this formula against actual submitted tensors.
+Supplementary `all_submitted_peer_tx_bytes` also includes routing/count
+all-gathers, derived from actual valid prompt lengths, model tensor dtypes,
+world size and decode length, and checked against posthoc CollectiveStats.
+Stage-A NCCL diagnostic intervals include the count exchanges as well as
+dispatch/return payload calls. None of these are wire-byte measurements.
 Logical H2D bytes are physical dispatcher fetches × 9 MiB; only posthoc traces
 are labeled actual observed H2D bytes. Controller time is per rank; report its
 max plus full per-rank evidence. Event CV is the unweighted event mean.
@@ -99,3 +104,14 @@ outer wait includes this scheduling pause; individual generation timers do not.
 `scheduling_pause.json` and `extension_status.json` preserve this transition.
 An independent fresh worker job supplies the same two-call warmup for the
 extension. Runtime source and compiled-binary fingerprints stay unchanged.
+
+W128 is a window of global routed-token rows, not 128 decode steps. In the
+rank-major gather order, R8/B16 contributes all 128 current decode rows, while
+R8/B32 contributes 256 and the history retains the last 128 (ranks 4–7).
+All 256 tokens still execute. This existing frozen history behavior is retained
+and disclosed; no batch-dependent history retuning or row reordering is made.
+
+For a fresh reproduction, `scripts/run_local_remote_study.py` now includes
+R8/B16 and B32 by default and schedules them before R4 directly, without a
+scheduling pause. `--dry-run` writes all three cell manifests and the job order
+without creating a CUDA context. Use a fresh output directory for new runs.

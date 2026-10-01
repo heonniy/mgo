@@ -17,6 +17,8 @@ def main():
     p.add_argument("--model", required=True)
     p.add_argument("--python", default=sys.executable)
     p.add_argument("--worlds", type=int, nargs="+", default=[8, 4])
+    p.add_argument("--r8-extra-batches", type=int, nargs="*", choices=[16, 32], default=[16, 32])
+    p.add_argument("--dry-run", action="store_true", help="write manifests and execution order without launching GPUs")
     args = p.parse_args()
     package = Path(__file__).resolve().parents[1]
     root, inputs = Path(args.root).resolve(), Path(args.inputs).resolve()
@@ -37,8 +39,21 @@ def main():
         jobs += [(world, f"stage_a_r{world}", "study_stage_a.py", ["--iterations", "20"]),
                  (world, f"stage_b_r{world}", "benchmark_model.py",
                   ["--cells", str(cell_path), "--steps", "65", "--repeats", "5"])]
+        if world == 8 and args.r8_extra_batches:
+            extra_cells = [dict(name=f"b{batch}_{name}", batch=batch, config=dict(base, admission=policy))
+                           for batch in sorted(set(args.r8_extra_batches)) for name, policy in policies]
+            extra_path = root / "cells_r8_extended.json"
+            extra_path.write_text(json.dumps(extra_cells, indent=2) + "\n")
+            jobs.append((8, "stage_b_r8_extended", "benchmark_model.py",
+                         ["--cells", str(extra_path), "--steps", "65", "--repeats", "5"]))
+    if args.dry_run:
+        plan = [dict(world=world, name=name, script=script, arguments=shared + extra) for world, name, script, extra in jobs]
+        (root / "launch_plan.json").write_text(json.dumps(plan, indent=2) + "\n")
+        print(json.dumps([job["name"] for job in plan]))
+        return
     state = dict(status="RUNNING", started_unix=time.time(), runs=[],
                  world_order=args.worlds, fixed_decode_steps=64, generated_tokens=65,
+                 r8_extra_batches=sorted(set(args.r8_extra_batches)),
                  same_support=64, same_alpha=.25, path_support=64, path_eta=.5,
                  plan_commit="1a98d10ac17557e7a9112e12ad36d07fe5d5be27",
                  source_hashes={str(path.relative_to(package)): hashlib.sha256(path.read_bytes()).hexdigest()
