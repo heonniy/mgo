@@ -135,12 +135,18 @@ class DistributedMoERuntime:
         self.metrics.total_gate_mass += float(weights.sum(dtype=np.float64))
         loads = np.zeros(self.controller.config.world_size, dtype=np.int64)
         for origin, routes in zip(gathered.routes.origin_ranks, plan.effective_token_routes):
-            destinations = {plan.owner_by_expert[e] for e in routes}
+            route_destinations = [plan.owner_by_expert[e] for e in routes]
+            local_routes = route_destinations.count(int(origin))
+            self.metrics.local_expert_routes += local_routes
+            self.metrics.remote_expert_routes += len(route_destinations) - local_routes
+            destinations = set(route_destinations)
             for dst in destinations:
                 loads[dst] += 1
                 self.metrics.remote_token_rank_pairs += dst != int(origin)
+                self.metrics.local_token_rank_pairs += dst == int(origin)
         if loads.sum():
             self.metrics.rank_token_cv_sum += float(loads.std() / loads.mean())
+            self.metrics.rank_token_max_mean_sum += float(loads.max() / loads.mean())
         incoming = {(layer, e) for e in plan.substitution.residual_exact_misses}
         self.metrics.reloads += len(incoming & self._fetched_keys)
         self._fetched_keys.update(incoming)

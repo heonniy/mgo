@@ -12,10 +12,14 @@ class ExpertMetrics:
     miss: int = 0
     fetches: int = 0
     remote_token_rank_pairs: int = 0
+    local_token_rank_pairs: int = 0
+    remote_expert_routes: int = 0
+    local_expert_routes: int = 0
     substituted_gate_mass: float = 0.0
     total_gate_mass: float = 0.0
     reloads: int = 0
     rank_token_cv_sum: float = 0.0
+    rank_token_max_mean_sum: float = 0.0
     events: int = 0
 
     def update_substitution(self, result: SubstitutionResult) -> None:
@@ -39,4 +43,10 @@ class ExpertMetrics:
         out.update(self.rates())
         out["substituted_gate_mass_fraction"] = self.substituted_gate_mass / max(self.total_gate_mass, 1e-30)
         out["mean_event_rank_token_cv"] = self.rank_token_cv_sum / max(self.events, 1)
+        out["mean_event_rank_token_max_mean"] = self.rank_token_max_mean_sum / max(self.events, 1)
+        pairs = self.local_token_rank_pairs + self.remote_token_rank_pairs
+        out["remote_pair_fraction"] = self.remote_token_rank_pairs / max(pairs, 1)
+        out["local_pair_fraction"] = self.local_token_rank_pairs / max(pairs, 1)
+        routes = self.local_expert_routes + self.remote_expert_routes
+        out["route_local_fraction"] = self.local_expert_routes / max(routes, 1)
         return out

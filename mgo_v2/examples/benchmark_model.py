@@ -197,6 +197,7 @@ def main():
                       "prefill": prefill,
                       "cache_stats": dispatcher.get_cache_stats().tolist(),
                       "fetch_modes": dispatcher.get_fetch_mode_counts().tolist(),
+                      "generated_token_ids": output.cpu().tolist(),
                       "host_fetch_bytes": dispatcher.get_cache_stats()[3].item() * cfg.hidden_size * cfg.moe_intermediate_size * 3 * 2,
                       "torch_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
                       "quality": {"correct": sum(row["correct"] for row in samples), "total": len(samples),

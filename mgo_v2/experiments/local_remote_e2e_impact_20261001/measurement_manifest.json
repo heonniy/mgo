@@ -1,0 +1,50 @@
+{
+  "status": "BOUND_BEFORE_TIMING",
+  "plan_commit": "1a98d10ac17557e7a9112e12ad36d07fe5d5be27",
+  "raw_root": "/home/hwlee/mgo-results/local_remote_e2e_impact_20261001",
+  "world_order": [
+    8,
+    4
+  ],
+  "repeats": 5,
+  "decode_steps": 64,
+  "forward_calls": 65,
+  "warmup_calls": 2,
+  "same_alpha": 0.25,
+  "path_eta": 0.5,
+  "affinity_verification": {
+    "same_layer": {
+      "support": 64,
+      "source": "/home/hwlee/sub-moe-results/hard_affinity_admission_20261001_r1/same_min64.bin",
+      "sha256": "051d6e3dce2ca1a87a7eb4138e9713445b45a28bf0af591cb85f7e994506a9fd",
+      "npz_equal": true
+    },
+    "path": {
+      "support": 64,
+      "source": "/home/hwlee/sub-moe-results/hard_affinity_admission_20261001_r1/path_min64.bin",
+      "sha256": "2692066b16eed8d2cb9d8cc5296891981a0b329b60c0a878d4c34710b12887bb",
+      "npz_equal": true
+    }
+  },
+  "input_hashes": {
+    "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733"
+  },
+  "profile_selection": {
+    "world": 8,
+    "local_batch": 8,
+    "policies": [
+      "C0_balanced_random",
+      "C2_hungarian_same_path"
+    ],
+    "repeat": 0
+  },
+  "optional_128_step_confirmation": false,
+  "extension_sha256": "c5efdf74c571dbc7906eca4aea1293f3f3349c9383377633bf777c471a9cd85a",
+  "reused_validation_sha256": {
+    "mgo_v2/results/server_20261001/correctness.json": "e5372fb9568de1d09d58481e0ef5bee683490398a2090e6936d38a15e8d05c5b",
+    "mgo_v2/results/server_20261001/nsight_r4.json": "3164ecb485ebf3a8f248f51a3e61356dba2d6e2dae8d04189753d04768725636",
+    "mgo_v2/results/server_20261001/nsight_r8.json": "7a6b211ea13b7c8ee7602f1bc713e1fdcdd7566330edad833319d7ad691c11fa"
+  }
+}
