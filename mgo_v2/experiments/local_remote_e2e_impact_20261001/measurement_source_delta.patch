@@ -1,0 +1,66 @@
+diff --git a/mgo_v2/examples/benchmark_model.py b/mgo_v2/examples/benchmark_model.py
+index 7e34aa5..e212a73 100644
+--- a/mgo_v2/examples/benchmark_model.py
++++ b/mgo_v2/examples/benchmark_model.py
+@@ -197,6 +197,7 @@ def main():
+                       "prefill": prefill,
+                       "cache_stats": dispatcher.get_cache_stats().tolist(),
+                       "fetch_modes": dispatcher.get_fetch_mode_counts().tolist(),
++                      "generated_token_ids": output.cpu().tolist(),
+                       "host_fetch_bytes": dispatcher.get_cache_stats()[3].item() * cfg.hidden_size * cfg.moe_intermediate_size * 3 * 2,
+                       "torch_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+                       "quality": {"correct": sum(row["correct"] for row in samples), "total": len(samples),
+diff --git a/mgo_v2/mgo_v2/metrics.py b/mgo_v2/mgo_v2/metrics.py
+index ab39c77..1ba960d 100644
+--- a/mgo_v2/mgo_v2/metrics.py
++++ b/mgo_v2/mgo_v2/metrics.py
+@@ -12,10 +12,14 @@ class ExpertMetrics:
+     miss: int = 0
+     fetches: int = 0
+     remote_token_rank_pairs: int = 0
++    local_token_rank_pairs: int = 0
++    remote_expert_routes: int = 0
++    local_expert_routes: int = 0
+     substituted_gate_mass: float = 0.0
+     total_gate_mass: float = 0.0
+     reloads: int = 0
+     rank_token_cv_sum: float = 0.0
++    rank_token_max_mean_sum: float = 0.0
+     events: int = 0
+ 
+     def update_substitution(self, result: SubstitutionResult) -> None:
+@@ -39,4 +43,10 @@ class ExpertMetrics:
+         out.update(self.rates())
+         out["substituted_gate_mass_fraction"] = self.substituted_gate_mass / max(self.total_gate_mass, 1e-30)
+         out["mean_event_rank_token_cv"] = self.rank_token_cv_sum / max(self.events, 1)
++        out["mean_event_rank_token_max_mean"] = self.rank_token_max_mean_sum / max(self.events, 1)
++        pairs = self.local_token_rank_pairs + self.remote_token_rank_pairs
++        out["remote_pair_fraction"] = self.remote_token_rank_pairs / max(pairs, 1)
++        out["local_pair_fraction"] = self.local_token_rank_pairs / max(pairs, 1)
++        routes = self.local_expert_routes + self.remote_expert_routes
++        out["route_local_fraction"] = self.local_expert_routes / max(routes, 1)
+         return out
+diff --git a/mgo_v2/mgo_v2/runtime.py b/mgo_v2/mgo_v2/runtime.py
+index f03bb8e..12cb3cb 100644
+--- a/mgo_v2/mgo_v2/runtime.py
++++ b/mgo_v2/mgo_v2/runtime.py
+@@ -135,12 +135,18 @@ class DistributedMoERuntime:
+         self.metrics.total_gate_mass += float(weights.sum(dtype=np.float64))
+         loads = np.zeros(self.controller.config.world_size, dtype=np.int64)
+         for origin, routes in zip(gathered.routes.origin_ranks, plan.effective_token_routes):
+-            destinations = {plan.owner_by_expert[e] for e in routes}
++            route_destinations = [plan.owner_by_expert[e] for e in routes]
++            local_routes = route_destinations.count(int(origin))
++            self.metrics.local_expert_routes += local_routes
++            self.metrics.remote_expert_routes += len(route_destinations) - local_routes
++            destinations = set(route_destinations)
+             for dst in destinations:
+                 loads[dst] += 1
+                 self.metrics.remote_token_rank_pairs += dst != int(origin)
++                self.metrics.local_token_rank_pairs += dst == int(origin)
+         if loads.sum():
+             self.metrics.rank_token_cv_sum += float(loads.std() / loads.mean())
++            self.metrics.rank_token_max_mean_sum += float(loads.max() / loads.mean())
+         incoming = {(layer, e) for e in plan.substitution.residual_exact_misses}
+         self.metrics.reloads += len(incoming & self._fetched_keys)
+         self._fetched_keys.update(incoming)

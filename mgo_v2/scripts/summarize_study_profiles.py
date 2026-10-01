@@ -82,6 +82,7 @@ def main():
                 row["all"].append((start, end))
     ranks = []
     for record in baseline_audit["cells"]:
+        assert record["large_h2d_copy_sizes"] == [9437184]
         label = f"mgo_cell:{record['rank']}:{record['cell']}:{record['repeat']}"
         measured = activity[label]
         start, end = windows[label]
@@ -106,9 +107,16 @@ def main():
     for cell in sorted({r["cell"] for r in ranks}):
         records = [r for r in ranks if r["cell"] == cell]
         assert len(records) == 8
+        receipts = [json.loads((Path(args.receipts) / f"{cell}-rep0-rank{rank}.json").read_text()) for rank in range(8)]
+        kinds = ("dispatch_hidden", "dispatch_metadata", "return_outputs", "return_metadata")
+        submitted = sum(sum(r["collectives"]["peer_payload_tx_bytes"].get(k, 0) for k in kinds) for r in receipts)
+        metrics = receipts[0]["metrics"]
+        derived = metrics["remote_token_rank_pairs"] * (2048 * 2 + 88) + metrics["remote_expert_routes"] * (2048 * 2 + 16)
+        assert submitted == derived
         h2d = sum(r["expert_h2d_union_ms"] for r in records)
         overlap = sum(r["h2d_gemm_overlap_ms"] for r in records)
         rows.append(dict(world=8, local_batch=8, cell=cell, repeat=0,
+            submitted_peer_payload_tx_bytes=submitted,
             actual_expert_h2d_bytes=sum(r["actual_expert_h2d_bytes"] for r in records),
             logical_expert_h2d_bytes=sum(r["logical_expert_h2d_bytes"] for r in records),
             full_expert_d2d_bytes=sum(r["full_expert_d2d_bytes"] for r in records),

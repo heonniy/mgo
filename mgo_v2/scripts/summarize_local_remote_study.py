@@ -54,11 +54,17 @@ def summarize(root, output, partial=False):
                 raise AssertionError(f"incomplete Stage A/R{world}")
         else:
             ranks = [read(p) for p in paths]
+            selected_events = read(directory / "selection.json")
+            assert selected_events["pool"] == 384
             for rank, receipt in enumerate(ranks):
                 assert receipt["status"] == "PASS" and receipt["rank"] == rank and receipt["world"] == world
                 assert receipt["counter_oracle_events"] == 432
+                assert receipt["checkpoint"] == binding["validated_checkpoint_identity"]
                 assert len(receipt["results"]) == 15
                 assert receipt["selections"] == ranks[0]["selections"]
+                assert receipt["selections"] == selected_events["events"]
+                event_path = directory / f"events-rank{rank}.pt"
+                evidence[str(event_path.relative_to(root))] = hashlib.sha256(event_path.read_bytes()).hexdigest()
                 for name, digest in receipt["source_hashes"].items():
                     assert digest == state["source_hashes"][name], name
             for index, cell in enumerate(ranks[0]["results"]):
@@ -174,6 +180,8 @@ def summarize(root, output, partial=False):
                 assert provenance["world"] == world and provenance["rank"] == rank
                 assert not provenance["instrumented"] and provenance["steps"] == 65 and provenance["repeats"] == 5
                 assert provenance["code_sha256"] == expected_fingerprint
+                assert provenance["checkpoint"] == binding["validated_checkpoint_identity"]
+                assert provenance["versions"] == binding["expected_versions"]
                 for input_path, digest in binding["input_hashes"].items():
                     key = {"screen_workload.json": "workload", "similarity.npy": "similarity", "affinity.npz": "affinity"}[Path(input_path).name]
                     assert provenance["input_sha256"][key] == digest
