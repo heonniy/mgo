@@ -16,6 +16,14 @@ from mgo_v2.types import LayerRoutes
 
 
 class TestSubstitution(unittest.TestCase):
+    def test_float32_similarity_threshold_is_inclusive(self):
+        sim = np.zeros((1, 3, 3), dtype=np.float32)
+        sim[0, 2, 0] = np.float32(.65)
+        cache = GlobalCacheState([2])
+        cache.place(0, (0, 0), 0, 0)
+        routes = LayerRoutes(0, np.array([0]), np.array([[2]]), np.array([[.1]], dtype=np.float32))
+        self.assertEqual(SubstitutionPolicy(sim).decide(routes, cache).source_to_target, {2: 0})
+
     def test_any_high_route_protects_whole_expert(self):
         sim = np.zeros((1, 4, 4), dtype=np.float32)
         sim[0, 2, 0] = 0.9

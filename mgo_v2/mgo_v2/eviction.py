@@ -25,6 +25,13 @@ class GateHistory:
         if probs.ndim != 2 or probs.shape[1] != self.num_experts:
             raise ValueError("probs must be [tokens, experts]")
         q = self.rows[layer]
+        if len(probs) >= self.window:
+            # Earlier rows cannot survive this event's W-token history.
+            latest = np.asarray(probs[-self.window:], dtype=np.float64)
+            q.clear()
+            q.extend(row.copy() for row in latest)
+            self.sums[layer] = latest.sum(axis=0)
+            return
         for row in probs:
             r = np.asarray(row, dtype=np.float64).copy()
             q.append(r)
@@ -34,18 +41,33 @@ class GateHistory:
 
     def score(self, layer: int, expert: int) -> float:
         n = max(1, len(self.rows[layer]))
-        return float(self.sums[layer, expert] / n)
+        # The trace packer computes a float64 mean and stores float32 scores.
+        # Match that rounding before ranking, so equal reference scores tie.
+        return float(np.float32(self.sums[layer, expert] / n))
 
 
 def _rank01(values: dict[ExpertKey, float]) -> dict[ExpertKey, float]:
+    denominator = 2 * max(1, len(values) - 1)
+    return {key: value / denominator for key, value in _midrank2(values).items()}
+
+
+def _midrank2(values: dict[ExpertKey, float]) -> dict[ExpertKey, int]:
     if not values:
         return {}
     keys = sorted(values, key=lambda k: (values[k], k))
     if len(keys) == 1:
-        return {keys[0]: 0.0}
-    out: dict[ExpertKey, float] = {}
-    for i, key in enumerate(keys):
-        out[key] = i / (len(keys) - 1)
+        return {keys[0]: 0}
+    out: dict[ExpertKey, int] = {}
+    i = 0
+    while i < len(keys):
+        j = i + 1
+        while j < len(keys) and values[keys[j]] == values[keys[i]]:
+            j += 1
+        # Preserve ties using the validated simulator's percentile midrank.
+        percentile = 2 * i + j - i - 1
+        for key in keys[i:j]:
+            out[key] = percentile
+        i = j
     return out
 
 
@@ -121,6 +143,9 @@ class DiversityEviction(EvictionPolicy):
         self.similarity_threshold = similarity_threshold
         self.lam = lam
         self.k_min = k_min
+        self.neighbors = similarity >= similarity_threshold
+        for layer in range(similarity.shape[0]):
+            np.fill_diagonal(self.neighbors[layer], True)
 
     def _represents(self, layer: int, resident: int, source: int) -> bool:
         return resident == source or (
@@ -132,20 +157,8 @@ class DiversityEviction(EvictionPolicy):
     ) -> int:
         layer, victim = key
         residents = sorted(cache.resident_layer(layer))
-        counts = np.zeros(self.similarity.shape[1], dtype=np.int32)
-        for source in range(self.similarity.shape[1]):
-            counts[source] = sum(
-                1 for resident in residents if self._represents(layer, resident, source)
-            )
-        damage = 0
-        for source in range(self.similarity.shape[1]):
-            before = max(0, self.k_min - int(counts[source]))
-            after_count = int(counts[source]) - int(
-                self._represents(layer, victim, source)
-            )
-            after = max(0, self.k_min - after_count)
-            damage += after - before
-        return int(damage)
+        counts = self.neighbors[layer][:, residents].sum(axis=1)
+        return int(np.count_nonzero(self.neighbors[layer, :, victim] & (counts <= self.k_min)))
 
     def choose(self, cache, rank, layer, pinned):
         cand = self.candidates(cache, rank, pinned)
@@ -153,9 +166,24 @@ class DiversityEviction(EvictionPolicy):
             raise RuntimeError(f"rank {rank}: no legal victim")
 
         gate = {k: self.history.score(k[0], k[1]) for k in cand}
-        damage = {k: float(self.coverage_damage(cache, k)) for k in cand}
-        gate_rank = _rank01(gate)
-        damage_rank = _rank01(damage)
+        # Compute global source coverage once per candidate layer, rather
+        # than rebuilding the same counts for every resident victim.
+        residents_by_layer = {}
+        for resident_layer, expert in cache.owner:
+            residents_by_layer.setdefault(resident_layer, []).append(expert)
+        damage = {}
+        for candidate_layer in {k[0] for k in cand}:
+            neighbors = self.neighbors[candidate_layer]
+            counts = neighbors[:, residents_by_layer[candidate_layer]].sum(axis=1)
+            losses = neighbors[counts <= self.k_min].sum(axis=0)
+            for key in cand:
+                if key[0] == candidate_layer:
+                    damage[key] = float(losses[key[1]])
+        # The common denominator cancels in argmin. Keep doubled integer
+        # numerators: normalized floats can break exact score ties by 1 ULP
+        # and choose a different victim before the LRU tie-break.
+        gate_rank = _midrank2(gate)
+        damage_rank = _midrank2(damage)
 
         return min(
             cand,

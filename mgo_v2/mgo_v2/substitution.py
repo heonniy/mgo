@@ -27,7 +27,9 @@ class SubstitutionPolicy:
             raise ValueError("similarity must be [layers, experts, experts]")
         self.similarity = similarity
         self.gate_threshold = gate_threshold
-        self.similarity_threshold = similarity_threshold
+        # The validated simulator stores both scores and its threshold as
+        # float32. Preserve an exact boundary value such as float32(.65).
+        self.similarity_threshold = float(np.asarray(similarity_threshold, dtype=similarity.dtype))
 
     def _best(self, layer: int, source: int, candidates: Iterable[int]) -> int | None:
         best = None

@@ -8,6 +8,7 @@
 #include "utils/cuda_utils.h"
 #include "utils/logger.h"
 #include "kernel/fused_moe_mlp.h"
+#include <c10/cuda/CUDAStream.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -373,6 +374,22 @@ MoEMLP::MoEMLP(int dtype, int expert_type) {
 }
 
 void MoEMLP::SetTensorsFromIds(const std::vector<std::uint32_t>& tensor_ids) {
+  // The controller pins all executing slots until this layer finishes. Bind
+  // their tensor views directly instead of copying a full expert on every hit.
+  const char* views = std::getenv("MOE_EP_SLOT_VIEWS");
+  const char* native = std::getenv("MOE_EP_NATIVE_NUMERICS");
+  if (views && views[0] == '1') {
+    TORCH_CHECK(native && native[0] == '1', "slot views require native numerics");
+    TORCH_CHECK(!param_set_ && tensor_ids.size() == 3, "invalid expert binding");
+    for (size_t i = 0; i < tensor_ids.size(); ++i) {
+      auto tensor = kTensorIndex->at(tensor_ids[i]).tensor;
+      TORCH_CHECK(tensor.is_cuda(), "expert is not bound to a CUDA slot");
+      param_[i].set_data(tensor);
+    }
+    param_init_ = true;
+    param_set_ = true;
+    return;
+  }
   std::vector<std::tuple<void*, int64_t>> tensor_ptrs;
   std::vector<std::vector<int64_t>> tensor_shapes;
   std::vector<std::vector<int64_t>> data_shapes;
@@ -435,8 +452,9 @@ void MoEMLP::SetTensorsFromIds(const std::vector<std::uint32_t>& tensor_ids) {
   for (size_t i = 0; i < tensor_ptrs.size(); i++) {
     auto [ptr, tensor_size] = tensor_ptrs[i];
     auto tensor_shape = tensor_shapes[i];
-    CUDA_CHECK(cudaMemcpy(param_[i].data_ptr(), ptr, tensor_size,
-                          cudaMemcpyDeviceToDevice));
+    CUDA_CHECK(cudaMemcpyAsync(param_[i].data_ptr(), ptr, tensor_size,
+                              cudaMemcpyDeviceToDevice,
+                              c10::cuda::getCurrentCUDAStream(device)));
   }
   param_set_ = true;
   // DLOG_FATAL(
@@ -449,20 +467,36 @@ torch::Tensor MoEMLP::forward(torch::Tensor hidden_states,
   int64_t batch_size = hidden_states.size(0);
   int64_t hdim = hidden_states.size(1);
 
-  DLOG_FATAL_IF(batch_size > kMaxTokens || batch_size <= 0,
+  const char* native = std::getenv("MOE_EP_NATIVE_NUMERICS");
+  const bool native_numerics = native && native[0] == '1';
+  DLOG_FATAL_IF((!native_numerics && batch_size > kMaxTokens) || batch_size <= 0,
                 "batch_size should be (0,", kMaxTokens, "] , but got",
                 batch_size);
 
   DLOG_FATAL_IF(param_set_ == false, "param_set_ should be true");
   DLOG_FATAL_IF(param_init_ == false, "param_init_ should be true");
 
+  // Native Qwen3 rounds gate, SiLU, up, product and down individually.
+  // The fused CUTLASS epilogue changes those BF16 rounding boundaries and
+  // can change routing several layers later even when final tokens agree.
+  if (native_numerics) {
+    auto& gate = param_[0];
+    auto& up = param_[expert_type_ == DEEPSEEK_MOE_DENSE_ACT_DENSE ? 1 : 2];
+    auto& down = param_[expert_type_ == DEEPSEEK_MOE_DENSE_ACT_DENSE ? 2 : 1];
+    auto output = torch::linear(torch::silu(torch::linear(hidden_states, gate)) *
+                                torch::linear(hidden_states, up), down);
+    param_set_ = false;
+    CUDA_CHECK(cudaStreamSynchronize(stream));
+    return output;
+  }
+
   auto& input_ = buffer_[0];
   auto& output_ = buffer_[1];
 
   // copy hidden_states to input_ using cudaMemcpy
-  cudaMemcpy(input_.data_ptr(), hidden_states.data_ptr(),
+  CUDA_CHECK(cudaMemcpyAsync(input_.data_ptr(), hidden_states.data_ptr(),
              hidden_states.numel() * hidden_states.element_size(),
-             cudaMemcpyDeviceToDevice);
+             cudaMemcpyDeviceToDevice, stream));
   // cudaStreamSynchronize(stream);
   // if (warmup_count_ == 0 && graph_mode_) {
   //   graph_.replay();

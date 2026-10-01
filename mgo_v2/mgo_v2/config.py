@@ -33,6 +33,17 @@ class RuntimeConfig:
     same_layer_alpha: float = 1.0
     path_eta: float = 0.5
     seed: int = 42
+    substitution_enabled: bool = True
+
+    def __post_init__(self):
+        if min(self.num_layers, self.num_experts, self.top_k, self.world_size, self.gate_window) <= 0:
+            raise ValueError("model dimensions, world size and gate window must be positive")
+        if self.top_k > self.num_experts:
+            raise ValueError("top_k exceeds num_experts")
+        if not 0 < self.global_cache_ratio <= 1:
+            raise ValueError("global_cache_ratio must be in (0, 1]")
+        if self.global_slots() < self.world_size:
+            raise ValueError("cache budget must provide at least one slot per rank")
 
     def total_experts(self) -> int:
         return self.num_layers * self.num_experts

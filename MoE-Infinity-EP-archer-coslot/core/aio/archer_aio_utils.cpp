@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cmath>
 #include <future>
+#include <cstdlib>
 #include "utils/logger.h"
 
 const size_t kBlockSize = 1 * 1024 * 1024;
@@ -14,7 +15,10 @@ const size_t kQueueDepth = std::thread::hardware_concurrency() /
                            4;  // set to 1/4 total number of cores in the system
 
 int ArcherOpenFile(const char* filename) {
-  const int flags = (O_RDWR | O_CREAT | O_DIRECT);
+  // Buffered reads can reuse the checkpoint page cache on virtual disks.
+  // H2D still reads the pinned host pool; this only changes disk loading.
+  const char* buffered = std::getenv("MOE_INFINITY_BUFFERED_IO");
+  const int flags = O_RDWR | O_CREAT | ((buffered && buffered[0] == '1') ? 0 : O_DIRECT);
   const int mode = 0660;
   const auto fd = open(filename, flags, mode);
   if (fd < 0) {

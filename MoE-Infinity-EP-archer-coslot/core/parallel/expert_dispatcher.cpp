@@ -67,12 +67,16 @@ ExpertDispatcher::ExpertDispatcher(int num_experts, int num_layers, int dtype,
       partial_seq_(kNumDevices(), 0),
       exec_queue_(kNumDevices()),
       h2d_streams_(kNumDevices(), nullptr),
+      inputs_ready_(kNumDevices(), nullptr),
+      outputs_ready_(kNumDevices(), nullptr),
       pending_(0) {
   main_thread_stop_flag_.store(false);
 
   // Per-GPU dedicated H2D streams (non-blocking so they overlap exec/NCCL).
   for (int i = 0; i < kNumDevices(); ++i) {
     cudaSetDevice(i);
+    CUDA_CHECK(cudaEventCreateWithFlags(&inputs_ready_[i], cudaEventDisableTiming));
+    CUDA_CHECK(cudaEventCreateWithFlags(&outputs_ready_[i], cudaEventDisableTiming));
     auto err =
         cudaStreamCreateWithFlags(&h2d_streams_[i], cudaStreamNonBlocking);
     if (err != cudaSuccess) {
@@ -164,6 +168,14 @@ ExpertDispatcher::~ExpertDispatcher() {
   for (auto& stream : h2d_streams_) {
     if (stream != nullptr) cudaStreamDestroy(stream);
   }
+  for (int g = 0; g < kNumDevices(); ++g) {
+    cudaSetDevice(g);
+    cudaEventDestroy(inputs_ready_[g]);
+    cudaEventDestroy(outputs_ready_[g]);
+    for (auto event : slot_last_compute_event_[g]) cudaEventDestroy(event);
+    delete modules_[g];
+    if (slot_pool_base_[g]) cudaFree(slot_pool_base_[g]);
+  }
 }
 
 void ExpertDispatcher::RegisterExpert(
@@ -195,8 +207,10 @@ void ExpertDispatcher::SetInputs(const torch::Tensor& hidden_states,
 // Slot pool — (cap + 1) fixed slots; index `cap` is the staging slot.
 // ===================================================================
 void ExpertDispatcher::InitSlotPool(int cap_per_gpu, int64_t expert_byte_size) {
+  TORCH_CHECK(cap_per_gpu > 0, "slot capacity must be positive");
   if (slot_pool_initialized_) {
-    DLOG_WARN("InitSlotPool called twice — ignoring");
+    TORCH_CHECK(cap_per_gpu == slot_cap_ && (expert_byte_size <= 0 || expert_byte_size == slot_expert_byte_size_),
+                "slot pool size changed; use reset_slot_pool at an experiment boundary");
     return;
   }
   if (expert_byte_size <= 0) {
@@ -249,6 +263,49 @@ void ExpertDispatcher::InitSlotPool(int cap_per_gpu, int64_t expert_byte_size) {
   slot_pool_initialized_ = true;
   DLOG_INFO("InitSlotPool: cap=", cap_per_gpu, " (+1 staging)",
             " expert_byte_size=", expert_byte_size);
+}
+
+void ExpertDispatcher::ResetSlotPool(int cap_per_gpu) {
+  TORCH_CHECK(cap_per_gpu > 0, "slot capacity must be positive");
+  TORCH_CHECK(pending_.load() == 0, "cannot reset an executing layer");
+  const int previous_device = at::cuda::current_device();
+  for (int g = 0; g < kNumDevices(); ++g) {
+    cudaSetDevice(g);
+    std::lock_guard<std::mutex> lock(sched_mutex_[g]);
+    TORCH_CHECK(!has_active_fetch_[g] && plan_queue_[g].empty() && partial_outputs_[g].empty(),
+                "drain all layer outputs before resetting slots");
+    CUDA_CHECK(cudaDeviceSynchronize());
+  }
+  // Nonresident tensor-index entries can still refer to an old slot too.
+  // Restore every expert's immutable host views before freeing the pool.
+  for (auto& per_expert : experts_) {
+    for (auto& en : per_expert) {
+      if (en && en->node && en->node->host_memory_ptr) {
+        auto node = en->node;
+        SetModuleMemoryFromCuda(node->tensor_ids, node->host_memory_ptr);
+        node->device_memory_ptr = nullptr;
+        node->device = CPU_DEVICE;
+      }
+    }
+  }
+  for (int g = 0; g < kNumDevices(); ++g) {
+    cudaSetDevice(g);
+    delete modules_[g];
+    modules_[g] = new MoEMLP(dtype_, expert_type_);
+    for (auto event : slot_last_compute_event_[g]) CUDA_CHECK(cudaEventDestroy(event));
+    slot_last_compute_event_[g].clear();
+    if (slot_pool_base_[g]) CUDA_CHECK(cudaFree(slot_pool_base_[g]));
+    slot_pool_base_[g] = nullptr;
+    snapshots_[g].clear();
+    cache_sizes_[g] = kTopologyHandle->GetSparseCacheLimit(CUDA_DEVICE(g));
+    expected_order_[g] = partial_seq_[g] = 0;
+    active_parked_[g] = 0;
+  }
+  slot_pool_initialized_ = false;
+  InitSlotPool(cap_per_gpu, slot_expert_byte_size_);
+  ResetCacheStats();
+  ResetPhaseTimes();
+  cudaSetDevice(previous_device);
 }
 
 // ===================================================================
@@ -372,6 +429,10 @@ void ExpertDispatcher::SubmitPlan(
   // acquire is ever removed/reordered, this store must move ABOVE the hit
   // PushExecTask loop (store pending_local before pushing any task).
   pending_.store(pending_local);
+  cache_visit_cnt_.fetch_add(pending_local, std::memory_order_relaxed);
+  // Snapshots and received activations belong to the caller's current
+  // stream, which need not be the CUDA default stream.
+  CUDA_CHECK(cudaEventRecord(inputs_ready_[gpu], c10::cuda::getCurrentCUDAStream(gpu)));
   CO_LOG("[SubmitPlan] gpu=%d num_hit=%zu num_miss=%zu pending=%d\n", gpu,
          hit_ops.size(), miss_ops.size(), pending_local);
 
@@ -420,7 +481,9 @@ void ExpertDispatcher::DoDirectFetch(int gpu, const PlanOp& op) {
   // alias the expert's torch tensors over the slot, then async H2D.
   node->device_memory_ptr = dst;
   node->device = CUDA_DEVICE(gpu);
-  experts_[op.expert][op.layer]->SetTensorsFromBlob(CUDA_DEVICE(gpu));
+  // ExpertNode::SetTensorsFromBlob only binds its unused legacy module;
+  // MoEMLP reads the tensor index. Rebind that index to the actual slot.
+  SetModuleCudaMemoryFromCPU(node->tensor_ids, dst, CUDA_DEVICE(gpu));
   CudaMemcpyAsync(dst, node->host_memory_ptr, node->byte_size,
                   cudaMemcpyHostToDevice, h2d_streams_[gpu]);
   if (node->fetch_event == nullptr) {
@@ -471,7 +534,7 @@ void ExpertDispatcher::CompleteStagingFetch(int gpu) {
                       slot_last_compute_event_[gpu][op.dst_slot], 0);
   node->device_memory_ptr = dst;
   node->device = CUDA_DEVICE(gpu);
-  experts_[op.expert][op.layer]->SetTensorsFromBlob(CUDA_DEVICE(gpu));
+  SetModuleCudaMemoryFromCPU(node->tensor_ids, dst, CUDA_DEVICE(gpu));
   CudaMemcpyAsync(dst, staging, node->byte_size, cudaMemcpyDeviceToDevice,
                   h2d_streams_[gpu]);
   if (node->fetch_event == nullptr) {
@@ -590,6 +653,9 @@ void ExpertDispatcher::GPUExecFunc(int gpu_id) {
     // weight_copy = slot->param_ D2D weight copy (per expert, ~expert_bytes).
     // Timed separately from the GEMM so "compute" is not inflated by the
     // per-expert weight movement (the two were previously conflated).
+    c10::cuda::CUDAStream torch_stream = c10::cuda::getStreamFromExternal(stream, gpu_id);
+    c10::cuda::CUDAStreamGuard guard(torch_stream);
+    CUDA_CHECK(cudaStreamWaitEvent(stream, inputs_ready_[gpu_id], 0));
     modules_[gpu_id]->SetTensorsFromIds(node->tensor_ids);
     auto _tw1 = std::chrono::steady_clock::now();
     weight_copy_us_.fetch_add(
@@ -600,9 +666,6 @@ void ExpertDispatcher::GPUExecFunc(int gpu_id) {
     // compute = the actual MoEMLP GEMM (forward internally cudaStreamSynchronizes
     // so this wall reflects the kernel + its sync).
     auto input = hidden_states_.index_select(0, task.token_idx).contiguous();
-    c10::cuda::CUDAStream torch_stream =
-        c10::cuda::getStreamFromExternal(stream, gpu_id);
-    c10::cuda::CUDAStreamGuard guard(torch_stream);
     auto output = modules_[gpu_id]->forward(input, stream);  // syncs `stream`
     auto _tc1 = std::chrono::steady_clock::now();
     compute_us_.fetch_add(
@@ -628,6 +691,7 @@ void ExpertDispatcher::GPUExecFunc(int gpu_id) {
 
     // Record this slot's compute event so a staging D2D reusing it waits.
     cudaEventRecord(slot_last_compute_event_[gpu_id][task.slot], stream);
+    CUDA_CHECK(cudaEventRecord(outputs_ready_[gpu_id], stream));
 
     {
       std::lock_guard<std::mutex> lk(sched_mutex_[gpu_id]);
@@ -657,12 +721,15 @@ void ExpertDispatcher::GPUExecFunc(int gpu_id) {
 // ===================================================================
 // WaitLayerDone + combine_partials (revision.md §7)
 // ===================================================================
-torch::Tensor ExpertDispatcher::WaitLayerDone() {
+void ExpertDispatcher::WaitForLayer() {
   {
     std::unique_lock<std::mutex> lk(pending_mutex_);
     pending_cv_.wait(lk, [&] { return pending_.load() == 0; });
   }
   int gpu = at::cuda::current_device();
+  // CPU pending==0 is not a CUDA stream dependency. The final fp32 copy
+  // is asynchronous even though forward() synchronized its GEMMs.
+  CUDA_CHECK(cudaStreamWaitEvent(c10::cuda::getCurrentCUDAStream(gpu), outputs_ready_[gpu], 0));
   // pending==0 ⇒ no in-flight fetch (every expert pushed + computed).
   {
     std::lock_guard<std::mutex> lk(sched_mutex_[gpu]);
@@ -672,7 +739,28 @@ torch::Tensor ExpertDispatcher::WaitLayerDone() {
                  plan_queue_[gpu].size(), " — scheduler bug");
     }
   }
-  return CombinePartials(gpu);
+}
+
+torch::Tensor ExpertDispatcher::WaitLayerDone() {
+  WaitForLayer();
+  return CombinePartials(at::cuda::current_device());
+}
+
+std::vector<std::tuple<int, torch::Tensor, torch::Tensor>> ExpertDispatcher::WaitLayerPartials() {
+  WaitForLayer();
+  int gpu = at::cuda::current_device();
+  std::vector<Partial> parts;
+  {
+    std::lock_guard<std::mutex> lk(sched_mutex_[gpu]);
+    parts.swap(partial_outputs_[gpu]);
+  }
+  std::vector<std::tuple<int, torch::Tensor, torch::Tensor>> result;
+  auto dtype = hidden_states_.scalar_type();
+  for (auto& p : parts) {
+    auto weighted = p.output.to(dtype) * p.weights.to(dtype).unsqueeze(1);
+    result.emplace_back(p.expert, p.token_idx, weighted);
+  }
+  return result;
 }
 
 torch::Tensor ExpertDispatcher::CombinePartials(int gpu) {
@@ -754,6 +842,28 @@ std::vector<std::pair<int, int>> ExpertDispatcher::GetCachedExperts(
   result.reserve(cached_experts_[gpu_id].size());
   for (auto key : cached_experts_[gpu_id]) {
     result.emplace_back((int)(key >> 32), (int)(key & 0xFFFFFFFF));
+  }
+  return result;
+}
+
+std::vector<std::tuple<int, int, int>> ExpertDispatcher::GetCachedSlots(int gpu_id) {
+  TORCH_CHECK(gpu_id >= 0 && gpu_id < (int)slot_to_key_.size(), "invalid GPU index");
+  std::lock_guard<std::mutex> lock(sched_mutex_[gpu_id]);
+  std::vector<std::tuple<int, int, int>> result;
+  for (int slot = 0; slot < slot_cap_; ++slot) {
+    auto key = slot_to_key_[gpu_id][slot];
+    if (key == kSlotEmpty) continue;
+    const int layer = (int)(key >> 32), expert = (int)(key & 0xFFFFFFFF);
+    auto node = experts_[expert][layer]->node;
+    int64_t offset = 0;
+    for (auto tid : node->tensor_ids) {
+      auto& entry = kTensorIndex->at(tid);
+      TORCH_CHECK(entry.tensor.is_cuda() && entry.tensor.get_device() == gpu_id &&
+                    entry.tensor.data_ptr() == static_cast<char*>(slot_device_ptr_[gpu_id][slot]) + offset,
+                  "resident expert tensor does not reference its physical slot");
+      offset += (entry.size + kAioAlignment - 1) & ~(kAioAlignment - 1);
+    }
+    result.emplace_back(layer, expert, slot);
   }
   return result;
 }

@@ -202,10 +202,13 @@ class HungarianAdmission(AdmissionPolicy):
 
         token_sources = _token_sources(ctx)
         base = _base_destinations(ctx)
-        cost = np.zeros((len(incoming), len(slots)), dtype=np.float64)
+        # Quota slots on the same rank have identical costs. Evaluate each
+        # expert/rank pair once, then expand to the assignment matrix.
+        rank_cost = np.zeros((len(incoming), ctx.world_size), dtype=np.float64)
         for i, e in enumerate(incoming):
-            for j, r in enumerate(slots):
-                cost[i, j] = self._cost(ctx, e, r, token_sources, base)
+            for r in range(ctx.world_size):
+                rank_cost[i, r] = self._cost(ctx, e, r, token_sources, base)
+        cost = rank_cost[:, slots]
 
         rows, cols = linear_sum_assignment(cost)
         out = {incoming[i]: slots[j] for i, j in zip(rows.tolist(), cols.tolist())}
@@ -223,22 +226,40 @@ class SwapRefinedAdmission(AdmissionPolicy):
         base_result = self.seed_policy.place(ctx)
         assign = dict(base_result.expert_to_rank)
         experts = sorted(assign)
-        current = exact_remote_pairs(ctx, assign)
+        owners = dict(ctx.preowned)
+        owners.update(assign)
+        # A swap changes only two destination counts on tokens that route to
+        # exactly one of its experts. Keep integer counts to evaluate the same
+        # objective without rebuilding every token's destination set per trial.
+        counts = np.zeros((len(ctx.effective_token_routes), ctx.world_size), dtype=np.int32)
+        for t, routes in enumerate(ctx.effective_token_routes):
+            for expert in routes:
+                counts[t, owners[expert]] += 1
+        presence = np.zeros((len(experts), len(ctx.effective_token_routes)), dtype=bool)
+        sources = _token_sources(ctx)
+        for i, expert in enumerate(experts):
+            presence[i, sources[expert]] = True
 
         for _ in range(self.max_passes):
             improved = False
             for i, a in enumerate(experts):
-                for b in experts[i + 1 :]:
+                for j in range(i + 1, len(experts)):
+                    b = experts[j]
                     ra, rb = assign[a], assign[b]
                     if ra == rb:
                         continue
-                    assign[a], assign[b] = rb, ra
-                    value = exact_remote_pairs(ctx, assign)
-                    if value < current:
-                        current = value
+                    tokens = np.flatnonzero(presence[i] != presence[j])
+                    delta = np.where(presence[i, tokens], 1, -1)
+                    ca, cb = counts[tokens, ra], counts[tokens, rb]
+                    remote_a = ctx.origin_ranks[tokens] != ra
+                    remote_b = ctx.origin_ranks[tokens] != rb
+                    before = np.count_nonzero((ca > 0) & remote_a) + np.count_nonzero((cb > 0) & remote_b)
+                    after = np.count_nonzero((ca - delta > 0) & remote_a) + np.count_nonzero((cb + delta > 0) & remote_b)
+                    if after < before:
+                        assign[a], assign[b] = rb, ra
+                        counts[tokens, ra] -= delta
+                        counts[tokens, rb] += delta
                         improved = True
-                    else:
-                        assign[a], assign[b] = ra, rb
             if not improved:
                 break
 

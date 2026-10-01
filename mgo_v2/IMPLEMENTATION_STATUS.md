@@ -31,7 +31,15 @@
 - Archer autonomous sparse eviction;
 - RPC expert dispatch.
 
-## Must be validated on the current server before paper timing
+## Current-server validation
+
+The H100 server now builds and runs the isolated `_store` data plane. Native
+full-model R1/R4/R8 parity at 10% cache, physical tensor-address/fetch audits,
+policy replay, empty-rank/custom-stream fixtures and direct slot views pass.
+See [SERVER_VALIDATION_RESULTS.md](SERVER_VALIDATION_RESULTS.md) for exact scope,
+raw receipts and measurement status.
+
+The following gates govern paper timing:
 
 1. build the legacy extension and run exact EP parity;
 2. validate per-rank slot capacity and cache-state parity;
@@ -41,12 +49,12 @@
 6. remove the resident-slot -> MoEMLP parameter D2D copy on every hit;
 7. only then collect real H2D / NVSwitch / end-to-end latency tables.
 
-## Why the D2D copy is not patched blindly here
+## Direct-slot execution
 
-The current C++ MoEMLP owns reusable parameter tensors and copies slot data
-into them before every GEMM. Converting those tensors into direct views of
-slot memory changes lifetime/aliasing assumptions in the CUDA extension.
-That change needs compile + CUDA correctness testing on the target H100
-server. mgo_v2 isolates the issue and records it as the final low-level
-performance blocker rather than silently changing CUDA ownership semantics
-without a runnable server.
+The tensor index now points at the actual CUDA slot. Native execution uses
+those views until the controller's pinned event finishes; CUDA events protect
+reuse and return-stream access. An explicit drained reset restores host views
+before freeing/resizing the pool. Nsight confirms zero expert-sized D2D copies
+in direct-view mode and H2D bytes equal logical misses. Copy mode remains an
+explicit profiling baseline. Final model timing and quality qualifications
+belong to the source-backed validation report, not to a microbenchmark claim.

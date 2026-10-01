@@ -34,6 +34,22 @@ class GlobalExpertController:
         affinity: AffinityTables | None = None,
     ):
         self.config = config
+        if similarity.shape != (config.num_layers, config.num_experts, config.num_experts):
+            raise ValueError("similarity dimensions do not match the model")
+        if not np.isfinite(similarity).all():
+            raise ValueError("similarity contains nonfinite values")
+        needs_same = config.admission in {"hungarian_same", "hungarian_same_path", "hungarian_swap"}
+        needs_path = config.admission in {"greedy_path", "hungarian_same_path", "hungarian_swap"}
+        if needs_same and (affinity is None or affinity.same_layer is None):
+            raise ValueError(f"{config.admission} requires same_layer affinity")
+        if needs_path and (affinity is None or affinity.path is None):
+            raise ValueError(f"{config.admission} requires path affinity")
+        if affinity is not None:
+            for name, table, layers in (("same_layer", affinity.same_layer, config.num_layers),
+                                        ("path", affinity.path, config.num_layers - 1)):
+                if table is not None and (table.shape != (layers, config.num_experts, config.num_experts)
+                                          or not np.isfinite(table).all()):
+                    raise ValueError(f"invalid {name} affinity dimensions or nonfinite values")
         self.similarity = similarity
         self.affinity = affinity
         self.cache = GlobalCacheState(config.per_rank_slots())
@@ -42,7 +58,7 @@ class GlobalExpertController:
         )
         self.substitution = SubstitutionPolicy(
             similarity,
-            gate_threshold=config.gate_protect_threshold,
+            gate_threshold=config.gate_protect_threshold if config.substitution_enabled else 0.0,
             similarity_threshold=config.similarity_threshold,
         )
         self.eviction = self._build_eviction()
@@ -132,6 +148,18 @@ class GlobalExpertController:
         }
         # Existing executing experts must not be evicted by same-event misses.
         pinned = {(routes.layer, e) for e in execution_experts if e in preowned}
+
+        # Reject an impossible event before modifying logical residency. Hard
+        # quotas and pinned execution experts must never cause partial plans.
+        for rank, quota in enumerate(admission.quotas):
+            available = self.cache.ranks[rank].capacity - sum(
+                self.cache.owner_of(key) == rank for key in pinned
+            )
+            if quota > available:
+                raise RuntimeError(
+                    f"rank {rank}: admission quota {quota} exceeds {available} unpinned slots; "
+                    "increase cache capacity or reduce the event token batch"
+                )
 
         # Existing hits first.
         for e, rank in sorted(preowned.items()):

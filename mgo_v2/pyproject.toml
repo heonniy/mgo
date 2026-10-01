@@ -12,6 +12,9 @@ dependencies = [
   "torch>=2.2",
 ]
 
+[project.optional-dependencies]
+qwen3 = ["transformers>=4.51,<5", "accelerate", "safetensors"]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["mgo_v2*"]

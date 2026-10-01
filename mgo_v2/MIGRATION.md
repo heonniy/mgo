@@ -63,21 +63,18 @@ It should be treated as **rank-local**: one torchrun process per GPU. The
 legacy one-process/multiple-GPU scheduler has shared state such as
 `hidden_states_` and `pending_`, which is not the desired R4/R8 runtime.
 
-## Performance blocker before final timing
+## Slot binding and weight movement
 
-The current C++ worker copies an expert from the resident slot into the
-MoEMLP parameter buffer on every execution via `SetTensorsFromIds`.
-That adds an expert-sized D2D weight copy even on cache hits.
+Server validation exposed a deeper issue in the original worker: slot fetches
+updated an unused legacy expert module but left the tensor index on CPU.
+`SetTensorsFromIds` consequently read host weights again on every execution.
+The current fetch path binds that index to the actual CUDA slot, and native
+MoEMLP reads direct slot views. Copy mode remains an explicit diagnostic.
 
-Do not use final latency/speedup tables until this is removed or measured and
-shown negligible. Preferred fix:
-
-- bind GEMM parameter tensor views directly to the resident slot memory; or
-- maintain slot-local parameter views and change them only when slot ownership
-  changes.
-
-This optimization should be made only after exact-EP/controller correctness is
-validated on the target server.
+R1/R4/R8 exact-model and physical-address audits pass with direct views.
+Nsight confirms that expert H2D equals logical misses and that expert-sized
+D2D is zero. See SERVER_VALIDATION_RESULTS.md for receipts and scope; this
+removal alone is not an end-to-end speedup claim.
 
 ## Prefetch
 

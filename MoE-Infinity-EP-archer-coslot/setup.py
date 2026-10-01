@@ -175,19 +175,21 @@ if cuda_available:
         )
     )
 
-    # _engine extension: compute kernels (needs CUTLASS)
-    ext_modules.append(
-        cpp_extension.CUDAExtension(
-            name="moe_infinity._engine",
-            sources=_ENGINE_SOURCES,
-            include_dirs=COMMON_INCLUDE_PATHS,
-            extra_compile_args={
-                "nvcc": COMMON_NVCC_ARGS
-                + _cuda_arch_flags
-                + ["-DBF16_AVAILABLE"],
-            },
+    # The controller-owned slot runtime only needs _store. Avoid building
+    # unrelated legacy kernels when bringing up that data plane.
+    if os.environ.get("MOE_BUILD_STORE_ONLY", "0") != "1":
+        ext_modules.append(
+            cpp_extension.CUDAExtension(
+                name="moe_infinity._engine",
+                sources=_ENGINE_SOURCES,
+                include_dirs=COMMON_INCLUDE_PATHS,
+                extra_compile_args={
+                    "nvcc": COMMON_NVCC_ARGS
+                    + _cuda_arch_flags
+                    + ["-DBF16_AVAILABLE"],
+                },
+            )
         )
-    )
 
 cmdclass = {
     "build_ext": cpp_extension.BuildExtension.with_options(use_ninja=True)

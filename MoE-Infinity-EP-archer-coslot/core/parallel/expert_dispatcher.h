@@ -97,6 +97,8 @@ class ExpertDispatcher : public base::noncopyable {
 
   // ---- slot pool: (cap_per_gpu + 1) slots; index cap is the staging slot. ----
   void InitSlotPool(int cap_per_gpu, int64_t expert_byte_size);
+  // Explicit experiment boundary, called with a fresh empty Python controller.
+  void ResetSlotPool(int cap_per_gpu);
 
   // ---- controller-owned execution entry points ----
   // hit_ops:  (layer, expert, slot)
@@ -106,9 +108,11 @@ class ExpertDispatcher : public base::noncopyable {
       const std::vector<std::tuple<int, int, int>>& hit_ops,
       const std::vector<std::tuple<int, int, int, int, int, int>>& miss_ops);
   torch::Tensor WaitLayerDone();
+  std::vector<std::tuple<int, torch::Tensor, torch::Tensor>> WaitLayerPartials();
 
   // ---- introspection / stats (kept) ----
   std::vector<std::pair<int, int>> GetCachedExperts(int gpu_id);
+  std::vector<std::tuple<int, int, int>> GetCachedSlots(int gpu_id);
   void ClearExpertCacheCounts();
   torch::Tensor GetCacheStats();
   void ResetCacheStats();
@@ -122,6 +126,7 @@ class ExpertDispatcher : public base::noncopyable {
   torch::Tensor GetFetchModeCounts();
 
  private:
+  void WaitForLayer();
   // scheduler (revision.md §3-4) — all under sched_mutex_[gpu].
   void StartNextFetch(int gpu);
   void DoDirectFetch(int gpu, const PlanOp& op);
@@ -188,6 +193,8 @@ class ExpertDispatcher : public base::noncopyable {
   std::vector<ThreadSafeQueue<ExecTask>> exec_queue_;
   std::vector<cudaStream_t> exec_streams_;   // one per gpu (worker's stream)
   std::vector<cudaStream_t> h2d_streams_;
+  std::vector<cudaEvent_t> inputs_ready_;
+  std::vector<cudaEvent_t> outputs_ready_;
 
   // pending / layer-done sync
   std::atomic<int> pending_;

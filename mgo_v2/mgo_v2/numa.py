@@ -57,7 +57,12 @@ def gpu_numa_node(physical_gpu_index: int) -> int:
     for base in candidates:
         p = base / "numa_node"
         if p.exists():
-            return int(p.read_text().strip())
+            node = int(p.read_text().strip())
+            if node >= 0:
+                return node
+    nodes = list(Path("/sys/devices/system/node").glob("node[0-9]*"))
+    if len(nodes) == 1:
+        return int(nodes[0].name[4:])
     return -1
 
 

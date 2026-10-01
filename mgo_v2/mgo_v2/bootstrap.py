@@ -61,7 +61,13 @@ def _numa_node(selector: str) -> int | None:
         p = Path("/sys/bus/pci/devices") / bdf / "numa_node"
         if p.exists():
             value = int(p.read_text().strip())
-            return value if value >= 0 else None
+            if value >= 0:
+                return value
+    # Virtualized hosts may expose GPU PCI NUMA=-1 while the OS has exactly
+    # one memory node. There is no locality ambiguity in that case.
+    nodes = list(Path("/sys/devices/system/node").glob("node[0-9]*"))
+    if len(nodes) == 1:
+        return int(nodes[0].name[4:])
     return None
 
 
@@ -69,8 +75,11 @@ def _apply_numa(node: int, strict: bool) -> str:
     try:
         lib = ctypes.CDLL("libnuma.so.1", use_errno=True)
         if lib.numa_available() < 0:
+            if strict:
+                raise RuntimeError("libnuma is unavailable")
             return "libnuma-unavailable"
-        lib.numa_run_on_node(ctypes.c_int(node))
+        if lib.numa_run_on_node(ctypes.c_int(node)) != 0:
+            raise OSError(ctypes.get_errno(), "NUMA CPU binding failed")
 
         if strict and hasattr(lib, "numa_allocate_nodemask"):
             lib.numa_allocate_nodemask.restype = ctypes.c_void_p
@@ -81,11 +90,23 @@ def _apply_numa(node: int, strict: bool) -> str:
                 lib.numa_bitmask_setbit(mask, node)
                 if hasattr(lib, "numa_set_strict"):
                     lib.numa_set_strict(ctypes.c_int(1))
+                # numa_set_membind returns void and only prints failures.
+                # Verify the kernel policy instead of claiming strict bind.
                 lib.numa_set_membind(mask)
                 if hasattr(lib, "numa_bitmask_free"):
                     lib.numa_bitmask_free.argtypes = [ctypes.c_void_p]
                     lib.numa_bitmask_free(mask)
+                mode = ctypes.c_int()
+                bits = (ctypes.c_ulong * ((node // 64) + 1))()
+                lib.get_mempolicy.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_void_p,
+                                             ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong]
+                ret = lib.get_mempolicy(ctypes.byref(mode), bits, len(bits) * 64, None, 0)
+                if ret != 0 or mode.value != 2 or not (bits[node // 64] & (1 << (node % 64))):
+                    raise RuntimeError("kernel did not apply strict NUMA memory binding")
                 return "membind-strict"
+
+        if strict:
+            raise RuntimeError("cannot allocate a strict NUMA nodemask")
 
         if hasattr(lib, "numa_set_preferred"):
             lib.numa_set_preferred.argtypes = [ctypes.c_int]
@@ -93,6 +114,8 @@ def _apply_numa(node: int, strict: bool) -> str:
             return "preferred"
         return "cpu-affinity-only"
     except Exception as exc:
+        if strict:
+            raise RuntimeError(f"strict NUMA binding failed for node {node}") from exc
         return f"numa-failed:{exc!r}"
 
 
@@ -103,6 +126,9 @@ def pin_rank_before_cuda_import(strict_numa: bool | None = None) -> dict:
     # Must happen before importing torch/moe_infinity in the caller.
     os.environ["CUDA_VISIBLE_DEVICES"] = selector
     os.environ.setdefault("MOE_EP_DISABLE_ARCHER_EVICT", "1")
+    os.environ.setdefault("MOE_EP_NATIVE_NUMERICS", "1")
+    if os.environ["MOE_EP_NATIVE_NUMERICS"] == "1":
+        os.environ.setdefault("MOE_EP_SLOT_VIEWS", "1")
     os.environ.setdefault("NCCL_P2P_DISABLE", "0")
     os.environ.setdefault("OMP_NUM_THREADS", "8")
 
@@ -113,6 +139,8 @@ def pin_rank_before_cuda_import(strict_numa: bool | None = None) -> dict:
     if node is not None:
         os.environ["MGO_V2_NUMA_NODE"] = str(node)
         policy = _apply_numa(node, strict_numa)
+    elif strict_numa:
+        raise RuntimeError("GPU NUMA locality is unknown; cannot enforce strict binding")
 
     return {
         "local_rank": local_rank,

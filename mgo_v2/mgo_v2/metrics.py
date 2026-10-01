@@ -12,6 +12,11 @@ class ExpertMetrics:
     miss: int = 0
     fetches: int = 0
     remote_token_rank_pairs: int = 0
+    substituted_gate_mass: float = 0.0
+    total_gate_mass: float = 0.0
+    reloads: int = 0
+    rank_token_cv_sum: float = 0.0
+    events: int = 0
 
     def update_substitution(self, result: SubstitutionResult) -> None:
         self.hit += len(result.exact_hits)
@@ -32,4 +37,6 @@ class ExpertMetrics:
     def to_dict(self):
         out = asdict(self)
         out.update(self.rates())
+        out["substituted_gate_mass_fraction"] = self.substituted_gate_mass / max(self.total_gate_mass, 1e-30)
+        out["mean_event_rank_token_cv"] = self.rank_token_cv_sum / max(self.events, 1)
         return out

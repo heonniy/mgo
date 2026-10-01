@@ -117,13 +117,18 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
            "Block until every submitted expert's GEMM is done, combine all "
            "partials once into final_local [K_recv, H] (fp32 accumulate → "
            "model dtype) and return it.")
+      .def("wait_layer_partials", &ExpertDispatcher::WaitLayerPartials,
+           "Return (expert, token_indices, weighted outputs) for native-order combine at the origin rank.")
       .def("get_cached_experts", &ExpertDispatcher::GetCachedExperts,
            py::arg("gpu_id"),
            "Snapshot of currently cached (layer, expert) pairs on a GPU.")
+      .def("get_cached_slots", &ExpertDispatcher::GetCachedSlots, py::arg("gpu_id"),
+           "Snapshot of (layer, expert, slot) for physical cache parity checks.")
       .def("clear_expert_cache_counts",
            &ExpertDispatcher::ClearExpertCacheCounts)
       .def("get_cache_stats", &ExpertDispatcher::GetCacheStats)
       .def("reset_cache_stats", &ExpertDispatcher::ResetCacheStats)
+      .def("reset_slot_pool", &ExpertDispatcher::ResetSlotPool)
       .def("get_phase_times", &ExpertDispatcher::GetPhaseTimes,
            "Cumulative [fetch_wait_us, compute_us, combine_us] across exec "
            "tasks since reset_phase_times.")
