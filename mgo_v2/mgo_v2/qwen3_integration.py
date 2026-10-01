@@ -10,14 +10,19 @@ def _qwen3_mgo_forward(self, hidden_states: torch.Tensor):
     flat = hidden_states.reshape(-1, hidden)
     router_logits = self.gate(flat)
 
-    # Use explicit fp32 softmax so full probabilities are available to the
-    # W=128 gate history. top-k weights are normalized exactly over selected
-    # experts when the model config requests it.
+    # Preserve the legacy fork's actual router kernel when available so
+    # mgo_v2 does not introduce an avoidable top-k numerical drift.  Full fp32
+    # probabilities are computed separately only for W=128 gate-history state.
     probs = torch.softmax(router_logits.float(), dim=-1)
-    top_vals, top_idx = torch.topk(probs, self.top_k, dim=-1)
-    if getattr(self, "norm_topk_prob", True):
-        top_vals = top_vals / top_vals.sum(dim=-1, keepdim=True)
-    top_vals = top_vals.to(flat.dtype)
+    if getattr(self, "lib", None) is not None and hasattr(self.lib, "topk_softmax"):
+        router_mask, routing_weight_mask = self.lib.topk_softmax(router_logits)
+        top_idx = torch.topk(router_logits, self.top_k, dim=-1).indices
+        top_vals = routing_weight_mask.gather(1, top_idx).to(flat.dtype)
+    else:
+        top_vals, top_idx = torch.topk(probs, self.top_k, dim=-1)
+        if getattr(self, "norm_topk_prob", True):
+            top_vals = top_vals / top_vals.sum(dim=-1, keepdim=True)
+        top_vals = top_vals.to(flat.dtype)
 
     out = self.mgo_runtime.forward_layer(
         layer=self.layer_id,

@@ -95,3 +95,33 @@ CPU affinity accordingly.
 On an NVSwitch 8-GPU server, NCCL handles GPU peer routing; NUMA remains
 important mainly for CPU-side controller work and host-to-device expert
 traffic.
+
+
+## Relationship to MoE-Infinity-EP-coslot
+
+A deeper audit found that `MoE-Infinity-EP-coslot/` already contains several
+useful pieces from the earlier multi-GPU work:
+
+- pre-import per-rank CUDA visibility pinning;
+- strict NUMA CPU/memory binding;
+- per-NUMA shared pinned host-memory prototypes;
+- NCCL EP all-to-all and return/combine;
+- replicated Python cache shadow + C++ physical-cache verification;
+- controller-owned fixed-slot execution.
+
+Those are better low-level references than the older
+`MoE-Infinity-EP-archer-coslot/` Python control path.
+
+mgo_v2 keeps its own clean A/B/C policy semantics, but server bring-up should
+reuse the proven launch invariants from EP-coslot:
+
+1. restrict each process to one GPU before importing the C++ extension;
+2. keep one cache authority;
+3. verify Python shadow == C++ physical slots after every layer during bring-up;
+4. use NCCL rather than RPC.
+
+Important difference: EP-coslot's current `nvlink_router.pack_tokens` sends
+one hidden row per (token, expert) route. The new admission objective is based
+on **deduplicated token->rank pairs**, so mgo_v2's communicator intentionally
+packs a token once per destination rank and includes all local-to-that-rank
+expert ids/weights in the packet.
