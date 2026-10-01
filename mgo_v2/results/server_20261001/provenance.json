@@ -1,0 +1,956 @@
+{
+  "runtime_commit": "a0be82e",
+  "input_sources": {
+    "sources": {
+      "/home/hwlee/sub-moe-results/multigpu_cache_characterization_20260930_r2/similarity.bin": "c7a9c7efd33bb4d97c49d0879d218c1d065e5b60cf0147e0da6869c34630455e",
+      "/home/hwlee/sub-moe-results/hard_affinity_admission_20261001_r1/same_min64.bin": "051d6e3dce2ca1a87a7eb4138e9713445b45a28bf0af591cb85f7e994506a9fd",
+      "/home/hwlee/sub-moe-results/hard_affinity_admission_20261001_r1/path_min64.bin": "2692066b16eed8d2cb9d8cc5296891981a0b329b60c0a878d4c34710b12887bb",
+      "/home/hwlee/sub-moe-results/eviction_quality_confirmation_20260930_r1/inputs.json": "fa4d83a23087a8d48ededf65d8b53e808aabbeb2a604acad2c5c5bb49b291d21",
+      "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/similarities.npy": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad"
+    },
+    "scope": "New zero-shot numeric screen using the same questions; not a reproduction of the prior few-shot protocol.",
+    "similarity_note": "Use canonical finite similarity NPY; replay binary masks only its diagonal with -inf."
+  },
+  "matrix_status": {
+    "status": "PASS",
+    "runs": [
+      {
+        "name": "ablation_r4",
+        "exit_code": 0
+      },
+      {
+        "name": "ablation_r8",
+        "exit_code": 0
+      },
+      {
+        "name": "matrix_r4",
+        "exit_code": 0
+      },
+      {
+        "name": "matrix_r8",
+        "exit_code": 0
+      }
+    ],
+    "elapsed_seconds": 5203.644376516342,
+    "steps": 16,
+    "repeats": 2,
+    "scope": "Short fixed-step cold-cache measurements and numeric accuracy screening; no production or population-quality claim."
+  },
+  "runs": {
+    "ablation_r4": {
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "world": 4,
+      "rank": 0,
+      "steps": 16,
+      "repeats": 2,
+      "instrumented": true,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6",
+        "numpy": "2.5.2"
+      },
+      "input_sha256": {
+        "similarity": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+        "affinity": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+        "workload": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+        "cells": "f84f740e7fff97348b32c244e3a74c3a41a925178151acebac6b2ba2221505b2"
+      },
+      "quality_scope": "Short zero-shot numeric GSM8K screen, not the prior few-shot quality protocol",
+      "timing_scope": "Empty expert cache; fixed-step generation; includes controller and communication, excludes loading/tokenization"
+    },
+    "ablation_r8": {
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "world": 8,
+      "rank": 0,
+      "steps": 16,
+      "repeats": 2,
+      "instrumented": true,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6",
+        "numpy": "2.5.2"
+      },
+      "input_sha256": {
+        "similarity": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+        "affinity": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+        "workload": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+        "cells": "f84f740e7fff97348b32c244e3a74c3a41a925178151acebac6b2ba2221505b2"
+      },
+      "quality_scope": "Short zero-shot numeric GSM8K screen, not the prior few-shot quality protocol",
+      "timing_scope": "Empty expert cache; fixed-step generation; includes controller and communication, excludes loading/tokenization"
+    },
+    "matrix_r4": {
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "world": 4,
+      "rank": 0,
+      "steps": 16,
+      "repeats": 2,
+      "instrumented": false,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6",
+        "numpy": "2.5.2"
+      },
+      "input_sha256": {
+        "similarity": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+        "affinity": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+        "workload": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+        "cells": "1e6de7e193436e93e857a5c1b7e1da067c46797e046806d07af1cbf9a96da11e"
+      },
+      "quality_scope": "Short zero-shot numeric GSM8K screen, not the prior few-shot quality protocol",
+      "timing_scope": "Empty expert cache; fixed-step generation; includes controller and communication, excludes loading/tokenization"
+    },
+    "matrix_r8": {
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "world": 8,
+      "rank": 0,
+      "steps": 16,
+      "repeats": 2,
+      "instrumented": false,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6",
+        "numpy": "2.5.2"
+      },
+      "input_sha256": {
+        "similarity": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+        "affinity": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+        "workload": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+        "cells": "1e6de7e193436e93e857a5c1b7e1da067c46797e046806d07af1cbf9a96da11e"
+      },
+      "quality_scope": "Short zero-shot numeric GSM8K screen, not the prior few-shot quality protocol",
+      "timing_scope": "Empty expert cache; fixed-step generation; includes controller and communication, excludes loading/tokenization"
+    }
+  },
+  "native_controls": {
+    "4": {
+      "status": "PASS",
+      "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "steps": 16,
+      "batch": 4,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6"
+      },
+      "source_sha256": "7a244745de2924b77733ff5835eb3ce43de646ed49486165e1541eab2f29842b",
+      "generation_sha256": "ad6a04f8889e86cf7e924578d1e2fdc682147f94dc336b49920065347732f6a2",
+      "workload_sha256": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+      "correct": 90,
+      "total": 256,
+      "unfinished": 62,
+      "scope": "Native BF16, eager GPU attention, short zero-shot numeric screen on GSM8K-train questions."
+    },
+    "8": {
+      "status": "PASS",
+      "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "steps": 16,
+      "batch": 8,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6"
+      },
+      "source_sha256": "7a244745de2924b77733ff5835eb3ce43de646ed49486165e1541eab2f29842b",
+      "generation_sha256": "ad6a04f8889e86cf7e924578d1e2fdc682147f94dc336b49920065347732f6a2",
+      "workload_sha256": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+      "correct": 91,
+      "total": 256,
+      "unfinished": 61,
+      "scope": "Native BF16, eager GPU attention, short zero-shot numeric screen on GSM8K-train questions."
+    },
+    "16": {
+      "status": "PASS",
+      "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "steps": 16,
+      "batch": 16,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6"
+      },
+      "source_sha256": "7a244745de2924b77733ff5835eb3ce43de646ed49486165e1541eab2f29842b",
+      "generation_sha256": "ad6a04f8889e86cf7e924578d1e2fdc682147f94dc336b49920065347732f6a2",
+      "workload_sha256": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+      "correct": 91,
+      "total": 256,
+      "unfinished": 63,
+      "scope": "Native BF16, eager GPU attention, short zero-shot numeric screen on GSM8K-train questions."
+    },
+    "32": {
+      "status": "PASS",
+      "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "steps": 16,
+      "batch": 32,
+      "checkpoint": {
+        "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+        "index_sha256": "8dde190b862c7c80ec7403c6495de00c60bbaf246ed479cee4506284989c584c",
+        "config_sha256": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+        "shards": {
+          "model-00001-of-00016.safetensors": {
+            "bytes": 3998893112,
+            "mtime_ns": 1790595691130353305
+          },
+          "model-00002-of-00016.safetensors": {
+            "bytes": 3999974192,
+            "mtime_ns": 1790595690070378699
+          },
+          "model-00003-of-00016.safetensors": {
+            "bytes": 3997360832,
+            "mtime_ns": 1790595690174376207
+          },
+          "model-00004-of-00016.safetensors": {
+            "bytes": 3999975056,
+            "mtime_ns": 1790595692186328008
+          },
+          "model-00005-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595784700111946
+          },
+          "model-00006-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595789719991715
+          },
+          "model-00007-of-00016.safetensors": {
+            "bytes": 3999975472,
+            "mtime_ns": 1790595793499901183
+          },
+          "model-00008-of-00016.safetensors": {
+            "bytes": 3997362064,
+            "mtime_ns": 1790595793467901949
+          },
+          "model-00009-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595867546127853
+          },
+          "model-00010-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595886469674694
+          },
+          "model-00011-of-00016.safetensors": {
+            "bytes": 3999975408,
+            "mtime_ns": 1790595899945352005
+          },
+          "model-00012-of-00016.safetensors": {
+            "bytes": 3987924896,
+            "mtime_ns": 1790595900169346642
+          },
+          "model-00013-of-00016.safetensors": {
+            "bytes": 3999975088,
+            "mtime_ns": 1790595945836253154
+          },
+          "model-00014-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790595988739258758
+          },
+          "model-00015-of-00016.safetensors": {
+            "bytes": 3999975400,
+            "mtime_ns": 1790596006626847638
+          },
+          "model-00016-of-00016.safetensors": {
+            "bytes": 1085307128,
+            "mtime_ns": 1790596009246787380
+          }
+        }
+      },
+      "versions": {
+        "torch": "2.11.0+cu128",
+        "transformers": "4.57.6"
+      },
+      "source_sha256": "7a244745de2924b77733ff5835eb3ce43de646ed49486165e1541eab2f29842b",
+      "generation_sha256": "ad6a04f8889e86cf7e924578d1e2fdc682147f94dc336b49920065347732f6a2",
+      "workload_sha256": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733",
+      "correct": 94,
+      "total": 256,
+      "unfinished": 62,
+      "scope": "Native BF16, eager GPU attention, short zero-shot numeric screen on GSM8K-train questions."
+    }
+  },
+  "native_b8_reproduction": {
+    "status": "PASS",
+    "identical_samples": 256,
+    "previous_control": "/home/hwlee/mgo-results/runtime_validation_20261001/native_quality_screen_positions_b8"
+  },
+  "matrix_config_example": {
+    "num_layers": 48,
+    "num_experts": 128,
+    "top_k": 8,
+    "gate_protect_threshold": 0.2,
+    "similarity_threshold": 0.65,
+    "global_cache_ratio": 0.3,
+    "gate_window": 128,
+    "coverage_k": 1,
+    "coverage_lambda": 2.0,
+    "world_size": 4,
+    "admission": "hungarian_same_path",
+    "eviction": "coverage",
+    "same_layer_alpha": 1.0,
+    "path_eta": 0.5,
+    "seed": 42,
+    "substitution_enabled": true
+  },
+  "profiling_tool": {
+    "version": "2025.6.1.190-256136895201v0",
+    "source": "https://developer.download.nvidia.com/devtools/repos/ubuntu2204/amd64/nsight-systems-2025.6.1_2025.6.1.190-1_amd64.deb",
+    "package_sha256": "08ce3f527a8a1ffa098b1d28489924868f24db2021686470e6339fae31f60086",
+    "installation": "Extracted under repository ignored .build-deps; no system package or shared environment changed.",
+    "capture_flags": [
+      "--trace=cuda,nvtx",
+      "--sample=none",
+      "--cpuctxsw=none",
+      "--cuda-event-trace=false",
+      "--flush-on-cudaprofilerstop=false",
+      "--capture-range=cudaProfilerApi",
+      "--capture-range-end=stop"
+    ]
+  },
+  "profile_runs": {
+    "r4": {
+      "run": "model_nsight_r4_nsys256",
+      "status": "PASS",
+      "rank_cell_count": 40,
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "wrapper": {
+        "rank": 0,
+        "measured_cells": 10,
+        "wrapper_sha256": "f533158cc3a404ec6b702c8380d0f8a2c3ddcdef3acaa81c0781d3ca3ea8251f",
+        "scope": "Nsight diagnostic; excludes loading, includes profiled fixed-step generation."
+      },
+      "periodic_stack_dump_seconds": 180,
+      "wrapper_source_receipt": "profile_model_worker_periodic_stack_diagnostic.py"
+    },
+    "r8": {
+      "run": "model_nsight_r8_nsys256_no_periodic",
+      "status": "PASS",
+      "rank_cell_count": 80,
+      "code_sha256": "0756e7567bab2538f46908213514adbe90616bd9da7ec38392a164315b3be6f9",
+      "wrapper": {
+        "rank": 0,
+        "measured_cells": 10,
+        "wrapper_sha256": "4a7cad04e949de3014f0d8a90c107ea5f8861b64ce3f7e7b9c2ddc5f62718e64",
+        "scope": "Nsight diagnostic; excludes loading, includes profiled fixed-step generation."
+      },
+      "periodic_stack_dump_seconds": 0
+    }
+  },
+  "trace_analysis_validation": {
+    "status": "PASS",
+    "scope": "All 40 R4 rank/cell summaries from the single-pass implementation exactly equal the original independent per-range SQL scans.",
+    "original_summary_sha256": "3164ecb485ebf3a8f248f51a3e61356dba2d6e2dae8d04189753d04768725636",
+    "single_pass_summary_sha256": "3164ecb485ebf3a8f248f51a3e61356dba2d6e2dae8d04189753d04768725636",
+    "script_sha256": "ce0a5499c5b0c04d7da358325dfe71b9d6011392f56cd0a3b0c8fc908321e982"
+  },
+  "incomplete_profiling_attempts": {
+    "model_nsight_r4": {
+      "status": "INCOMPLETE",
+      "reason": "Multi-process Nsight capture stalled during second cell; collecting diagnostic stacks in a fresh run",
+      "processes": [
+        {
+          "pid": 4089189,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4 --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4089190,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4 --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4089191,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4 --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4089192,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4 --steps 16 --repeats 1 --profile "
+        }
+      ]
+    },
+    "model_nsight_r4_buffered": {
+      "status": "INCOMPLETE",
+      "time": "2026-10-01T09:14:12.812359+00:00",
+      "reason": "No forward progress in second cell B_lru; rank3 waits in C++ wait_layer_partials, peers in return count collective; longer Nsight flush interval did not resolve. Exact cause under investigation.",
+      "processes": [
+        {
+          "pid": 4093884,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4_buffered --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4093885,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4_buffered --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4093886,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4_buffered --steps 16 --repeats 1 --profile "
+        },
+        {
+          "pid": 4093887,
+          "command": "/home/hwlee/sub-moe/phase01/.venv/bin/python -u examples/profile_model_worker.py --model /home/hwlee/model/Qwen3-30B-A3B-Instruct-2507 --offload-dir /home/hwlee/mgo-results/runtime_validation_20261001/expert_store --similarity /home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy --affinity /home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz --workload /home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json --cells /home/hwlee/mgo-results/runtime_validation_20261001/model_matrix_v2/ablation_cells.json --output /home/hwlee/mgo-results/runtime_validation_20261001/model_nsight_r4_buffered --steps 16 --repeats 1 --profile "
+        }
+      ]
+    },
+    "model_nsight_r4_lru": {
+      "status": "INCOMPLETE",
+      "reason": "Nsight 2024.6.2 single-cell diagnostic exited with SIGSEGV on rank3; no completed benchmark receipts. A native stack sample was taken during pinned-store loading before measurement; the interaction has not been isolated. Excluded from all tables."
+    },
+    "model_nsight_r8_nsys256": {
+      "status": "INCOMPLETE",
+      "time": "2026-10-01T09:45:02.423926+00:00",
+      "completed_rank_cells": 72,
+      "reason": "Rank7 SIGSEGV at 18:43:12 KST during last C_hungarian_swap cell, coincident with a periodic faulthandler stack snapshot. No wrapper completion receipts; excluded from final trace tables. Rerun disables only periodic stack snapshots; root cause not established."
+    }
+  },
+  "analysis_source_sha256": {
+    "scripts/summarize_server_matrix.py": "97e82b60510f99c1745e35db0cd189ddb497016f21aeaebb7e00b4e3f503c494",
+    "scripts/summarize_model_trace.py": "ce0a5499c5b0c04d7da358325dfe71b9d6011392f56cd0a3b0c8fc908321e982",
+    "scripts/summarize_slot_trace.py": "048f882f9152f26f39c3b243db70c84b700064974ff21fc7e23125e67140c7ff",
+    "scripts/plot_server_matrix.py": "c5c6cae5798468b0e80e0df08752f04002a7d31ee3dd0248fc5746a31e42bca5"
+  }
+}

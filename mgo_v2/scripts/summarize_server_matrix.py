@@ -21,8 +21,15 @@ def main():
     args = p.parse_args()
     root, output = Path(args.root), Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
-    native = {row["sample_id"]: row for row in json.loads((Path(args.native_reference) / "samples.json").read_text())}
+    native_root = Path(args.native_reference)
+    def native_for_batch(batch):
+        folder = native_root / f"b{batch}" if (native_root / f"b{batch}").exists() else native_root
+        summary = json.loads((folder / "summary.json").read_text())
+        samples = {row["sample_id"]: row for row in json.loads((folder / "samples.json").read_text())}
+        return summary, samples
     cells, missing, audits = [], [], []
+    unmatched_native_batches = set()
+    provenance_audits = []
     for phase in ("ablation", "matrix"):
         manifest = json.loads((root / f"{phase}_cells.json").read_text())
         for world in (4, 8):
@@ -32,7 +39,30 @@ def main():
                 missing.append(str(provenance_path))
                 continue
             provenance = json.loads(provenance_path.read_text())
+            devices = set()
+            for rank in range(world):
+                path = folder / f"provenance-rank{rank}.json"
+                if not path.exists():
+                    missing.append(str(path))
+                    continue
+                peer = json.loads(path.read_text())
+                assert peer["rank"] == rank and peer["world"] == world, str(path)
+                for key in provenance.keys() - {"boot", "rank"}:
+                    assert peer[key] == provenance[key], f"rank provenance drift: {path}: {key}"
+                device = peer["boot"]["visible_gpu"]
+                assert device not in devices, f"multiple workers expose GPU {device}"
+                devices.add(device)
+                provenance_audits.append({"phase": phase, "world": world, "rank": rank, "status": "PASS"})
             for cell in manifest:
+                native_summary, native = native_for_batch(cell["batch"])
+                if native_summary["batch"] != cell["batch"]:
+                    unmatched_native_batches.add(cell["batch"])
+                    if not args.partial:
+                        raise ValueError("final quality comparisons require a native control at the same local batch size")
+                if "checkpoint" in native_summary:
+                    assert native_summary["checkpoint"] == provenance["checkpoint"], "native checkpoint differs"
+                assert native_summary["steps"] == provenance["steps"], "native token limit differs"
+                assert native_summary["workload_sha256"] == provenance["input_sha256"]["workload"], "native question workload differs"
                 repeats, first_samples = [], None
                 first_metrics = None
                 for repeat in range(provenance["repeats"]):
@@ -60,7 +90,9 @@ def main():
                               for key in ("hit", "subhit", "miss", "fetches", "reloads", "remote_token_rank_pairs",
                                           "substituted_gate_mass", "total_gate_mass", "rank_token_cv_sum", "events")}
                     denom = max(1, decode["hit"] + decode["subhit"] + decode["miss"])
-                    values = {"ttft_seconds": first["ttft_seconds"], "tpot_seconds": first["tpot_seconds"],
+                    values = {"global_prompt_tokens": sum(sum(row["prompt_tokens"]) for row in ranks),
+                              "max_padded_prompt_tokens": max(row["padded_prompt_tokens"] for row in ranks),
+                              "ttft_seconds": first["ttft_seconds"], "tpot_seconds": first["tpot_seconds"],
                               "generation_seconds": first["global_max_generation_seconds"],
                               "output_tokens_per_second": first["fixed_step_output_tokens_per_second"],
                               "controller_seconds_max_rank": max(row["controller_seconds"] for row in ranks),
@@ -80,6 +112,11 @@ def main():
                               "native_token_mismatch_samples": sum(row["token_ids"] != native[row["sample_id"]]["token_ids"] for row in samples),
                               "quality_gains_vs_native": sum(row["correct"] and not native[row["sample_id"]]["correct"] for row in samples),
                               "quality_losses_vs_native": sum(not row["correct"] and native[row["sample_id"]]["correct"] for row in samples)}
+                    if cell["name"] == "A_exact":
+                        assert values["native_token_mismatch_samples"] == 0, label + ": exact native token mismatch"
+                        assert all(row["finished"] == native[row["sample_id"]]["finished"]
+                                   and row["correct"] == native[row["sample_id"]]["correct"]
+                                   for row in samples), label + ": exact native quality mismatch"
                     for key in ("peer_payload_tx_bytes", "collective_cuda_ms_max_rank", "decode_peer_payload_tx_bytes"):
                         values[key] = None
                     if "collectives" in first:
@@ -94,21 +131,40 @@ def main():
                 if len(repeats) != provenance["repeats"]:
                     continue
                 result = {"phase": phase, "world": world, "cell": cell["name"], "local_batch": cell["batch"],
+                          "native_control_batch": native_summary["batch"],
                           "cache_ratio": cell["config"]["global_cache_ratio"], "eviction": cell["config"]["eviction"],
                           "admission": cell["config"]["admission"], "instrumented": provenance["instrumented"],
                           "repeats": len(repeats), "steps": provenance["steps"]}
                 result.update({key: median(repeats, key) if repeats[0][key] is not None else None for key in repeats[0]})
+                for key in ("ttft_seconds", "tpot_seconds", "output_tokens_per_second"):
+                    result[key + "_min"] = min(row[key] for row in repeats)
+                    result[key + "_max"] = max(row[key] for row in repeats)
                 result["repeat_measurements"] = repeats
                 cells.append(result)
-    result = {"status": "PARTIAL" if missing else "PASS", "completed_cells": len(cells), "missing_receipts": missing,
-              "audits": audits, "cells": cells,
+    instrumentation_audits = []
+    for world in (4, 8):
+        a_folder, b_folder = root / f"ablation_r{world}", root / f"matrix_r{world}"
+        for rank in range(world):
+            a_path = a_folder / f"C_hungarian_same_path-rep0-rank{rank}.json"
+            b_path = b_folder / f"b8_c30-rep0-rank{rank}.json"
+            if not a_path.exists() or not b_path.exists():
+                continue
+            a, b = json.loads(a_path.read_text()), json.loads(b_path.read_text())
+            assert a["config"] == b["config"], "anchor/matrix configuration mismatch"
+            assert a["metrics"] == b["metrics"], "collective instrumentation changed policy trajectory"
+            assert a["quality"] == b["quality"], "collective instrumentation changed generated outputs"
+            instrumentation_audits.append({"world": world, "rank": rank, "status": "PASS"})
+    result = {"status": "PARTIAL" if missing or unmatched_native_batches else "PASS",
+              "unmatched_native_batches": sorted(unmatched_native_batches), "completed_cells": len(cells), "missing_receipts": missing,
+              "audits": audits, "provenance_audits": provenance_audits,
+              "instrumentation_audits": instrumentation_audits, "cells": cells,
               "scope": "Medians of recorded repeats; cold-cache fixed-step generation and short numeric quality screen. No confidence intervals or quality-safety claim."}
     (output / "matrix_summary.json").write_text(json.dumps(result, indent=2) + "\n")
     for phase in ("ablation", "matrix"):
         selected = [{key:value for key,value in row.items() if key != "repeat_measurements"} for row in cells if row["phase"] == phase]
         if selected:
             with (output / f"{phase}.csv").open("w", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=list(selected[0]))
+                writer = csv.DictWriter(f, fieldnames=list(selected[0]), lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(selected)
     print(json.dumps({"status": result["status"], "completed_cells": len(cells), "audited_repeats": len(audits), "missing": len(missing)}))

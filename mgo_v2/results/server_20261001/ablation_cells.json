@@ -1,0 +1,102 @@
+[
+  {
+    "name": "A_exact",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "random",
+      "eviction": "lru",
+      "substitution_enabled": false
+    }
+  },
+  {
+    "name": "B_lru",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "random",
+      "eviction": "lru",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "B_gate",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "random",
+      "eviction": "gate",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "B_coverage",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "random",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_greedy_current",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "greedy_current",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_greedy_path",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "greedy_path",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_hungarian_current",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "hungarian_current",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_hungarian_same",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "hungarian_same",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_hungarian_same_path",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "hungarian_same_path",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  },
+  {
+    "name": "C_hungarian_swap",
+    "batch": 8,
+    "config": {
+      "global_cache_ratio": 0.3,
+      "admission": "hungarian_swap",
+      "eviction": "coverage",
+      "substitution_enabled": true
+    }
+  }
+]

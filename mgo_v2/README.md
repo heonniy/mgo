@@ -79,8 +79,8 @@ Do not let multiple workers prepare the same destination.
 With this directory on `PYTHONPATH`, launch `examples/validate_slots.py` using
 `torchrun --standalone --nproc_per_node=1`, then 4 and 8. Use separate output
 directories. `examples/native_reference.py` saves native fixed-prompt receipts;
-`examples/validate_model.py` compares all router choices, weights, MoE outputs
-and generated tokens and audits each resident tensor's physical slot address.
+`examples/validate_model.py` compares valid-token router choices, weights,
+MoE outputs and generated tokens and audits each resident tensor's physical slot address.
 
 `examples/qwen3_smoke.py` uses the same model loader. Supply `--similarity` as
 a finite `[L,E,E]` NPY, and `--affinity` as an NPZ containing `same_layer`
@@ -88,8 +88,10 @@ a finite `[L,E,E]` NPY, and `--affinity` as an NPZ containing `same_layer`
 them. Use `--exact --admission random --eviction lru` for no substitution.
 Missing affinity tables cause an error rather than silently changing policies.
 
-Call `pin_rank_before_cuda_import()` before importing CUDA libraries. Strict
-NUMA mode verifies the kernel memory policy. A PCI NUMA value of -1 is accepted
+Call `pin_rank_before_cuda_import()` before importing CUDA libraries, then
+`warmup_collectives()` after process-group initialization and before loading
+the pinned expert store. Run full-model jobs sequentially on this server;
+concurrent context teardown and large pinned allocations stalled a diagnostic. Strict NUMA mode verifies the kernel memory policy. A PCI NUMA value of -1 is accepted
 only when the OS exposes exactly one memory node. Native execution reads
 resident slots directly (`MOE_EP_SLOT_VIEWS=1`); `=0` is a copy baseline for
 profiling. `reset_slot_pool(capacity)` is only for a drained experiment boundary
@@ -104,11 +106,41 @@ use GPU attention and a single logical residency controller.
 `examples/benchmark_model.py` accepts an explicit JSON cell manifest and
 question workload. It records empty-cache TTFT, fixed-step TPOT/throughput,
 expert metrics, controller time, fetch bytes, and a short numeric quality screen.
+Left padding has explicit per-sequence position IDs; padding rows never enter
+expert policies. Throughput uses the maximum whole-generation wall clock
+across ranks, and prefill snapshots allow separate decode counters.
 Optional collective instrumentation records submitted peer tensor payloads and
 CUDA intervals, not NCCL wire bytes or isolated kernel times. Instrumented
 timings must be labelled. Results are resumable only with matching code, inputs
 and settings. `examples/benchmark_fabric.py` separately measures H2D and
 all-to-all bandwidth; `scripts/summarize_slot_trace.py` audits Nsight SQLite
 exports for actual expert transfers and H2D/GEMM overlap.
+
+`scripts/run_server_matrix.py` writes the A/B/C and batch/cache manifests and
+runs them sequentially. `scripts/summarize_server_matrix.py` requires every
+rank and repeat, checks identical repeated decisions/tokens, verifies fetch and
+input-dispatch byte accounting, and emits JSON/CSV tables. `--partial` is only
+for progress inspection. Nsight diagnostics can use
+`examples/profile_model_worker.py` in a fresh output directory with
+`--capture-range=cudaProfilerApi`; `scripts/summarize_model_trace.py` joins its
+per-cell ranges to physical H2D receipts and actual NCCL kernel durations.
+
+Use the separately validated Nsight 2025.6.1 configuration:
+`--trace=cuda,nvtx --sample=none --cpuctxsw=none --cuda-event-trace=false
+--flush-on-cudaprofilerstop=false --capture-range=cudaProfilerApi
+--capture-range-end=stop`. Export its `.nsys-rep` with `nsys export --type=sqlite`
+and pass the original ablation receipt directory as `--baseline` to
+`summarize_model_trace.py`; it requires all worker completion records, exact
+range coverage and identical runtime/input fingerprints, policies and outputs.
+Large trace export can take several minutes after generation finishes.
+`MGO_DEBUG_PTRACE=1` is an opt-in for native stack attachment to the profiling
+workers; SIGUSR1 dumps their Python stacks. Periodic dumps are off by default
+and can be explicitly requested with `MGO_STACK_DUMP_SECONDS`. Normal benchmark
+workers do not install these debug hooks.
+
+`examples/quality_reference.py --batches 4 8 16 32` creates batch-matched
+native controls with one checkpoint load. Final aggregation requires matching
+batch size, token limit, workload and checkpoint identity. The optional
+`plot_server_matrix.py` (Matplotlib) renders only a fully audited summary.
 
 See MIGRATION.md for the legacy issues this replaces.

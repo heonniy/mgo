@@ -2,6 +2,30 @@
 
 This plan is for implementation validation after the policy code lands.
 
+## Execution status — 2026-10-01
+
+The server run and its limits are recorded in
+[SERVER_VALIDATION_RESULTS.md](SERVER_VALIDATION_RESULTS.md), with compact
+measurements under [results/server_20261001](results/server_20261001).
+
+| Stage | Executed scope |
+|---|---|
+| 0 | Eight H100s; one visible GPU per process; strict binding to the sole OS-visible NUMA node; legacy controllers disabled. |
+| 1 | Native R1/R4/R8 output/router/token parity at 10% cache, plus padded R4 batch-8 parity; all exact checks pass. The small cache also exercises replacement. |
+| 2 | Per-layer slot/address/single-copy/fetch audits and independent FFN fixtures, including empty ranks, custom streams and pool reset, pass. |
+| 3 | .20/.65 substitution counters, source/target maps and gate mass match recorded policy replay. |
+| 4 | LRU/Gate/Coverage replay passes; both R4/R8 ablations include actual fetches, bytes, reloads and paired short-screen quality. |
+| 5 | All seven admission policies measured at R4/R8, including submitted NCCL tensor bytes, CUDA collective intervals, controller time and rank-load CV. Full-model Nsight audits also verify actual expert transfers and NCCL kernel intervals in all 120 rank/cell ranges; byte counters exclude wire overhead. |
+| 6 | Direct slot views eliminate expert D2D copies in the Nsight fixture; H2D/compute overlap and R1/R2/R4/R8 H2D/staging/NVSwitch bandwidth measured. Physical remote-NUMA comparison is unavailable in this VM. |
+| 7 | All 60 conditions × 2 repeats complete, with 720 audited rank receipts and batch-matched native controls. Tables cover the requested batch/cache grid and A/B/C ablations. |
+
+Stage 7 is a bounded **16-step server measurement**, not a publication-ready
+accuracy or significance claim. Two repeats expose timing variation but do
+not establish small speedups. The numeric quality screen uses held-out
+GSM8K-train questions, a new zero-shot prompt and a 16-token cap; standard
+few-shot/test accuracy and longer-run serving behavior remain unmeasured.
+The original stage requirements below remain the research checklist.
+
 ## Stage 0 — environment
 
 - one process per GPU;

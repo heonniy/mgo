@@ -39,15 +39,19 @@ policy replay, empty-rank/custom-stream fixtures and direct slot views pass.
 See [SERVER_VALIDATION_RESULTS.md](SERVER_VALIDATION_RESULTS.md) for exact scope,
 raw receipts and measurement status.
 
-The following gates govern paper timing:
+The final R4/R8 matrix completes 60 conditions × two repeats, including all
+batch/cache cells and A/B/C ablations. Every rank receipt is audited; native
+quality controls use the same local batch as the corresponding measurement.
+Complete R4/R8 Nsight diagnostics audit 120 rank/cell ranges, with exact
+physical expert-transfer accounting and unchanged policies/generated outputs.
+The report retains two-repeat ranges, answer gains/losses, controller overhead
+and the fixed 16-step/zero-shot-screen limitations. Communication reduction
+alone does not imply a throughput improvement in these measurements.
 
-1. build the legacy extension and run exact EP parity;
-2. validate per-rank slot capacity and cache-state parity;
-3. validate expert-level Hit/SubHit/Miss against the completed simulator;
-4. validate R4 then R8 NCCL dispatch/combine;
-5. profile controller overhead;
-6. remove the resident-slot -> MoEMLP parameter D2D copy on every hit;
-7. only then collect real H2D / NVSwitch / end-to-end latency tables.
+The runtime fingerprint in the checked-in provenance identifies the measured
+sources and compiled extension at `a0be82e`. Later report/analysis changes do
+not alter that runtime. Standard GSM8K test accuracy, longer generations and
+statistical confidence beyond two repeats are not established here.
 
 ## Direct-slot execution
 
