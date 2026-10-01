@@ -1,0 +1,21 @@
+name: mgo-v2-unit
+
+on:
+  push:
+    paths:
+      - "mgo_v2/**"
+      - ".github/workflows/mgo-v2-unit.yml"
+  pull_request:
+    paths:
+      - "mgo_v2/**"
+
+jobs:
+  cpu-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy scipy
+      - run: PYTHONPATH=mgo_v2 python -m unittest discover -s mgo_v2/tests -p 'test_*.py' -v
