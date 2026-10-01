@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Full checkpoint EP parity and physical-cache audit against native receipts."""
 import argparse
+import faulthandler
+import signal
 import json
 import os
 from pathlib import Path
@@ -15,6 +17,7 @@ import numpy as np
 import torch
 import torch.distributed as dist
 
+from mgo_v2.communicator import warmup_collectives
 from mgo_v2.config import RuntimeConfig
 from mgo_v2.controller import GlobalExpertController
 from mgo_v2.executor import LegacySlotExecutorAdapter
@@ -33,10 +36,11 @@ def main():
     p.add_argument("--prompt-index", type=int, default=None)
     p.add_argument("--diagnostic", action="store_true", help="record divergences without a successful parity claim")
     args = p.parse_args()
+    faulthandler.register(signal.SIGUSR1, all_threads=True)
     torch.set_num_threads(4)
     torch.cuda.set_device(0)
     dist.init_process_group("nccl", device_id=torch.device("cuda:0"))
-    dist.all_reduce(torch.ones(1, device="cuda"))
+    warmup_collectives()
     rank, world = dist.get_rank(), dist.get_world_size()
     root = Path(args.output)
     root.mkdir(parents=True, exist_ok=True)
@@ -56,10 +60,15 @@ def main():
     reference_events = []
     event_metrics = []
     event_index = 0
+    valid_only = False
+    current_valid = None
     def hook(module, inputs, output):
         nonlocal event_index
         expected = reference_events[event_index]
         hidden, logits = output
+        if valid_only:
+            hidden = hidden.reshape(-1, hidden.shape[-1])[current_valid]
+            logits = logits[current_valid]
         probs = logits.float().softmax(-1)
         weights, selected = probs.topk(module.top_k, dim=-1)
         weights = (weights / weights.sum(-1, keepdim=True)).to(hidden.dtype)
@@ -80,16 +89,23 @@ def main():
     with torch.inference_mode():
         for prompt_index in prompt_indices:
             ref = torch.load(Path(args.reference) / f"prompt{prompt_index}.pt", weights_only=True)
+            valid_only = ref.get("valid_only", False)
             reference_events = ref["events"]
             event_metrics = []
             event_index = 0
             all_ids = ref["input_ids"].cuda()
+            mask = ref.get("attention_mask", torch.ones_like(ref["input_ids"])).cuda()
             past = None
             for step in range(len(ref["logits"])):
-                out = model(input_ids=all_ids if past is None else all_ids[:, -1:],
-                            past_key_values=past, use_cache=True)
+                current = all_ids if past is None else all_ids[:, -1:]
+                positions = mask.long().cumsum(-1) - 1
+                positions.masked_fill_(mask == 0, 0)
+                current_valid = mask[:, -current.shape[1]:].reshape(-1).bool()
+                out = model(input_ids=current, attention_mask=mask, position_ids=positions[:, -current.shape[1]:],
+                            past_key_values=past, use_cache=True, logits_to_keep=1)
                 all_ids = torch.cat((all_ids, out.logits[:, -1].argmax(-1, keepdim=True)), -1)
                 past = out.past_key_values
+                mask = torch.cat((mask, mask.new_ones((mask.shape[0], 1))), 1)
             result = {"prompt_index": prompt_index, "token_ids": all_ids.cpu().tolist(),
                       "tokens_equal": bool(torch.equal(all_ids.cpu(), ref["output_ids"])),
                       "selected_mismatches": sum(row["selected_mismatches"] for row in event_metrics),

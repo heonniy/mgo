@@ -156,6 +156,27 @@ class TestController(unittest.TestCase):
         cache.evict((0, 1))
         self.assertEqual(policy.coverage_damage(cache, (0, 0)), 2)
 
+    def test_incremental_coverage_matches_fresh_global_counts(self):
+        rng = np.random.default_rng(135)
+        sim = rng.random((3, 8, 8), dtype=np.float32)
+        policy = DiversityEviction(GateHistory(3, 8), sim)
+        cache = GlobalCacheState([4, 4])
+        for event in range(40):
+            if event == 20:
+                cache = GlobalCacheState([4, 4])
+            rank = event % 2
+            if cache.ranks[rank].free_slot() is None:
+                keys = cache.keys_on_rank(rank)
+                cache.evict(keys[int(rng.integers(len(keys)))])
+            candidates = [(l, e) for l in range(3) for e in range(8) if (l, e) not in cache.owner]
+            key = candidates[int(rng.integers(len(candidates)))]
+            cache.place(rank, key, cache.ranks[rank].free_slot(), event)
+            for layer, expert in cache.owner:
+                residents = sorted(cache.resident_layer(layer))
+                counts = policy.neighbors[layer][:, residents].sum(axis=1)
+                expected = np.count_nonzero(policy.neighbors[layer, :, expert] & (counts <= 1))
+                self.assertEqual(policy.coverage_damage(cache, (layer, expert)), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

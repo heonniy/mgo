@@ -23,6 +23,7 @@ import torch.distributed as dist
 import transformers
 from transformers import AutoTokenizer
 from mgo_v2.affinity import AffinityTables
+from mgo_v2.communicator import warmup_collectives
 from mgo_v2.config import RuntimeConfig
 from mgo_v2.controller import GlobalExpertController
 from mgo_v2.executor import LegacySlotExecutorAdapter
@@ -43,7 +44,10 @@ def generate(model, ids, mask, steps, after_prefill=None):
     for _ in range(steps):
         torch.cuda.synchronize()
         start = time.perf_counter()
-        out = model(input_ids=ids, attention_mask=mask, past_key_values=past, use_cache=True, logits_to_keep=1)
+        positions = mask.long().cumsum(-1) - 1
+        positions.masked_fill_(mask == 0, 0)
+        out = model(input_ids=ids, attention_mask=mask, position_ids=positions[:, -ids.shape[1]:],
+                    past_key_values=past, use_cache=True, logits_to_keep=1)
         ids = out.logits[:, -1].argmax(-1, keepdim=True)
         past = out.past_key_values
         output.append(ids)
@@ -69,7 +73,7 @@ def main():
     torch.set_num_threads(4)
     torch.cuda.set_device(0)
     dist.init_process_group("nccl", device_id=torch.device("cuda:0"))
-    dist.all_reduce(torch.ones(1, device="cuda"))
+    warmup_collectives()
     rank, world = dist.get_rank(), dist.get_world_size()
     root = Path(args.output)
     root.mkdir(parents=True, exist_ok=True)
@@ -157,8 +161,13 @@ def main():
                                cache_stats=dispatcher.get_cache_stats().tolist())
                 if collective_stats:
                     prefill["peer_payload_tx_bytes"] = dict(collective_stats.payload_bytes)
+            dist.barrier()
+            torch.cuda.synchronize()
+            generation_start = time.perf_counter()
             with torch.inference_mode():
                 output, seconds = generate(model, encoded["input_ids"], encoded["attention_mask"], args.steps, snapshot_prefill)
+            torch.cuda.synchronize()
+            generation_seconds = time.perf_counter() - generation_start
             executor.assert_cache_matches(controller.cache.ranks[rank])
             samples = []
             for row, ids in zip(rows, output.cpu().tolist()):
@@ -173,12 +182,17 @@ def main():
             timings = torch.tensor(seconds, device="cuda", dtype=torch.float64)
             dist.all_reduce(timings, op=dist.ReduceOp.MAX)
             max_seconds = timings.cpu().tolist()
+            elapsed = torch.tensor(generation_seconds, device="cuda", dtype=torch.float64)
+            dist.all_reduce(elapsed, op=dist.ReduceOp.MAX)
+            global_generation_seconds = elapsed.item()
             result = {"status": "PASS", "name": label, "rank": rank, "world": world, "repeat": repeat,
                       "local_batch": batch, "prompt_tokens": encoded["attention_mask"].sum(-1).cpu().tolist(),
                       "padded_prompt_tokens": encoded["input_ids"].shape[1], "config": asdict(config),
                       "rank_step_seconds": seconds, "global_max_step_seconds": max_seconds,
                       "ttft_seconds": max_seconds[0], "tpot_seconds": sum(max_seconds[1:]) / (args.steps - 1),
-                      "fixed_step_output_tokens_per_second": batch * world * args.steps / sum(max_seconds),
+                      "rank_generation_seconds": generation_seconds,
+                      "global_max_generation_seconds": global_generation_seconds,
+                      "fixed_step_output_tokens_per_second": batch * world * args.steps / global_generation_seconds,
                       "metrics": runtime.metrics.to_dict(), "controller_seconds": runtime.controller_seconds,
                       "prefill": prefill,
                       "cache_stats": dispatcher.get_cache_stats().tolist(),

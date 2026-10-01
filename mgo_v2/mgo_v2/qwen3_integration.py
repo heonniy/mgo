@@ -24,14 +24,17 @@ def _qwen3_mgo_forward(self, hidden_states: torch.Tensor):
             top_vals = top_vals / top_vals.sum(dim=-1, keepdim=True)
         top_vals = top_vals.to(flat.dtype)
 
+    valid = getattr(self.mgo_runtime, "valid_token_indices", None)
     out = self.mgo_runtime.forward_layer(
         layer=self.layer_id,
-        hidden_states=flat,
-        selected_experts=top_idx,
-        routing_weights=top_vals,
-        full_router_probs=probs,
+        hidden_states=flat if valid is None else flat.index_select(0, valid),
+        selected_experts=top_idx if valid is None else top_idx.index_select(0, valid),
+        routing_weights=top_vals if valid is None else top_vals.index_select(0, valid),
+        full_router_probs=probs if valid is None else probs.index_select(0, valid),
         is_decode=(seq == 1),
     )
+    if valid is not None:
+        out = torch.zeros_like(flat).index_copy_(0, valid, out)
     return out.view(batch, seq, hidden).to(hidden_states.dtype), router_logits
 
 
@@ -57,10 +60,27 @@ def attach_qwen3_runtime(model, runtime) -> int:
         count += 1
     if count == 0:
         raise RuntimeError("no compatible Qwen3 MoE blocks found")
+    def capture_valid_tokens(_module, args, kwargs):
+        mask = kwargs.get("attention_mask", args[1] if len(args) > 1 else None)
+        inputs = kwargs.get("input_ids", args[0] if args else None)
+        if inputs is None:
+            inputs = kwargs.get("inputs_embeds")
+        runtime.valid_token_indices = None
+        if mask is not None:
+            if (mask.ndim != 2 or inputs is None or mask.shape[0] != inputs.shape[0]
+                    or mask.shape[1] < inputs.shape[1]):
+                raise ValueError("mgo_v2 requires a two-dimensional token attention mask")
+            current = mask[:, -inputs.shape[1]:].reshape(-1).bool()
+            if not bool(current.all()):
+                runtime.valid_token_indices = current.nonzero().flatten()
+    model._mgo_v2_mask_hook = model.register_forward_pre_hook(capture_valid_tokens, with_kwargs=True)
     return count
 
 
 def detach_qwen3_runtime(model) -> int:
+    if hasattr(model, "_mgo_v2_mask_hook"):
+        model._mgo_v2_mask_hook.remove()
+        del model._mgo_v2_mask_hook
     count = 0
     for module in model.modules():
         if hasattr(module, "_mgo_v2_original_forward"):

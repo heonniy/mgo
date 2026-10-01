@@ -52,18 +52,32 @@ finishes; correctness and profiling below are completed results.
    fresh controller. Hungarian repeated-rank costs, exact swap deltas, bulk
    gate-history updates and token packet construction avoid redundant work.
 
+8. Left-padded batched generation now supplies per-sequence position IDs.
+   Padding rows are excluded from expert execution, policy history and traffic.
+   The original dense attention mask still controls attention. CPU regressions
+   cover decode refresh, empty valid inputs and detaching the root mask hook.
+9. Coverage losses are updated only for changed resident layers. A randomized
+   cache-mutation oracle and the 3,335-victim recorded replay preserve decisions.
+   The previous full recomputation dominated preliminary controller time.
+10. All-to-all and all-gather connections are warmed before the 54GiB pinned
+    host expert store is allocated. A padded R4 attempt made no forward progress
+    for ten minutes in UVM memory operations while another CUDA job overlapped;
+    sequential execution with explicit warmup completed and passed. This does
+    not isolate the driver cause. No NCCL transport workaround is assumed.
+
 ## Correctness evidence
 
 | Check | Result | Receipt |
 |---|---|---|
-| CPU regressions | 19 passed | `cpu_tests.log` |
+| CPU regressions | 22 passed | `cpu_tests.log` |
 | R1 native full model, 10% cache | 4 prompts, 768 MoE events, zero differences | `model_r1_bound_cache10/rank0.json` |
 | R4 native full model, 10% cache | 4 ranks, 768 events, zero differences | `model_r4_bound_cache10/rank*.json` |
 | R8 native full model, 10% cache | 8 ranks, 1,536 events, zero differences | `model_r8_bound_cache10/rank*.json` |
-| R8 slots with substitution, Coverage, swap, resize | All outputs bitwise equal to independent FFN oracle | `slots_r8_bound_reset/rank*.json` |
+| R4 padded native batch, 10% cache | 32 questions × 4 generated tokens, 768 events, zero differences | `model_r4_padded_b8_warm/rank*.json` |
+| R8 slots with substitution, Coverage, swap, resize | All outputs bitwise equal to independent FFN oracle | `slots_r8_incremental/rank*.json` |
 | Recorded LRU policy replay | 96 events, 4,573 evictions checked | `replay_lru.json` |
 | Recorded Gate policy replay | 96 events, 4,169 evictions checked | `replay_gate.json` |
-| Recorded Coverage policy replay | 96 events, 3,335 evictions checked | `replay_coverage_final.json` |
+| Recorded Coverage policy replay | 96 events, 3,335 evictions checked | `replay_coverage_incremental.json` |
 
 Full-model parity checks selected expert IDs, routing weights, every MoE output
 element/checksum and all generated token IDs. Four fixed prompts each produce
@@ -101,13 +115,16 @@ active-slot eviction.
 
 Receipts: `profile_slots_bound_{copy,views}_summary.json`, corresponding
 `.nsys-rep`/SQLite files, and `scripts/summarize_slot_trace.py`.
-`fabric_r{1,2,4,8}/rank*.json` separately records OS-local pinned H2D,
+`fabric_warm_r{1,2,4,8}/rank*.json` separately records OS-local pinned H2D,
 H2D+staging-D2D and NCCL all-to-all bandwidth with five samples per rank.
 These are payload bandwidth measurements, excluding wire/protocol overhead.
 
 ## Model measurement matrix
 
-Pending final aggregation. `scripts/run_server_matrix.py` defines sequential
+Pending final aggregation in `model_matrix_v2`. The earlier `model_matrix`,
+`benchmark_r4_probe` and `native_quality_screen` are explicitly superseded:
+measurements predated the padding corrections and whole-generation throughput
+clock. Their receipts remain on disk, excluded from final measurements. `scripts/run_server_matrix.py` defines sequential
 R4/R8 A/B/C anchors at local batch 8/cache 30%, followed by local batches
 4/8/16/32 × cache 10/20/30/40/50% with the configured Coverage + same/path
 default. The protocol uses cold expert caches, fixed-step greedy generation,

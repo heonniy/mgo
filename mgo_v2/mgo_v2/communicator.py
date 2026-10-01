@@ -7,6 +7,21 @@ import torch
 import torch.distributed as dist
 
 
+def warmup_collectives() -> None:
+    """Establish NCCL collective and peer paths before pinning a large store.
+
+    NCCL can initialize point-to-point connections lazily on the first
+    all-to-all; an all-reduce alone does not exercise that path. Keep this
+    outside loading and measured generation, with every rank participating.
+    """
+    world = dist.get_world_size()
+    warm = torch.ones(world * 1024, device="cuda")
+    dist.all_reduce(warm)
+    dist.all_to_all_single(torch.empty_like(warm), warm)
+    dist.all_gather([torch.empty_like(warm) for _ in range(world)], warm)
+    torch.cuda.synchronize()
+
+
 @dataclass
 class ReceivedBatch:
     hidden_states: torch.Tensor

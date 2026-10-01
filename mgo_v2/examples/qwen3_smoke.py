@@ -18,6 +18,7 @@ import torch.distributed as dist
 from transformers import AutoTokenizer
 
 from mgo_v2.affinity import AffinityTables
+from mgo_v2.communicator import warmup_collectives
 from mgo_v2.config import RuntimeConfig
 from mgo_v2.controller import GlobalExpertController
 from mgo_v2.executor import LegacySlotExecutorAdapter
@@ -60,7 +61,7 @@ def main():
     if not dist.is_initialized():
         dist.init_process_group("nccl", init_method="env://", device_id=torch.device("cuda:0"))
     # Initialize NCCL before allocating the checkpoint-sized pinned host store.
-    dist.all_reduce(torch.ones(1, device="cuda"))
+    warmup_collectives()
     rank, world = dist.get_rank(), dist.get_world_size()
 
     model_config = AutoConfig.from_pretrained(args.model, local_files_only=True)

@@ -146,6 +146,34 @@ class DiversityEviction(EvictionPolicy):
         self.neighbors = similarity >= similarity_threshold
         for layer in range(similarity.shape[0]):
             np.fill_diagonal(self.neighbors[layer], True)
+        self._coverage_cache = None
+        self._coverage_residents = set()
+        self._coverage_counts = None
+        self._coverage_losses = None
+
+    def _sync_coverage(self, cache):
+        """Update only layers whose global resident set changed since a victim.
+
+        Resident keys, rather than rank-local candidates, determine coverage;
+        pinned and remote experts remain part of the counts. Comparing keys
+        also supports independent replay/manual cache mutations.
+        """
+        if self._coverage_cache is not cache:
+            self._coverage_cache = cache
+            self._coverage_residents = set()
+            self._coverage_counts = np.zeros(self.neighbors.shape[:2], dtype=np.int32)
+            self._coverage_losses = self.neighbors.sum(axis=1)
+        residents = set(cache.owner)
+        changed = set()
+        for layer, expert in self._coverage_residents - residents:
+            self._coverage_counts[layer] -= self.neighbors[layer, :, expert]
+            changed.add(layer)
+        for layer, expert in residents - self._coverage_residents:
+            self._coverage_counts[layer] += self.neighbors[layer, :, expert]
+            changed.add(layer)
+        for layer in changed:
+            self._coverage_losses[layer] = self.neighbors[layer][self._coverage_counts[layer] <= self.k_min].sum(axis=0)
+        self._coverage_residents = residents
 
     def _represents(self, layer: int, resident: int, source: int) -> bool:
         return resident == source or (
@@ -155,10 +183,8 @@ class DiversityEviction(EvictionPolicy):
     def coverage_damage(
         self, cache: GlobalCacheState, key: ExpertKey
     ) -> int:
-        layer, victim = key
-        residents = sorted(cache.resident_layer(layer))
-        counts = self.neighbors[layer][:, residents].sum(axis=1)
-        return int(np.count_nonzero(self.neighbors[layer, :, victim] & (counts <= self.k_min)))
+        self._sync_coverage(cache)
+        return int(self._coverage_losses[key])
 
     def choose(self, cache, rank, layer, pinned):
         cand = self.candidates(cache, rank, pinned)
@@ -166,19 +192,8 @@ class DiversityEviction(EvictionPolicy):
             raise RuntimeError(f"rank {rank}: no legal victim")
 
         gate = {k: self.history.score(k[0], k[1]) for k in cand}
-        # Compute global source coverage once per candidate layer, rather
-        # than rebuilding the same counts for every resident victim.
-        residents_by_layer = {}
-        for resident_layer, expert in cache.owner:
-            residents_by_layer.setdefault(resident_layer, []).append(expert)
-        damage = {}
-        for candidate_layer in {k[0] for k in cand}:
-            neighbors = self.neighbors[candidate_layer]
-            counts = neighbors[:, residents_by_layer[candidate_layer]].sum(axis=1)
-            losses = neighbors[counts <= self.k_min].sum(axis=0)
-            for key in cand:
-                if key[0] == candidate_layer:
-                    damage[key] = float(losses[key[1]])
+        self._sync_coverage(cache)
+        damage = {key: int(self._coverage_losses[key]) for key in cand}
         # The common denominator cancels in argmin. Keep doubled integer
         # numerators: normalized floats can break exact score ties by 1 ULP
         # and choose a different victim before the LRU tie-break.
