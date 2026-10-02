@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "created_unix": 1790941341.2153444,
+  "measurement_manifest_sha256": "ce2cbb4ea82b422b59f173b7440c3078ded98f886679d9df2c9535cde9e5ba3f",
+  "measured_sources_unchanged": true,
+  "original_C0_core_unchanged": true,
+  "original_packet_artifacts_verified": 45,
+  "analysis_only_changes": {
+    "scripts/summarize_controller_overhead.py": {
+      "frozen_sha256": "cdcc203b63ba08e1f0fb23737950e3c559ab4c160ce625e958f75d6ae2ac4ede",
+      "final_sha256": "98e4ea58f1a2c6240b925ea4846f6f31f313720cd6dcdfa89c9ce7fff914690e"
+    }
+  },
+  "reason": "Add interpretation of shared-host baseline rank skew, descriptive C1/C2 differences, CPU test receipt and already-validated GPU duration table. No measurement code, analyzer, replay, timings or parity gates changed.",
+  "pipeline_status": {
+    "status": "PASS",
+    "started_unix": 1790938526.0016303,
+    "stages": [
+      {
+        "stage": "C0",
+        "exit_code": 0,
+        "finished_unix": 1790939284.2003713
+      },
+      {
+        "stage": "cpu_differential",
+        "exit_code": 0,
+        "finished_unix": 1790940169.2711136
+      },
+      {
+        "stage": "C1",
+        "exit_code": 0,
+        "finished_unix": 1790940566.8175852
+      },
+      {
+        "stage": "C2",
+        "exit_code": 0,
+        "finished_unix": 1790940965.9273996
+      },
+      {
+        "stage": "profiles",
+        "exit_code": 0,
+        "finished_unix": 1790941238.7682796
+      },
+      {
+        "stage": "profile_analysis",
+        "exit_code": 0,
+        "finished_unix": 1790941257.3527005
+      },
+      {
+        "stage": "summary",
+        "exit_code": 0,
+        "finished_unix": 1790941258.242601
+      }
+    ],
+    "active_stage": "summary",
+    "finished_unix": 1790941258.2426653
+  }
+}

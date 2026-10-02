@@ -1,0 +1,206 @@
+{
+  "status": "PASS",
+  "primary_generations": 9,
+  "batch": 8,
+  "repeats_per_policy_controller": 1,
+  "profile_generations": 2,
+  "profile_forwards": 9,
+  "expanded_batches": false,
+  "checks": [
+    {
+      "controller": "C0",
+      "policy": "P0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C0",
+      "policy": "P1",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C0",
+      "policy": "O0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C1",
+      "policy": "P0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C1",
+      "policy": "P1",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C1",
+      "policy": "O0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C2",
+      "policy": "P0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C2",
+      "policy": "P1",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    },
+    {
+      "controller": "C2",
+      "policy": "O0",
+      "ranks": 4,
+      "events": 3120,
+      "status": "PASS",
+      "original_routes_decisions_cache_tokens_equal": true,
+      "full_generation_device_work_counters_equal": true
+    }
+  ],
+  "memory": {
+    "min_host_available_gib": 1607.338191986084,
+    "max_tree_rss_gib": 231.88697052001953,
+    "min_selected_gpu_free_mib": 70151,
+    "guard_stops": 0
+  },
+  "cpu_differential": {
+    "status": "PASS",
+    "checks": [
+      {
+        "policy": "P0",
+        "events": 3120,
+        "status": "PASS",
+        "full_plan_cache_history_equal": true,
+        "compact_follower_equal": true,
+        "captured_physical_plan_equal": true,
+        "decision_transcript_sha256": "4d24a911154ebe52085c7d54154fbe28e85dc93fad2ee86891801c9c95f13e39",
+        "follower_apply_cpu_seconds": 3.352857147,
+        "validation_wall_seconds": 303.7940444946289
+      },
+      {
+        "policy": "P1",
+        "events": 3120,
+        "status": "PASS",
+        "full_plan_cache_history_equal": true,
+        "compact_follower_equal": true,
+        "captured_physical_plan_equal": true,
+        "decision_transcript_sha256": "509368c690574ab7fec67f1b299d07d9b0945e10b4f96ce8ebb32f0f5afd260b",
+        "follower_apply_cpu_seconds": 3.202714628,
+        "validation_wall_seconds": 292.30402183532715
+      },
+      {
+        "policy": "O0",
+        "events": 3120,
+        "status": "PASS",
+        "full_plan_cache_history_equal": true,
+        "compact_follower_equal": true,
+        "captured_physical_plan_equal": true,
+        "decision_transcript_sha256": "9099c19ab6458a2a274204f4d4b24a0fe5ccf24f58e681a45b46077e18c42d35",
+        "follower_apply_cpu_seconds": 3.359707924,
+        "validation_wall_seconds": 288.37518215179443
+      }
+    ]
+  },
+  "gpu_profile": {
+    "status": "PASS",
+    "scope": "P1 prefill plus 8 decode forwards; C0 prefix from original profile",
+    "checks": [
+      {
+        "controller": "C1",
+        "rank": 0,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C1",
+        "rank": 1,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C1",
+        "rank": 2,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C1",
+        "rank": 3,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C2",
+        "rank": 0,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C2",
+        "rank": 1,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C2",
+        "rank": 2,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      },
+      {
+        "controller": "C2",
+        "rank": 3,
+        "events": 432,
+        "status": "PASS",
+        "expert_rows_gemm_counts_fetch_bytes_equal_C0": true,
+        "transport_bytes_reconciled": true
+      }
+    ]
+  }
+}

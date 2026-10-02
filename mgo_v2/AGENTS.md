@@ -16,6 +16,12 @@ Use only physical GPUs **0,1,4,5** as R4. Compare Balanced Random, existing Hung
 
 **Oracle packet status: complete.** The owner-reduced 30 generations and three full B8 profiles passed at `experiments/rank_demand_oracle_20261002/{RESULTS.md,validation.json}`. Do not rerun the packet. Continue only the separately authorized reduced controller-overhead follow-up.
 
+**Controller follow-up status: complete.** The reduced B8 packet passed at
+`experiments/controller_overhead_20261002/{RESULTS.md,validation.json}`: nine
+primary generations, 9,360 captured CPU differential events and two short P1
+profiles. C1/C2 remain opt-in. Do not automatically rerun, add repetitions,
+expand to B4/B16 or change placement policies. Single-sample timing is descriptive.
+
 ## New priority — admission trajectory/controller breakdown (2026-10-02)
 
 The physical locality study is complete at `e61758e`. Before changing the method, read `experiments/admission_trajectory_controller_breakdown_20261002/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}`.

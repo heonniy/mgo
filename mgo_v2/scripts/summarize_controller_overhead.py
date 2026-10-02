@@ -107,16 +107,29 @@ def main():
         '|---|---|---:|---:|---:|---:|---:|']
     for r in components:
         report.append(f'| {r["policy"]} | {r["controller"]} | {r["controller_seconds"]:.3f} | {r["component_seconds"].get("coverage_rank_and_victim",0):.3f} | {r["counts"].get("candidate_visits",0):,} | {r["counts"].get("cache_key_items",0):,} | {r["counts"].get("full_resident_set_materializations",0):,} |')
+    report+=['','## Interpretation of the reduced comparison','',
+        'The measured bottleneck is repeated Coverage victim evaluation, not the Hungarian solver. In the P0 trace alone, 68,131 victim choices inspect 30,646,150 candidates (about 450 per choice). C0 also materializes 31,392,509 cache-key items and 68,131 full resident sets. C1 keeps every candidate visit and victim decision while removing those repeated full constructions and using incremental Coverage counts and array ranking. The separate CPU component replay supports this mechanism independently of the physical timing samples.','',
+        'All three physical C1 samples reduce controller time substantially. This is consistent with host planning contributing to the previous critical path. It does not establish a stable end-to-end speedup magnitude: the fresh C0/P1 controller times vary from 87.844 to 145.518 seconds across ranks, and its 205.113-second generation is much slower than the original P1 B8 control samples. Shared-host scheduling variation is visible in the baseline itself.','',
+        'C2 has lower observed E2E than C1 for P0/P1 (70.359 to 61.714 seconds and 69.870 to 61.295 seconds), but O0 is nearly unchanged (74.667 to 73.800 seconds). P0 maximum-rank controller time is also essentially unchanged between C1 and C2. These single samples do not establish a universal advantage for single-planner broadcast. Keep C1 and C2 separately selectable; do not infer that removing four concurrent copies of planning should provide a fourfold latency gain.','',
+        'This overhead-only study supplies no new stable ranking of P0/P1/O0 placement policies. The original oracle packet remains the placement evidence. No additional repetitions or B4/B16 controller expansion are needed under the owner-reduced confirmation scope.']
     report+=['','Detailed exclusive history, substitution, admission, Coverage synchronization and cache components are retained in `cpu_components_*.csv` and `cpu_component_summary.json`.','',
         '## Planner transport and device work','',
         f'C2 broadcasts {next(r for r in rows if r["controller"]=="C2")["planner_payload_bytes_per_event"]:,} payload bytes per layer event. The logical payload and modeled planner-to-peer bytes are recorded separately from expert H2D traffic; they exclude NCCL protocol overhead and are not measured wire bytes.','',
-        'The short P1 profiles cover one prefill plus eight decode forwards after primary timing. They compare C1/C2 against the same prefix of the original C0 profile. Per-event/rank expert rows, GEMM counts and physical expert-fetch bytes must match exactly. Full 65-forward runtime fetch/cache/route counters also match for all three policies. The short profile does not characterize late-decode timing or all policies.','',
+        'The short P1 profiles cover one prefill plus eight decode forwards after primary timing. They compare C1/C2 against the same prefix of the original C0 profile. Per-event/rank expert rows, GEMM counts and physical expert-fetch bytes matched exactly. Full 65-forward runtime fetch/cache/route counters also match for all three policies. The short profile does not characterize late-decode timing or all policies.','',
         '| Rank | Planner compute s | Encode s | Broadcast/copies/wait s | Apply s |',
         '|---:|---:|---:|---:|---:|']
     for r in broadcast:
         t=r['component_seconds'];report.append(f'| {r["rank"]} | {t.get("planner_compute",0):.4f} | {t.get("plan_encode",0):.4f} | {t.get("planner_broadcast",0):.4f} | {t.get("plan_apply",0):.4f} |')
     report+=['','Follower broadcast time includes waiting for rank 0 to finish planning. It is not a pure network-latency estimate. CPU transport spans include required copies and synchronization; actual NCCL GPU intervals and payload-copy reconciliation are retained in the profile artifacts.','',
+        'GPU durations below sum the maximum rank interval-union duration at each decode layer event over the eight profiled decode forwards. NCCL includes the added C2 planner broadcast; it also includes GPU waiting and is not pure communication service time.','',
+        '| Controller | Expert GPU ms | GEMM ms | NCCL ms | Expert H2D ms |',
+        '|---|---:|---:|---:|---:|']
+    for r in read(OUT/'gpu_profile_summary.json'):
+        prefix='sum_event_max_rank_'
+        report.append('| '+r['controller']+' | '+' | '.join(f'{r[prefix+k+"_gpu_union_ms"]:.3f}' for k in ('expert','gemm','nccl','h2d'))+' |')
+    report+=['',
         '## Correctness and resources','',
+        'All 39 CPU tests passed (the 32 existing tests and seven optimization/codec tests); see `cpu_tests.txt`.','',
         'All 9,360 captured CPU events match complete C0/C1/follower plans, effective-route weights, cache owners/slots/timestamps and rolling history. All nine physical generations match the original packet event hashes and full generated tokens on every rank. Malformed payloads, rounding/ties and diagnostics parity are tested separately.','',
         f'Only physical GPUs 0,1,4,5 were used, one job at a time. Minimum host availability was {memory["min_host_available_gib"]:.1f} GiB; maximum process-tree RSS was {memory["max_tree_rss_gib"]:.1f} GiB; minimum selected-GPU free memory was {memory["min_selected_gpu_free_mib"]:,} MiB. Guard stops: {memory["guard_stops"]}. Shared-host interference remains a timing limitation.','',
         '## Artifacts and reproduction','',
