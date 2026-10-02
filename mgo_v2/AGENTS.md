@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `f64eb56`: stable IPC baseline rebase.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/IPC_BASELINE_REBASE.md`.
+Do not rerun the CPU Pareto screen; its raw H2D/peer-byte results and F/K
+selection are transport-independent. Set `NCCL_CUMEM_ENABLE=0` in both new
+physical modes. T0 must validate as `P2P/IPC` direct P2P over NVSwitch;
+R3 must validate as SHM with P2P disabled and no NET path. After one paired
+smoke, re-run the frozen 384-event E1 communication replay. Only STRONG_GAP
+may authorize the existing clean F/K stage. Do not use P2P/CUMEM again,
+retune NCCL, rerun C or change rho.
+
 **Bounded cuMem diagnosis complete (2026-10-03): CUMEM_PATH_UNSTABLE.**
 All three fresh default-T0 trials selected P2P/CUMEM and timed out at the
 90-second bound. The single NCCL_CUMEM_ENABLE=0 diagnostic selected P2P/IPC

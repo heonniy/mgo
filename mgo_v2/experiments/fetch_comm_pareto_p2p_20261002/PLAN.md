@@ -196,6 +196,23 @@ Follow [CUMEM_PREFLIGHT_RETRY.md](CUMEM_PREFLIGHT_RETRY.md):
 
 The cuMem-disabled path is diagnostic only and must not silently replace T0.
 
+## Stage 0G — rebase physical transport to stable P2P/IPC vs SHM
+
+The bounded diagnosis at `f64eb56` found default `P2P/CUMEM` unstable (3/3 timeout) while `NCCL_CUMEM_ENABLE=0` produced a validated `P2P/IPC` direct-P2P path.
+
+Follow [IPC_BASELINE_REBASE.md](IPC_BASELINE_REBASE.md).
+
+New physical transport definitions:
+
+```text
+T0-IPC = NCCL_CUMEM_ENABLE=0 + direct P2P enabled -> P2P/IPC over NVSwitch
+R3-SHM = NCCL_CUMEM_ENABLE=0 + P2P_LEVEL=LOC + IB_DISABLE=1 -> SHM, no direct P2P
+```
+
+The CPU replica Pareto results at `dc7b099` remain valid and must not be rerun because they depend on byte/fetch counts, not NCCL transport timing.
+
+Run one paired smoke, then re-run the existing 384-event E1 trace communication replay under these two stable conditions. Only a STRONG_GAP may authorize the existing clean F/K physical stage.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

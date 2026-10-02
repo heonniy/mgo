@@ -263,5 +263,41 @@
     "E1_must_use_default_cumem_path": true,
     "fresh_result_root_required": true,
     "E2_conditional_on_existing_STRONG_GAP": true
+  },
+  "ipc_baseline_rebase": {
+    "checkpoint": "f64eb568d2e96929b6f171bdae2b2e91f8eaef98",
+    "cpu_pareto_rerun": false,
+    "cpu_pareto_unchanged": true,
+    "T0_IPC": {
+      "label": "direct P2P / NVSwitch",
+      "env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_P2P_DISABLE": null,
+        "NCCL_P2P_LEVEL": null,
+        "NCCL_IB_DISABLE": null,
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_NET_GDR_C2C": null,
+        "NCCL_SHM_DISABLE": null
+      },
+      "expected_transport": "P2P/IPC"
+    },
+    "R3_SHM": {
+      "label": "P2P disabled / host-staged SHM",
+      "env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_P2P_DISABLE": null,
+        "NCCL_P2P_LEVEL": "LOC",
+        "NCCL_IB_DISABLE": "1",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_NET_GDR_C2C": null,
+        "NCCL_SHM_DISABLE": null
+      },
+      "expected_transport_prefix": "SHM/"
+    },
+    "paired_smokes": 2,
+    "E1_replay": true,
+    "E1_thresholds_unchanged": true,
+    "E2_clean_fk_conditional_on_STRONG_GAP": true,
+    "old_fkc_physical_is_historical": true
   }
 }

@@ -1,3 +1,21 @@
+## Immediate task — adopt IPC T0 baseline and rerun E1
+
+Current checkpoint: `f64eb56`.
+
+Read `IPC_BASELINE_REBASE.md`.
+
+Do exactly:
+
+1. keep the CPU Pareto/F-K selection unchanged;
+2. set NCCL_CUMEM_ENABLE=0 for both new transport modes;
+3. verify T0-IPC uses P2P/IPC and R3-SHM uses SHM with no P2P/NET;
+4. if both paired smokes pass, re-run the frozen 384-event E1 trace replay;
+5. commit the transport rebase/E1 result and stop.
+
+Only if E1=STRONG_GAP may the already-planned clean F/K model timing proceed.
+
+Do not use default P2P/CUMEM again, rerun CPU simulation, tune NCCL, or rerun C.
+
 ## Completed — bounded cuMem diagnosis
 
 **Bounded cuMem diagnosis complete (2026-10-03): CUMEM_PATH_UNSTABLE.**
