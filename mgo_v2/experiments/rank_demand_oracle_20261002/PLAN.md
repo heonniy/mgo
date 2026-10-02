@@ -329,6 +329,135 @@ Before GPU timing:
 
 No event may fall back from exact oracle to heuristic.
 
+## 12. Controller-overhead repair and clean remeasurement
+
+This is a **separate follow-up stage after the placement/oracle measurements above**. If Stage A/B has already started from the previous plan commit, let it finish unchanged. Do not mix controller changes into the primary P0/P1/O0 placement comparison.
+
+The completed controller breakdown established that the current runtime has a large host-side planning bottleneck:
+
+- Coverage ranking accounts for roughly **69.5–71.0%** of instrumented controller time;
+- each victim selection visits about **448–452 candidates**;
+- the measured R4 traces perform roughly **20.6M–42.1M candidate visits** across B4–B16;
+- repeated `keys_on_rank()`, resident list/set construction, candidate score/rank construction, `_sync_coverage()`, and full cache-consistency scans contribute additional Python work;
+- cost construction plus Hungarian assignment is at most **0.96%** of controller time, so optimizing the assignment solver is not the priority;
+- every rank currently receives the same global routing metadata and independently computes the same global plan, duplicating logical planning work across ranks.
+
+The goal of this stage is to remove implementation overhead **without changing any controller decision** and then remeasure whether the placement/load effect becomes more visible in TPOT/E2E.
+
+### 12.1 C0 — frozen baseline controller
+
+Use the exact existing implementation as the baseline. Preserve the already-collected P0/P1/O0 results; do not regenerate them merely to overwrite the baseline.
+
+Record, per event and per run:
+
+- total controller wall time;
+- Coverage victim ranking time;
+- admission construction/assignment time;
+- substitution time;
+- cache/history synchronization time;
+- candidate visits;
+- cache-key/list materializations;
+- plan/cache hashes.
+
+### 12.2 C1 — decision-equivalent local controller optimization
+
+Optimize the current controller implementation while keeping each rank's planning semantics unchanged.
+
+Priority order:
+
+1. **Coverage victim selection**
+   - avoid materializing the full rank cache for every victim;
+   - reuse resident/pinned views within an event;
+   - cache or incrementally maintain gate/coverage quantities that are currently rebuilt for every candidate;
+   - avoid repeated Python sorting/scoring when the relevant state has not changed.
+
+2. **Resident/list/set construction**
+   - remove repeated `keys_on_rank()` scans and redundant global resident-set reconstruction;
+   - update affected resident/layer state incrementally where possible.
+
+3. **Validation-only scans**
+   - move expensive full-cache consistency scans out of the timed production path or gate them behind a debug/validation option;
+   - retain equivalent correctness tests outside primary timing.
+
+C1 must preserve, event by event:
+
+- substitution mapping;
+- admission assignment;
+- selected victim;
+- cache state;
+- effective routes;
+- generated tokens.
+
+Any semantic difference invalidates C1 as an overhead-only optimization.
+
+### 12.3 C2 — remove replicated global planning
+
+After C1 parity passes, measure a second runtime variant in which one designated planner rank computes the deterministic global plan once and broadcasts a compact plan/decision payload to the other ranks.
+
+Requirements:
+
+- all ranks still contribute the same required global routing metadata;
+- planner output must be sufficient for every rank to execute exactly the C1 plan;
+- the broadcast payload and synchronization cost must be measured explicitly;
+- event-level plan/cache/token hashes must match C1 exactly;
+- no policy coefficient, cache rule, substitution decision, quota, placement objective, replication or migration change is allowed.
+
+C2 tests whether replacing **R copies of identical CPU planning** with one planning pass plus a small collective improves the real critical path.
+
+### 12.4 Controller optimization timing matrix
+
+After parity/correctness gates, remeasure the primary R4/B8 cell first.
+
+For each of P0, P1 and O0 frozen placement traces compare:
+
+- C0 baseline controller;
+- C1 local optimized controller;
+- C2 single-planner controller.
+
+Use uninstrumented fixed-work generation for TPOT/E2E. Use separate diagnostic runs for subcomponent controller timings.
+
+If R4/B8 shows a material controller reduction with stable outputs, expand the uninstrumented comparison to R4/B4 and R4/B16.
+
+Use the same workload/checkpoint/cache/substitution/Coverage settings and the same balanced policy-order discipline as Stage B. Do not retune placement coefficients after seeing the controller results.
+
+### 12.5 Primary controller-overhead metrics
+
+Report:
+
+[
+ControllerReduction = 1 - \frac{T_{controller}^{optimized}}{T_{controller}^{C0}}
+]
+
+and separately:
+
+- TPOT;
+- generation time;
+- controller time / generation time;
+- Coverage ranking time;
+- candidate visits per victim;
+- planner broadcast time and bytes for C2;
+- GPU expert/NCCL/H2D metrics to verify that a controller-only change did not alter device work.
+
+The important interpretation is:
+
+- if controller time falls and TPOT/E2E falls with identical GPU work, the previous host planning path was masking placement gains;
+- if controller time falls but TPOT/E2E barely changes, host planning was largely overlapped or outside the critical path;
+- if C1 helps but C2 does not, replicated planning was not worth the added synchronization;
+- if C2 helps, the production controller should not compute the identical global plan independently on every rank.
+
+### 12.6 Correctness gates for controller optimization
+
+Before any optimized timing claim:
+
+1. run existing CPU tests;
+2. add event-level C0/C1/C2 differential tests;
+3. require identical assignments, victims, cache hashes, substitution mappings and generated tokens;
+4. verify debug-only consistency checks still pass offline;
+5. verify C2 payload decode reproduces the planner rank's exact plan on every rank;
+6. keep diagnostic instrumentation outside the uninstrumented timing path.
+
+The controller optimization is a **runtime repair**, not a new placement policy. Report its gain separately from the P0/P1/O0 placement comparison.
+
 ## 12. Required artifacts
 
 Create:
@@ -352,22 +481,29 @@ Recommended figures:
 3. remote-pair change versus max-rank expert-load change;
 4. per-step max-rank expert load for R4/B8.
 
-## 13. Stop condition
+## 14. Stop condition
 
-Stop after:
+Stop the placement/oracle stage after:
 
 1. oracle correctness tests;
 2. planning traces;
 3. 54 uninstrumented generations (3 batches × 3 policies × 6 repeats);
 4. three R4/B8 posthoc profiles;
-5. final result packet.
+5. the placement/oracle result packet.
+
+Then execute the controller-overhead stage in Section 12:
+
+6. C0/C1/C2 decision-parity tests;
+7. R4/B8 controller timing + uninstrumented comparison for P0/P1/O0;
+8. expand to B4/B16 only if the R4/B8 controller optimization materially reduces controller time without semantic drift;
+9. publish a separate controller-overhead result packet.
 
 Do not automatically:
 
 - add communication to O0;
 - add a soft/hard load-aware production policy;
-- retune Coverage;
+- retune Coverage policy semantics;
 - change substitution;
 - add replication/migration.
 
-Those are follow-up method decisions after owner review.
+Those remain follow-up method decisions after owner review.

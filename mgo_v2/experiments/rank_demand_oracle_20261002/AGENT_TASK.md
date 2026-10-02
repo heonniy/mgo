@@ -92,8 +92,32 @@ Publish:
 
 Do not commit giant Nsight traces.
 
+## Follow-up: controller-overhead repair
+
+After the P0/P1/O0 placement/oracle packet is complete, continue with the controller-overhead stage in PLAN.md. **Do not modify the controller implementation during the primary placement/oracle timing.**
+
+Implement and validate:
+
+- C1: decision-equivalent optimization of Coverage victim search, repeated resident/list/set construction, and debug-only full consistency scans;
+- C2: compute the deterministic global plan once on a designated planner rank and broadcast the compact plan to the other ranks.
+
+For both C1 and C2 require event-level parity with C0 for:
+
+- substitution;
+- admission assignment;
+- victim selection;
+- cache state;
+- effective routes;
+- generated tokens.
+
+Primary first cell: R4/B8 on GPUs 0,1,4,5.
+
+Measure controller wall time separately from uninstrumented TPOT/E2E. Only expand to B4/B16 after the R4/B8 parity and controller-time gate passes.
+
+Do not change placement objectives, quotas, Coverage semantics, substitution, replication or migration in this stage.
+
 ## Stop
 
-Stop after 54 uninstrumented generations, three B8 profiles and the result packet.
+Stop the placement/oracle phase after 54 uninstrumented generations, three B8 profiles and its result packet. Then run the isolated controller-overhead repair stage defined above and in PLAN.md.
 
 Do not design the joint communication+load method yet.
