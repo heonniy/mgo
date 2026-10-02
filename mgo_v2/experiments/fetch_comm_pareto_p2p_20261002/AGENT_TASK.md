@@ -1,3 +1,17 @@
+## Completed — IPC baseline rebase and I1 communication gate
+
+**IPC baseline rebase complete (2026-10-03): AMBIGUOUS_GAP.**
+Both NCCL_CUMEM_ENABLE=0 smokes passed: T0 uses P2P/IPC only and R3
+uses SHM/direct/direct only, on one node/four local ranks. The original
+384-event communication replay passed all payload checks in both orders.
+Primary R3/T0 ratios are 1.0529x and 1.0836x (median 1.0682x), below the
+1.20x STRONG_GAP threshold. CPU Pareto results and frozen schedule metadata
+are SHA256-identical; no CPU screen or model was run. Peak process-tree RSS
+was 2.72 GiB with no OOM. GPUs 0,1,4,5 are released. Read
+`IPC_BASELINE_REBASE_RESULTS.md` and `ipc_baseline_validation.json` in the
+experiment packet. Stop here; do not launch clean F/K, add repetitions or
+tune transport. Earlier checkpoints below are historical.
+
 ## Immediate task — adopt IPC T0 baseline and rerun E1
 
 Current checkpoint: `f64eb56`.

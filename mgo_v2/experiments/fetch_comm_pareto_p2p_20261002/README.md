@@ -1,6 +1,21 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current diagnosis: CUMEM_PATH_UNSTABLE (2026-10-03).**
+**Current result: IPC baseline rebase AMBIGUOUS_GAP (2026-10-03).**
+Both transport smokes passed with cuMem disabled: T0-IPC uses P2P/IPC;
+R3-SHM uses SHM/direct/direct without P2P or NET. The bounded 384-event
+actual-trace replay passed all payload checks. R3/T0 ratios are 1.0529x
+and 1.0836x, median 1.0682x, below the 1.20x clean F/K gate. CPU Pareto
+results and frozen schedule metadata are unchanged; no CPU screen or
+model was run. No OOM; target GPUs are released. Stop without extra
+repetitions or model timing. Read
+[IPC_BASELINE_REBASE_RESULTS.md](IPC_BASELINE_REBASE_RESULTS.md),
+[summary CSV](ipc_trace_comm_replay.csv),
+[full evidence](ipc_trace_comm_replay.json), and
+[validation](ipc_baseline_validation.json).
+The earlier diagnosis and instructions below are historical; IPC was
+subsequently authorized by [IPC_BASELINE_REBASE.md](IPC_BASELINE_REBASE.md).
+
+**Prior diagnosis: CUMEM_PATH_UNSTABLE (2026-10-03).**
 Default P2P/CUMEM timed out in all three 90-second trials. The one
 cuMem-disabled diagnostic passed on P2P/IPC. This does not authorize
 adopting IPC as the T0 baseline. E1 was not retried and no model was started.
