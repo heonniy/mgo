@@ -4,6 +4,14 @@ Read `experiments/fetch_comm_pareto_p2p_20261002/{README.md,PLAN.md,matrix.json,
 
 This is the new owner-authorized minimum-scope go/no-go study. Use only GPUs 0,1,4,5; R4/B8/cache30; one prefill + 32 decode forwards; substitution off; LRU fixed. Characterize whether replica budget trades CPU expert H2D against peer activation communication. Compare normal NVSwitch against `NCCL_P2P_DISABLE=1` with SHM fallback left enabled. CPU sweep first; physically validate only F/K/C, two repeats each transport mode (12 primary generations maximum unless the >10% spread rule triggers one targeted repeat). Do not add load balancing, substitution, final weighted objectives, B4/B16 or R8.
 
+**Immediate transport recovery after `7c881f7`:** do not start the model.
+Read `experiments/fetch_comm_pareto_p2p_20261002/TRANSPORT_RECOVERY.md`.
+Try only the bounded R1/R2/R3 no-P2P smoke sequence, committing each result.
+R1 uses `NCCL_P2P_LEVEL=LOC`; R2 additionally disables GDR; R3 disables IB
+and may use Socket/loopback as an explicitly synthetic stress condition. Stop
+at the first valid path. If all fail, stop synthetic H100 T1 work and move the
+Pareto experiment to the real no-NVLink server rather than exploring more NCCL knobs.
+
 **Stage 0 status (2026-10-03): blocked at T1 transport.** T0 smoke and three
 calibration cells passed; T1 selected NET/IB/GDRDMA and failed its first
 all-to-all with `IBV_WC_RETRY_EXC_ERR`. See the packet's `RESULTS.md` and

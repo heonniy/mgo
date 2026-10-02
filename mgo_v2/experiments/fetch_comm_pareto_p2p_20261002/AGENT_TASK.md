@@ -1,3 +1,19 @@
+## Immediate task — recover T1 transport only
+
+Current checkpoint: `7c881f7`. Do **not** implement replication or run the model yet.
+
+Read `TRANSPORT_RECOVERY.md` and execute only its bounded R1 -> R2 -> R3 smoke sequence. Commit after every success/failure.
+
+Important:
+
+- R1 uses `NCCL_P2P_LEVEL=LOC` with `NCCL_P2P_DISABLE` unset.
+- R2 additionally disables GDR.
+- R3 disables IB and accepts Socket as an explicit synthetic slow-communication condition.
+- Stop at the first passing non-P2P condition.
+- If all bounded conditions fail, stop H100 synthetic T1 work and report `BLOCKED_SYNTHETIC_TRANSPORT`.
+
+After the first success, run only the three tiny calibration cells. Resume Stage 1 only after committing that result.
+
 # AGENT TASK — Fast Fetch/Comm Pareto characterization
 
 Read `PLAN.md` and the completed controller-overhead results at `../controller_overhead_20261002/RESULTS.md`.

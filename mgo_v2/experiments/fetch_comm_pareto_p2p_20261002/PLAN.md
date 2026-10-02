@@ -69,6 +69,21 @@ Save the logs. Confirm that T1 does not use the direct P2P transport for the MoE
 
 If the runtime still selects an NVLS/direct-NVLink path for the measured MoE collective despite `NCCL_P2P_DISABLE=1`, stop and report it rather than silently calling the condition P2P-disabled.
 
+## Stage 0A — blocked T1 transport recovery
+
+The original `NCCL_P2P_DISABLE=1` smoke is blocked by `NET/IB/GDRDMA -> IBV_WC_RETRY_EXC_ERR` at commit `7c881f7`.
+
+Before continuing Stage 0, execute the bounded recovery matrix in [TRANSPORT_RECOVERY.md](TRANSPORT_RECOVERY.md).
+
+Priority is:
+
+1. `NCCL_P2P_LEVEL=LOC` (official no-P2P cutoff);
+2. if needed, additionally disable GDR with `NCCL_NET_GDR_LEVEL=LOC`;
+3. if IB remains broken, disable IB and allow Socket fallback;
+4. at most one final same-host `NCCL_SOCKET_IFNAME=lo` retry.
+
+Stop at the first valid non-P2P transport. Do not load the model until this gate passes.
+
 ## Stage 0 — tiny hardware calibration
 
 Do not run a large benchmark suite.
