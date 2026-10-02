@@ -1,6 +1,14 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current result: physical pilot NO_CLEAR_SHIFT (2026-10-03).**
+**Current status: E1 BLOCKED_PREFLIGHT (2026-10-03).**
+T0 selected P2P/CUMEM but its tiny preflight did not complete within the
+180-second bound. No trace timing or E2 model run was started. This is not
+a NO_GAP measurement. The target GPUs were released without OOM. Read
+[TRACE_COMM_REPLAY_RESULTS.md](TRACE_COMM_REPLAY_RESULTS.md),
+[failure receipt](trace_comm_preflight_failure.json), and
+[stage JSON](trace_comm_replay.json). Preserve the failure and stop for review.
+
+**Prior result: physical pilot NO_CLEAR_SHIFT (2026-10-03).**
 All six cells passed correctness. T0-K and R3-F are descriptively fastest,
 but the communication-cost mechanism is not supported and application/check
 CPU timing varies substantially. No repeats were added; GPUs 0,1,4,5 were

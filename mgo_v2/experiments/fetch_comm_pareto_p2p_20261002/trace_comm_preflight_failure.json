@@ -1,0 +1,103 @@
+{
+  "status": "BLOCKED_PREFLIGHT",
+  "mode": "T0",
+  "stop_reason": "bounded timeout",
+  "timeout_seconds": 180,
+  "observed_total_seconds": 183.80545139312744,
+  "exit_code": 1,
+  "communicator_initialized": true,
+  "path_selected": "P2P/CUMEM",
+  "payload_validation_completed": false,
+  "last_observed_activity": "P2P shareable-buffer imports/UDS handle mapping after communicator initialization",
+  "root_cause": "Not established; no automatic retry, driver reset or NCCL knob change.",
+  "process_wait_channels_observed": [
+    "uvm_gpu_retain_by_uuid",
+    "uvm_va_space_unregister_gpu"
+  ],
+  "torch_version": "2.11.0+cu128",
+  "cuda_runtime_version": "12.8",
+  "nccl_version": "2.28.9",
+  "cuda_driver_version": "12080",
+  "previous_successful_preflight_nccl_version": "2.28.9+cuda12.9",
+  "logs": [
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/trace_comm_20261003/preflight_T0/nccl-cloud-0n58xq-1949015.log",
+      "sha256": "5df91e69d879c39103079452eb52a427ac40aa9529623ba778b061412df4f280",
+      "bytes": 98477,
+      "communicator_init_complete": true,
+      "p2p_cumem_selected": true,
+      "warning_lines": [],
+      "last_lines": [
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b1ac00000",
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO UDS converted handle 0x7f5d4c0f6d00 to fd 114 on remote peer 2",
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b1b600000",
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO UDS converted handle 0x7f5d4c0cb550 to fd 114 on remote peer 2",
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b1c000000",
+        "cloud-0n58xq:1949015:1949015 [0] NCCL INFO UDS converted handle 0x7f5d4c0f83c0 to fd 114 on remote peer 2"
+      ]
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/trace_comm_20261003/preflight_T0/nccl-cloud-0n58xq-1949016.log",
+      "sha256": "57f31b05db4d8dc52f789ea086ffc65593644fe97f9defba9ab969d4952aa081",
+      "bytes": 99966,
+      "communicator_init_complete": true,
+      "p2p_cumem_selected": true,
+      "warning_lines": [],
+      "last_lines": [
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b22a00000",
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO UDS converted handle 0x7f9abc0d5d30 to fd 113 on remote peer 3",
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b22c00000",
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO UDS converted handle 0x7f9abc101cc0 to fd 113 on remote peer 3",
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b23600000",
+        "cloud-0n58xq:1949016:1949016 [0] NCCL INFO UDS converted handle 0x7f9abc0d73f0 to fd 113 on remote peer 3"
+      ]
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/trace_comm_20261003/preflight_T0/nccl-cloud-0n58xq-1949017.log",
+      "sha256": "6918a23c31a8c328c03bfa862eaa0f6caed89f473bc600c46eaef2cb8972ac2d",
+      "bytes": 112647,
+      "communicator_init_complete": true,
+      "p2p_cumem_selected": true,
+      "warning_lines": [],
+      "last_lines": [
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b44000000",
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO UDS converted handle 0x7f9abc15ee00 to fd 114 on remote peer 3",
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b44a00000",
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO UDS converted handle 0x7f9d20134c10 to fd 114 on remote peer 1",
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b44c00000",
+        "cloud-0n58xq:1949017:1949017 [0] NCCL INFO UDS converted handle 0x7f9abc1604c0 to fd 114 on remote peer 3"
+      ]
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/trace_comm_20261003/preflight_T0/nccl-cloud-0n58xq-1949018.log",
+      "sha256": "323b782e7ee21feb0ca547f415a9d3955de420119c9ee8cf7fa5f603560a216a",
+      "bytes": 112777,
+      "communicator_init_complete": true,
+      "p2p_cumem_selected": true,
+      "warning_lines": [],
+      "last_lines": [
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO UDS converted handle 0x7f986015ee00 to fd 114 on remote peer 0",
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b44a00000",
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO UDS converted handle 0x7f5d4c134c10 to fd 114 on remote peer 2",
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO Imported shareable buffer device 0 size 10485760 ptr 0x2b44c00000",
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO UDS converted handle 0x7f98601604c0 to fd 114 on remote peer 0",
+        "cloud-0n58xq:1949018:1949018 [0] NCCL INFO Imported shareable buffer device 0 size 2097152 ptr 0x2b45600000"
+      ]
+    }
+  ],
+  "memory_guard_triggered": false,
+  "model_runs": 0,
+  "timed_trace_replays": 0,
+  "R3_started": false,
+  "E2_started": false,
+  "target_gpu_memory_used_mib_after_cleanup": {
+    "0": 0,
+    "1": 0,
+    "4": 0,
+    "5": 0
+  },
+  "status_receipt": {
+    "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/trace_comm_20261003/preflight_T0/status.json",
+    "sha256": "5d6dd4bbdb49ad28b67f97159458eec84195925d861bcbd3f43824b899c366e7"
+  }
+}

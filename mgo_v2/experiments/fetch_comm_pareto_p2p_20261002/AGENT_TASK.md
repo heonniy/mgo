@@ -1,3 +1,18 @@
+## Blocked — E1 preflight
+
+**E1 trace-communication stage blocked (2026-10-03): BLOCKED_PREFLIGHT.**
+The first T0 32-KiB preflight exceeded its 180-second bound. Communicators
+initialized and selected P2P/CUMEM; no validated payload receipt followed.
+Last logs show shareable-buffer imports/UDS mapping; root cause is not
+established. No OOM: peak process-tree RSS 4.69 GiB, minimum host available
+1851.92 GiB. Target GPUs were released. The 384-event input/count validation
+and two CPU tests pass, but zero trace timings or model runs were executed.
+Read `TRACE_COMM_REPLAY_RESULTS.md` and `trace_comm_preflight_failure.json`.
+Do not label this NO_GAP: no ratio exists. E2 remains unauthorized by its
+STRONG_GAP gate; stop without an automatic retry, NCCL tuning or server move.
+
+Earlier instructions below are retained as history.
+
 ## Immediate task — actual-trace comm replay, then conditional clean F/K
 
 Current checkpoint: `b6edeb0`.
