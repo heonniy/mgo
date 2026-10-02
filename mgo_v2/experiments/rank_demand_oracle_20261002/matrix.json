@@ -1,0 +1,76 @@
+{
+  "experiment": "rank_demand_oracle_20261002",
+  "base_result_commit": "86fc58a3e6dfd11e01b8a6f78dd8e1e6f9e06ed8",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "world_size": 4,
+  "frozen": {
+    "model": "Qwen3-30B-A3B-Instruct-2507",
+    "cache_pct": 30,
+    "substitution": "expert_level_gate0.20_sim0.65",
+    "eviction": "coverage_w128_k1_lambda2",
+    "decode_steps": 64,
+    "hard_balanced_admission_quota": true,
+    "no_replication": true,
+    "no_migration": true
+  },
+  "policies": [
+    "P0_balanced_random",
+    "P1_hungarian_current",
+    "O0_exact_rank_demand_oracle"
+  ],
+  "oracle_objective": "minimize max rank effective expert-token rows; no communication term",
+  "oracle_execution": {
+    "exact_solver": "scipy_milp_highs",
+    "no_heuristic_fallback": true,
+    "planning_pass": true,
+    "frozen_assignment_timed_replay": true,
+    "solver_time_excluded_from_e2e": true,
+    "solver_time_reported_separately": true
+  },
+  "cells": [
+    {
+      "local_batch": 4,
+      "global_batch": 16
+    },
+    {
+      "local_batch": 8,
+      "global_batch": 32
+    },
+    {
+      "local_batch": 16,
+      "global_batch": 64
+    }
+  ],
+  "uninstrumented_repeats": 6,
+  "order_protocol": "all six permutations of P0/P1/O0 once per batch",
+  "profile_cell": {
+    "local_batch": 8,
+    "global_batch": 32,
+    "policies": [
+      "P0_balanced_random",
+      "P1_hungarian_current",
+      "O0_exact_rank_demand_oracle"
+    ]
+  },
+  "primary_metrics": [
+    "tpot_seconds",
+    "generation_seconds",
+    "max_rank_expert_gpu_time",
+    "max_rank_effective_expert_rows"
+  ],
+  "controls": [
+    "remote_pairs",
+    "peer_payload",
+    "h2d_bytes",
+    "fetches",
+    "reloads",
+    "controller_seconds",
+    "rank_token_cv"
+  ],
+  "no_joint_method_tuning": true
+}
