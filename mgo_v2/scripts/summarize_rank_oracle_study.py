@@ -5,6 +5,7 @@ import csv
 import hashlib
 import itertools
 import json
+import math
 from pathlib import Path
 import statistics
 import subprocess
@@ -42,6 +43,11 @@ def main():
         assert len(p['events'])==65*48
         a=p['assignments']
         assert len(a)==65*48 and all(x['status']=='optimal' for x in a)
+        for event,assignment in zip(p['events'],a):
+            assert event['loads']==assignment['loads'] and max(assignment['loads'])==assignment['z']
+            if assignment['incoming']:
+                certificate=assignment['primary_certificate']
+                assert certificate['mip_gap']<1e-9 and math.ceil(certificate['dual_bound']-1e-7)==assignment['z']
         planning.append(dict(batch=batch,events=len(a),solver_seconds=sum(x['solver_seconds'] for x in a),
             prefill_solver_seconds=sum(x['solver_seconds'] for x in a[:48]),
             decode_solver_seconds=sum(x['solver_seconds'] for x in a[48:]),
@@ -94,6 +100,15 @@ def main():
                                           max_rank_rows=max(e['loads']),total_rows=sum(e['loads']),
                                           distinct_experts=sum(e['distinct'])))
     save('oracle_planning_summary',planning); save('e2e_repeats',repeats); save('rank_load_events',ranks)
+    event_index={(r['batch'],r['policy'],r['event']):r for r in ranks}
+    headroom=[]
+    for batch in (4,8,16):
+        for event in range(3120):
+            o=event_index[batch,'O0',event]['max_rank_rows']
+            headroom.append(dict(batch=batch,event=event,step=event//48,layer=event%48,
+                load_reduction_vs_P0=1-o/event_index[batch,'P0',event]['max_rank_rows'],
+                load_reduction_vs_P1=1-o/event_index[batch,'P1',event]['max_rank_rows']))
+    save('event_load_headroom',headroom)
     summary=[]
     for batch in (4,8,16):
         for policy in ('P0','P1','O0'):
@@ -162,7 +177,7 @@ def main():
         write(OUT/'gpu_phase_summary.json',totals)
     else: report+=['Pending; no GPU critical-path conclusion is made from the row proxy alone.']
     report+=['','## Resource and measurement limits','',
-        'All new jobs were sequential R4 jobs. Other users continued work on GPUs 2,3,6,7 and shared CPU, RAM and storage. Balanced ordering reduces fixed order bias but does not remove shared-host interference. No long-horizon quality conclusion is made from this fixed-work numeric workload.',
+        'All new jobs were sequential R4 jobs. Other users continued work on GPUs 2,3,6,7 and shared CPU, RAM and storage. Balanced ordering reduces fixed order bias but does not remove shared-host interference. No long-horizon quality conclusion is made from this fixed-work numeric workload. B4/B8/B16 use the corresponding 16/32/64-question prefix, so cross-batch differences also change workload composition and W128 history span.',
         'Timing retains compact CPU evidence and planned-row counting for all policies, plus frozen-demand checks for O0. Hashing, serialization and token checks run outside the generation timer. No NVTX/CUDA events/CUPTI are active in primary timing. See IMPLEMENTATION.md for exact boundaries and memory guards.',
         f'Observed minimum host availability: {min(x["host_available_gib"] for x in safety):.1f} GiB; minimum selected-GPU free memory: {min(x["min_gpu_free_mib"] for x in safety):,} MiB. Initial smoke RSS observations included only the launcher process group; full planning/timing monitoring counts descendants as well.',
         '', '## Reproduction and artifacts','',
