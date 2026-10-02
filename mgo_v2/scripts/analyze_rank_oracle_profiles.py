@@ -110,9 +110,9 @@ def analyze(policy):
 def main():
     rows=[]
     for policy in ('P0','P1','O0'): rows.extend(analyze(policy))
-    write(OUT/'gpu_phase_profile.json',rows)
+    (OUT/'gpu_phase_profile.json').write_text(json.dumps(rows,separators=(',',':'))+'\n')
     with (OUT/'gpu_phase_profile.csv').open('w') as f:
-        writer=csv.DictWriter(f,fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+        writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator="\n"); writer.writeheader(); writer.writerows(rows)
     grouped=defaultdict(list)
     for row in rows: grouped[row['policy'],row['event']].append(row)
     critical=[]
@@ -122,8 +122,8 @@ def main():
             **{'max_rank_'+metric:max(r[metric] for r in ranks) for metric in
                ('expert_gpu_union_ms','expert_gpu_span_ms','gemm_gpu_union_ms','nccl_gpu_union_ms',
                 'h2d_gpu_union_ms','moe_cpu_ms','allgpu_gpu_span_ms')}))
-    write(OUT/'gpu_critical_path.json',critical)
+    (OUT/'gpu_critical_path.json').write_text(json.dumps(critical,separators=(',',':'))+'\n')
     with (OUT/'gpu_critical_path.csv').open('w') as f:
-        writer=csv.DictWriter(f,fieldnames=list(critical[0])); writer.writeheader(); writer.writerows(critical)
+        writer=csv.DictWriter(f,fieldnames=list(critical[0]),lineterminator="\n"); writer.writeheader(); writer.writerows(critical)
 
 if __name__=='__main__': main()

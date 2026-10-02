@@ -4,6 +4,14 @@
 
 Read `experiments/rank_demand_oracle_20261002/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}`.
 
+**Owner scope reduction (2026-10-02):** the latest user instruction requests the
+minimum sufficient experiment set. Read `scope_amendment.json` in that packet.
+Preserve the completed six-repeat B4 results; B8/B16 use two repeats per policy
+(30 primary generations total). Controller follow-up is B8 only, one fresh
+C0/C1/C2 generation per policy (9 total), full decision/cache/token parity and
+separate diagnostics. Do not expand controller timing to B4/B16. This amendment
+overrides the larger repetition/expansion matrix in the earlier plan.
+
 Use only physical GPUs **0,1,4,5** as R4. Compare Balanced Random, existing Hungarian-current, and an exact diagnostic **rank-demand oracle** that ignores communication and minimizes the busiest rank's current effective expert-token rows under the same hard admission-count quota. Oracle assignments are generated in an untimed planning pass and replayed frozen for primary E2E/TPOT, with exact plan/cache/token parity required; solver time is reported separately. Run B4/B8/B16, 64 decode forwards, six uninstrumented repetitions using all policy-order permutations once per batch. After timing, profile only R4/B8 to measure actual max-rank expert GPU time, NCCL, H2D and layer completion. Do not add a joint communication+load policy before this headroom study is complete.
 
 ## New priority — admission trajectory/controller breakdown (2026-10-02)

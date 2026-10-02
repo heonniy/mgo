@@ -1,0 +1,112 @@
+{
+  "status": "AUTHORIZED_SCOPE_REDUCTION",
+  "created_unix": 1790933878.9506946,
+  "user_instruction": "실험을 최대한 반복이든 좀 축소해줘. 너무 많이 제대로 확인만 되게 해줘.",
+  "original_manifest": "measurement_manifest.json",
+  "reason": "Minimum sufficient correctness and descriptive performance checks; prioritize fewer experiments.",
+  "preserved": {
+    "planning_batches": [
+      4,
+      8,
+      16
+    ],
+    "solver_events": 9360,
+    "completed_or_running_batch4_repetitions_per_policy": 6,
+    "model_forwards_per_generation": 65,
+    "oracle_frozen_trace_parity": true,
+    "measurement_implementation_unchanged": true
+  },
+  "amended_timing": {
+    "batch4_orders": [
+      [
+        "P0",
+        "P1",
+        "O0"
+      ],
+      [
+        "P0",
+        "O0",
+        "P1"
+      ],
+      [
+        "P1",
+        "P0",
+        "O0"
+      ],
+      [
+        "P1",
+        "O0",
+        "P0"
+      ],
+      [
+        "O0",
+        "P0",
+        "P1"
+      ],
+      [
+        "O0",
+        "P1",
+        "P0"
+      ]
+    ],
+    "batch8_orders": [
+      [
+        "P0",
+        "P1",
+        "O0"
+      ],
+      [
+        "O0",
+        "P1",
+        "P0"
+      ]
+    ],
+    "batch16_orders": [
+      [
+        "P0",
+        "P1",
+        "O0"
+      ],
+      [
+        "O0",
+        "P1",
+        "P0"
+      ]
+    ],
+    "total_generations": 30
+  },
+  "profiles": {
+    "batch": 8,
+    "policies": [
+      "P0",
+      "P1",
+      "O0"
+    ],
+    "repeats": 1
+  },
+  "controller_followup": {
+    "batch": 8,
+    "variants": [
+      "C0",
+      "C1",
+      "C2"
+    ],
+    "policies": [
+      "P0",
+      "P1",
+      "O0"
+    ],
+    "timing_repeats": 1,
+    "primary_generations": 9,
+    "expand_batches": false,
+    "full_event_cache_token_parity_required": true,
+    "diagnostics": "Full captured-route CPU differential replay; one short P1 GPU profile each for C1/C2 after primary timing.",
+    "performance_scope": "One matched full generation per policy/controller; descriptive latency only, no repeatability or small-speedup claim."
+  },
+  "limitations": [
+    "B8/B16 two repeats provide descriptive checks, not a well-powered performance conclusion.",
+    "Forward/reverse order counterbalances endpoints but keeps P1 in the middle; full position balance is sacrificed explicitly to reduce work.",
+    "No B4/B16 controller expansion, even if B8 passes the prior material-reduction gate.",
+    "Controller stage uses one fresh matched sample per policy/variant, no policy/controller order balancing; exact trajectory parity replaces repetitions for correctness, not for timing confidence."
+  ]
+}

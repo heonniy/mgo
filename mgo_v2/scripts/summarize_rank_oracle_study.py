@@ -24,10 +24,13 @@ def save(name, rows):
     write(OUT/(name+'.json'),rows)
     if rows:
         with (OUT/(name+'.csv')).open('w') as f:
-            writer=csv.DictWriter(f,fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+            writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator="\n"); writer.writeheader(); writer.writerows(rows)
 
 
 def main():
+    amendment = read(OUT/"scope_amendment.json") if (OUT/"scope_amendment.json").exists() else None
+    def orders_for(batch):
+        return amendment["amended_timing"][f"batch{batch}_orders"] if amendment else list(itertools.permutations(("P0","P1","O0")))
     repeats=[]; ranks=[]; planning=[]; validations=[]; sources=[]; safety=[]
     for status_path in sorted(ROOT.glob('*/status.json')):
         state=read(status_path)
@@ -53,7 +56,7 @@ def main():
             decode_solver_seconds=sum(x['solver_seconds'] for x in a[48:]),
             max_event_solver_seconds=max(x['solver_seconds'] for x in a),solves=sum(x['solves'] for x in a),
             all_events_optimal=True,trace_sha256=sha(planroot/f'{planname}-evidence-rank0.json')))
-        for repeat,order in enumerate(itertools.permutations(('P0','P1','O0'))):
+        for repeat,order in enumerate(orders_for(batch)):
             root=ROOT/f'timing_b{batch}'/'receipts'
             assert read(ROOT/f'timing_b{batch}'/'status.json')['status']=='PASS'
             for position,policy in enumerate(order):
@@ -113,8 +116,8 @@ def main():
     for batch in (4,8,16):
         for policy in ('P0','P1','O0'):
             rows=[r for r in repeats if r['batch']==batch and r['policy']==policy]
-            assert len(rows)==6
-            row=dict(batch=batch,policy=policy,repeats=6)
+            assert len(rows)==len(orders_for(batch))
+            row=dict(batch=batch,policy=policy,repeats=len(rows))
             for key in ('generation_seconds','tpot_seconds','ttft_seconds','tokens_per_second','controller_seconds_max_rank'):
                 values=[r[key] for r in rows]
                 for label,fun in [('median',statistics.median),('min',min),('max',max)]: row[key+'_'+label]=fun(values)
@@ -129,15 +132,19 @@ def main():
     validation=dict(status='PASS' if profiles else 'TIMING_COMPLETE_PROFILES_PENDING',uninstrumented_generations=len(repeats),
                     full_profiles=3 if profiles else 0,planning_cells=3,decode_forwards=64,physical_gpus=[0,1,4,5],
                     checks=validations,smoke=read(OUT/'smoke_validation.json'),solver=read(OUT/'oracle_solver_validation.json'))
+    expected = amendment['amended_timing']['total_generations'] if amendment else 54
+    assert len(repeats)==expected
+    validation['scope_amendment_applied']=bool(amendment)
+    validation['repetitions_per_policy']={str(b):len(orders_for(b)) for b in (4,8,16)}
     write(OUT/'validation.json',validation)
     report=['# Rank-demand oracle and GPU critical-path study','',
-            f'Status: {validation["status"]}. Plan `dccc93c`; physical GPUs 0,1,4,5 only. Exactly 54 unprofiled full generations, three local batches, six policy-order permutations per batch. One prefill plus 64 decode forwards; cache/history reset for every generation. Solver planning time is excluded from frozen-oracle timing.','',
+            f'Status: {validation["status"]}. Plan `dccc93c`, with owner-authorized scope reduction when `scope_amendment.json` is present; physical GPUs 0,1,4,5 only. Exactly {len(repeats)} unprofiled full generations across three local batches; B4/B8/B16 repetitions per policy: {len(orders_for(4))}/{len(orders_for(8))}/{len(orders_for(16))}. One prefill plus 64 decode forwards; cache/history reset for every generation. Solver planning time is excluded from frozen-oracle timing.','',
             '## Primary measurements','',
             '| Local B | Policy | E2E median [min, max], s | TPOT median [min, max], s | Decode sum busiest-rank rows | H2D GiB | Remote pairs |',
             '|---:|---|---:|---:|---:|---:|---:|']
     for r in summary:
         report.append(f'| {r["batch"]} | {r["policy"]} | {r["generation_seconds_median"]:.3f} [{r["generation_seconds_min"]:.3f}, {r["generation_seconds_max"]:.3f}] | {r["tpot_seconds_median"]:.4f} [{r["tpot_seconds_min"]:.4f}, {r["tpot_seconds_max"]:.4f}] | {r["decode_sum_max_rank_expert_rows"]:,} | {r["h2d_bytes"]/2**30:.2f} | {r["remote_pairs"]:,} |')
-    report+=['','P0 = Balanced Random; P1 = Hungarian-current; O0 = exact rank-demand oracle replay. O0 is an upper-bound diagnostic, not an online deployable speedup. Min/max are observed ranges, not confidence intervals.','', '## Oracle headroom and controls','']
+    report+=['','P0 = Balanced Random; P1 = Hungarian-current; O0 = exact rank-demand oracle replay. O0 is an exact per-event load-headroom diagnostic conditional on its own cache state and effective demand; it is neither a global trajectory optimum nor an online deployable speedup. Min/max are observed ranges, not confidence intervals. All 65 forward outputs are counted even after EOS; throughput is a fixed-work token output rate.','', '## Oracle headroom and controls','']
     for batch in (4,8,16):
         r={x['policy']:x for x in summary if x['batch']==batch}; o=r['O0']
         for base in ('P0','P1'):
@@ -145,7 +152,7 @@ def main():
             report.append(f'- B{batch}, O0 relative to {base}: TPOT reduction {100*(1-o["tpot_seconds_median"]/b["tpot_seconds_median"]):+.2f}%; E2E reduction {100*(1-o["generation_seconds_median"]/b["generation_seconds_median"]):+.2f}%; decode busiest-rank row reduction {100*(1-o["decode_sum_max_rank_expert_rows"]/b["decode_sum_max_rank_expert_rows"]):+.2f}%; remote-pair change {100*(o["remote_pairs"]/b["remote_pairs"]-1):+.2f}%; H2D change {100*(o["h2d_bytes"]/b["h2d_bytes"]-1):+.2f}%.')
     report+=['','Policies can change later substitution, routes and fetches. These complete model trajectories do not hold raw demand constant across policies. H2D, reloads, next-use survival and controller time are reported alongside rank load; material differences confound a pure compute-balance interpretation. Pair counts and modeled activation payload exclude NCCL protocol overhead and are not wire traffic measurements.','', '## Solver and validation','']
     for r in planning: report.append(f'- B{r["batch"]}: {r["solver_seconds"]:.3f} s exact solve time across {r["events"]} events; slowest event {r["max_event_solver_seconds"]:.3f} s. Every solve is optimal; no heuristic fallback.')
-    report+=['','All six O0 replays reproduce every event route/substitution/admission/victim/cache-slot hash and every full generated token on all ranks. Each policy repeats deterministically. Instrumentation on/off passes the short GPU gate; full B8 profile parity is separately required. CPU exhaustive tests verify both the optimal load and unique lexicographic tie-break.','', '## GPU critical path','']
+    report+=['','All recorded O0 replays reproduce every event route/substitution/admission/victim/cache-slot hash and every full generated token on all ranks. Each policy repeats deterministically. Instrumentation on/off passes the short GPU gate; full B8 profile parity is separately required. CPU exhaustive tests verify both the optimal load and unique lexicographic tie-break.','', '## GPU critical path','']
     if profiles:
         report+=['Decode-only sums of per-event maxima across four ranks; these maxima need not occur on the same rank. Kernel union excludes idle gaps; span includes gaps and waits.','',
                  '| Policy | Expert kernel union max sum (ms) | GEMM union max sum (ms) | Expert span max sum (ms) | NCCL union max sum (ms) | H2D union max sum (ms) |',
@@ -162,7 +169,7 @@ def main():
         report+=['','### Answers to the planned questions','',
             f'1. P1 versus P0: decode busiest-rank rows change {delta(b8["P1"]["decode_sum_max_rank_expert_rows"],b8["P0"]["decode_sum_max_rank_expert_rows"]):+.2f}%; measured expert-kernel max-rank time changes {delta(totals["P1"][expert],totals["P0"][expert]):+.2f}%. This is a descriptive physical comparison, with policy-dependent raw routes.',
             f'2. O0 versus P1: expert-kernel max-rank time changes {delta(totals["O0"][expert],totals["P1"][expert]):+.2f}%; versus P0, {delta(totals["O0"][expert],totals["P0"][expert]):+.2f}%. GEMM-only and elapsed-span alternatives are retained above.',
-            f'3. At B8, O0 versus P1 changes primary median TPOT {delta(b8["O0"]["tpot_seconds_median"],b8["P1"]["tpot_seconds_median"]):+.2f}% and E2E {delta(b8["O0"]["generation_seconds_median"],b8["P1"]["generation_seconds_median"]):+.2f}%. These use the six unprofiled repetitions, not profile wall time.',
+            f'3. At B8, O0 versus P1 changes primary median TPOT {delta(b8["O0"]["tpot_seconds_median"],b8["P1"]["tpot_seconds_median"]):+.2f}% and E2E {delta(b8["O0"]["generation_seconds_median"],b8["P1"]["generation_seconds_median"]):+.2f}%. These use the unprofiled repetitions listed above, not profile wall time.',
             f'4. O0 versus P1 changes B8 remote pairs {delta(b8["O0"]["remote_pairs"],b8["P1"]["remote_pairs"]):+.2f}% and profiled max-rank NCCL kernel union {delta(totals["O0"]["max_rank_nccl_gpu_union_ms"],totals["P1"]["max_rank_nccl_gpu_union_ms"]):+.2f}%. NCCL intervals include device-side waiting.',
             f'5. O0 versus P1 changes B8 physical H2D volume {delta(b8["O0"]["h2d_bytes"],b8["P1"]["h2d_bytes"]):+.2f}% and median maximum-rank controller time {delta(b8["O0"]["controller_seconds_max_rank_median"],b8["P1"]["controller_seconds_max_rank_median"]):+.2f}%. These concurrent changes and shared-host noise limit attributing all E2E change to compute balance.']
         correlations=[]
@@ -177,7 +184,7 @@ def main():
         write(OUT/'gpu_phase_summary.json',totals)
     else: report+=['Pending; no GPU critical-path conclusion is made from the row proxy alone.']
     report+=['','## Resource and measurement limits','',
-        'All new jobs were sequential R4 jobs. Other users continued work on GPUs 2,3,6,7 and shared CPU, RAM and storage. Balanced ordering reduces fixed order bias but does not remove shared-host interference. No long-horizon quality conclusion is made from this fixed-work numeric workload. B4/B8/B16 use the corresponding 16/32/64-question prefix, so cross-batch differences also change workload composition and W128 history span.',
+        'All new jobs were sequential R4 jobs. Other users continued work on GPUs 2,3,6,7 and shared CPU, RAM and storage. B4 uses all six policy orders. The reduced B8/B16 forward/reverse pair keeps P1 in the middle and does not fully balance position. Two repetitions support descriptive checks only; they do not establish small performance differences. Ordering does not remove shared-host interference. No long-horizon quality conclusion is made from this fixed-work numeric workload. B4/B8/B16 use the corresponding 16/32/64-question prefix, so cross-batch differences also change workload composition and W128 history span.',
         'Timing retains compact CPU evidence and planned-row counting for all policies, plus frozen-demand checks for O0. Hashing, serialization and token checks run outside the generation timer. No NVTX/CUDA events/CUPTI are active in primary timing. See IMPLEMENTATION.md for exact boundaries and memory guards.',
         f'Observed minimum host availability: {min(x["host_available_gib"] for x in safety):.1f} GiB; minimum selected-GPU free memory: {min(x["min_gpu_free_mib"] for x in safety):,} MiB. Initial smoke RSS observations included only the launcher process group; full planning/timing monitoring counts descendants as well.',
         '', '## Reproduction and artifacts','',
