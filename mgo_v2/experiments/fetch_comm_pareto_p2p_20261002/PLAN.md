@@ -169,6 +169,20 @@ A >=5% within-transport margin plus consistent H2D/peer mechanism counters is re
 
 Do not run Stage 1/2/3 automatically after this pilot.
 
+## Stage 0E — real-trace communication replay, then clean F/K timing
+
+The physical F/K/C pilot at `b6edeb0` was correctness-clean but timing-confounded by 1.87–2.87 s of replay/check CPU work and did not show a slower R3 collective interval inside the model.
+
+Follow [TRACE_COMM_CLEAN_FK.md](TRACE_COMM_CLEAN_FK.md).
+
+First run **communication-only actual-trace replay** using the recorded 384 decode-layer dispatch/combine matrices under T0 and R3. No model/H2D/cache work is allowed in this first gate.
+
+Only if R3 is slower in both counter-ordered passes and the median cumulative real-trace ratio is >=1.20x may the agent proceed to a cleaned physical F/K experiment.
+
+The clean physical stage removes heavy validation from the timed path and runs only F=rho0 and K=rho.25, two repeats each transport (8 cells total). C is not rerun.
+
+Do not continue automatically if the communication-only gate is absent or ambiguous.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

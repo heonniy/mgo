@@ -1,3 +1,25 @@
+## Immediate task — actual-trace comm replay, then conditional clean F/K
+
+Current checkpoint: `b6edeb0`.
+
+Read `TRACE_COMM_CLEAN_FK.md`.
+
+Stage E1 is mandatory and model-free:
+
+1. replay the validated 384-event decode dispatch/combine traffic exactly;
+2. compare T0 vs R3 in two counter-ordered passes;
+3. commit E1 immediately.
+
+Do **not** start a model unless E1 satisfies STRONG_GAP exactly as defined.
+
+If E1=STRONG_GAP, then:
+
+4. remove heavy replay/check validation from the timed path;
+5. run only F=rho0 and K=rho.25, two repeats per T0/R3 (8 cells);
+6. commit E2 and stop.
+
+No C, extra rho, longer decode, Nsight, substitution, weighted method or further NCCL tuning.
+
 ## Completed — six-cell physical F/K/C pilot
 
 **Physical F/K/C pilot complete (2026-10-03): NO_CLEAR_SHIFT.**

@@ -171,5 +171,69 @@
     "max_primary_runs": 6,
     "automatic_repeats": false,
     "nsight": false
+  },
+  "trace_comm_clean_fk_followup": {
+    "checkpoint": "b6edeb0a6ee242725f5c2cdc7197775305135407",
+    "E1_trace_comm_replay": {
+      "source": "validated exact-only 384 decode-layer dispatch/combine matrices",
+      "model_runs": 0,
+      "expert_h2d": false,
+      "cache_controller": false,
+      "passes": [
+        [
+          "T0",
+          "R3"
+        ],
+        [
+          "R3",
+          "T0"
+        ]
+      ],
+      "warmup_full_traces_per_cell": 1,
+      "timed_full_trace_replays_per_cell": 3,
+      "strong_gap": {
+        "direction_required_in_both_passes": "R3_slower_than_T0",
+        "minimum_median_ratio": 1.2
+      },
+      "no_gap": {
+        "maximum_median_ratio": 1.1,
+        "direction_flip_is_no_gap": true
+      }
+    },
+    "E2_clean_fk": {
+      "conditional_on": "E1_STRONG_GAP",
+      "points": [
+        {
+          "name": "F",
+          "rho": 0
+        },
+        {
+          "name": "K",
+          "rho": 0.25
+        }
+      ],
+      "repeats_per_cell": 2,
+      "order": [
+        "T0-F",
+        "R3-K",
+        "T0-K",
+        "R3-F",
+        "R3-F",
+        "T0-K",
+        "R3-K",
+        "T0-F"
+      ],
+      "total_model_cells": 8,
+      "decode_forwards": 8,
+      "heavy_validation_inside_timing": false,
+      "action_cpu_contamination_guard": {
+        "max_fraction_of_decode": 0.1,
+        "max_same_point_transport_difference_fraction": 0.1
+      },
+      "shift_min_margin_fraction": 0.05,
+      "rerun_C": false,
+      "nsight": false,
+      "automatic_third_repeat": false
+    }
   }
 }

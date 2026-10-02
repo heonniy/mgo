@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `b6edeb0`: actual-trace comm gate, then conditional clean F/K.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/TRACE_COMM_CLEAN_FK.md`.
+First replay the recorded 384 decode-layer dispatch/combine traffic with no
+model, expert H2D or cache work. Compare T0/R3 in two counter-ordered passes
+and commit this E1 result. Only if R3 is slower in both passes and the median
+cumulative ratio is >=1.20x may E2 start. E2 removes heavy per-event validation
+from the timed path and runs only F=rho0 and K=rho.25, two repeats per
+transport (8 cells). Do not rerun C, add rho values, use Nsight, enable
+substitution or tune more NCCL knobs. Commit each stage separately and stop.
+
 **Physical F/K/C pilot complete (2026-10-03): NO_CLEAR_SHIFT.**
 All six cells passed trace/cache/action/send-count/token parity (2,592 global
 layer events). Descriptive winners differ: T0-K (8.3423 s decode) and R3-F
