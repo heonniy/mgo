@@ -1,17 +1,17 @@
-## Immediate task — payload crossover only
+## Immediate task — one exact-only payload capture, then crossover
 
-Current checkpoint: `fad71d2`.
+Current checkpoint: `0c09fae`.
 
-Do not run Stage 1 or implement replication yet.
+The prior existing-trace audit is complete and must not be repeated.
 
-Read `PAYLOAD_CROSSOVER.md` and do exactly two things:
+Read `EXACT_PAYLOAD_CAPTURE.md` and run only:
 
-1. extract actual R4/B8 decode rank-pair payload sizes from an existing raw-routing trace, using raw exact routes and ignoring substitution;
-2. run the five-size T0/R3 peer microbenchmark with two lightweight counter-ordered passes.
+1. one R4/B8 P0 exact-only capture (substitution off, replication off, LRU, 1 prefill + 8 decode forwards, T0);
+2. extract actual dispatch/combine rank-pair payload p50/p90/p99/max from recorded runtime counts;
+3. if capture validation passes, run the five-size T0/R3 crossover with two counter-ordered passes;
+4. commit results immediately and stop.
 
-No new model trace, no new NCCL knob search, no H2D/concurrent rerun.
-
-Commit the bounded result immediately and stop for owner review.
+Do not implement replication, run Stage 1, add quality evaluation, or search more NCCL knobs.
 
 ## Immediate task — recover T1 transport only
 

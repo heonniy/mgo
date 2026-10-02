@@ -45,5 +45,49 @@
     "C"
   ],
   "repeats": 2,
-  "max_primary_generations": 12
+  "max_primary_generations": 12,
+  "payload_crossover_followup": {
+    "checkpoint": "0c09fae89a61e33b996bca7cf7e3df4385af3f7e",
+    "exact_capture": {
+      "policy": "P0_balanced_random",
+      "transport": "T0_nvSwitch_default",
+      "local_batch": 8,
+      "prefill_forwards": 1,
+      "decode_forwards": 8,
+      "substitution": false,
+      "replication": false,
+      "eviction": "lru",
+      "runs": 1
+    },
+    "crossover": {
+      "sizes_bytes": [
+        32768,
+        65536,
+        262144,
+        1048576,
+        4194304
+      ],
+      "warmups": 10,
+      "timed_iterations": 30,
+      "passes": [
+        [
+          "T0_nvSwitch_default",
+          "R3_shm_non_p2p"
+        ],
+        [
+          "R3_shm_non_p2p",
+          "T0_nvSwitch_default"
+        ]
+      ],
+      "R3_env": {
+        "NCCL_P2P_DISABLE": null,
+        "NCCL_P2P_LEVEL": "LOC",
+        "NCCL_IB_DISABLE": "1",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_NET_GDR_C2C": null,
+        "NCCL_SHM_DISABLE": null
+      },
+      "continuation_threshold_ratio": 1.5
+    }
+  }
 }

@@ -106,19 +106,21 @@ Purpose: verify that disabling P2P changes the relative price of communication v
 
 Stop this stage after the six cells (2 modes x 3 cases).
 
-## Stage 0B — actual-payload crossover check
+## Stage 0B — exact-only payload capture + crossover check
 
-Recovery finished at `fad71d2`: R3 is functional through `SHM/direct/direct`, but the tiny proxy was not slower than T0.
+The existing-trace audit at `0c09fae` proved that substituted-away raw experts do not have observed exact destination ranks, so the exact rank-pair distribution cannot be recovered from those traces without inventing a placement convention.
 
-Before Stage 1, run only the bounded analysis in [PAYLOAD_CROSSOVER.md](PAYLOAD_CROSSOVER.md):
+Before Stage 1, execute only [EXACT_PAYLOAD_CAPTURE.md](EXACT_PAYLOAD_CAPTURE.md):
 
-1. derive the real R4/B8 decode rank-pair payload distribution from an **existing raw-routing trace**;
-2. benchmark only 32 KiB, 64 KiB, 256 KiB, 1 MiB and 4 MiB per peer under T0 and R3;
-3. decide whether the T0/R3 crossover occurs inside the real p90/p99 payload range.
+1. one R4/B8 **exact-only** capture under P0 Balanced Random, substitution off, replication off, LRU, one prefill + **8 decode forwards**;
+2. record the actual owner map and dispatch/combine send counts at every layer event;
+3. compute exact decode payload p50/p90/p99/max;
+4. run the five-size T0/R3 crossover microbenchmark;
+5. stop for owner review.
 
-No model generation, replication implementation, H2D concurrency sweep or further NCCL tuning is allowed in this check.
+No performance claim is made from the short capture. Do not implement replication or resume Stage 1 until this gate is reviewed.
 
-If R3 is not >=1.5x slower within the real p99 payload range, stop the synthetic H100 P2P-off branch and move the communication-sensitive validation to the real no-NVLink server.
+If R3 is not >=1.5x slower at or below the observed exact-only p90/p99 payload range, stop the synthetic H100 P2P-off branch and move the communication-sensitive validation to the real no-NVLink server.
 
 ## Stage 1 — one exact-routing trace
 
