@@ -1,5 +1,5 @@
 {
-  "status": "FUNCTIONAL_NON_P2P",
+  "status": "FUNCTIONAL_NO_COST_INCREASE",
   "plan_commit": "92b207049623f4aa85be972d637f5adf7d32c0fc",
   "attempts": [
     {
@@ -68,10 +68,53 @@
         "NCCL_IB_DISABLE": "1"
       },
       "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_smoke",
-      "peer_median_ms": null,
-      "h2d_median_ms": null
+      "peer_median_ms": 0.23606399446725845,
+      "h2d_median_ms": 0.19812799990177155
     }
   ],
-  "calibration": null,
+  "calibration": {
+    "condition": "R3",
+    "status": "PASS",
+    "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_calibration",
+    "summary": [
+      {
+        "condition": "R3",
+        "case": "h2d",
+        "warmups": 10,
+        "timed_iterations": 30,
+        "ranks": 4,
+        "h2d_median_ms": 0.19812799990177155,
+        "h2d_p90_ms": 0.2030527949333191,
+        "peer_median_ms": null,
+        "peer_p90_ms": null
+      },
+      {
+        "condition": "R3",
+        "case": "peer",
+        "warmups": 10,
+        "timed_iterations": 30,
+        "ranks": 4,
+        "h2d_median_ms": null,
+        "h2d_p90_ms": null,
+        "peer_median_ms": 0.23606399446725845,
+        "peer_p90_ms": 0.27709758579730986
+      },
+      {
+        "condition": "R3",
+        "case": "concurrent",
+        "warmups": 10,
+        "timed_iterations": 30,
+        "ranks": 4,
+        "h2d_median_ms": 0.19184000045061111,
+        "h2d_p90_ms": 0.19351360499858855,
+        "peer_median_ms": 0.2272000014781952,
+        "peer_p90_ms": 0.24535039514303209
+      }
+    ],
+    "T0_peer_median_ms": 0.3364799916744232,
+    "peer_cost_ratio_vs_T0": 0.701569187791924,
+    "cost_increase_demonstrated": false,
+    "preferred_2x_contrast_met": false
+  },
   "selected_condition": "R3"
 }

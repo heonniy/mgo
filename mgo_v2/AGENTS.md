@@ -4,6 +4,17 @@ Read `experiments/fetch_comm_pareto_p2p_20261002/{README.md,PLAN.md,matrix.json,
 
 This is the new owner-authorized minimum-scope go/no-go study. Use only GPUs 0,1,4,5; R4/B8/cache30; one prefill + 32 decode forwards; substitution off; LRU fixed. Characterize whether replica budget trades CPU expert H2D against peer activation communication. Compare normal NVSwitch against `NCCL_P2P_DISABLE=1` with SHM fallback left enabled. CPU sweep first; physically validate only F/K/C, two repeats each transport mode (12 primary generations maximum unless the >10% spread rule triggers one targeted repeat). Do not add load balancing, substitution, final weighted objectives, B4/B16 or R8.
 
+**Recovery outcome (2026-10-03): functional, cost-increase gate not met.**
+R1 and R2 failed with IB retry errors; R3 passed all-rank payload validation
+using `SHM/direct/direct` with P2P_LEVEL=LOC and IB disabled. Stop at that first
+success: no loopback retry or further knobs. Its three calibration cells passed,
+but peer median was 0.236064 ms versus prior T0 0.336480 ms (0.702x), so there is
+no demonstrated communication-cost increase. Stage 1/model/replica work has
+not started. Read `TRANSPORT_RECOVERY_RESULTS.md` and
+`transport_recovery_result.json` in the packet before further work. The prior
+instructions/status below are retained as history; do not automatically rerun
+or manufacture a slower condition.
+
 **Immediate transport recovery after `7c881f7`:** do not start the model.
 Read `experiments/fetch_comm_pareto_p2p_20261002/TRANSPORT_RECOVERY.md`.
 Try only the bounded R1/R2/R3 no-P2P smoke sequence, committing each result.

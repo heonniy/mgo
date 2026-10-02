@@ -1,0 +1,166 @@
+{
+  "status": "PASS",
+  "condition": "R3",
+  "calibration": true,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py",
+    "--output",
+    "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_calibration"
+  ],
+  "transport_env": {
+    "NCCL_P2P_LEVEL": "LOC",
+    "NCCL_IB_DISABLE": "1"
+  },
+  "cleared_inherited_nccl": {},
+  "worker_sha256": "97ad52b215678cf267f663da1813bd08afb18647d6b6e17f5632fdf13854477f",
+  "launcher_sha256": "85c4b9e3e5b11433e2bdd25d645af046c262735211d30a03dfc482a6c3b736f7",
+  "memory": [
+    {
+      "host_available_bytes": 1980779307008,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 0
+        }
+      },
+      "unix": 1790954620.2848675
+    },
+    {
+      "host_available_bytes": 1980455047168,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 1
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 1
+        }
+      },
+      "unix": 1790954623.2882695,
+      "group_rss_bytes": 539865088
+    },
+    {
+      "host_available_bytes": 1979307495424,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954625.5634305,
+      "group_rss_bytes": 2722848768
+    },
+    {
+      "host_available_bytes": 1978897559552,
+      "gpu": {
+        "0": {
+          "free_mib": 81067,
+          "used_mib": 23
+        },
+        "1": {
+          "free_mib": 81068,
+          "used_mib": 22
+        },
+        "4": {
+          "free_mib": 81077,
+          "used_mib": 14
+        },
+        "5": {
+          "free_mib": 81051,
+          "used_mib": 39
+        }
+      },
+      "unix": 1790954628.2468083,
+      "group_rss_bytes": 3244113920
+    },
+    {
+      "host_available_bytes": 1976806801408,
+      "gpu": {
+        "0": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "1": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "4": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "5": {
+          "free_mib": 80141,
+          "used_mib": 949
+        }
+      },
+      "unix": 1790954630.6498296,
+      "group_rss_bytes": 4999671808
+    },
+    {
+      "host_available_bytes": 1980362186752,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954633.0365283,
+      "group_rss_bytes": 0
+    }
+  ],
+  "started_unix": 1790954620.2852297,
+  "pid": 1856661,
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1790954633.1317458
+}

@@ -1,5 +1,11 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
+**Current recovery outcome: FUNCTIONAL_NO_COST_INCREASE.** R3 passed via
+`SHM/direct/direct` with IB disabled. Its peer median was 0.236064 ms versus
+T0 0.336480 ms (0.702x). The required cost-increase gate for Stage 1 is not met;
+no model/replica work has started. R1/R2 failed; R3 was the first success, so no
+loopback retry or additional transport tuning was run.
+
 For the authorized recovery after the original failure, read
 [TRANSPORT_RECOVERY_RESULTS.md](TRANSPORT_RECOVERY_RESULTS.md) and
 [transport_recovery_result.json](transport_recovery_result.json).

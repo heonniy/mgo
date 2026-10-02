@@ -1,5 +1,12 @@
 # Fetch/communication Pareto: blocked at the transport prerequisite
 
+**Recovery update (2026-10-03):** R3 subsequently passed with
+`NCCL_P2P_LEVEL=LOC`, `NCCL_IB_DISABLE=1` and actual `SHM/direct/direct`
+transport. Its peer median was 0.236064 ms versus original T0 0.336480 ms,
+so the required communication-cost increase was not demonstrated. Stage 1
+remains unstarted. See [TRANSPORT_RECOVERY_RESULTS.md](TRANSPORT_RECOVERY_RESULTS.md).
+The original failed Stage 0 result below is retained as history.
+
 **Status: BLOCKED_TRANSPORT. The requested Pareto study is not complete.** The four burn workers on GPUs 0,1,4,5 were stopped. T0 smoke and three T0 calibration cells passed. The T1 smoke failed before model loading; no routing capture, replica sweep, primary generation or profile was run. This is not a negative result about replication.
 
 ## Observed transport failure

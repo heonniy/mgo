@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_TRANSPORT",
+  "status": "FUNCTIONAL_NO_COST_INCREASE",
   "study_complete": false,
   "plan_commit": "f779eef70b08c8ac75c78872f08d3dcaacbbf8ed",
   "physical_gpus": [
@@ -10,7 +10,7 @@
   ],
   "burn_workers_stopped": true,
   "model_generations": 0,
-  "calibration_cells_completed": 3,
+  "calibration_cells_completed": 6,
   "calibration_cells_planned": 6,
   "trace_capture": false,
   "cpu_replica_sweep": false,
@@ -34,20 +34,46 @@
       "status": "FAIL"
     }
   },
-  "blocker": "T1 all_to_all_single selects NET/IB/GDRDMA/Shared and fails with IBV_WC_RETRY_EXC_ERR; SHM fallback is unverified.",
-  "outcome": "Transport prerequisite blocked; no conclusion about the replica Pareto frontier.",
-  "source_sha256": {
+  "blocker": "Stage 1 requires measurably more expensive communication; recovered R3 peer median / original T0 is 0.702x.",
+  "outcome": "Functional non-P2P transport recovered, but no communication cost increase demonstrated. Stage 1 not started; no replica Pareto conclusion.",
+  "run_provenance": "The recorded worker ran under the saved temporary launcher; the checked-in launcher adds bounded timeout/memory guards for a deliberate rerun. No calibration or model measurements were rerun.",
+  "resource_scope": "Tiny calibration only: one 9 MiB pinned source/destination and 384 KiB send/receive buffers per rank, plus CUDA/NCCL context. Observed approximately 1.1 GiB GPU use per rank. No model loaded; selected GPUs returned to 0 MiB after failure. No OOM observed.",
+  "original_stage0_status": "BLOCKED_TRANSPORT",
+  "recovery": {
+    "selected_condition": "R3",
+    "actual_transport": "SHM/direct/direct",
+    "payload_validation_all_four_ranks": true,
+    "calibration_cells_completed": 3,
+    "peer_cost_ratio_vs_T0": 0.701569187791924,
+    "cost_increase_gate_met": false,
+    "preferred_2x_contrast_met": false,
+    "model_started": false,
+    "bounded_attempts": [
+      "R1",
+      "R2",
+      "R3"
+    ],
+    "loopback_retry": false
+  },
+  "initial_attempt_source_sha256": {
     "examples/fetch_comm_calibration.py": "480742d706708ace2ef68f8ee792ea0dbc37eaf3c710e43457142b65a7bd8ec3",
     "scripts/run_fetch_comm_calibration.py": "cd392275ae297847a015fd66ec80033af0a6b24825d1a3b0b7c7c6824301d444",
     "scripts/summarize_fetch_comm_gate.py": "fb021bb8463f3ca7c7c8efc64c89d190fa86046ff9717f44852f28a2e8ea56d6"
   },
-  "run_provenance": "The recorded worker ran under the saved temporary launcher; the checked-in launcher adds bounded timeout/memory guards for a deliberate rerun. No calibration or model measurements were rerun.",
-  "unmodified_transport_controls": [
+  "original_transport_controls": [
     "NCCL_SHM_DISABLE unset",
     "NCCL_P2P_LEVEL unset",
     "No NCCL_IB_DISABLE override",
     "T0 NCCL_P2P_DISABLE unset",
     "T1 NCCL_P2P_DISABLE=1"
   ],
-  "resource_scope": "Tiny calibration only: one 9 MiB pinned source/destination and 384 KiB send/receive buffers per rank, plus CUDA/NCCL context. Observed approximately 1.1 GiB GPU use per rank. No model loaded; selected GPUs returned to 0 MiB after failure. No OOM observed."
+  "current_transport_controls": {
+    "NCCL_P2P_LEVEL": "LOC",
+    "NCCL_IB_DISABLE": "1",
+    "NCCL_P2P_DISABLE": null,
+    "NCCL_SHM_DISABLE": null,
+    "NCCL_NET_GDR_LEVEL": null,
+    "NCCL_NET_GDR_C2C": null,
+    "NCCL_SOCKET_IFNAME": null
+  }
 }

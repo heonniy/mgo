@@ -20,7 +20,10 @@ def main():
    rows.append(row)
   ratio=rows[1]['peer_median_ms']/float(baseline['peer_median_ms'])
   result['calibration'].update(summary=rows,T0_peer_median_ms=float(baseline['peer_median_ms']),peer_cost_ratio_vs_T0=ratio)
-  result['status']='READY_FOR_STAGE_1' if ratio>=2 else 'FUNCTIONAL_BUT_BELOW_2X_REPORT_BEFORE_CONTINUING'
+  result['status']=('FUNCTIONAL_NO_COST_INCREASE' if ratio<=1 else
+                    'READY_FOR_STAGE_1' if ratio>=2 else 'FUNCTIONAL_BUT_BELOW_2X_REPORT_BEFORE_CONTINUING')
+  result['calibration']['cost_increase_demonstrated']=ratio>1
+  result['calibration']['preferred_2x_contrast_met']=ratio>=2
   chosen=next(a for a in result['attempts'] if a['condition']==condition)
   chosen.update(peer_median_ms=rows[1]['peer_median_ms'],h2d_median_ms=rows[0]['h2d_median_ms'])
   with (OUT/'transport_recovery_calibration.csv').open('w') as f:
@@ -51,11 +54,13 @@ def main():
    def val(k):return '—' if r[k] is None else f'{r[k]:.6f}'
    report.append(f'| {r["case"]} | {val("h2d_median_ms")} | {val("peer_median_ms")} | {val("h2d_p90_ms")} | {val("peer_p90_ms")} |')
   report += ['',f'Peer median / original T0 ({c["T0_peer_median_ms"]:.6f} ms): **{c["peer_cost_ratio_vs_T0"]:.3f}x**. The original T0 was measured earlier on the shared host; this is a small calibration comparison, not an end-to-end claim.','']
-  if c['peer_cost_ratio_vs_T0']<2:report+=['The first functional path did not meet the preferred 2x contrast. Per the recovery plan, report this result before continuing; Stage 1 has not started. Do not try later R conditions merely to obtain a larger ratio.','']
+  if c['peer_cost_ratio_vs_T0']<=1:report+=['The first functional path does not demonstrate more expensive communication on this calibration, so the required Stage 1 cost-increase gate is not met. The preferred 2x contrast is also absent. Stage 1 has not started. The smaller measured median does not establish that SHM is intrinsically faster: the runs were separated in time on a shared host. Do not try later R conditions or retune messages merely to obtain a larger ratio.','']
+  elif c['peer_cost_ratio_vs_T0']<2:report+=['The first functional path did not meet the preferred 2x contrast. Per the recovery plan, report this result before continuing; Stage 1 has not started. Do not try later R conditions merely to obtain a larger ratio.','']
   else:report+=['The transport and preferred cost-contrast gates pass. Commit this calibration before starting Stage 1.','']
  report+=['The original `artifact_hashes.json` is the historical Stage 0 snapshot; owner edits at `92b2070` and this recovery are separate. Current recovery artifacts/source hashes are in `transport_recovery_hashes.json`. Raw trial commands, environment, source hashes and memory samples are retained alongside each smoke.','']
  (OUT/'TRANSPORT_RECOVERY_RESULTS.md').write_text('\n'.join(report))
- paths=[OUT/n for n in ('transport_recovery.csv','transport_recovery_result.json','TRANSPORT_RECOVERY_RESULTS.md','TRANSPORT_RECOVERY.md')]
+ paths=[OUT/n for n in ('transport_recovery.csv','transport_recovery_result.json','TRANSPORT_RECOVERY_RESULTS.md','TRANSPORT_RECOVERY.md',
+                       'validation.json','README.md','RESULTS.md','PLAN.md','AGENT_TASK.md','matrix.json')]
  paths+=list((OUT/'transport_recovery_logs').rglob('*'))
  if (OUT/'transport_recovery_calibration.csv').exists():paths.append(OUT/'transport_recovery_calibration.csv')
  sources=[PACKAGE/'examples/fetch_comm_calibration.py',PACKAGE/'scripts/run_transport_recovery.py',Path(__file__)]
