@@ -213,6 +213,22 @@ The CPU replica Pareto results at `dc7b099` remain valid and must not be rerun b
 
 Run one paired smoke, then re-run the existing 384-event E1 trace communication replay under these two stable conditions. Only a STRONG_GAP may authorize the existing clean F/K physical stage.
 
+## Stage 0H — NVLink bandwidth ladder characterization
+
+The stable IPC E1 result at `3e59975` found only a 1.0682x median SHM/direct-P2P whole-trace gap, so model F/K remained blocked.
+
+Follow [NVLINK_BW_LADDER.md](NVLINK_BW_LADDER.md) to characterize three communication regimes using the same frozen 384-event MoE trace:
+
+```text
+FULL-P2P = NVSwitch FULL + P2P/IPC
+OFF-P2P  = NVLink bandwidth OFF + direct P2P retained (PCIe-P2P characterization)
+SHM      = P2P disabled + host-staged SHM
+```
+
+The OFF mode is treated as a global server change: run only if all eight GPUs are idle, install unconditional FULL restoration, and verify FULL after restore. No sudo, job killing, waiting, or driver reset.
+
+The CPU Pareto screen is transport-independent and must not be rerun. This stage is communication-only; it does not automatically authorize F/K model timing.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

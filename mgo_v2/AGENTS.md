@@ -1,5 +1,16 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `3e59975`: NVLink bandwidth ladder only.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/NVLINK_BW_LADDER.md`.
+Characterize the same frozen MoE communication trace under FULL-P2P,
+NVLink-bandwidth-OFF direct P2P, and P2P-disabled SHM. Use
+`NCCL_CUMEM_ENABLE=0` throughout. The bandwidth-mode write is treated as
+server-global: proceed only if all 8 GPUs are idle and current mode is FULL;
+restore FULL unconditionally after OFF and verify it before any further work.
+Run only 32/128-KiB tiny calibration and the 384-event trace. No model, CPU
+Pareto rerun, extra bandwidth modes, NCCL tuning, sudo, driver reset or job
+killing. Commit and stop for owner review.
+
 **IPC baseline rebase complete (2026-10-03): AMBIGUOUS_GAP.**
 Both NCCL_CUMEM_ENABLE=0 smokes passed: T0 uses P2P/IPC only and R3
 uses SHM/direct/direct only, on one node/four local ranks. The original

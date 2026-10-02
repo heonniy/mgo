@@ -1,3 +1,23 @@
+## Immediate task — FULL / NVLink-OFF / SHM communication ladder
+
+Current checkpoint: `3e59975`.
+
+Read `NVLINK_BW_LADDER.md`.
+
+Do only this bounded characterization:
+
+1. read-only check that the host supports querying/setting NVLink bandwidth mode;
+2. require all 8 GPUs idle and current mode FULL;
+3. measure FULL-P2P using P2P/IPC;
+4. switch bandwidth mode OFF, verify OFF, measure direct P2P;
+5. restore FULL in an unconditional cleanup path and verify restoration;
+6. measure P2P-disabled SHM after FULL restoration;
+7. use only 32/128-KiB tiny calibration plus the frozen 384-event communication trace;
+8. commit results and stop.
+
+Do not rerun CPU Pareto or F/K/C model experiments. Do not add HALF/MIN/3QUARTER.
+If mode switching is unsupported, lacks privilege, another GPU is occupied, or FULL restoration cannot be verified, stop with an explicit blocked/failure receipt.
+
 ## Completed — IPC baseline rebase and I1 communication gate
 
 **IPC baseline rebase complete (2026-10-03): AMBIGUOUS_GAP.**

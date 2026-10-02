@@ -299,5 +299,76 @@
     "E1_thresholds_unchanged": true,
     "E2_clean_fk_conditional_on_STRONG_GAP": true,
     "old_fkc_physical_is_historical": true
+  },
+  "nvlink_bw_ladder": {
+    "checkpoint": "3e599755377c89c7fe4c22f1e687f10ba93ee7e4",
+    "cpu_pareto_rerun": false,
+    "model_runs": 0,
+    "global_state_guard": {
+      "require_all_8_gpus_idle": true,
+      "require_initial_bw_mode": "FULL",
+      "no_sudo": true,
+      "restore_mode": "FULL",
+      "verify_restore": true
+    },
+    "common_env": {
+      "NCCL_CUMEM_ENABLE": "0"
+    },
+    "conditions": [
+      {
+        "name": "FULL-P2P",
+        "bw_mode": "FULL",
+        "p2p_enabled": true,
+        "expected_transport": "P2P/IPC"
+      },
+      {
+        "name": "OFF-P2P",
+        "bw_mode": "OFF",
+        "p2p_enabled": true,
+        "expected_transport": "P2P/IPC",
+        "interpretation": "NVLink bandwidth disabled; characterize direct P2P as PCIe-P2P regime"
+      },
+      {
+        "name": "SHM",
+        "bw_mode": "FULL",
+        "p2p_enabled": false,
+        "env": {
+          "NCCL_P2P_LEVEL": "LOC",
+          "NCCL_IB_DISABLE": "1"
+        },
+        "expected_transport_prefix": "SHM/"
+      }
+    ],
+    "tiny_calibration": {
+      "sizes_bytes": [
+        32768,
+        131072
+      ],
+      "warmups": 10,
+      "timed_iterations": 30
+    },
+    "trace_replay": {
+      "source": "validated frozen 384 decode-layer dispatch/combine matrices",
+      "warmups_per_condition": 1,
+      "timed_replays_per_condition": 3,
+      "order": [
+        "FULL-P2P",
+        "OFF-P2P",
+        "RESTORE_FULL",
+        "SHM"
+      ]
+    },
+    "interpretation": {
+      "realistic_intermediate": {
+        "ordering": "T_FULL < T_OFF < T_SHM",
+        "min_off_over_full_ratio": 1.1
+      },
+      "off_close_to_full": {
+        "max_off_over_full_ratio": 1.1
+      }
+    },
+    "automatic_fk_model_followup": false,
+    "additional_bw_modes": false,
+    "nsight": false
   }
 }
