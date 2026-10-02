@@ -1,0 +1,100 @@
+{
+  "status": "PASS",
+  "plan_commit": "aa24271f35a59f3891d819214be6d98ec7b4ed48",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "world_size": 4,
+  "local_batch": 8,
+  "config": {
+    "num_layers": 48,
+    "num_experts": 128,
+    "top_k": 8,
+    "gate_protect_threshold": 0.2,
+    "similarity_threshold": 0.65,
+    "global_cache_ratio": 0.3,
+    "gate_window": 128,
+    "coverage_k": 1,
+    "coverage_lambda": 2.0,
+    "world_size": 4,
+    "admission": "random",
+    "eviction": "lru",
+    "same_layer_alpha": 1.0,
+    "path_eta": 0.5,
+    "seed": 42,
+    "substitution_enabled": false
+  },
+  "replication": false,
+  "model_generations": 1,
+  "prefill_forwards": 1,
+  "decode_forwards": 8,
+  "model_warmup_forwards": 0,
+  "events": 432,
+  "decode_events": 384,
+  "exact_owners_complete": true,
+  "substitution_count": 0,
+  "plan_cache_equal_all_ranks": true,
+  "physical_cache_checked_every_event": true,
+  "actual_counts_equal_exact_route_accounting": true,
+  "send_receive_matrices_transpose_match": true,
+  "expert_fetches": 22922,
+  "expert_h2d_bytes": 216319131648,
+  "hidden_size": 2048,
+  "element_bytes": 2,
+  "quality_evaluation": false,
+  "performance_timing": false,
+  "raw_receipts": [
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/capture/rank0.json",
+      "bytes": 36025486,
+      "sha256": "24d778bed7e5f091f2b9163a2a9e9829a5430e7f404af526eb671b602e0dd75a"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/capture/rank1.json",
+      "bytes": 36025444,
+      "sha256": "055aec59d5b1b2bacf5376cd6d67669855802cdfc078e90e457436033486d05d"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/capture/rank2.json",
+      "bytes": 36025461,
+      "sha256": "cded7aac3e84a98a38bd9791d27af3328376c20343c0ace4f12cf4076457a4ba"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/capture/rank3.json",
+      "bytes": 36025433,
+      "sha256": "8f7a1a5dea71a9ea2176dbe01235ba7f693e6975ec9b8956308320558a97e89b"
+    }
+  ],
+  "generated_token_sha256": "26f40aa183bebc606fce00914d25d174a97e916beb838d325127eb25408b4c14",
+  "sources": {
+    "launch.py": {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/launch.py",
+      "sha256": "28a185c567b03c955a5a477fe1170724db5beea190ccef7cab8e9570833439de"
+    },
+    "crossover_worker.py": {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/crossover_worker.py",
+      "sha256": "30430d935a1daccf47d82e5724513eea74d5745765f0615ec992c3f0db77a684"
+    },
+    "capture_worker.py": {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/capture_worker.py",
+      "sha256": "02704c5548fe2fca90878ad26417ee7ed52b5d4c64f198ce4feb5f4f9b16fba2"
+    },
+    "summarize_capture.py": {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/summarize_capture.py",
+      "sha256": "9d0a1354ca0be5358804cce383ee891313d5afe62bc54e6a3223d2f4ba004110"
+    },
+    "run_crossover.py": {
+      "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/exact_payload_20261003/run_crossover.py",
+      "sha256": "6f4b2a1add37e80b572a657288950c48cdef8c9f147193e1db718bb8a1777553"
+    }
+  },
+  "memory": {
+    "min_host_available_gib": 1612.9986381530762,
+    "max_process_tree_rss_gib": 226.8744239807129,
+    "min_gpu_free_mib": 70391,
+    "guard_stop": null
+  }
+}
