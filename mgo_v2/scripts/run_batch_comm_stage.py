@@ -1,4 +1,4 @@
-"""One bounded stage, burn paused for measurements and resumed in finally."""
+"""One bounded stage, idle model load paused for measurements and resumed in finally."""
 import argparse,json
 from batch_comm_common import *
 
@@ -10,7 +10,7 @@ def main():
  state.setdefault('source_sha256',{str(p):sha(p) for p in sources});assert all(sha(p)==h for p,h in state['source_sha256'].items())
  write(PACKET/'batch_comm_progress.json',state)
  try:
-  stop_burn()
+  stop_idle_load()
   if a.stage.startswith('capture'):
    batch=int(a.stage[7:]);run(a.stage,'batch_comm_capture.py',['--batch',batch,'--prompts',PACKET/'batch_comm_prompt_provenance.json'],model=True)
   else:
@@ -23,5 +23,5 @@ def main():
   state['completed'].append(a.stage);state.update(status='STAGE_PASS',active_stage=None)
  except BaseException as exc:state.update(status='FAIL',error=repr(exc));raise
  finally:
-  state['burn_processes']=start_burn();write(PACKET/'batch_comm_progress.json',state)
+  state['idle_model_processes']=start_idle_load();write(PACKET/'batch_comm_progress.json',state)
 if __name__=='__main__':main()

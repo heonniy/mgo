@@ -3,11 +3,13 @@
 **Owner amendment (2026-10-03): include local B32/global B128.**
 The batch packet now has B4/B8/B16/B32, with exactly three new captures
 (B4/B16/B32) and the existing B8 reused. This supersedes the plan's B16 cap.
-The owner also requests burn on all eight GPUs whenever experiments are not
-running. Pause our eight burn processes for experimental stages; resume them
-on stage exit, including failure. Never kill another user's jobs. Existing
-burn guards yield if another compute process appears, GPU temperature reaches
-85 C, GPU free memory falls below 8 GiB, or host available memory below 128 GiB.
+The owner requests idle load on all eight GPUs whenever experiments are not
+running, and then specified real model inference rather than GEMM burn.
+Use `examples/model_inference_load.py`: resident Qwen1.5-MoE-A2.7B-Chat,
+BF16, local batch8/max128 input tokens, repeated forwards without KV growth.
+Pause our eight inference workers for experimental stages; resume on exit,
+including failure. Never kill another user's jobs. Workers yield to another
+compute process, temperature >=85 C, GPU free <8 GiB or host free <128 GiB.
 See `BATCH_COMM_EXECUTION.md` for the frozen expansion and measurement rules.
 
 **Immediate follow-up after the B8 IPC/SHM characterization: batch communication sensitivity.**

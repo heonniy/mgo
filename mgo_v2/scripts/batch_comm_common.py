@@ -1,4 +1,4 @@
-"""Bounded batch study paths, exclusive burn handoff, and worker guard."""
+"""Bounded batch study paths, exclusive idle-model handoff, and worker guard."""
 import json,os,signal,subprocess,sys,time
 from pathlib import Path
 from trace_comm_input import PACKET,sha
@@ -6,18 +6,19 @@ from run_rank_oracle_study import memory,process_tree
 from run_ipc_baseline_rebase import write
 PACKAGE=PACKET.parents[1]
 ROOT=Path('/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003')
-BURN=Path('/home/hwlee/mgo-results/gpu_burn_batch_20261003')
+LOAD=Path('/home/hwlee/mgo-results/model_inference_load_20261003')
+WORKER=PACKAGE/'examples/model_inference_load.py'
 PYTHON='/home/hwlee/sub-moe/phase01/.venv/bin/python'
 BATCHES=(4,8,16,32)
 ORDER=((0,'T0'),(0,'R3'),(1,'R3'),(1,'T0'))
 
 def owned(pid):
- try:return str(BURN/'burn.py') in Path(f'/proc/{pid}/cmdline').read_bytes().decode().split('\0')
+ try:return str(WORKER) in Path(f'/proc/{pid}/cmdline').read_bytes().decode().split('\0')
  except FileNotFoundError:return False
 
-def stop_burn():
- (BURN/'STOP').touch()
- ps=json.loads((BURN/'processes.json').read_text())
+def stop_idle_load():
+ (LOAD/'STOP').touch()
+ ps=json.loads((LOAD/'processes.json').read_text())
  for r in ps:
   if owned(r['pid']):os.kill(r['pid'],signal.SIGTERM)
  deadline=time.monotonic()+20
@@ -27,21 +28,21 @@ def stop_burn():
  time.sleep(1)
  assert not any(owned(r['pid']) for r in ps)
 
-def start_burn():
+def start_idle_load():
  # Never stop or compete with someone else's workload; existing guard also exits on arrival.
  uuids=subprocess.check_output(['nvidia-smi','--query-gpu=index,uuid','--format=csv,noheader'],text=True)
  apps=subprocess.check_output(['nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader,nounits'],text=True)
  busy={line.split(',')[0].strip() for line in apps.splitlines()}
- (BURN/'STOP').unlink(missing_ok=True)
- old=json.loads((BURN/'processes.json').read_text());ps=[r for r in old if owned(r['pid'])]
+ (LOAD/'STOP').unlink(missing_ok=True)
+ old=json.loads((LOAD/'processes.json').read_text());ps=[r for r in old if owned(r['pid'])]
  for line in uuids.splitlines():
   g,uuid=[x.strip() for x in line.split(',')];g=int(g)
   if uuid in busy or any(r['gpu']==g for r in ps):continue
   env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(g),OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
-  with (BURN/f'gpu{g}.log').open('a') as f:
-   p=subprocess.Popen([PYTHON,'-u',str(BURN/'burn.py')],env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)
+  with (LOAD/f'gpu{g}.log').open('a') as f:
+   p=subprocess.Popen([PYTHON,'-u',str(WORKER)],env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)
   ps.append(dict(gpu=g,pid=p.pid))
- write(BURN/'processes.json',ps)
+ write(LOAD/'processes.json',ps)
  return ps
 
 def run(label,worker,args=(),mode='T0',model=False,smoke=False):

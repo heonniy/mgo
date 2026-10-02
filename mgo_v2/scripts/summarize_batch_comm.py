@@ -113,7 +113,7 @@ def main():
  f"- Peak process-tree RSS {mem['peak_process_tree_rss_gib']:.2f} GiB; minimum host available {mem['min_host_available_gib']:.2f} GiB; minimum target GPU free {mem['min_target_gpu_free_mib']:,} MiB. No memory guard stop.",
  '- All CPU Pareto results and frozen schedule metadata retain their SHA256 hashes. No CPU screen, F/K/C run, additional decode, NCCL tuning, or NVLink-mode operation.',
  '- Fresh transport smokes accepted T0 P2P/IPC and R3 SHM only. Both use NCCL_CUMEM_ENABLE=0. INFO is absent during timing.',
- '- Eight burn workers are paused throughout experiment stages and restarted on exit. Their own safeguards yield to other GPU jobs and memory/temperature pressure.',
+ '- Eight resident-model inference workers are paused throughout experiment stages and restarted on exit. Their safeguards yield to other GPU jobs and memory/temperature pressure. Idle inference is separate from the three research captures.',
  '- Raw capture/timing receipts are outside Git with hashes; compact geometry, prompt provenance, diagnostics and results are checked in. No automatic F/K model timing; stop for owner review.', '',
  'See [geometry](batch_comm_geometry.json), [trace timing](batch_comm_trace_timing.json), [calibration](small_payload_latency.json), [validation](batch_comm_validation.json), and [frozen conventions](BATCH_COMM_EXECUTION.md).','']
  (PACKET/'BATCH_COMM_SENSITIVITY_RESULTS.md').write_text('\n'.join(lines))

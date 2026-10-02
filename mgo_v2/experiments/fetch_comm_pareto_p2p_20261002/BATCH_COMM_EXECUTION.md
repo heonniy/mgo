@@ -59,10 +59,17 @@ Resource bounds: before launch host available >=512 GiB, target GPU used
 process-tree RSS <=320 GiB for capture / <=32 GiB for communication. Timeout
 600 s per capture, 180 s per communication process group. No automatic retry.
 
-Burn handoff: eight guarded FP16 GEMM workers while no GPU experiment runs;
-all eight paused for experimental stages to avoid contamination. Each allocates
-three 8192x8192 matrices (384 MiB torch allocation). Resume in the stage's
-finally path. PID ownership is checked before signaling; foreign jobs are never
-stopped. The existing burn guard yields to foreign compute jobs/heat/memory.
-Burn receipts/logs: `/home/hwlee/mgo-results/gpu_burn_batch_20261003/`.
+Idle-load handoff (owner amended during B32 capture): use eight resident
+Qwen1.5-MoE-A2.7B-Chat inference workers, one per GPU. The former matrix-only
+burn was retired. BF16, local batch8, max128 prompt tokens, no retained KV
+cache; torch allocation is capped at 65% of GPU memory. All eight are paused
+for experimental stages and resumed in the stage's finally path. PID ownership
+is checked before signaling. Workers yield to foreign compute jobs, 85 C,
+GPU free <8 GiB or host available <128 GiB. These idle forwards are separate
+from the three research captures and never overlap communication timing.
+
+The capture-source hash epoch is retained in progress; only idle-load handoff
+changed before timing. Capture and trace/calibration measurement code remain
+unchanged. No extra research model capture was introduced.
+Idle-load receipts/logs: `/home/hwlee/mgo-results/model_inference_load_20261003/`.
 Experiment raw root: `/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/`.
