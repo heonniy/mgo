@@ -122,6 +122,29 @@ No performance claim is made from the short capture. Do not implement replicatio
 
 If R3 is not >=1.5x slower at or below the observed exact-only p90/p99 payload range, stop the synthetic H100 P2P-off branch and move the communication-sensitive validation to the real no-NVLink server.
 
+## Stage 0C — replica-budget Pareto screen
+
+The exact-only payload/crossover packet at `ed7f82b` passed and showed a workload-relevant T0/R3 communication-price contrast at 32 KiB.
+
+Before any longer trace or physical replica implementation, run only the CPU replay in [REPLICA_PARETO_SCREEN.md](REPLICA_PARETO_SCREEN.md).
+
+Use the existing exact-only eight-decode trace and sweep:
+
+```text
+rho = {0, 0.125, 0.25, 0.50, 0.75}
+```
+
+Primary plane:
+
+```text
+x = decode peer activation bytes
+y = decode expert H2D bytes
+```
+
+No GPU work is authorized in this stage.
+
+Continue only if at least three points are nondominated and the two endpoints differ by >=10% on **both** axes.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

@@ -1,3 +1,19 @@
+## Immediate task — CPU-only replica Pareto screen
+
+Current checkpoint: `ed7f82b`.
+
+Transport characterization is complete enough for this decision. Do not run more NCCL tests.
+
+Read `REPLICA_PARETO_SCREEN.md` and:
+
+1. reuse the validated exact-only 8-decode capture;
+2. implement only the deterministic CPU replay described there;
+3. sweep rho = 0, 0.125, 0.25, 0.50, 0.75;
+4. report decode H2D bytes versus peer activation bytes and nondominated points;
+5. commit immediately and stop.
+
+No new model generation, GPU timing, replication runtime, substitution, load objective, final weighted loss or Stage 3.
+
 ## Immediate task — one exact-only payload capture, then crossover
 
 Current checkpoint: `0c09fae`.

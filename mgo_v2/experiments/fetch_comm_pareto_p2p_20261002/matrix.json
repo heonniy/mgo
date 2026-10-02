@@ -89,5 +89,28 @@
       },
       "continuation_threshold_ratio": 1.5
     }
+  },
+  "replica_pareto_screen": {
+    "checkpoint": "ed7f82b6a323460c18374c45f24018bc48a899f4",
+    "source": "validated exact-only R4/B8 capture from eb65df0/ed7f82b",
+    "gpu_runs": 0,
+    "substitution": false,
+    "eviction": "lru",
+    "replica_budget": [
+      0,
+      0.125,
+      0.25,
+      0.5,
+      0.75
+    ],
+    "primary_metrics": [
+      "decode_peer_activation_bytes",
+      "decode_expert_h2d_bytes"
+    ],
+    "go_gate": {
+      "minimum_nondominated_points": 3,
+      "minimum_endpoint_h2d_change_fraction": 0.1,
+      "minimum_endpoint_peer_change_fraction": 0.1
+    }
   }
 }

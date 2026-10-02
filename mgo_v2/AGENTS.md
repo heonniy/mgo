@@ -1,5 +1,16 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `ed7f82b`: CPU-only replica Pareto screen.**
+NCCL characterization is paused. Read
+`experiments/fetch_comm_pareto_p2p_20261002/REPLICA_PARETO_SCREEN.md`.
+Reuse the validated exact-only 8-decode trace; no new GPU/model run. Sweep
+replica-budget rho={0,0.125,0.25,0.5,0.75} with one common deterministic
+first-copy rule, LRU, and greedy current-byte-saving replicas. Primary plane is
+decode peer activation bytes vs decode expert H2D bytes. Continue only if at
+least three points are nondominated and F/C differ by >=10% on both axes.
+Commit the CPU result immediately and stop; do not implement the final method
+or physical F/K/C automatically.
+
 **Immediate follow-up after `0c09fae`: exact-only payload capture.**
 The existing substituted traces cannot recover exact destination ranks. Run one
 R4/B8 P0 capture with substitution off, replication off, LRU, T0, and only
