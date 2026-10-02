@@ -1,5 +1,16 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after the B8 IPC/SHM characterization: batch communication sensitivity.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/BATCH_COMM_SENSITIVITY.md`.
+Hold cache ratio at 30% and R4 fixed; compare local B4/B8/B16 (global
+16/32/64). Reuse B8 and capture only exact-only B4/B16 traces with the same
+prompt ordering, P0 seed42, LRU, no substitution/replication, 1 prefill +
+8 decode. Replay all three 384-event traces on stable T0-IPC and R3-SHM.
+Primary = whole-trace CUDA/wall ratio; old sum-event max-rank is diagnostic
+only. Also report message-size/fan-out geometry and a bounded 16-256 KiB
+small-payload calibration. No cache sweep, F/K/C model runs, R8, Nsight,
+NVLink-mode work or NCCL tuning. Commit and stop.
+
 **NVLink bandwidth ladder blocked (2026-10-03): BLOCKED_PRIVILEGE.**
 All eight GPUs are idle, but the read-only bandwidth-mode query returned
 code 4 (insufficient permission per the installed NVIDIA-SMI manual).

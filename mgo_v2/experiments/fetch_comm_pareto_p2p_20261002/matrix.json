@@ -370,5 +370,120 @@
     "automatic_fk_model_followup": false,
     "additional_bw_modes": false,
     "nsight": false
+  },
+  "batch_comm_sensitivity": {
+    "checkpoint": "a18c5d382cd20d7c79d06190f90fea8f1085414e",
+    "model": "Qwen3-30B-A3B-Instruct-2507",
+    "hardware": {
+      "gpus": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "world_size": 4
+    },
+    "cache_ratio": 0.3,
+    "local_batches": [
+      4,
+      8,
+      16
+    ],
+    "global_batches": [
+      16,
+      32,
+      64
+    ],
+    "source_capture": {
+      "capture_new_batches": [
+        4,
+        16
+      ],
+      "reuse_existing_batch": 8,
+      "prefill_forwards": 1,
+      "decode_forwards": 8,
+      "substitution": false,
+      "replication": false,
+      "eviction": "lru",
+      "admission": "P0_balanced_random_seed42",
+      "transport": "T0-IPC",
+      "require_prompt_provenance": true
+    },
+    "transports": {
+      "T0": {
+        "label": "P2P/IPC direct P2P over NVSwitch",
+        "env": {
+          "NCCL_CUMEM_ENABLE": "0"
+        }
+      },
+      "R3": {
+        "label": "SHM/direct/direct with direct P2P disabled",
+        "env": {
+          "NCCL_CUMEM_ENABLE": "0",
+          "NCCL_P2P_LEVEL": "LOC",
+          "NCCL_IB_DISABLE": "1"
+        }
+      }
+    },
+    "small_payload_calibration": {
+      "sizes_bytes": [
+        16384,
+        32768,
+        65536,
+        131072,
+        262144
+      ],
+      "warmups": 10,
+      "timed_iterations": 30,
+      "passes": [
+        [
+          "T0",
+          "R3"
+        ],
+        [
+          "R3",
+          "T0"
+        ]
+      ]
+    },
+    "trace_replay": {
+      "events_per_batch": 384,
+      "passes": [
+        [
+          "T0",
+          "R3"
+        ],
+        [
+          "R3",
+          "T0"
+        ]
+      ],
+      "warmup_full_traces_per_cell": 1,
+      "timed_full_traces_per_cell": 3,
+      "primary_metrics": [
+        "median_full_trace_cuda_interval_ms",
+        "median_wall_ms"
+      ],
+      "secondary_metrics": [
+        "sum_event_max_rank_pair_ms",
+        "max_rank_cumulative_ms",
+        "event_percentiles"
+      ]
+    },
+    "event_buckets_bytes": [
+      32768,
+      65536,
+      131072,
+      262144
+    ],
+    "interpretation": {
+      "batch_sensitive_min_ratio_growth_points": 0.1,
+      "latency_dominated_max_whole_trace_ratio": 1.1
+    },
+    "max_new_model_captures": 2,
+    "cache_ratio_sweep": false,
+    "fk_model_runs": false,
+    "nsight": false,
+    "r8": false
   }
 }

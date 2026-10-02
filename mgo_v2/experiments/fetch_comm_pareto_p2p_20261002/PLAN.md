@@ -229,6 +229,22 @@ The OFF mode is treated as a global server change: run only if all eight GPUs ar
 
 The CPU Pareto screen is transport-independent and must not be rerun. This stage is communication-only; it does not automatically authorize F/K model timing.
 
+## Stage 0I — batch-size communication sensitivity
+
+The B8 IPC/SHM replay showed large event-level latency differences but almost no whole-trace gap. Follow [BATCH_COMM_SENSITIVITY.md](BATCH_COMM_SENSITIVITY.md) to test whether this is a small-message/launch-overhead regime.
+
+Keep cache ratio fixed at **30%** and vary only local batch:
+
+```text
+B4 / B8 / B16  (global 16 / 32 / 64)
+```
+
+Reuse the validated B8 trace; capture only missing B4 and B16 exact-only traces (1 prefill + 8 decode, R4, P0 seed42, LRU, no substitution/replication). Then replay each 384-event trace on T0-IPC and R3-SHM.
+
+Primary metrics are whole-trace CUDA and wall time. The previous `sum_event max_rank` metric is secondary only. Also measure payload-size/fan-out distributions and a bounded 16-256 KiB latency calibration to distinguish fixed overhead from byte sensitivity.
+
+No cache-ratio sweep or F/K model timing is authorized in this stage.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

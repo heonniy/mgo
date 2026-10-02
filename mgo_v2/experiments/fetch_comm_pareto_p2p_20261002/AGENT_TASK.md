@@ -1,3 +1,23 @@
+## Immediate task — B4/B8/B16 communication sensitivity
+
+Current checkpoint: `a18c5d3` plus the validated IPC/SHM replay at `3e59975`.
+
+Read `BATCH_COMM_SENSITIVITY.md`.
+
+Do only this:
+
+1. keep cache ratio fixed at 30%, R4 GPUs 0,1,4,5;
+2. recover and hash the original B8 prompt ordering;
+3. capture new exact-only B4 and B16 traces only; reuse B8;
+4. report per-batch message-size, peer-byte, self-byte and fan-out geometry;
+5. run the bounded 16/32/64/128/256-KiB T0-IPC vs R3-SHM latency calibration;
+6. replay B4/B8/B16 384-event traces under both transports in two counter-orders;
+7. make whole-trace CUDA/wall the primary comparison and keep sum-event-max-rank secondary;
+8. bucket event latency by actual remote bytes/fan-out;
+9. commit and stop.
+
+No cache sweep, rho/F/K/C, substitution, R8, long decode, Nsight, NVLink-mode work or NCCL tuning.
+
 ## Blocked — NVLink bandwidth ladder safety gate
 
 **NVLink bandwidth ladder blocked (2026-10-03): BLOCKED_PRIVILEGE.**
