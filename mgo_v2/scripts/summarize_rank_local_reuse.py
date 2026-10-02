@@ -24,23 +24,23 @@ def main():
  manifest=json.loads((P/'execution_manifest.json').read_text())
  for path,h in manifest['source_sha256'].items():assert sha(path)==h,path
  for path,h in manifest['baseline_sha256'].items():assert sha(path)==h,path
- stages=[json.loads(f.read_text()) for f in sorted(P.glob('R02_B*.json'))]
+ stages=sorted((json.loads(f.read_text()) for f in P.glob('R02_B*.json')),key=lambda d:d['batch'])
  assert any(d['batch']==8 for d in stages) and all(d['status']=='PASS' for d in stages)
  pairs=[];horizons=[];upper=[];occurrence_distributions={};r3points=[]
  for stage in stages:
   b=stage['batch'];horizon_acc={str(h):dict(occurrences=0,positive_future_occurrences=0,overlapping_future_marginal_sum=0,reuse_steps=0,reuse_routes=0,demand_steps=0) for h in (1,2,4,'remaining')}
-  distances=Counter();bursts=Counter()
+  distances=Counter();bursts=Counter();demand_bursts=Counter()
   path=ROOT/f'reuse_occurrences_B{b}.jsonl.gz'
   assert sha(path)==next(a['sha256'] for a in stage['artifacts'] if a['path']==str(path))
   with gzip.open(path,'rt') as f:
    for line in f:
-    row=json.loads(line);distances[str(row['next_remote_reuse_distance'])]+=1;bursts[str(row['remote_burst'])]+=1
+    row=json.loads(line);distances[str(row['next_remote_reuse_distance'])]+=1;bursts[str(row['remote_burst'])]+=1;demand_bursts[str(row['demand_burst'])]+=1
     for h,v in row['horizons'].items():
      acc=horizon_acc[h];acc['occurrences']+=1;acc['positive_future_occurrences']+=v['future_peer_bytes_saved']>0;acc['overlapping_future_marginal_sum']+=v['future_peer_bytes_saved']
      for k in ('reuse_steps','reuse_routes','demand_steps'):acc[k]+=v[k]
   for h,a in horizon_acc.items():
    n=a['occurrences'];horizons.append(dict(batch=b,horizon=h,remote_occurrences=n,positive_future_fraction=a['positive_future_occurrences']/n,mean_future_marginal_bytes=a['overlapping_future_marginal_sum']/n,mean_future_remote_steps=a['reuse_steps']/n,mean_future_remote_routes=a['reuse_routes']/n,mean_future_demand_steps=a['demand_steps']/n,next_remote_recurrence_weighted_byte_share=stage['marginal_byte_share_next_remote_reuse'].get(h)))
-  occurrence_distributions[b]=dict(next_remote_step_distance_counts=distances,consecutive_remote_burst_counts=bursts)
+  occurrence_distributions[b]=dict(next_remote_step_distance_counts=distances,consecutive_remote_burst_counts=bursts,consecutive_positive_demand_burst_counts=demand_bursts)
   row=dict(batch=b,pair_count=stage['pair_count'],actual_F_peer_bytes=stage['baseline']['peer_activation_bytes'],individual_marginal_peer_bytes=stage['remote_marginal_bytes'],R2_gate=stage['R2_gate'])
   for metric,shares in stage['concentration'].items():
    row[metric+'_gini']=stage['gini'][metric]
@@ -49,7 +49,29 @@ def main():
   pairs.append(row);upper+=stage['persistence']
   f=P/f'R3_B{b}.json'
   if f.exists():
-   d=json.loads(f.read_text());assert d['status']=='PASS' and len(d['points'])==16;r3points+=d['points']
+   d=json.loads(f.read_text());assert d['status']=='PASS' and len(d['points'])==16
+   assert {(str(r['horizon']),r['threshold_peer_bytes']) for r in d['points']}=={(str(h),t) for h in (1,2,4,'remaining') for t in (0,65536,262144,1048576)}
+   for point in d['points']:
+    assert point['events']==384 and point['total_fetches']==sum(point[k] for k in ('first_copy_fetches','reload_fetches','replica_fetches'))
+    assert point['expert_h2d_bytes']==point['total_fetches']*9437184
+    assert point['peer_activation_bytes']==point['dispatch_bytes']+point['combine_bytes']
+    life=point['lifetimes'];assert Path(life['path']).stat().st_size==life['bytes'] and sha(life['path'])==life['sha256']
+    count=reused=censored=0;durations=[]
+    with gzip.open(life['path'],'rt') as stream:
+     for text in stream:
+      copy=json.loads(text);count+=1;reused+=copy['reused'];censored+=copy['right_censored'];durations.append(copy['lifetime_layer_events'])
+      assert copy['lifetime_layer_events']==copy['end_event']-copy['birth_event']>0
+      assert bool(copy['reuse_events'])==copy['reused']
+    assert count==point['replica_admissions']==point['replica_fetches'] and reused==point['reused_replicas'] and censored==point['right_censored_replicas']
+    assert math.isclose(point['fraction_reused_before_eviction'],reused/count if count else 0)
+    assert math.isclose(point['mean_replica_lifetime_layer_events'],statistics.mean(durations) if count else 0)
+    ordered=sorted(durations)
+    point['replica_lifetime_p50_layer_events']=statistics.median(ordered) if count else None
+    if count:
+     pos=(count-1)*.9;lo=math.floor(pos);hi=math.ceil(pos)
+     point['replica_lifetime_p90_layer_events']=ordered[lo]+(ordered[hi]-ordered[lo])*(pos-lo)
+    else:point['replica_lifetime_p90_layer_events']=None
+   r3points+=d['points']
  csvwrite('reuse_pair_summary.csv',pairs);write('reuse_pair_summary.json',dict(rows=pairs,per_pair_files=[dict(path=f'reuse_pairs_B{d["batch"]}.csv',sha256=sha(P/f'reuse_pairs_B{d["batch"]}.csv')) for d in stages],raw_accounting=[dict(batch=d['batch'],baseline=d['baseline'],artifacts=d['artifacts'],provenance=d['provenance']) for d in stages]))
  csvwrite('reuse_horizon_summary.csv',horizons);write('reuse_horizon_summary.json',dict(rows=horizons,occurrence_distributions=occurrence_distributions,future_definition='Strictly later same-layer decode steps; eight-step right truncation; current event excluded.'))
  csvwrite('persistence_upper_bound.csv',upper);write('persistence_upper_bound.json',dict(rows=upper,per_candidate_files=[a for d in stages for a in d['artifacts'] if 'persistence_candidates' in a['path']],interpretation='Independent candidate persistence bounds; sums are not a jointly attainable multi-replica saving or time model.'))
@@ -97,8 +119,17 @@ def main():
   for r in points8:
    f=next(x for x in frontier if x['kind']=='selective' and x['horizon']==r['horizon'] and x['threshold_peer_bytes']==r['threshold_peer_bytes'])
    lines.append(f"| {f['label']} | {r['peer_activation_bytes']/2**20:.3f} | {r['expert_h2d_bytes']/2**30:.3f} | {r['replica_admissions']} | {r['fraction_reused_before_eviction']:.2%} | {r['victim_induced_reload_count']} | {f['dominates_old_rhos']} |")
+  zero=[r for r in points8 if r['threshold_peer_bytes']==0]
+  lines += ['', f"At threshold zero, only {min(r['reused_replicas'] for r in zero)}–{max(r['reused_replicas'] for r in zero)} replicas per cell serve a later local demand out of {min(r['replica_admissions'] for r in zero):,}–{max(r['replica_admissions'] for r in zero):,} admissions. Mean copy lifetimes are {min(r['mean_replica_lifetime_layer_events'] for r in zero):.2f}–{max(r['mean_replica_lifetime_layer_events'] for r in zero):.2f} layer events, versus 48 layer events to the next same-layer decode opportunity."]
   lines+=['','![B8 frontier](frontier_B8.png)','', 'Replica reuse counts only a later local service before eviction; current-event service is excluded. End-of-trace survivors are right-censored. All lifecycle counts and actual coordinates, including secondary B16/B32, are in the selective replay files. No secondary historical frontier is invented.']
  else:lines+=['No selective replay has run. Follow the gate and stage boundary above.']
+ if any(r['batch']!=8 for r in r3points):
+  lines += ['', '## Secondary batch coordinates', '', 'No historical K/C points exist for these batches. The table shows each freshly reproduced F and the selective cell with the lowest peer bytes; this is not a secondary headroom classification.', '', '| Batch | F peer MiB | F H2D GiB | Lowest-peer cell | Selective peer MiB | Selective H2D GiB |', '|---:|---:|---:|:---|---:|---:|']
+  for b in (16,32):
+   available=[r for r in r3points if r['batch']==b]
+   if not available:continue
+   base=next(d['baseline'] for d in stages if d['batch']==b);best=min(available,key=lambda r:(r['peer_activation_bytes'],r['expert_h2d_bytes']))
+   lines.append(f"| {b} | {base['peer_activation_bytes']/2**20:.3f} | {base['expert_h2d_bytes']/2**30:.3f} | H{best['horizon']}/T{best['threshold_peer_bytes']//1024}KiB | {best['peer_activation_bytes']/2**20:.3f} | {best['expert_h2d_bytes']/2**30:.3f} |")
  if decision=='NO_HEADROOM':lines+=['','Temporal demand recurs, but this bounded selective policy does not dominate any old nonzero-rho point once real slots, evictions and reloads are included. This does not prove that every possible selective policy is useless; it does not justify an online controller or GPU follow-up.']
  elif decision in ('MODEST_HEADROOM','STRONG_HEADROOM'):lines+=['','The predeclared CPU frontier criterion is met by the cells marked in frontier_comparison.json. This is future-aware diagnostic headroom, not an online policy or measured latency benefit. Owner review is required before any GPU follow-up.']
  elif decision=='LOW_RANK_LOCAL_REUSE':lines+=['','The reuse gate failed. Stop without capacity-aware replay or a new controller.']
@@ -113,8 +144,10 @@ def main():
  (P/'RESULTS.md').write_text('\n'.join(lines))
  workerroot=Path('/home/hwlee/mgo-results/model_inference_load_20261003');current=json.loads((workerroot/'processes.json').read_text());assert current==manifest['gpu_worker_pids_before']
  assert all('model_inference_load.py' in Path(f"/proc/{r['pid']}/cmdline").read_bytes().decode() for r in current)
+ live_receipts=[json.loads((workerroot/f"gpu{r['gpu']}.json").read_text()) for r in current]
+ assert all(s['pid']==r['pid'] and s['batch']==1024 and time.time()-s['unix']<120 for r,s in zip(current,live_receipts))
  outputs=[f for f in P.iterdir() if f.suffix in ('.csv','.json','.png','.svg') and f.name!='validation.json']+[P/'RESULTS.md']
- validation=dict(status='PASS',decision=decision,batches=[d['batch'] for d in stages],independent_F_events=432*len(stages),selective_cells=len(r3points),selective_decode_events=384*len(r3points),unit_tests=11,cpu_only=True,cuda_visible_devices='',address_space_limit_bytes=4*1024**3,threads=1,peak_rss_mib=maxrss,gpu_workers_unchanged=True,gpu_worker_pids=current,baseline_hashes_unchanged=True,source_hashes_unchanged=True,new_research_gpu_runs=0,summary_source_sha256=sha(Path(__file__)),output_sha256={f.name:sha(f) for f in outputs})
+ validation=dict(status='PASS',decision=decision,batches=[d['batch'] for d in stages],independent_F_events=432*len(stages),selective_cells=len(r3points),selective_decode_events=384*len(r3points),unit_tests=11,cpu_only=True,cuda_visible_devices='',address_space_limit_bytes=4*1024**3,threads=1,peak_rss_mib=maxrss,gpu_workers_unchanged=True,gpu_worker_pids=current,gpu_worker_live_receipts=[{k:r[k] for k in ('gpu','pid','batch','iterations','unix')} for r in live_receipts],baseline_hashes_unchanged=True,source_hashes_unchanged=True,new_research_gpu_runs=0,summary_source_sha256=sha(Path(__file__)),output_sha256={f.name:sha(f) for f in outputs})
  write('validation.json',validation)
  print(json.dumps({k:validation[k] for k in ('status','decision','batches','selective_cells','peak_rss_mib','gpu_workers_unchanged')},indent=2))
 if __name__=='__main__':main()

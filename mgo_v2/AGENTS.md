@@ -1,4 +1,16 @@
-**New owner-authorized CPU-only headroom study (2026-10-03): rank-local reuse and selective replication.**
+**Rank-local reuse study complete (2026-10-03): NO_HEADROOM.**
+Read `experiments/rank_local_reuse_oracle_20261003/{RESULTS.md,validation.json}`.
+B8 F was reproduced exactly. The four-step marginal-byte recurrence share
+is 73.70%, but none of the 16 selective cells dominates an old nonzero-rho
+point. B16/B32 secondary traces also completed 16 cells each; no historical
+secondary K/C frontier is assumed. All 48 CPU cells passed, with peak RSS
+720.78 MiB under a hard 4-GiB address-space bound. The original eight
+resident-model GPU worker PIDs remained unchanged. Stop research work;
+no online controller, new trace, threshold tuning or GPU follow-up is
+authorized by this result. Keep the requested resident-model idle load.
+The prospective instructions below are retained as history.
+
+**Owner-authorized CPU-only headroom study (2026-10-03): rank-local reuse and selective replication.**
 Read `experiments/rank_local_reuse_oracle_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 Reuse the existing exact B8 capture and the same rho=0 cache/traffic semantics.
 First reproduce F exactly, then measure temporal reuse of remote

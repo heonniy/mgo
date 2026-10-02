@@ -1,6 +1,14 @@
 # AGENT TASK — rank-local reuse / selective replication
 
-Current owner checkpoint: `02eeb59`.
+Owner plan commit: `32a41463145a72be5777c6ee5d052cdd993e6da5`.
+
+**Complete: NO_HEADROOM.** See [RESULTS.md](RESULTS.md) and
+[validation.json](validation.json). Exact F reproduction, reuse accounting,
+and all 48 fixed selective cells across B8/B16/B32 passed. No B8 selective
+point dominates an old nonzero-rho point. Peak RSS was 720.78 MiB; all eight
+resident-model workers retained their original PIDs. Stop here without
+new experiments or controller work. The sequence below records the original
+authorized scope.
 
 Read [PLAN.md](PLAN.md) and reuse the existing CPU replay code rather than
 creating a second cache semantics.

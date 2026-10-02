@@ -9,6 +9,8 @@ The B8 rho0 replay exactly reproduced F: 17,635 fetches, 166,424,739,840 expert 
 | Local batch | Observed remote pairs | Top 10% marginal byte share | Byte share recurring within 4 steps | Gate |
 |---:|---:|---:|---:|:---|
 | 8 | 9434 | 37.23% | 73.70% | PASS |
+| 16 | 11211 | 40.06% | 78.03% | PASS |
+| 32 | 12960 | 43.69% | 80.06% | PASS |
 
 The gate weights current **individual candidate marginal** bytes, not total wire traffic. Shared dispatch rows create interactions, so individual marginals are not additive joint savings. Recurrence is truncated at the eighth decode step; current-event savings are excluded from all future scores.
 
@@ -20,6 +22,14 @@ The gate weights current **individual candidate marginal** bytes, not total wire
 | 8 | 2 | 5870 / 9434 | 84.0 | 0.00911 | 0 |
 | 8 | 4 | 6491 / 9434 | 144.0 | 0.01562 | 0 |
 | 8 | remaining | 6748 / 9434 | 232.0 | 0.02517 | 0 |
+| 16 | 1 | 6143 / 11211 | 100.0 | 0.01085 | 0 |
+| 16 | 2 | 7316 / 11211 | 160.0 | 0.01736 | 0 |
+| 16 | 4 | 8190 / 11211 | 276.0 | 0.02995 | 0 |
+| 16 | remaining | 8557 / 11211 | 432.0 | 0.04688 | 0 |
+| 32 | 1 | 6961 / 12960 | 212.0 | 0.02300 | 0 |
+| 32 | 2 | 8823 / 12960 | 332.0 | 0.03602 | 0 |
+| 32 | 4 | 9860 / 12960 | 624.0 | 0.06771 | 0 |
+| 32 | remaining | 10272 / 12960 | 1132.0 | 0.12283 | 0 |
 
 One hypothetical replica costs 9 MiB. These ratios are byte accounting, not equivalent time costs. Each bound assumes a free, persistent replica for one pair; sums of independent candidates are not a joint oracle policy.
 
@@ -46,15 +56,26 @@ Exactly 16 predeclared horizon/threshold cells were run per available batch. All
 | Hremaining/T256KiB | 319.453 | 154.995 | 0 | 0.00% | 0 | [] |
 | Hremaining/T1024KiB | 319.453 | 154.995 | 0 | 0.00% | 0 | [] |
 
+At threshold zero, only 1–1 replicas per cell serve a later local demand out of 13,718–17,963 admissions. Mean copy lifetimes are 18.33–20.86 layer events, versus 48 layer events to the next same-layer decode opportunity.
+
 ![B8 frontier](frontier_B8.png)
 
 Replica reuse counts only a later local service before eviction; current-event service is excluded. End-of-trace survivors are right-censored. All lifecycle counts and actual coordinates, including secondary B16/B32, are in the selective replay files. No secondary historical frontier is invented.
+
+## Secondary batch coordinates
+
+No historical K/C points exist for these batches. The table shows each freshly reproduced F and the selective cell with the lowest peer bytes; this is not a secondary headroom classification.
+
+| Batch | F peer MiB | F H2D GiB | Lowest-peer cell | Selective peer MiB | Selective H2D GiB |
+|---:|---:|---:|:---|---:|---:|
+| 16 | 684.152 | 189.536 | Hremaining/T0KiB | 156.094 | 420.249 |
+| 32 | 1399.285 | 217.978 | Hremaining/T0KiB | 290.363 | 501.478 |
 
 Temporal demand recurs, but this bounded selective policy does not dominate any old nonzero-rho point once real slots, evictions and reloads are included. This does not prove that every possible selective policy is useless; it does not justify an online controller or GPU follow-up.
 
 ## Validation and stage boundary
 
-- Peak study process RSS: 224.89 MiB, under a hard 4-GiB address-space limit; CUDA hidden and BLAS/OMP threads fixed at one.
+- Peak study process RSS: 720.78 MiB, under a hard 4-GiB address-space limit; CUDA hidden and BLAS/OMP threads fixed at one.
 - Eleven targeted/cache regression tests passed before tracing. Raw receipt sizes/SHA256 and committed cross-rank provenance were verified. Original CPU Pareto artifacts remain hash-identical.
 - No model, Torch, CUDA or NCCL work was launched by this study. The owner’s eight resident-model GPU worker PIDs remained unchanged.
 - Full per-occurrence, per-candidate, physical-state and replica-lifetime records are compressed outside Git with hashes. Compact summaries and per-pair statistics are checked in.
