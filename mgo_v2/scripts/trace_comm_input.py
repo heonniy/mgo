@@ -11,7 +11,7 @@ def sha(path):
     with Path(path).open('rb') as f: return hashlib.file_digest(f, 'sha256').hexdigest()
 
 
-def validate_events(events):
+def validate_events(events, local_batch=8):
     assert len(events) == 384
     for i, e in enumerate(events):
         assert e['source_event'] == i + 48 and e['layer'] == i % 48
@@ -21,8 +21,8 @@ def validate_events(events):
             assert all(len(row) == 4 for row in send+recv)
             assert all(isinstance(v,int) and v>=0 for row in send+recv for v in row)
             assert all(send[a][b] == recv[b][a] for a in range(4) for b in range(4))
-        assert sum(map(sum,e['combine_send'])) == 32*8
-        assert all(sum(row)<=8*4 for row in e['dispatch_send'])
+        assert sum(map(sum,e['combine_send'])) == 4*local_batch*8
+        assert all(sum(row)<=local_batch*4 for row in e['dispatch_send'])
 
 
 def classify(ratios):

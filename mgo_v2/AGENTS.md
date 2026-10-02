@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Owner amendment (2026-10-03): include local B32/global B128.**
+The batch packet now has B4/B8/B16/B32, with exactly three new captures
+(B4/B16/B32) and the existing B8 reused. This supersedes the plan's B16 cap.
+The owner also requests burn on all eight GPUs whenever experiments are not
+running. Pause our eight burn processes for experimental stages; resume them
+on stage exit, including failure. Never kill another user's jobs. Existing
+burn guards yield if another compute process appears, GPU temperature reaches
+85 C, GPU free memory falls below 8 GiB, or host available memory below 128 GiB.
+See `BATCH_COMM_EXECUTION.md` for the frozen expansion and measurement rules.
+
 **Immediate follow-up after the B8 IPC/SHM characterization: batch communication sensitivity.**
 Read `experiments/fetch_comm_pareto_p2p_20261002/BATCH_COMM_SENSITIVITY.md`.
 Hold cache ratio at 30% and R4 fixed; compare local B4/B8/B16 (global

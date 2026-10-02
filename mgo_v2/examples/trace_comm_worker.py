@@ -27,7 +27,7 @@ def main(a):
     if getattr(a,'ipc_rebase',False):want['NCCL_CUMEM_ENABLE']='0'
     actual={k:v for k,v in os.environ.items() if k.startswith('NCCL_')}
     assert actual==want,(actual,want)
-    source=json.loads(a.counts.read_text());validate_events(source['events'])
+    source=json.loads(a.counts.read_text());validate_events(source['events'],source.get('local_batch',8))
     assert source['hidden_size']==2048 and source['row_bytes']==4096
     torch.set_num_threads(1);torch.cuda.set_device(0)
     dist.init_process_group('nccl',device_id=torch.device('cuda:0'));rank=dist.get_rank();assert dist.get_world_size()==4
