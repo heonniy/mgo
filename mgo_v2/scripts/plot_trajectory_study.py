@@ -17,7 +17,10 @@ plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':
 
 def export(fig,name):
     for extension in ('png','svg'):
-        fig.savefig(OUT/f'{name}.{extension}',dpi=160,bbox_inches='tight')
+        path=OUT/f'{name}.{extension}'
+        fig.savefig(path,dpi=160,bbox_inches='tight')
+        if extension=='svg':
+            path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
     plt.close(fig)
 
 def main():
