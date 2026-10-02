@@ -1,0 +1,53 @@
+{
+  "status": "BLOCKED_TRANSPORT",
+  "study_complete": false,
+  "plan_commit": "f779eef70b08c8ac75c78872f08d3dcaacbbf8ed",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "burn_workers_stopped": true,
+  "model_generations": 0,
+  "calibration_cells_completed": 3,
+  "calibration_cells_planned": 6,
+  "trace_capture": false,
+  "cpu_replica_sweep": false,
+  "primary_generations": 0,
+  "profiles": 0,
+  "transport": {
+    "T0": {
+      "direct_p2p_channels": 480,
+      "shm_channels": 0,
+      "ib_gdr_channels": 0,
+      "ib_retry_errors": 0,
+      "nvls_channels": 0,
+      "status": "PASS"
+    },
+    "T1": {
+      "direct_p2p_channels": 0,
+      "shm_channels": 0,
+      "ib_gdr_channels": 48,
+      "ib_retry_errors": 8,
+      "nvls_channels": 0,
+      "status": "FAIL"
+    }
+  },
+  "blocker": "T1 all_to_all_single selects NET/IB/GDRDMA/Shared and fails with IBV_WC_RETRY_EXC_ERR; SHM fallback is unverified.",
+  "outcome": "Transport prerequisite blocked; no conclusion about the replica Pareto frontier.",
+  "source_sha256": {
+    "examples/fetch_comm_calibration.py": "480742d706708ace2ef68f8ee792ea0dbc37eaf3c710e43457142b65a7bd8ec3",
+    "scripts/run_fetch_comm_calibration.py": "cd392275ae297847a015fd66ec80033af0a6b24825d1a3b0b7c7c6824301d444",
+    "scripts/summarize_fetch_comm_gate.py": "fb021bb8463f3ca7c7c8efc64c89d190fa86046ff9717f44852f28a2e8ea56d6"
+  },
+  "run_provenance": "The recorded worker ran under the saved temporary launcher; the checked-in launcher adds bounded timeout/memory guards for a deliberate rerun. No calibration or model measurements were rerun.",
+  "unmodified_transport_controls": [
+    "NCCL_SHM_DISABLE unset",
+    "NCCL_P2P_LEVEL unset",
+    "No NCCL_IB_DISABLE override",
+    "T0 NCCL_P2P_DISABLE unset",
+    "T1 NCCL_P2P_DISABLE=1"
+  ],
+  "resource_scope": "Tiny calibration only: one 9 MiB pinned source/destination and 384 KiB send/receive buffers per rank, plus CUDA/NCCL context. Observed approximately 1.1 GiB GPU use per rank. No model loaded; selected GPUs returned to 0 MiB after failure. No OOM observed."
+}

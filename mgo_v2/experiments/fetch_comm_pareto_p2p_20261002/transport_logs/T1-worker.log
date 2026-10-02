@@ -1,0 +1,204 @@
+[rank0]:[E1003 00:00:52.149460326 ProcessGroupNCCL.cpp:612] [Rank 0] Collective WorkNCCL(SeqNum=1, OpType=ALLTOALL_BASE, NumelIn=65536, NumelOut=65536, Timeout(ms)=600000) raised the following async exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<48638> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_0
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f1981f7205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7f186fd38340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7f186fd3f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7f186fd44474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7f186fd46597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7f198cd15c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7f198f985ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7f198fa178d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank0]:[E1003 00:00:52.158021425 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 0]  failure detected by watchdog at work sequence id: 1 PG status: last enqueued work: 2, last completed work: -1
+[rank0]:[E1003 00:00:53.937275144 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 all_to_all_single from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4829
+#1 wrapper from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 peer from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:26
+#3 main from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:27
+#4 <module> from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:50
+
+[rank0]:[E1003 00:00:53.937380605 ProcessGroupNCCL.cpp:2636] [PG ID 0 PG GUID 0(default_pg) Rank 0] First PG on this rank to signal dumping.
+[rank1]:[E1003 00:00:53.245936236 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 1] Observed flight recorder dump signal from another rank via TCPStore.
+[rank1]:[E1003 00:00:53.246234370 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 1] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 2, last completed NCCL work: -1.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank1]:[E1003 00:00:53.246686559 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 1] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank0]:[E1003 00:00:54.390924956 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 0] Received a dump signal due to a collective timeout from this local rank and we will try our best to dump the debug info. Last enqueued NCCL work: 2, last completed NCCL work: -1.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank3]:[E1003 00:00:54.391111271 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 3] Observed flight recorder dump signal from another rank via TCPStore.
+[rank0]:[E1003 00:00:54.391314216 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 0] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank3]:[E1003 00:00:54.391415804 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 3] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 2, last completed NCCL work: -1.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank3]:[E1003 00:00:54.391799395 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 3] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank2]:[E1003 00:00:54.639728646 ProcessGroupNCCL.cpp:612] [Rank 2] Collective WorkNCCL(SeqNum=1, OpType=ALLTOALL_BASE, NumelIn=65536, NumelOut=65536, Timeout(ms)=600000) raised the following async exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<43838> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_4
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7fc8d677205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7fc7c4538340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7fc7c453f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7fc7c4544474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7fc7c4546597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7fc8e15e1c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7fc8e4251ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7fc8e42e38d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank2]:[E1003 00:00:54.643910180 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 2]  failure detected by watchdog at work sequence id: 1 PG status: last enqueued work: 2, last completed work: -1
+[rank3]:[E1003 00:00:54.739491226 ProcessGroupNCCL.cpp:612] [Rank 3] Collective WorkNCCL(SeqNum=1, OpType=ALLTOALL_BASE, NumelIn=65536, NumelOut=65536, Timeout(ms)=600000) raised the following async exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<41718> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_5
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f691557205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7f6841138340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7f684113f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7f6841144474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7f6841146597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7f695e031c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7f6960ca1ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7f6960d338d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank3]:[E1003 00:00:54.743711496 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 3]  failure detected by watchdog at work sequence id: 1 PG status: last enqueued work: 2, last completed work: -1
+[rank2]:[E1003 00:00:54.893637553 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 2] Observed flight recorder dump signal from another rank via TCPStore.
+[rank2]:[E1003 00:00:54.893860714 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 2] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 2, last completed NCCL work: -1.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank2]:[E1003 00:00:54.894143655 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 2] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank3]:[E1003 00:00:54.194702805 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 all_to_all_single from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4829
+#1 wrapper from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 peer from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:26
+#3 main from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:27
+#4 <module> from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:50
+
+[rank2]:[E1003 00:00:55.430113682 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 all_to_all_single from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4829
+#1 wrapper from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 peer from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:26
+#3 main from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:27
+#4 <module> from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:50
+
+[rank1]:[E1003 00:00:56.990907400 ProcessGroupNCCL.cpp:612] [Rank 1] Collective WorkNCCL(SeqNum=1, OpType=ALLTOALL_BASE, NumelIn=65536, NumelOut=65536, Timeout(ms)=600000) raised the following async exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<46424> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_1
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f5e12d7205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7f5d3e938340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7f5d3e93f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7f5d3e944474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7f5d3e946597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7f5e5b867c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7f5e5e4d7ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7f5e5e5698d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank1]:[E1003 00:00:56.995096791 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 1]  failure detected by watchdog at work sequence id: 1 PG status: last enqueued work: 2, last completed work: -1
+[rank1]:[E1003 00:00:56.995551561 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 all_to_all_single from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4829
+#1 wrapper from /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 peer from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:26
+#3 main from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:27
+#4 <module> from /home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py:50
+
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py", line 50, in <module>
+[rank0]:     if __name__=='__main__':main()
+[rank0]:                             ^^^^^^
+[rank0]:   File "/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py", line 29, in main
+[rank0]:     for src in range(4):assert torch.all(recv[src*n:(src+1)*n]==src)
+[rank0]:                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: AssertionError
+[rank0]:[W1003 00:01:53.270775830 ProcessGroupNCCL.cpp:1575] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[rank0]:[E1003 00:01:54.496535384 ProcessGroupNCCL.cpp:750] [Rank 0] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank0]:[E1003 00:01:54.496579028 ProcessGroupNCCL.cpp:764] [Rank 0] To avoid data inconsistency, we are taking the entire process down.
+[rank0]:[E1003 00:01:54.496776883 ProcessGroupNCCL.cpp:2119] [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<48638> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_0
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f1981f7205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7f186fd38340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7f186fd3f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7f186fd44474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7f186fd46597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7f198cd15c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7f198f985ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7f198fa178d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: NCCL error: remote process exited or there was a network error, NCCL version 2.28.9
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+NET/IB: Got completion from peer 192.168.0.2<48638> with status=IBV_WC_RETRY_EXC_ERR(12) opcode=IBV_WC_SEND(0) reqSize=0 vendor_err=129 req_type=Recv hca mlx5_0
+Exception raised from checkForNCCLErrorsInternal at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2770 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f1981f7205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x380 (0x7f186fd38340 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x80 (0x7f186fd3f6e0 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::Watchdog::runLoop() + 0xa84 (0x7f186fd44474 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::Watchdog::run() + 0x157 (0x7f186fd46597 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: <unknown function> + 0xf6c06 (0x7f198cd15c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #6: <unknown function> + 0x94ac3 (0x7f198f985ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #7: <unknown function> + 0x1268d0 (0x7f198fa178d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+Exception raised from run at /pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2125 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f1981f7205d in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x9b5d75 (0x7f186f5a6d75 in /home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0xf6c06 (0x7f198cd15c06 in /home/hwlee/anaconda3/envs/qwen3-gemm/bin/../lib/libstdc++.so.6)
+frame #3: <unknown function> + 0x94ac3 (0x7f198f985ac3 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #4: <unknown function> + 0x1268d0 (0x7f198fa178d0 in /lib/x86_64-linux-gnu/libc.so.6)
+
+W1003 00:01:54.572000 1843127 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 1843168 closing signal SIGTERM
+W1003 00:01:54.573000 1843127 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 1843169 closing signal SIGTERM
+W1003 00:01:54.574000 1843127 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 1843170 closing signal SIGTERM
+E1003 00:01:55.039000 1843127 site-packages/torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: -6) local_rank: 0 (pid: 1843167) of binary: /home/hwlee/sub-moe/phase01/.venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 994, in <module>
+    main()
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-03_00:01:55
+  host      : cloud-0n58xq
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 1843168)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 1843168
+[2]:
+  time      : 2026-10-03_00:01:55
+  host      : cloud-0n58xq
+  rank      : 2 (local_rank: 2)
+  exitcode  : -15 (pid: 1843169)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 1843169
+[3]:
+  time      : 2026-10-03_00:01:55
+  host      : cloud-0n58xq
+  rank      : 3 (local_rank: 3)
+  exitcode  : -15 (pid: 1843170)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 1843170
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-03_00:01:54
+  host      : cloud-0n58xq
+  rank      : 0 (local_rank: 0)
+  exitcode  : -6 (pid: 1843167)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 1843167
+============================================================
