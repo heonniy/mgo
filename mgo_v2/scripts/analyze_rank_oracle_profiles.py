@@ -49,10 +49,13 @@ def analyze(policy):
         return records[rank,event]
     # Associate asynchronous kernels through their CPU launch correlation,
     # rather than requiring device completion inside the CPU submission range.
+    strings=dict(db.execute('SELECT id,value FROM StringIds'))
+    launch_ids=[i for i,value in strings.items() if 'launch' in value.lower()]
+    nccl_ids={i for i,value in strings.items() if 'nccl' in value.lower()}
+    gemm_ids={i for i,value in strings.items() if re.search(r'gemm|gemv|matmul|cutlass|^nvjet_tst_',value,re.I)}
     launches={}
-    for tid,a,b,correlation in db.execute(
-            "SELECT r.globalTid,r.start,r.end,r.correlationId FROM CUPTI_ACTIVITY_KIND_RUNTIME r "
-            "JOIN StringIds s ON r.nameId=s.id WHERE s.value LIKE '%Launch%'"):
+    launch_sql='SELECT globalTid,start,end,correlationId FROM CUPTI_ACTIVITY_KIND_RUNTIME WHERE nameId IN ('+','.join('?' for _ in launch_ids)+')'
+    for tid,a,b,correlation in db.execute(launch_sql,launch_ids):
         pid=tid & ~((1<<24)-1)
         row=locate(pid,a,b)
         if row is None: continue
@@ -61,23 +64,26 @@ def analyze(policy):
             left,right=phases[row['rank'],row['event'],candidate]
             if left<=a and b<=right: phase=candidate; break
         launches[pid,correlation]=(row['rank'],row['event'],phase)
-    kernel_names=defaultdict(int)
-    sql='SELECT k.globalPid,k.start,k.end,s.value,k.correlationId FROM CUPTI_ACTIVITY_KIND_KERNEL k JOIN StringIds s ON k.demangledName=s.id'
-    for pid,a,b,name_,correlation in db.execute(sql):
+    kernel_names=defaultdict(int); expert_kernel_names=defaultdict(int)
+    sql='SELECT globalPid,start,end,demangledName,correlationId FROM CUPTI_ACTIVITY_KIND_KERNEL'
+    for pid,a,b,name_id,correlation in db.execute(sql):
+        name_=strings[name_id]
         associated=launches.get((pid,correlation))
         if associated is None: continue
         rank,event,phase=associated
         row=records[rank,event]
         interval=(a,b); row['allgpu'].append(interval)
         key=(row['rank'],row['event'])
-        if 'nccl' in name_.lower():
+        if name_id in nccl_ids:
             row['nccl'].append(interval)
             if phase not in ('routing_metadata','dispatch','combine'):
                 raise RuntimeError(f'unattributed NCCL launch: {key} {phase}')
             row[phase].append(interval)
-        if phase=='expert_execution' and 'nccl' not in name_.lower():
-            row['expert'].append(interval)
-            if re.search(r'gemm|gemv|matmul|cutlass',name_,re.I):
+        if phase=='expert_execution' and name_id not in nccl_ids:
+            row['expert'].append(interval); expert_kernel_names[name_]+=1
+            # This CUDA build emits native expert linears as nvjet_tst_*;
+            # native source has three linears and per-event counts reconcile.
+            if name_id in gemm_ids:
                 row['gemm'].append(interval); row['gemm_kernel_count']+=1
                 kernel_names[name_]+=1
     for pid,a,b,size in db.execute('SELECT globalPid,start,end,bytes FROM CUPTI_ACTIVITY_KIND_MEMCPY WHERE copyKind=1'):
@@ -96,7 +102,9 @@ def analyze(policy):
         for e in evidence['events']:
             row=records[rank,e['event']]
             row['expert_rows']=e['loads'][rank]; row['distinct_experts']=e['distinct'][rank]
-            assert row['gemm_kernel_count']>=row['distinct_experts']*3, 'missing expert GEMMs'
+            if row['gemm_kernel_count']<row['distinct_experts']*3:
+                write(root/'attribution_debug.json',dict(rank=rank,event=e['event'],expected=row['distinct_experts']*3,actual=row['gemm_kernel_count'],expert_kernel_names=dict(expert_kernel_names),gemm_kernel_names=dict(kernel_names)))
+                raise AssertionError(f'missing expert GEMMs rank={rank} event={e["event"]} expected={row["distinct_experts"]*3} actual={row["gemm_kernel_count"]}')
             for category in ('expert','gemm','h2d','allgpu','routing_metadata','dispatch','combine','nccl'):
                 values=row.pop(category)
                 row[category+'_gpu_union_ms']=duration(values)
@@ -104,6 +112,11 @@ def analyze(policy):
                 row[category+'_gpu_sum_ms']=sum(b-a for a,b in values)/1e6
             result.append(row)
     write(OUT/f'profile_{policy}_kernel_names.json',dict(kernel_names))
+    write(OUT/f'profile_{policy}_kernel_validation.json',dict(status='PASS',
+        classified_gemm_kernels=sum(r['gemm_kernel_count'] for r in result),
+        expected_native_linear_calls=3*sum(r['distinct_experts'] for r in result),
+        exact_three_per_expert=all(r['gemm_kernel_count']==3*r['distinct_experts'] for r in result),
+        classification='Native expert ranges only; gemm/gemv/matmul/cutlass or observed nvjet_tst_* kernels.'))
     return result
 
 

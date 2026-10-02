@@ -13,3 +13,13 @@ Each oracle replay checks every event's raw selected experts, weights, full rout
 After primary timing, opt-in NVTX ranges identify complete MoE layers, routing metadata, dispatch, expert execution, asynchronous H2D submission, and combine. Kernels are assigned by process and CUDA launch correlation to the enclosing layer/phase, so asynchronous completion after a CPU submission range remains attributable. Native worker launch timestamps identify the corresponding expert phase; H2D copies are assigned within enclosing complete-layer intervals. The H2D submission range is a CPU submission scope, not an H2D GPU duration. Nsight copy and kernel records provide actual GPU intervals; no synchronization is added to separate overlapping fetch and compute. Profiles are diagnostic and never supply primary TPOT/E2E.
 
 The launcher exposes only physical GPUs 0,1,4,5, executes one four-rank job at a time, and samples host/GPU memory every ten seconds. Launch requires at least 512 GiB host memory available and less than 1 GiB already used on each selected GPU. It stops only its own process tree if available host memory falls below 128 GiB, worker-tree RSS exceeds 320 GiB, or a selected GPU has less than 8 GiB free. These are conservative guards, not a guarantee against sudden unrelated allocations. GPUs 2,3,6,7 and other users' processes are untouched. Checkpoint experts use the existing host store and cache30 slots; no second full GPU model is loaded.
+
+## Observed matrix-kernel names
+
+The captured CUDA build emits the native expert's three `torch::linear`
+operations as `nvjet_tst_*` kernels. The analyzer includes that observed family
+alongside explicit GEMM/GEMV/CUTLASS names, only inside expert execution ranges.
+Per-event/rank kernel counts are reconciled against three linears per executed
+expert; `profile_*_kernel_validation.json` and the kernel-name receipts retain
+the evidence. Kernel names are classified once by Nsight string ID to avoid
+repeatedly scanning long template names while streaming millions of activities.
