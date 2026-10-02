@@ -1,5 +1,11 @@
 # mgo_v2 coding instructions
 
+## New priority — PCIe/NUMA fabric characterization on shared 4-GPU server (2026-10-02)
+
+Read `experiments/pcie_numa_fabric_characterization_20261002/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}`.
+
+Use exactly physical GPUs **1,2,3,5** with strict NUMA-local host fetch: GPU1/2 -> NUMA0 and GPU3/5 -> NUMA1. The selected topology has same-NUMA PXB pairs (1,2) and (3,5), while cross-group pairs are SYS. Measure 9 MiB expert H2D contention, same-NUMA versus cross-NUMA GPU communication, four-rank NCCL, and H2D+communication co-contention. The owner permits short overlap with unrelated shared-server GPU jobs; never stop or modify those jobs, and record background utilization so results are labeled contention-inclusive rather than isolated peak bandwidth. Do not launch topology-aware policy tuning from this stage.
+
 ## New priority — admission trajectory/controller breakdown (2026-10-02)
 
 The physical locality study is complete at `e61758e`. Before changing the method, read `experiments/admission_trajectory_controller_breakdown_20261002/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}`.

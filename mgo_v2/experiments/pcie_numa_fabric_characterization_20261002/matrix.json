@@ -1,0 +1,160 @@
+{
+  "experiment": "pcie_numa_fabric_characterization_20261002",
+  "physical_gpus": [
+    1,
+    2,
+    3,
+    5
+  ],
+  "rank_mapping": [
+    {
+      "rank": 0,
+      "gpu": 1,
+      "numa": 0
+    },
+    {
+      "rank": 1,
+      "gpu": 2,
+      "numa": 0
+    },
+    {
+      "rank": 2,
+      "gpu": 3,
+      "numa": 1
+    },
+    {
+      "rank": 3,
+      "gpu": 5,
+      "numa": 1
+    }
+  ],
+  "topology_classes": {
+    "same_numa_pxb": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        5
+      ]
+    ],
+    "cross_numa_sys": [
+      [
+        1,
+        3
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        5
+      ]
+    ]
+  },
+  "shared_server": true,
+  "overlap_with_unrelated_jobs": true,
+  "strict_local_host_fetch": true,
+  "h2d": {
+    "payload_bytes": [
+      9437184,
+      67108864
+    ],
+    "primary_payload_bytes": 9437184,
+    "isolated": [
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        3
+      ],
+      [
+        5
+      ]
+    ],
+    "same_numa_pairs": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        5
+      ]
+    ],
+    "cross_numa_pairs": [
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "four_way": [
+      [
+        1,
+        2,
+        3,
+        5
+      ]
+    ],
+    "samples": 10
+  },
+  "gpu_gpu": {
+    "payload_bytes": [
+      4096,
+      65536,
+      1048576,
+      4194304,
+      9437184,
+      33554432
+    ],
+    "cuda_peer_if_supported": true,
+    "nccl_sendrecv": true,
+    "bidirectional": true
+  },
+  "nccl_four_rank": {
+    "payload_bytes": [
+      1048576,
+      4194304,
+      33554432
+    ],
+    "all_to_all": true
+  },
+  "overlap": {
+    "h2d_payload_bytes": 9437184,
+    "groups": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        5
+      ]
+    ],
+    "modes": [
+      "h2d_only",
+      "nccl_only",
+      "overlap"
+    ]
+  },
+  "no_policy_tuning": true
+}
