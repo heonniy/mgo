@@ -1,0 +1,193 @@
+{
+  "status": "PASS",
+  "condition": "R3",
+  "calibration": false,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py",
+    "--output",
+    "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_smoke",
+    "--smoke"
+  ],
+  "transport_env": {
+    "NCCL_P2P_LEVEL": "LOC",
+    "NCCL_IB_DISABLE": "1",
+    "NCCL_DEBUG": "INFO",
+    "NCCL_DEBUG_SUBSYS": "INIT,GRAPH,P2P,SHM",
+    "NCCL_DEBUG_FILE": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_smoke/nccl-%h-%p.log"
+  },
+  "cleared_inherited_nccl": {},
+  "worker_sha256": "97ad52b215678cf267f663da1813bd08afb18647d6b6e17f5632fdf13854477f",
+  "launcher_sha256": "85c4b9e3e5b11433e2bdd25d645af046c262735211d30a03dfc482a6c3b736f7",
+  "memory": [
+    {
+      "host_available_bytes": 1980803346432,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 0
+        }
+      },
+      "unix": 1790954549.973709
+    },
+    {
+      "host_available_bytes": 1980504162304,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 1
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 1
+        }
+      },
+      "unix": 1790954553.2481086,
+      "group_rss_bytes": 539717632
+    },
+    {
+      "host_available_bytes": 1979444989952,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954555.506021,
+      "group_rss_bytes": 2638098432
+    },
+    {
+      "host_available_bytes": 1979038715904,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 80565,
+          "used_mib": 525
+        },
+        "4": {
+          "free_mib": 81067,
+          "used_mib": 23
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954558.2634737,
+      "group_rss_bytes": 3144552448
+    },
+    {
+      "host_available_bytes": 1977237794816,
+      "gpu": {
+        "0": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "1": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "4": {
+          "free_mib": 80141,
+          "used_mib": 949
+        },
+        "5": {
+          "free_mib": 80141,
+          "used_mib": 949
+        }
+      },
+      "unix": 1790954560.7413166,
+      "group_rss_bytes": 5000331264
+    },
+    {
+      "host_available_bytes": 1980307460096,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954563.0244505,
+      "group_rss_bytes": 556425216
+    },
+    {
+      "host_available_bytes": 1980812591104,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 0
+        }
+      },
+      "unix": 1790954565.2791724,
+      "group_rss_bytes": 0
+    }
+  ],
+  "started_unix": 1790954549.9740207,
+  "pid": 1855803,
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1790954565.3736377
+}

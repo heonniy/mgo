@@ -1,5 +1,5 @@
 {
-  "status": "RECOVERY_IN_PROGRESS",
+  "status": "FUNCTIONAL_NON_P2P",
   "plan_commit": "92b207049623f4aa85be972d637f5adf7d32c0fc",
   "attempts": [
     {
@@ -47,7 +47,31 @@
       "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R2_smoke",
       "peer_median_ms": null,
       "h2d_median_ms": null
+    },
+    {
+      "condition": "R3",
+      "status": "PASS",
+      "p2p_used": false,
+      "selected_transport": "SHM/direct/direct",
+      "payload_validation": true,
+      "ib_error": false,
+      "external_socket_interface": true,
+      "error": "",
+      "topology_lines": [
+        "comm 0x556346e29010 rank 0 nRanks 4 nNodes 1 localRanks 4 localRank 0 MNNVL 0",
+        "comm 0x55ffb4252aa0 rank 3 nRanks 4 nNodes 1 localRanks 4 localRank 3 MNNVL 0",
+        "comm 0x562694e18310 rank 1 nRanks 4 nNodes 1 localRanks 4 localRank 1 MNNVL 0",
+        "comm 0x5650bf103af0 rank 2 nRanks 4 nNodes 1 localRanks 4 localRank 2 MNNVL 0"
+      ],
+      "environment": {
+        "NCCL_P2P_LEVEL": "LOC",
+        "NCCL_IB_DISABLE": "1"
+      },
+      "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R3_smoke",
+      "peer_median_ms": null,
+      "h2d_median_ms": null
     }
   ],
-  "calibration": null
+  "calibration": null,
+  "selected_condition": "R3"
 }
