@@ -1,0 +1,99 @@
+{
+  "experiment": "admission_trajectory_controller_breakdown_20261002",
+  "base_result_commit": "e61758e2b25922d56e640735f27fef382b9dbac9",
+  "goal": "explain why balanced-random vs hungarian-current changes E2E sign across cells",
+  "frozen": {
+    "model": "Qwen3-30B-A3B-Instruct-2507",
+    "cache_pct": 30,
+    "substitution": "expert_level_gate0.20_sim0.65",
+    "eviction": "coverage_w128_k1_lambda2",
+    "admission_policies": [
+      "random",
+      "hungarian_current"
+    ],
+    "hard_balanced_expert_quota": true,
+    "decode_steps": 64,
+    "no_replication": true,
+    "no_migration": true
+  },
+  "retrospective_cells": [
+    {
+      "world": 8,
+      "local_batch": 4
+    },
+    {
+      "world": 8,
+      "local_batch": 8
+    },
+    {
+      "world": 8,
+      "local_batch": 16
+    },
+    {
+      "world": 8,
+      "local_batch": 32
+    },
+    {
+      "world": 4,
+      "local_batch": 8
+    }
+  ],
+  "diagnostic_gpu_cells": [
+    {
+      "world": 8,
+      "local_batch": 4,
+      "global_batch": 32,
+      "role": "strong_positive"
+    },
+    {
+      "world": 8,
+      "local_batch": 8,
+      "global_batch": 64,
+      "role": "negative"
+    },
+    {
+      "world": 4,
+      "local_batch": 8,
+      "global_batch": 32,
+      "role": "matched_global_negative",
+      "physical_gpus": [
+        0,
+        1,
+        4,
+        5
+      ]
+    }
+  ],
+  "gpu_diagnostic_repeats": 1,
+  "controller_replay_repeats": 5,
+  "matched_replay_directions": [
+    "random_trace_to_both",
+    "current_trace_to_both"
+  ],
+  "required_breakdown": [
+    "history",
+    "substitution",
+    "effective_route_merge",
+    "admission_prep",
+    "admission_cost_build",
+    "admission_assignment",
+    "eviction_candidates",
+    "coverage_sync",
+    "coverage_rank_and_victim",
+    "cache_mutation_and_bookkeeping"
+  ],
+  "required_trajectory_metrics": [
+    "residual_exact_misses",
+    "admissions",
+    "evictions",
+    "reloads",
+    "next_use_survival",
+    "physical_h2d_bytes",
+    "remote_token_rank_pairs",
+    "rank_token_cv",
+    "rank_token_max_mean",
+    "eviction_candidate_count"
+  ],
+  "no_policy_tuning": true,
+  "no_primary_speedup_rerun": true
+}

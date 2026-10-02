@@ -1,5 +1,11 @@
 # mgo_v2 coding instructions
 
+## New priority — admission trajectory/controller breakdown (2026-10-02)
+
+The physical locality study is complete at `e61758e`. Before changing the method, read `experiments/admission_trajectory_controller_breakdown_20261002/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}`.
+
+The next task explains why Hungarian-current beats Balanced Random at R8/B4 but loses at R8/B8 and R4/B8. Add diagnostic-only subcomponent timers/counters to `plan_layer`, capture cache/fetch/eviction trajectories, and run matched-raw-demand controller replay. GPU scope is only six diagnostic runs: Random/Current at R8/B4, R8/B8 and R4/B8; R4 uses physical GPUs 0,1,4,5. Existing five-repeat E2E results remain the performance evidence. Do not tune or redesign admission, optimize controller code, add token-load constraints, or revive same+path before this mechanistic packet is complete.
+
 ## New priority — local/remote TPOT and E2E impact study (2026-10-01)
 
 Read `experiments/local_remote_e2e_impact_20261001/{README.md,PLAN.md,matrix.json,AGENT_TASK.md}` before new timing work.
