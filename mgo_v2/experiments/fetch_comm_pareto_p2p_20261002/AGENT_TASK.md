@@ -1,3 +1,12 @@
+## Completed — CPU-only replica screen
+
+**GO_FOR_OWNER_REVIEW**, all five rho points nondominated; F/K/C=0/.25/.75.
+Decode H2D +160.20%, peer activation bytes -100% from F to C. All 2,160
+CPU replay events passed, with independent rho=0 parity at all 432 events.
+See [REPLICA_PARETO_RESULTS.md](REPLICA_PARETO_RESULTS.md). Stop after
+committing this result. No new GPU/model run or physical F/K/C is authorized
+by completion of the gate. The tasks below are historical.
+
 ## Immediate task — CPU-only replica Pareto screen
 
 Current checkpoint: `ed7f82b`.

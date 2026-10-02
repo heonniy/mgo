@@ -1,6 +1,19 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current recovery outcome: FUNCTIONAL_NO_COST_INCREASE.** R3 passed via
+**Current result: CPU replica screen GO_FOR_OWNER_REVIEW (2026-10-03).**
+All five rho settings are nondominated. F/K/C are rho=0/.25/.75; from F to C,
+decode H2D increases 160.20% and peer activation bytes fall 100%. This reused
+the exact-only eight-decode trace with no new GPU/model run. All 2,160 CPU
+events passed; independent rho=0 parity passed at all 432 events. Peak CPU
+RSS was 201.88 MiB and the sweep took 98.22 seconds. Stop for owner review.
+
+Read [REPLICA_PARETO_RESULTS.md](REPLICA_PARETO_RESULTS.md),
+[summary CSV](replica_pareto_screen.csv), [full JSON](replica_pareto_screen.json),
+[validation](replica_pareto_validation.json), and
+[frozen replay protocol](REPLICA_REPLAY_PROTOCOL.md).
+The earlier transport/recovery statuses below are historical.
+
+**Historical recovery outcome: FUNCTIONAL_NO_COST_INCREASE.** R3 passed via
 `SHM/direct/direct` with IB disabled. Its peer median was 0.236064 ms versus
 T0 0.336480 ms (0.702x). The required cost-increase gate for Stage 1 is not met;
 no model/replica work has started. R1/R2 failed; R3 was the first success, so no

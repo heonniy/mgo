@@ -1,5 +1,13 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**CPU-only replica screen complete (2026-10-03): GO_FOR_OWNER_REVIEW.**
+All five budgets are nondominated; F/K/C rho=0/.25/.75. F to C increases
+decode H2D by 160.20% and reduces peer activation bytes by 100%. All 2,160
+CPU events passed, including 432 independent rho=0 checks. No new GPU/model
+run. Read `REPLICA_PARETO_RESULTS.md` and `replica_pareto_validation.json`
+in the packet. Stop here; do not rerun or start physical validation without
+an owner follow-up. The earlier priorities below are retained as history.
+
 **Immediate follow-up after `ed7f82b`: CPU-only replica Pareto screen.**
 NCCL characterization is paused. Read
 `experiments/fetch_comm_pareto_p2p_20261002/REPLICA_PARETO_SCREEN.md`.
