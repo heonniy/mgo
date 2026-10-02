@@ -1,0 +1,278 @@
+{
+  "status": "PASS",
+  "smokes": [
+    {
+      "mode": "T0",
+      "transports": [
+        "P2P/IPC"
+      ],
+      "transport_env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_DEBUG": "INFO",
+        "NCCL_DEBUG_SUBSYS": "INIT,GRAPH,P2P,SHM",
+        "NCCL_DEBUG_FILE": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/smoke_T0/nccl-%h-%p.log"
+      },
+      "payload_valid_all_ranks": true,
+      "receipts": [
+        {
+          "status": "PASS",
+          "rank": 0,
+          "mode": "T0",
+          "boot": {
+            "local_rank": 0,
+            "visible_gpu": "0",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 1,
+          "mode": "T0",
+          "boot": {
+            "local_rank": 1,
+            "visible_gpu": "1",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 2,
+          "mode": "T0",
+          "boot": {
+            "local_rank": 2,
+            "visible_gpu": "4",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 3,
+          "mode": "T0",
+          "boot": {
+            "local_rank": 3,
+            "visible_gpu": "5",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "R3",
+      "transports": [
+        "SHM/direct/direct"
+      ],
+      "transport_env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_P2P_LEVEL": "LOC",
+        "NCCL_IB_DISABLE": "1",
+        "NCCL_DEBUG": "INFO",
+        "NCCL_DEBUG_SUBSYS": "INIT,GRAPH,P2P,SHM",
+        "NCCL_DEBUG_FILE": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/smoke_R3/nccl-%h-%p.log"
+      },
+      "payload_valid_all_ranks": true,
+      "receipts": [
+        {
+          "status": "PASS",
+          "rank": 0,
+          "mode": "R3",
+          "boot": {
+            "local_rank": 0,
+            "visible_gpu": "0",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0",
+            "NCCL_P2P_LEVEL": "LOC",
+            "NCCL_IB_DISABLE": "1"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 1,
+          "mode": "R3",
+          "boot": {
+            "local_rank": 1,
+            "visible_gpu": "1",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0",
+            "NCCL_P2P_LEVEL": "LOC",
+            "NCCL_IB_DISABLE": "1"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 2,
+          "mode": "R3",
+          "boot": {
+            "local_rank": 2,
+            "visible_gpu": "4",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0",
+            "NCCL_P2P_LEVEL": "LOC",
+            "NCCL_IB_DISABLE": "1"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        },
+        {
+          "status": "PASS",
+          "rank": 3,
+          "mode": "R3",
+          "boot": {
+            "local_rank": 3,
+            "visible_gpu": "5",
+            "numa_node": 0,
+            "numa_policy": "membind-strict",
+            "strict_numa": true
+          },
+          "hostname": "cloud-0n58xq",
+          "world_size": 4,
+          "local_world_size": 4,
+          "payload_valid": true,
+          "per_peer_bytes": 32768,
+          "transport_env": {
+            "NCCL_CUMEM_ENABLE": "0",
+            "NCCL_P2P_LEVEL": "LOC",
+            "NCCL_IB_DISABLE": "1"
+          },
+          "versions": {
+            "torch": "2.11.0+cu128",
+            "cuda": "12.8",
+            "nccl": [
+              2,
+              28,
+              9
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "idle_model_processes_stopped_before_measurement": true
+}
