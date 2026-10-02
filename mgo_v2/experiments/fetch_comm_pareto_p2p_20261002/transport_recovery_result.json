@@ -1,0 +1,29 @@
+{
+  "status": "RECOVERY_IN_PROGRESS",
+  "plan_commit": "92b207049623f4aa85be972d637f5adf7d32c0fc",
+  "attempts": [
+    {
+      "condition": "R1",
+      "status": "FAIL",
+      "p2p_used": false,
+      "selected_transport": "NET/IB/0/GDRDMA/Shared; NET/IB/1/GDRDMA/Shared; NET/IB/4/GDRDMA/Shared; NET/IB/5/GDRDMA/Shared",
+      "payload_validation": false,
+      "ib_error": true,
+      "external_socket_interface": false,
+      "error": "IBV_WC_RETRY_EXC_ERR",
+      "topology_lines": [
+        "comm 0x556563975950 rank 2 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x557b5aa53b60 rank 1 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x55974ab810a0 rank 0 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x560a0039e6b0 rank 3 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0"
+      ],
+      "environment": {
+        "NCCL_P2P_LEVEL": "LOC"
+      },
+      "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R1_smoke",
+      "peer_median_ms": null,
+      "h2d_median_ms": null
+    }
+  ],
+  "calibration": null
+}

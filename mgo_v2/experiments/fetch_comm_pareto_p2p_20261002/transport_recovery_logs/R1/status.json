@@ -1,0 +1,1365 @@
+{
+  "status": "FAIL",
+  "condition": "R1",
+  "calibration": false,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/fetch_comm_calibration.py",
+    "--output",
+    "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R1_smoke",
+    "--smoke"
+  ],
+  "transport_env": {
+    "NCCL_P2P_LEVEL": "LOC",
+    "NCCL_DEBUG": "INFO",
+    "NCCL_DEBUG_SUBSYS": "INIT,GRAPH,P2P,SHM",
+    "NCCL_DEBUG_FILE": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R1_smoke/nccl-%h-%p.log"
+  },
+  "cleared_inherited_nccl": {},
+  "worker_sha256": "97ad52b215678cf267f663da1813bd08afb18647d6b6e17f5632fdf13854477f",
+  "launcher_sha256": "85c4b9e3e5b11433e2bdd25d645af046c262735211d30a03dfc482a6c3b736f7",
+  "memory": [
+    {
+      "host_available_bytes": 1980818350080,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 0
+        }
+      },
+      "unix": 1790954230.1134558
+    },
+    {
+      "host_available_bytes": 1980521246720,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81089,
+          "used_mib": 1
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 1
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 1
+        }
+      },
+      "unix": 1790954233.3463678,
+      "group_rss_bytes": 539709440
+    },
+    {
+      "host_available_bytes": 1979319529472,
+      "gpu": {
+        "0": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "1": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954235.603287,
+      "group_rss_bytes": 2706014208
+    },
+    {
+      "host_available_bytes": 1978962534400,
+      "gpu": {
+        "0": {
+          "free_mib": 81068,
+          "used_mib": 22
+        },
+        "1": {
+          "free_mib": 80565,
+          "used_mib": 525
+        },
+        "4": {
+          "free_mib": 81087,
+          "used_mib": 4
+        },
+        "5": {
+          "free_mib": 81087,
+          "used_mib": 4
+        }
+      },
+      "unix": 1790954238.085821,
+      "group_rss_bytes": 3072593920
+    },
+    {
+      "host_available_bytes": 1976903991296,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954240.3301473,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976903200768,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954242.5856493,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976910102528,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954244.7985566,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976909152256,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954247.0345228,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976906461184,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954249.2759113,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976906317824,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954251.5191066,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976905961472,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954253.7558131,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976883130368,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954256.067877,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976896442368,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954258.337851,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976896430080,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954260.5784903,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976893468672,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954262.814318,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976894078976,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954265.07871,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976882569216,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954267.3160613,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976881143808,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954269.5546079,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976879640576,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954271.79213,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976877182976,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954274.0264938,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976875962368,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954276.2604837,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976874786816,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954278.5054142,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976874872832,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954280.7828104,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976894541824,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954283.022209,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976896143360,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954285.2627535,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976896487424,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954287.581273,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976895651840,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954289.8281522,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976895721472,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954292.0631514,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976892153856,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954294.3026931,
+      "group_rss_bytes": 5242736640
+    },
+    {
+      "host_available_bytes": 1976841854976,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954296.541483,
+      "group_rss_bytes": 5362270208
+    },
+    {
+      "host_available_bytes": 1976628363264,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954298.7823896,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976628383744,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954301.0194206,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976625770496,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954303.299639,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633901056,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954305.5415387,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631476224,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954307.780976,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631218176,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954310.0922267,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631033856,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954312.4180722,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976632741888,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954314.6567614,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631746560,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954316.8935056,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976632147968,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954319.1295292,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976632180736,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954321.3664043,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633651200,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954323.6016839,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633995264,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954325.8516557,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631697408,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954328.038176,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976630976512,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954330.2722473,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631820288,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954332.5986989,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976630382592,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954334.851737,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976622723072,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954337.0926154,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976620453888,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954339.3315742,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633917440,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954341.5769029,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633901056,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954343.8166387,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976631693312,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954346.0539646,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976629288960,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954348.3178964,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976632446976,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954350.5595348,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976633843712,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954352.7833197,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976632918016,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954355.0390167,
+      "group_rss_bytes": 5700849664
+    },
+    {
+      "host_available_bytes": 1976601223168,
+      "gpu": {
+        "0": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "1": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "4": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        },
+        "5": {
+          "free_mib": 79983,
+          "used_mib": 1107
+        }
+      },
+      "unix": 1790954357.2925394,
+      "group_rss_bytes": 5751422976
+    },
+    {
+      "host_available_bytes": 1980826537984,
+      "gpu": {
+        "0": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "1": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "4": {
+          "free_mib": 81090,
+          "used_mib": 0
+        },
+        "5": {
+          "free_mib": 81090,
+          "used_mib": 0
+        }
+      },
+      "unix": 1790954359.5289009,
+      "group_rss_bytes": 0
+    }
+  ],
+  "started_unix": 1790954230.1137984,
+  "pid": 1852445,
+  "exit_code": 1,
+  "stop_reason": null,
+  "finished_unix": 1790954359.6243649
+}
