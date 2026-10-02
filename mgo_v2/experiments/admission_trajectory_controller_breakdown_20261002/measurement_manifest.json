@@ -1,0 +1,471 @@
+{
+  "status": "COMPLETE",
+  "plan_commit": "30614bbc065c140060ef31af9bc4f8615ab16ca5",
+  "base_result_commit": "e61758e2b25922d56e640735f27fef382b9dbac9",
+  "implementation_commit": "caf014345f6ccdd64d5270eba2cc02c7fc5963d9",
+  "started_unix": 1790920913.9980636,
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "cells": [
+    {
+      "name": "b4_random",
+      "batch": 4,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "random"
+      }
+    },
+    {
+      "name": "b4_hungarian_current",
+      "batch": 4,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "hungarian_current"
+      }
+    },
+    {
+      "name": "b8_random",
+      "batch": 8,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "random"
+      }
+    },
+    {
+      "name": "b8_hungarian_current",
+      "batch": 8,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "hungarian_current"
+      }
+    },
+    {
+      "name": "b16_random",
+      "batch": 16,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "random"
+      }
+    },
+    {
+      "name": "b16_hungarian_current",
+      "batch": 16,
+      "config": {
+        "global_cache_ratio": 0.3,
+        "substitution_enabled": true,
+        "eviction": "coverage",
+        "same_layer_alpha": 0.25,
+        "path_eta": 0.5,
+        "seed": 42,
+        "admission": "hungarian_current"
+      }
+    }
+  ],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/diagnose_trajectory.py",
+    "--model",
+    "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+    "--offload-dir",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/expert_store",
+    "--similarity",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+    "--affinity",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/affinity.npz",
+    "--workload",
+    "/home/hwlee/mgo-results/runtime_validation_20261001/screen_workload.json",
+    "--cells",
+    "/home/hwlee/mgo-results/admission_trajectory_controller_breakdown_20261002/cells.json",
+    "--output",
+    "/home/hwlee/mgo-results/admission_trajectory_controller_breakdown_20261002/physical",
+    "--steps",
+    "65",
+    "--repeats",
+    "1",
+    "--debug-cache"
+  ],
+  "source_sha256": {
+    "mgo_v2/__init__.py": "c236dd96681ca74f2ee0d5cb52b107c48a3839fb7c567d33a09fe46cf89cd186",
+    "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+    "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+    "mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+    "mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+    "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+    "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+    "mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+    "mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+    "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+    "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+    "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
+    "mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+    "mgo_v2/controller.py": "df23ccb0251a3c4949852377f75a69260ad99de59f1cb0e401d31015aa78d5c4",
+    "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+    "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+    "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+    "mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+    "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+    "mgo_v2/cache.py": "bdd242d2fb4bb296711062bed3a020e9b817f0286029ae9f9294ffa5505c915f",
+    "examples/diagnose_trajectory.py": "ce61cbfec39d6700c57ab7c2db7af8895b98e5f66e97dbf65d0bf1e0fe9854bd",
+    "scripts/run_trajectory_study.py": "7221dd526a95793e823157392469c31a68eec1c83b0177db5e031f2d68d92ba5"
+  },
+  "input_sha256": {
+    "similarity.npy": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+    "affinity.npz": "8ed2ecff1bae4e4c9355ca28ad3e41ca34d7157bf0ac8c13e7aee405c51c0b3a",
+    "screen_workload.json": "ccb19832a3d4aef654466bca871340f0c3d6a9124bc5df9c9aae74c429460733"
+  },
+  "diagnostic_only": true,
+  "optional_profiles": "omitted: reuse existing resident-only evidence; no new GPU timing attribution",
+  "exit_code": 0,
+  "physical_finished_unix": 1790922269.5601368,
+  "finished_unix": 1790925584.5513403,
+  "validation": {
+    "status": "PASS",
+    "physical_cells": 6,
+    "rank_receipts": 24,
+    "global_physical_events": 18720,
+    "rank_events": 74880,
+    "cpu_replays": 60,
+    "replay_events": 187200,
+    "smoke_rank_checks": 8,
+    "baseline_b8_token_comparisons": 40,
+    "checks": [
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "random",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "random",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "random",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "random",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "hungarian_current",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "hungarian_current",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "hungarian_current",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 4,
+        "policy": "hungarian_current",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 4,
+        "source_policy": "random",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 4,
+        "source_policy": "random",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 4,
+        "source_policy": "hungarian_current",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 4,
+        "source_policy": "hungarian_current",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "random",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "random",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "random",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "random",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "hungarian_current",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "hungarian_current",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "hungarian_current",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 8,
+        "policy": "hungarian_current",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 8,
+        "source_policy": "random",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 8,
+        "source_policy": "random",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 8,
+        "source_policy": "hungarian_current",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 8,
+        "source_policy": "hungarian_current",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "random",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "random",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "random",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "random",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "hungarian_current",
+        "rank": 0,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "hungarian_current",
+        "rank": 1,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "hungarian_current",
+        "rank": 2,
+        "status": "PASS"
+      },
+      {
+        "check": "physical_rank_event_plan_cache_fetch_and_timer",
+        "batch": 16,
+        "policy": "hungarian_current",
+        "rank": 3,
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 16,
+        "source_policy": "random",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 16,
+        "source_policy": "random",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 16,
+        "source_policy": "hungarian_current",
+        "policy": "random",
+        "status": "PASS"
+      },
+      {
+        "check": "replay_five_repeats_and_own_trace_parity",
+        "batch": 16,
+        "source_policy": "hungarian_current",
+        "policy": "hungarian_current",
+        "status": "PASS"
+      }
+    ]
+  },
+  "replay_status": {
+    "started": {
+      "4": 1021338,
+      "8": 1028684,
+      "16": 1032749
+    },
+    "finished": {
+      "4": 0,
+      "8": 0,
+      "16": 0
+    },
+    "affinities": {
+      "4": 180,
+      "8": 182,
+      "16": 184
+    },
+    "status": "COMPLETE"
+  },
+  "replay_implementation_commit": "a33cbd183018564348826c42797c8d29f4d5f65f",
+  "replay_source_sha256": {
+    "replay_trajectory.py": "4f282b406c26a678920966767a7968c20f3d90ab7853bff4934f7a281c2ea280",
+    "run_trajectory_replays.py": "e59a5588ff7a35a777e062f9d326a8601d471239e19af6ce66f4ed7af5826e9c"
+  },
+  "native_extension_sha256": "c5efdf74c571dbc7906eca4aea1293f3f3349c9383377633bf777c471a9cd85a",
+  "baseline_unchanged_runtime_files": [
+    "controller.py",
+    "admission.py",
+    "eviction.py",
+    "runtime.py",
+    "cache.py",
+    "executor.py",
+    "substitution.py",
+    "communicator.py"
+  ],
+  "analysis_source_sha256": {
+    "scripts/audit_trajectory_physical.py": "79a52373a0c871389c73ee756f42c2df01a11b503a81ac1d04424a15b9fd7c3b",
+    "scripts/complete_trajectory_packet.py": "c08f40118b01397d3b5c1c45ff54077cd53b8f718443a82adb78f14b2ea9f0d2",
+    "scripts/finalize_trajectory_study.py": "37b3c230bd9bfe62e4dc1f39d3c05675a8f81fdf629d49fe3d300a342fc24bda",
+    "scripts/observe_trajectory_scheduling.py": "49d95e5f2124af9c72833e954bf9627841dea9542995a2deefd2bc0520180773",
+    "scripts/plot_trajectory_study.py": "ae1dd9f6141bd33564ac79f2e0891b2d9a6f14b72fc2a3a0f1ef7ac4e9939ae6",
+    "scripts/replay_trajectory.py": "4f282b406c26a678920966767a7968c20f3d90ab7853bff4934f7a281c2ea280",
+    "scripts/report_trajectory_study.py": "17f1e8c54393bafe3fca6790ffd127ddc7d093fadceb4b4b97dafe8a41883440",
+    "scripts/retrospective_trajectory.py": "ba95cb9298322702d4ca809d7c899af44d2fbd43dbeb1a58aa9d38c8386319dd",
+    "scripts/run_trajectory_replays.py": "e59a5588ff7a35a777e062f9d326a8601d471239e19af6ce66f4ed7af5826e9c",
+    "scripts/run_trajectory_study.py": "7221dd526a95793e823157392469c31a68eec1c83b0177db5e031f2d68d92ba5",
+    "scripts/summarize_trajectory_study.py": "bf1b7930466d9034f36f8ce47b4b23b36fd824bdca5599b8fb84956242372051",
+    "scripts/trajectory_state_examples.py": "16bc7eaac01fb1f28ffd0fed4963cb0b4fff5e301f0792c98b11880b0496241d"
+  },
+  "raw_root": "/home/hwlee/mgo-results/admission_trajectory_controller_breakdown_20261002",
+  "raw_file_count": 278,
+  "raw_bytes": 1762585887
+}

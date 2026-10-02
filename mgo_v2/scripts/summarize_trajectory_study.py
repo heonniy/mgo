@@ -62,6 +62,16 @@ def next_use(rows):
         next_use_owner_changed=sum(r['owner_changed'] for r in eligible))
 
 def summarize_rows(rows):
+    for r in rows:
+        incoming=np.bincount([a[2] for a in r['admissions']],minlength=4).tolist()
+        assert incoming==r['quotas'] and max(incoming)-min(incoming)<=1
+        assert sum(incoming)==r['miss']==len(r['admissions'])
+        assert r['counts'].get('choose_calls',0)==len(r['evictions'])
+        assert r['calls'].get('coverage_sync',0)==len(r['evictions'])
+        assert sum(r['rank_tokens'])==r['remote_pairs']+r['local_pairs']
+        assert sum(r['rank_expert_rows'])>=sum(r['rank_tokens'])
+        assert r['remote_expert_routes']>=r['remote_pairs']
+        assert all(free>=0 for free in r['free_after'])
     decode=[r for r in rows if r['phase']=='decode']
     totals={k:sum(r[k] for r in rows) for k in ('hit','subhit','miss','reloads','remote_pairs','local_pairs','remote_expert_routes')}
     totals.update(events=len(rows),admissions=sum(len(r['admissions']) for r in rows),evictions=sum(len(r['evictions']) for r in rows),
@@ -71,6 +81,8 @@ def summarize_rows(rows):
         mean_rank_expert_row_max_mean=statistics.mean(max(r['rank_expert_rows'])/max(1,statistics.mean(r['rank_expert_rows'])) for r in rows),
         candidate_count=sum(r['counts'].get('eviction_candidate_count',0) for r in rows),
         changed_coverage_layers=sum(r['counts'].get('coverage_changed_layers',0) for r in rows),
+        decode_sum_max_rank_tokens=sum(max(r['rank_tokens']) for r in decode),
+        decode_sum_max_rank_expert_rows=sum(max(r['rank_expert_rows']) for r in decode),
         decode_fetches_per_step=sum(r['miss'] for r in decode)/64,
         decode_h2d_bytes_per_step=sum(r['miss'] for r in decode)*EXPERT_BYTES/64,
         decode_evictions_per_step=sum(len(r['evictions']) for r in decode)/64,
@@ -80,7 +92,7 @@ def summarize_rows(rows):
 
 def main():
     assert read(ROOT/'status.json')['status']=='PHYSICAL_COMPLETE'
-    breakdown=[];trajectory=[];survival=[];replay_summary=[];validation=[];aligned=[]
+    breakdown=[];trajectory=[];survival=[];replay_summary=[];validation=[];aligned=[];all_repeats=[];physical_receipts=[]
     for batch in (4,8,16):
         for policy in POLICIES:
             stem=f'b{batch}_{policy}'
@@ -100,6 +112,7 @@ def main():
                 assert receipt['status']=='PASS' and receipt['world']==4 and receipt['local_batch']==batch
                 assert len(receipt['generated_token_ids'])==batch and all(len(t)==65 for t in receipt['generated_token_ids'])
                 ranks.append(receipt)
+                physical_receipts.append(receipt)
                 labels=sorted({k for r in rr for k in r['times_ns']})
                 for label in labels:
                     breakdown.append(dict(mode='physical',batch=batch,source_policy=policy,policy=policy,rank=rank,
@@ -119,6 +132,7 @@ def main():
             survival.append(dict(mode='physical',batch=batch,source_policy=policy,policy=policy,**stats))
         complete=read(ROOT/'replay'/f'b{batch}'/'complete.json')
         assert complete['status']=='PASS' and complete['replays']==20
+        all_repeats.extend(complete['summaries'])
         for source in POLICIES:
             paired={};timings={}
             for policy in POLICIES:
@@ -128,6 +142,9 @@ def main():
                 paired[policy]=rows
                 group=[r for r in complete['summaries'] if r['source_policy']==source and r['policy']==policy]
                 assert len(group)==5
+                common_counts=set.intersection(*(set(r['counts']) for r in group))
+                assert all(len({r['counts'][key] for r in group})==1 for key in common_counts), 'Replay operation counts changed'
+                assert all(r['final']==group[0]['final'] for r in group), 'Replay final states changed'
                 labels=sorted({k for r in group for k in r['times_ns']})
                 total_med=statistics.median(r['controller_ns'] for r in group)/1e9
                 result=dict(batch=batch,source_policy=source,policy=policy,repeats=5,own_trajectory=source==policy,
@@ -195,6 +212,8 @@ def main():
                 assert read(ROOT/'physical'/f'b8_{policy}-rep0-rank{rank}.json')['metrics']==read(prior/f'b8_{label}-rep{repeat}-rank{rank}.json')['metrics']
     save('controller_breakdown',breakdown);save('trajectory_summary',trajectory);save('next_use_survival',survival)
     save('matched_replay_summary',replay_summary)
+    save('replay_repeats',all_repeats)
+    (OUT/'physical_rank_receipts.json').write_text(json.dumps(physical_receipts,indent=2)+'\n')
     save('cumulative_event_deltas',aligned)
     (OUT/'validation.json').write_text(json.dumps(dict(status='PASS',physical_cells=6,rank_receipts=24,
         global_physical_events=18720,rank_events=74880,cpu_replays=60,

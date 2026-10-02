@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "figures": {
+    "cumulative_trajectories": {
+      "png_sha256": "2a8ec834705cc7c73bfc3df7bdb8bd3d17aa856ac929a63595621e67ba4839f6",
+      "svg_sha256": "4a518ff935f218cea01df3a523fd2de4d2e7840ef7dc79285b34fe9be43bd0b2"
+    },
+    "controller_components": {
+      "png_sha256": "37125a4fb3dea515b46c86b39dc7a4d4a2294564c8537f11dd1adb9b238b7cdd",
+      "svg_sha256": "3fc956b2e8228e3f8fc1ed11132fc58187094a98e9d38ce34130c44b65bd0f78"
+    },
+    "next_use_survival": {
+      "png_sha256": "dcc30d1c82ec41873c16fbe95b29beaf36126cc6e42ab738cfcd1f9e38f7bb8b",
+      "svg_sha256": "df19239746e18bbbbdd00e35d5595b9c7ecb236158b7518900c3dd9f0b03dd66"
+    },
+    "communication_load": {
+      "png_sha256": "5db297ef5020a53178b3ff168e69083c556878445f8ea111d4845ac50d9e348d",
+      "svg_sha256": "1326f55160464c5615c160d0b74f153bbf5caf2cabdd9cacb02d2e2ba0eaa825"
+    }
+  },
+  "visual_checks": [
+    "All four PNGs inspected: labels/legends readable; no clipping or overlap.",
+    "Controller component panels share an absolute time scale; survival panels share a zero-based scale.",
+    "Cumulative delta panels share units/scales by row and explicitly distinguish event-median time sums.",
+    "Communication plot separates deduplicated token delivery from planned expert GEMM work.",
+    "Source streams/policies retain color plus line/marker/hatch distinctions; no new E2E speedup shown."
+  ],
+  "vector_xml": "PASS",
+  "unchanged_previously_inspected_pngs": [
+    "cumulative_trajectories.png",
+    "communication_load.png"
+  ]
+}

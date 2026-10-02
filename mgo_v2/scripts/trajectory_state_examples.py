@@ -31,6 +31,7 @@ def main():
             rows={p:events(root/f'{source}-to-{p}-rep0-events.jsonl') for p in POLICIES}
             snapshots={p:{r['event']:r for r in read(root/f'{source}-to-{p}-snapshots.json')} for p in POLICIES}
             for index in read(root/f'{source}-selected-events.json'):
+                assert all(snapshots[p][index]['cache_sha256']==rows[p][index]['cache_sha256'] for p in POLICIES)
                 delta=len(rows['hungarian_current'][index]['admissions'])-len(rows['random'][index]['admissions'])
                 states={p:{(r['layer'],r['expert']):r for r in snapshots[p][index]['residents']} for p in POLICIES}
                 preferred='hungarian_current' if delta<0 else 'random'

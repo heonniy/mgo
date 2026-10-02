@@ -21,6 +21,8 @@ class DiagnosticParity(unittest.TestCase):
                 weights = np.take_along_axis(probs, ids, axis=-1)
                 weights /= weights.sum(-1, keepdims=True)
                 routes = LayerRoutes(index % 8, np.arange(len(probs)) % 4, ids, weights, probs)
+                for array in (routes.origin_ranks, routes.selected_experts, routes.routing_weights, routes.full_router_probs):
+                    array.flags.writeable = False
                 a, b = normal.plan_layer(routes), measured.plan_layer(routes)
                 self.assertEqual(digest(a), digest(b))
                 self.assertEqual(normal.cache.owner, measured.cache.owner)

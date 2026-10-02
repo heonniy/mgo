@@ -1,16 +1,18 @@
 # Admission trajectory and controller breakdown — 2026-10-02
 
-This study explains **why communication-aware admission wins or loses in the physical runtime**, under the current hardware constraint that only **four GPUs are available for new runs**.
+The bounded packet is complete: **six R4 diagnostics on physical GPUs 0,1,4,5** and **60 single-process CPU replays**, with all correctness gates passing. No new R8 job was launched.
 
-It follows the completed physical locality study at commit `e61758e`. Existing R8 results remain useful retrospective evidence, but **no new R8 job is allowed** in this study.
+Start with [RESULTS.md](RESULTS.md). Detailed evidence:
 
-New GPU work is restricted to physical GPUs **0,1,4,5** and world size **R4**.
+- [Implementation and measurement definitions](IMPLEMENTATION.md)
+- [Validation](validation.json) and [measurement manifest](measurement_manifest.json)
+- [Controller breakdown](controller_breakdown.csv) and [implementation audit](implementation_audit.md)
+- [Cache trajectories](trajectory_summary.csv), [next-use survival](next_use_survival.csv) and [state examples](state_examples.md)
+- [Matched-demand comparisons](matched_comparisons.csv), [all replay repetitions](replay_repeats.csv) and [policy/stream decomposition](counterfactual_decomposition.csv)
+- [Artifact hashes](artifact_hashes.json) and [raw-file receipts](raw_hash_receipts.json)
 
-The goal is not to invent a new admission policy. First decompose the existing runtime and determine whether the win/loss comes from:
+The original prospective [plan](PLAN.md), [matrix](matrix.json) and [agent task](AGENT_TASK.md) remain unchanged. The plan commit is `30614bbc065c140060ef31af9bc4f8615ab16ca5`; prior performance evidence is fixed at `e61758e`. The new runs are diagnostics, not new speedup estimates. Normal policy/runtime implementation and the native executor remain unchanged; instrumentation is opt-in.
 
-1. immediate communication;
-2. future cache/fetch/eviction trajectory;
-3. controller implementation cost;
-4. rank execution-load skew.
+Raw router streams, rank-event records and cache snapshots remain at `/home/hwlee/mgo-results/admission_trajectory_controller_breakdown_20261002`. The exact physical command and source/input bindings are in the manifest. Launchers guard against overwriting completed results; any deliberate rerun needs a fresh output binding. No giant raw router traces are committed.
 
-Primary comparison: **Balanced Random vs Hungarian Current**. Same+path is not tuned in this study.
+Stop here for owner review. No admission redesign, token-load constraint, controller optimization, Coverage tuning, same+path tuning, replication or migration was introduced.
