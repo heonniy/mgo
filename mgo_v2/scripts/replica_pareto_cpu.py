@@ -111,7 +111,7 @@ class ReplicaReplay:
         return (self.tick, [[(k, e.slot, e.used) for k, e in sorted(rank.items())] for rank in self.ranks],
                 sorted(self.primary.items()), sorted(self.seen))
 
-    def event(self, layer, origins, selected, audit_greedy=False):
+    def event(self, layer, origins, selected, audit_greedy=False, candidate_score=None):
         origins = np.asarray(origins, dtype=np.int64)
         selected = np.asarray(selected, dtype=np.int64)
         assert selected.ndim == 2 and len(selected) == len(origins)
@@ -168,8 +168,9 @@ class ReplicaReplay:
                     if audit_greedy:
                         trial = dest.copy(); trial[ts, ks] = r
                         assert traffic(origins, dest, self.world)['peer_bytes'] - traffic(origins, trial, self.world)['peer_bytes'] == saving
-                    candidate = (-saving, e, r)
-                    if saving > 0 and (best is None or candidate < best):
+                    score = saving if candidate_score is None else candidate_score(self, layer, e, r, choices[r], saving)
+                    candidate = (-score, e, r)
+                    if score > 0 and (best is None or candidate < best):
                         best = candidate
             if best is None:
                 break
@@ -178,14 +179,17 @@ class ReplicaReplay:
             q = self.primary[key]
             ts, ks = locations[e, r]
             choice = choices[r]
+            # The selection score may be future-aware; traffic accounting always
+            # uses the exact current-event marginal, independent of that score.
+            actual_saving = (len(ts) + int((occupancy[ts, q] == 1).sum())) * ROW_BYTES
             self.place(r, key, choice)
             assert self.duplicates <= self.cap
             duplicate_peak = max(duplicate_peak, self.duplicates)
             occupancy[ts, q] -= 1; occupancy[ts, r] += 1
             dest[ts, ks] = r
             fetch['replica_fetches'] += 1
-            savings_total -= negative
-            operations.append(('replica', e, r, choice, -negative))
+            savings_total += actual_saving
+            operations.append(('replica', e, r, choice, actual_saving))
         assert np.all(occupancy >= 0)
         # LRU means physical usage: touch only the copies that actually serve.
         local_hits = remote_resident = pre_global = local_service = 0
