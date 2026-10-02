@@ -1,5 +1,5 @@
 {
-  "status": "PREPARED",
+  "status": "STAGE_PASS",
   "plan_commit": "9ec43e83da94060b0a06c147518a2bb26a34fd73",
   "user_amendment": "Include local B32/global B128; run eight-GPU burn whenever experiments are not running.",
   "batches": [
@@ -13,11 +13,58 @@
     16,
     32
   ],
-  "completed": [],
+  "completed": [
+    "capture4"
+  ],
   "cpu_result_sha256": {
     "replica_pareto_screen.csv": "160962917bef37eacd57d74e7dc0f572d7aa4ccbe750c7610dd9d586312b7ca6",
     "replica_pareto_screen.json": "e735374cc3d0eba1a131d5440c6b889ecc68d326edddea3cc640c37517b05183",
     "replica_pareto_events.csv": "d575302e3a76cbfd09b65aeeb76581177238ff55babf2bfe52e151df3d529737",
     "physical_fkc_schedule_metadata.json": "1c4211bbe2a004e44919bc93b6d478cbd5cf649a86cdc730507104f014675e44"
-  }
+  },
+  "active_stage": null,
+  "source_sha256": {
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_capture.py": "a32a178868cd12143969dbeec06eaba39255bb81c753c1d0399e764dbfd0f83d",
+    "/home/hwlee/mgo/mgo_v2/examples/trace_comm_worker.py": "061956d22503c9f8abf9bd9dd61d6195766fee118491d1d1513bfbc5b687543c",
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_latency.py": "afc7078a2ff55ac719c988c98fc5fa86c43f4d982683c7ff9d9d357a30ddfd5d",
+    "/home/hwlee/mgo/mgo_v2/examples/ipc_rebase_smoke.py": "71a26aebadbe2bf2c49d787c86f457298d3436c7812371da64bf55efc14307e3",
+    "/home/hwlee/mgo/mgo_v2/scripts/run_batch_comm_stage.py": "31e4a78b14bb1ef8d3ba19c8f849947c393d6680e0de670b276c21cb6a11846d",
+    "/home/hwlee/mgo/mgo_v2/scripts/batch_comm_common.py": "012b7d787c8b351e91beb3bc3bb2e75cd830e85bc40e8c7a37f8891c9a562ef8",
+    "/home/hwlee/mgo/mgo_v2/scripts/trace_comm_input.py": "08bef4685eb35b7ba64cf38a5cf0373ed964da987e616b9d7b15ccfb6c6843ba",
+    "/home/hwlee/mgo/mgo_v2/experiments/fetch_comm_pareto_p2p_20261002/batch_comm_prompt_provenance.json": "fe29a51fa23c3bc773f32dd7373e2810b6b02caf2154e3f3fbacacb91f73fd6b"
+  },
+  "burn_processes": [
+    {
+      "gpu": 0,
+      "pid": 2011157
+    },
+    {
+      "gpu": 1,
+      "pid": 2011158
+    },
+    {
+      "gpu": 2,
+      "pid": 2011159
+    },
+    {
+      "gpu": 3,
+      "pid": 2011160
+    },
+    {
+      "gpu": 4,
+      "pid": 2011161
+    },
+    {
+      "gpu": 5,
+      "pid": 2011162
+    },
+    {
+      "gpu": 6,
+      "pid": 2011163
+    },
+    {
+      "gpu": 7,
+      "pid": 2011164
+    }
+  ]
 }
