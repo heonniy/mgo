@@ -1,0 +1,49 @@
+{
+  "hardware": {
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "world_size": 4
+  },
+  "model": "Qwen3-30B-A3B-Instruct-2507",
+  "local_batch": 8,
+  "decode_forwards": 32,
+  "cache_ratio": 0.3,
+  "substitution": false,
+  "eviction": "lru",
+  "transport_modes": [
+    {
+      "name": "T0_nvSwitch_default",
+      "env": {
+        "NCCL_P2P_DISABLE": null,
+        "NCCL_SHM_DISABLE": null,
+        "NCCL_P2P_LEVEL": null
+      }
+    },
+    {
+      "name": "T1_p2p_disabled",
+      "env": {
+        "NCCL_P2P_DISABLE": "1",
+        "NCCL_SHM_DISABLE": null,
+        "NCCL_P2P_LEVEL": null
+      }
+    }
+  ],
+  "replica_budget_sweep": [
+    0,
+    0.125,
+    0.25,
+    0.5,
+    0.75
+  ],
+  "physical_points": [
+    "F",
+    "K",
+    "C"
+  ],
+  "repeats": 2,
+  "max_primary_generations": 12
+}
