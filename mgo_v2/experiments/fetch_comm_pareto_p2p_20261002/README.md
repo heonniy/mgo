@@ -1,6 +1,16 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current result: IPC baseline rebase AMBIGUOUS_GAP (2026-10-03).**
+**Current result: NVLink bandwidth ladder BLOCKED_PRIVILEGE (2026-10-03).**
+All eight GPUs are idle, but querying the current bandwidth mode fails with
+permission return code 4. FULL cannot be verified, so no mode write or
+communication experiment was started. CPU results remain unchanged.
+Restoration is not applicable; a post-gate idle snapshot is saved.
+Read [NVLINK_BW_LADDER_RESULTS.md](NVLINK_BW_LADDER_RESULTS.md),
+[result JSON](nvlink_bw_ladder.json), and
+[validation](nvlink_bw_ladder_validation.json). Stop without sudo or retries.
+Earlier results below are historical.
+
+**Prior result: IPC baseline rebase AMBIGUOUS_GAP (2026-10-03).**
 Both transport smokes passed with cuMem disabled: T0-IPC uses P2P/IPC;
 R3-SHM uses SHM/direct/direct without P2P or NET. The bounded 384-event
 actual-trace replay passed all payload checks. R3/T0 ratios are 1.0529x

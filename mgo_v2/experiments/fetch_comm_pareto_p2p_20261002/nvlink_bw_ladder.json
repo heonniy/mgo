@@ -1,0 +1,82 @@
+{
+  "status": "BLOCKED_PRIVILEGE",
+  "plan_commit": "b3b21c59d9e9e4bb9ed81904cbd6d0760d1d14c7",
+  "reason": "Read-only bandwidth-mode query returns code 4; installed nvidia-smi manual defines code 4 as insufficient permission. Current FULL state cannot be verified.",
+  "uid": 1003,
+  "all_eight_gpus_idle": true,
+  "cli_syntax_present": true,
+  "device_mode_support_verified": false,
+  "current_mode": null,
+  "mode_query": {
+    "time_utc": "2026-10-02T18:09:20.722953+00:00",
+    "argv": [
+      "nvidia-smi",
+      "nvlink",
+      "-gBwMode"
+    ],
+    "returncode": 4,
+    "stdout": "Unable to read nvlink bandwidth mode\n",
+    "stderr": ""
+  },
+  "help": {
+    "time_utc": "2026-10-02T18:09:20.643491+00:00",
+    "argv": [
+      "nvidia-smi",
+      "nvlink",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "\n    nvlink -- Display NvLink information.\n\n    Usage: nvidia-smi nvlink [options]\n\n    Options include:\n    [-h | --help]: Display help information\n    [-i | --id]: Enumeration index, PCI bus ID or UUID.\n    [-l | --link]: Limit a command to a specific link.  Without this flag, all link information is displayed.\n    [-s | --status]: Display link state (active/inactive).\n    [-c | --capabilities]: Display link capabilities.\n    [-p | --pcibusid]: Display remote node PCI bus ID for a link.\n    [-R | --remotelinkinfo]: Display remote device PCI bus ID and NvLink ID for a link.\n    [-sc | --setcontrol]: Setting counter control is deprecated!\n    [-gc | --getcontrol]: Getting counter control is deprecated!\n    [-g | --getcounters]: Getting counters using option -g is deprecated.\n       Please use option -gt/--getthroughput instead.\n    [-r | --resetcounters]: Resetting counters is deprecated!\n    [-e | --errorcounters]: Display error counters for a link.\n    [-ec | --crcerrorcounters]: Display per-lane CRC error counters for a link.\n    [-re | --reseterrorcounters]: Reset all error counters to zero.\n    [-gt | --getthroughput]: Display link throughput counters for specified counter type\n       The arguments consist of character string representing the type of traffic counted:\n          d: Display tx and rx data payload in KiB\n          r: Display tx and rx data payload and protocol overhead in KiB if supported\n    [-sLowPwrThres | --setLowPowerThreshold]: Set NvLink Low Power Threshold\n       Threshold ranges and units can be found using -gLowPwrInfo\n    [-gLowPwrInfo | --getLowPowerInfo]: Get NvLink Low Power Info\n    [-sBwMode | --setBandwidthMode]: Set NvLink Bandwidth mode\n    [-gBwMode | --getBandwidthMode]: Get NvLink Bandwidth mode\n    [-cBridge | --checkBridge]: Check NvLink Bridge presence\n    [-sLWidth | --setLinkWidth]: Set NvLink Link Width\n       values: Display possible Link Widths that can be set\n    [-gLWidth | --getLinkWidth]: Get NvLink Link Width\n\n\n",
+    "stderr": ""
+  },
+  "versions": {
+    "time_utc": "2026-10-02T18:09:20.873308+00:00",
+    "argv": [
+      "nvidia-smi",
+      "--version"
+    ],
+    "returncode": 0,
+    "stdout": "NVIDIA-SMI version  : 570.211.01\nNVML version        : 570.211\nDRIVER version      : 570.211.01\nCUDA Version        : 12.8\n",
+    "stderr": ""
+  },
+  "mode_write_attempted": false,
+  "mode_changed_by_experiment": false,
+  "restoration": "NOT_APPLICABLE_NO_MODE_WRITE",
+  "post_restore_snapshot": "NOT_APPLICABLE_NO_MODE_WRITE",
+  "sudo_used": false,
+  "jobs_killed": false,
+  "calibration_cells": 0,
+  "trace_replays": 0,
+  "model_runs": 0,
+  "cpu_screen_rerun": false,
+  "cpu_results_unchanged": true,
+  "cpu_result_sha256": {
+    "replica_pareto_screen.csv": "160962917bef37eacd57d74e7dc0f572d7aa4ccbe750c7610dd9d586312b7ca6",
+    "replica_pareto_screen.json": "e735374cc3d0eba1a131d5440c6b889ecc68d326edddea3cc640c37517b05183",
+    "replica_pareto_events.csv": "d575302e3a76cbfd09b65aeeb76581177238ff55babf2bfe52e151df3d529737",
+    "physical_fkc_schedule_metadata.json": "1c4211bbe2a004e44919bc93b6d478cbd5cf649a86cdc730507104f014675e44"
+  },
+  "conditions": [
+    {
+      "condition": "FULL-P2P",
+      "status": "NOT_RUN",
+      "transport_receipt": "NOT_AVAILABLE_PREFLIGHT_NOT_RUN"
+    },
+    {
+      "condition": "OFF-P2P",
+      "status": "NOT_RUN",
+      "transport_receipt": "NOT_AVAILABLE_PREFLIGHT_NOT_RUN"
+    },
+    {
+      "condition": "SHM",
+      "status": "NOT_RUN",
+      "transport_receipt": "NOT_AVAILABLE_PREFLIGHT_NOT_RUN"
+    }
+  ],
+  "T_FULL": null,
+  "T_OFF": null,
+  "T_SHM": null,
+  "OFF_over_FULL": null,
+  "SHM_over_FULL": null,
+  "SHM_over_OFF": null
+}

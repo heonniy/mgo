@@ -1,3 +1,16 @@
+## Blocked — NVLink bandwidth ladder safety gate
+
+**NVLink bandwidth ladder blocked (2026-10-03): BLOCKED_PRIVILEGE.**
+All eight GPUs are idle, but the read-only bandwidth-mode query returned
+code 4 (insufficient permission per the installed NVIDIA-SMI manual).
+Current FULL state cannot be verified. No mode write, calibration, trace,
+model or CPU screen was run. CPU results and frozen schedule metadata
+remain SHA256-identical. Restoration is not applicable because no mode was
+changed. Read `NVLINK_BW_LADDER_RESULTS.md` and
+`nvlink_bw_ladder_validation.json` in the experiment packet.
+Stop without sudo, mode writes or automatic retries. Earlier checkpoints
+below are historical.
+
 ## Immediate task — FULL / NVLink-OFF / SHM communication ladder
 
 Current checkpoint: `3e59975`.

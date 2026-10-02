@@ -1,0 +1,65 @@
+Installed manual: /usr/share/man/man1/nvidia-smi.1.gz
+SHA256: be1b6ff532f00bcbed390e628050aff04a86384b068bbf898dfcbb9f944c3ed9
+
+.SH "RETURN VALUE"
+.PP
+
+Return code reflects whether the operation succeeded or failed and what was the reason of failure.
+.IP \[bu]
+Return code 0 \- Success
+.IP \[bu]
+Return code 2 \- A supplied argument or flag is invalid
+.IP \[bu]
+Return code 3 \- The requested operation is not available on target device
+.IP \[bu]
+Return code 4 \- The current user does not have permission to access this device or perform this operation
+.IP \[bu]
+Return code 6 \- A query to find an object was unsuccessful
+.IP \[bu]
+Return code 8 \- A device's external power cables are not properly attached
+.IP \[bu]
+Return code 9 \- NVIDIA driver is not loaded
+.IP \[bu]
+Return code 10 \- NVIDIA Kernel detected an interrupt issue with a GPU
+.IP \[bu]
+Return code 12 \- NVML Shared Library couldn't be found or loaded
+.IP \[bu]
+Return code 13 \- Local version of NVML doesn't implement this function
+.IP \[bu]
+Return code 14 \- infoROM is corrupted
+.IP \[bu]
+Return code 15 \- The GPU has fallen off the bus or has otherwise become inaccessible
+.IP \[bu]
+Return code 255 \- Other error or internal driver error occurred
+
+.PP
+.B 18) Set Nvlink Bandwidth mode
+.TP 15
+.I nvidia\-smi nvlink -sBwMode <Bandwidth Mode>
+.TP 15
+.I nvidia\-smi nvlink --setBandwidthMode <Bandwidth Mode>
+.TP 15
+Set the Nvlink Bandwidth mode for all GPUs. This is DEPRECATED for Blackwell+.
+.TP 15
+The options are:
+.TP 15
+ FULL - All links are at max Bandwidth.
+.TP 15
+ OFF - Bandwidth is not used. P2P is via PCIe bus.
+.TP 15
+ MIN - Bandwidth is at minimum speed.
+.TP 15
+ HALF - Bandwidth is at around half of FULL speed.
+.TP 15
+ 3QUARTER - Bandwidth is at around 75% of FULL speed.
+
+.TP 15
+.B 19) Get Nvlink Bandwidth mode
+.TP 15
+.I nvidia\-smi nvlink -gBwMode
+.TP 15
+.I nvidia\-smi nvlink --getBandwidthMode
+.TP 15
+Get the Nvlink Bandwidth mode for all GPUs. THis is DEPRECATED for Blackwell+.
+
+.TP 15

@@ -1,5 +1,16 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**NVLink bandwidth ladder blocked (2026-10-03): BLOCKED_PRIVILEGE.**
+All eight GPUs are idle, but the read-only bandwidth-mode query returned
+code 4 (insufficient permission per the installed NVIDIA-SMI manual).
+Current FULL state cannot be verified. No mode write, calibration, trace,
+model or CPU screen was run. CPU results and frozen schedule metadata
+remain SHA256-identical. Restoration is not applicable because no mode was
+changed. Read `NVLINK_BW_LADDER_RESULTS.md` and
+`nvlink_bw_ladder_validation.json` in the experiment packet.
+Stop without sudo, mode writes or automatic retries. Earlier checkpoints
+below are historical.
+
 **Immediate follow-up after `3e59975`: NVLink bandwidth ladder only.**
 Read `experiments/fetch_comm_pareto_p2p_20261002/NVLINK_BW_LADDER.md`.
 Characterize the same frozen MoE communication trace under FULL-P2P,
