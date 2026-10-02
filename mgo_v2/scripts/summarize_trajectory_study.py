@@ -17,11 +17,12 @@ POLICIES=('random','hungarian_current')
 def read(path): return json.loads(path.read_text())
 def events(path): return [json.loads(line) for line in path.open()]
 def save(name, rows):
-    (OUT/f'{name}.json').write_text(json.dumps(rows,indent=2)+'\n')
+    json_root=ROOT if name=='cumulative_event_deltas' else OUT
+    (json_root/f'{name}.json').write_text(json.dumps(rows,indent=2)+'\n')
     if rows:
         with (OUT/f'{name}.csv').open('w') as f:
             columns=list(dict.fromkeys(k for row in rows for k in row))
-            w=csv.DictWriter(f,fieldnames=columns);w.writeheader()
+            w=csv.DictWriter(f,fieldnames=columns,lineterminator='\n');w.writeheader()
             w.writerows({k:json.dumps(v,separators=(',',':')) if isinstance(v,(list,dict)) else v for k,v in r.items()} for r in rows)
 
 def next_use(rows):
@@ -49,6 +50,7 @@ def next_use(rows):
     for (layer,expert),(i,rank) in pending.items():
         output.append(dict(admission_event=i,layer=layer,expert=expert,admitted_rank=rank,
             next_demand_event=None,distance=None,survived=None,outcome='right_censored',owner_changed=None,censored=True))
+    assert len(output)==sum(len(r['admissions']) for r in rows)
     eligible=[r for r in output if not r['censored']]
     return output,dict(admissions=len(output),later_demand=len(eligible),right_censored=len(output)-len(eligible),
         next_use_survival=sum(r['survived'] for r in eligible)/max(1,len(eligible)),
@@ -168,6 +170,18 @@ def main():
     assert [p['boot']['visible_gpu'] for p in boots]==['0','1','4','5']
     assert all(p['boot']['strict_numa'] and p['boot']['numa_policy']=='membind-strict' for p in boots)
     assert len({p['code_sha256'] for p in boots})==1
+    state=read(ROOT/'status.json')
+    for relative,expected in state['source_sha256'].items():
+        assert hashlib.sha256((PACKAGE/relative).read_bytes()).hexdigest()==expected, ('measurement source drift',relative)
+    for name,expected in state['input_sha256'].items():
+        assert hashlib.sha256((Path('/home/hwlee/mgo-results/runtime_validation_20261001')/name).read_bytes()).hexdigest()==expected
+    expected_uuids=['GPU-f217c8a0-1142-20f4-d84b-af29f3a47a0d','GPU-a77f3471-67d4-20b0-9fab-e502d4de5adb',
+                    'GPU-6076e2f2-5b63-3761-5586-56ceb7df8139','GPU-a1a1cfcf-93a1-3544-9a5e-e58144b68730']
+    observed=read(ROOT/'physical_device_observations.json')['rows']
+    assert len(observed)==4 and all(r['world']==4 and r['gpu_uuid']==expected_uuids[r['rank']] for r in observed)
+    previous_boot=read(Path('/home/hwlee/mgo-results/local_remote_e2e_impact_20261001/stage_b_r4/provenance-rank0.json'))
+    assert boots[0]['checkpoint']==previous_boot['checkpoint']
+    assert all(p['input_sha256'][name]==previous_boot['input_sha256'][name] for p in boots for name in ('similarity','affinity','workload'))
     for policy in POLICIES:
         for rank in range(4): assert read(ROOT/'physical'/f'b4_{policy}-smoke-rank{rank}.json')['status']=='PASS'
     # B8 generated-token identity against all prior five-repeat uninstrumented runs.
@@ -178,6 +192,7 @@ def main():
             for repeat in range(5):
                 expected=read(prior/f'b8_{label}-rep{repeat}-rank{rank}.json')['generated_token_ids']
                 assert actual==expected, ('B8 baseline output mismatch',policy,rank,repeat)
+                assert read(ROOT/'physical'/f'b8_{policy}-rep0-rank{rank}.json')['metrics']==read(prior/f'b8_{label}-rep{repeat}-rank{rank}.json')['metrics']
     save('controller_breakdown',breakdown);save('trajectory_summary',trajectory);save('next_use_survival',survival)
     save('matched_replay_summary',replay_summary)
     save('cumulative_event_deltas',aligned)

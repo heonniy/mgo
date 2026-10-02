@@ -14,10 +14,12 @@ summary=[]
 for world,batch,policy in sorted({(r['world'],r['local_batch'],r['policy']) for r in rows}):
     group=[r for r in rows if (r['world'],r['local_batch'],r['policy'])==(world,batch,policy)]
     summary.append(dict(world=world,local_batch=batch,policy=policy,repeats=len(group),
-                        **{f:statistics.median(r[f] for r in group) for f in fields}))
+                        **{f:statistics.median(r[f] for r in group) for f in fields},
+                        **{f+'_min':min(r[f] for r in group) for f in fields},
+                        **{f+'_max':max(r[f] for r in group) for f in fields}))
 (o/'retrospective_summary.json').write_text(json.dumps(summary,indent=2)+'\n')
 with (o/'retrospective_summary.csv').open('w') as f:
-    w=csv.DictWriter(f,fieldnames=list(summary[0]));w.writeheader();w.writerows(summary)
+    w=csv.DictWriter(f,fieldnames=list(summary[0]),lineterminator='\n');w.writeheader();w.writerows(summary)
 (o/'retrospective_correlations.json').write_text(json.dumps(dict(scope='Descriptive only; 50 repeated rows, 10 conditions, correlated predictors and world/batch confounding; no causality',
     row_count=len(rows),pearson_with_generation={f:float(np.corrcoef([r[f] for r in rows],[r['generation_seconds'] for r in rows])[0,1]) for f in fields}),indent=2)+'\n')
 print('Retrospective: 50 repeats / 10 conditions; complete before new GPU work.')

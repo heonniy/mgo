@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "cells": [
+    {
+      "batch": 4,
+      "policy": "random",
+      "events": 3120,
+      "fetches": 47475,
+      "status": "PASS"
+    },
+    {
+      "batch": 4,
+      "policy": "hungarian_current",
+      "events": 3120,
+      "fetches": 48370,
+      "status": "PASS"
+    },
+    {
+      "batch": 8,
+      "policy": "random",
+      "events": 3120,
+      "fetches": 69974,
+      "status": "PASS"
+    },
+    {
+      "batch": 8,
+      "policy": "hungarian_current",
+      "events": 3120,
+      "fetches": 65960,
+      "status": "PASS"
+    },
+    {
+      "batch": 16,
+      "policy": "random",
+      "events": 3120,
+      "fetches": 94634,
+      "status": "PASS"
+    },
+    {
+      "batch": 16,
+      "policy": "hungarian_current",
+      "events": 3120,
+      "fetches": 95867,
+      "status": "PASS"
+    }
+  ],
+  "rank_receipts": 24,
+  "rank_events": 74880,
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "note": "Per-event plan/cache agreement across ranks, native physical fetch reconciliation, frozen inputs/config/source and output lengths verified. Full final packet adds CPU replay and baseline-token comparisons."
+}
