@@ -106,6 +106,20 @@ Purpose: verify that disabling P2P changes the relative price of communication v
 
 Stop this stage after the six cells (2 modes x 3 cases).
 
+## Stage 0B — actual-payload crossover check
+
+Recovery finished at `fad71d2`: R3 is functional through `SHM/direct/direct`, but the tiny proxy was not slower than T0.
+
+Before Stage 1, run only the bounded analysis in [PAYLOAD_CROSSOVER.md](PAYLOAD_CROSSOVER.md):
+
+1. derive the real R4/B8 decode rank-pair payload distribution from an **existing raw-routing trace**;
+2. benchmark only 32 KiB, 64 KiB, 256 KiB, 1 MiB and 4 MiB per peer under T0 and R3;
+3. decide whether the T0/R3 crossover occurs inside the real p90/p99 payload range.
+
+No model generation, replication implementation, H2D concurrency sweep or further NCCL tuning is allowed in this check.
+
+If R3 is not >=1.5x slower within the real p99 payload range, stop the synthetic H100 P2P-off branch and move the communication-sensitive validation to the real no-NVLink server.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

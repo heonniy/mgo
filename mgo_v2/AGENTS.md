@@ -4,6 +4,17 @@ Read `experiments/fetch_comm_pareto_p2p_20261002/{README.md,PLAN.md,matrix.json,
 
 This is the new owner-authorized minimum-scope go/no-go study. Use only GPUs 0,1,4,5; R4/B8/cache30; one prefill + 32 decode forwards; substitution off; LRU fixed. Characterize whether replica budget trades CPU expert H2D against peer activation communication. Compare normal NVSwitch against `NCCL_P2P_DISABLE=1` with SHM fallback left enabled. CPU sweep first; physically validate only F/K/C, two repeats each transport mode (12 primary generations maximum unless the >10% spread rule triggers one targeted repeat). Do not add load balancing, substitution, final weighted objectives, B4/B16 or R8.
 
+**Immediate follow-up after `fad71d2`: payload crossover only.**
+Do not start Stage 1/model/replication work. Read
+`experiments/fetch_comm_pareto_p2p_20261002/PAYLOAD_CROSSOVER.md`.
+Reuse an existing R4/B8 raw-routing trace to compute actual decode rank-pair
+payload p50/p90/p99/max, then benchmark only 32 KiB, 64 KiB, 256 KiB, 1 MiB
+and 4 MiB per peer under T0 and the validated R3 SHM condition. Two
+counter-ordered lightweight passes only. If R3 is not >=1.5x slower within the
+real p99 payload range, stop synthetic H100 P2P-off work and move the
+communication-sensitive experiment to the real no-NVLink server. Commit the
+result immediately; do not tune more NCCL knobs.
+
 **Recovery outcome (2026-10-03): functional, cost-increase gate not met.**
 R1 and R2 failed with IB retry errors; R3 passed all-rank payload validation
 using `SHM/direct/direct` with P2P_LEVEL=LOC and IB disabled. Stop at that first

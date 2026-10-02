@@ -1,3 +1,18 @@
+## Immediate task — payload crossover only
+
+Current checkpoint: `fad71d2`.
+
+Do not run Stage 1 or implement replication yet.
+
+Read `PAYLOAD_CROSSOVER.md` and do exactly two things:
+
+1. extract actual R4/B8 decode rank-pair payload sizes from an existing raw-routing trace, using raw exact routes and ignoring substitution;
+2. run the five-size T0/R3 peer microbenchmark with two lightweight counter-ordered passes.
+
+No new model trace, no new NCCL knob search, no H2D/concurrent rerun.
+
+Commit the bounded result immediately and stop for owner review.
+
 ## Immediate task — recover T1 transport only
 
 Current checkpoint: `7c881f7`. Do **not** implement replication or run the model yet.
