@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "interpretations": [
+    {
+      "comparison": "B4_to_B16",
+      "decision": "MIXED",
+      "message_median_growth_ratio": 4.0,
+      "max_rank_bytes_median_growth_ratio": 4.046511627906977,
+      "message_count_growth_ratio": 1.001303780964798,
+      "whole_cuda_ratio_increase_pp": -18.477283805792,
+      "whole_wall_ratio_increase_pp": -18.48729753983821
+    },
+    {
+      "comparison": "B4_to_B32",
+      "decision": "BATCH_SENSITIVE",
+      "message_median_growth_ratio": 8.0,
+      "max_rank_bytes_median_growth_ratio": 8.069767441860465,
+      "message_count_growth_ratio": 1.001303780964798,
+      "whole_cuda_ratio_increase_pp": 10.617636670299756,
+      "whole_wall_ratio_increase_pp": 10.628834978993918
+    }
+  ],
+  "whole_cuda_ratio_monotonic": false,
+  "robust_bandwidth_crossover_established": false,
+  "new_model_captures": 3,
+  "B8_reused": true,
+  "decode_events_per_trace": 384,
+  "trace_cells": 16,
+  "timed_traces": 48,
+  "warmup_traces": 16,
+  "validated_global_trace_events": 24576,
+  "latency_cells": 20,
+  "transport_smokes": 2,
+  "cpu_results_unchanged": true,
+  "cpu_result_sha256": {
+    "replica_pareto_screen.csv": "160962917bef37eacd57d74e7dc0f572d7aa4ccbe750c7610dd9d586312b7ca6",
+    "replica_pareto_screen.json": "e735374cc3d0eba1a131d5440c6b889ecc68d326edddea3cc640c37517b05183",
+    "replica_pareto_events.csv": "d575302e3a76cbfd09b65aeeb76581177238ff55babf2bfe52e151df3d529737",
+    "physical_fkc_schedule_metadata.json": "1c4211bbe2a004e44919bc93b6d478cbd5cf649a86cdc730507104f014675e44"
+  },
+  "timing_sources_unchanged": true,
+  "capture_source_sha256": {
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_capture.py": "a32a178868cd12143969dbeec06eaba39255bb81c753c1d0399e764dbfd0f83d",
+    "/home/hwlee/mgo/mgo_v2/examples/trace_comm_worker.py": "061956d22503c9f8abf9bd9dd61d6195766fee118491d1d1513bfbc5b687543c",
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_latency.py": "afc7078a2ff55ac719c988c98fc5fa86c43f4d982683c7ff9d9d357a30ddfd5d",
+    "/home/hwlee/mgo/mgo_v2/examples/ipc_rebase_smoke.py": "71a26aebadbe2bf2c49d787c86f457298d3436c7812371da64bf55efc14307e3",
+    "/home/hwlee/mgo/mgo_v2/scripts/run_batch_comm_stage.py": "31e4a78b14bb1ef8d3ba19c8f849947c393d6680e0de670b276c21cb6a11846d",
+    "/home/hwlee/mgo/mgo_v2/scripts/batch_comm_common.py": "012b7d787c8b351e91beb3bc3bb2e75cd830e85bc40e8c7a37f8891c9a562ef8",
+    "/home/hwlee/mgo/mgo_v2/scripts/trace_comm_input.py": "08bef4685eb35b7ba64cf38a5cf0373ed964da987e616b9d7b15ccfb6c6843ba",
+    "/home/hwlee/mgo/mgo_v2/experiments/fetch_comm_pareto_p2p_20261002/batch_comm_prompt_provenance.json": "fe29a51fa23c3bc773f32dd7373e2810b6b02caf2154e3f3fbacacb91f73fd6b"
+  },
+  "timing_source_sha256": {
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_capture.py": "a32a178868cd12143969dbeec06eaba39255bb81c753c1d0399e764dbfd0f83d",
+    "/home/hwlee/mgo/mgo_v2/examples/trace_comm_worker.py": "061956d22503c9f8abf9bd9dd61d6195766fee118491d1d1513bfbc5b687543c",
+    "/home/hwlee/mgo/mgo_v2/examples/batch_comm_latency.py": "afc7078a2ff55ac719c988c98fc5fa86c43f4d982683c7ff9d9d357a30ddfd5d",
+    "/home/hwlee/mgo/mgo_v2/examples/ipc_rebase_smoke.py": "71a26aebadbe2bf2c49d787c86f457298d3436c7812371da64bf55efc14307e3",
+    "/home/hwlee/mgo/mgo_v2/scripts/run_batch_comm_stage.py": "9a09d4aa36ec44af9b0dfd9ec97fbed12c03927ef6a3095e48852690b9972e22",
+    "/home/hwlee/mgo/mgo_v2/scripts/batch_comm_common.py": "5489f860a61ba8d12abab551353593d19c3f2fed444b98a06c51802cfc0a77d1",
+    "/home/hwlee/mgo/mgo_v2/scripts/trace_comm_input.py": "08bef4685eb35b7ba64cf38a5cf0373ed964da987e616b9d7b15ccfb6c6843ba",
+    "/home/hwlee/mgo/mgo_v2/experiments/fetch_comm_pareto_p2p_20261002/batch_comm_prompt_provenance.json": "fe29a51fa23c3bc773f32dd7373e2810b6b02caf2154e3f3fbacacb91f73fd6b",
+    "/home/hwlee/mgo/mgo_v2/examples/model_inference_load.py": "332d1d1a42480d4dc963a89a8a45364299f2a7fa4649af2cecfce7d28b79993a"
+  },
+  "analysis_source_sha256": {
+    "/home/hwlee/mgo/mgo_v2/scripts/summarize_batch_comm.py": "29d07172d3c1f3137191801f3c02c06b2fa58e9b1181cce333795f21f4e54965",
+    "/home/hwlee/mgo/mgo_v2/scripts/batch_comm_analysis.py": "388b89028b75b56702ee49796209f8e560842e6eec34fad9a9786a360b62a73f"
+  },
+  "memory": {
+    "peak_process_tree_rss_gib": 228.91225051879883,
+    "min_host_available_gib": 1620.1724548339844,
+    "min_target_gpu_free_mib": 68385
+  },
+  "output_sha256": {
+    "batch_comm_geometry.csv": "cf12e78f597358e81415b3b778c227de135d824f7691cbaaaf9532b8309a7896",
+    "batch_comm_geometry.json": "e7e764a45dacd1adc3d696c84d32eaf115bbb87cf5a6ebb4df53e3d37a461bb4",
+    "batch_comm_trace_timing.csv": "eaf4899660e939040716a96404dda1af5d941b6c29c64f7d4b7f742f9f76ccf0",
+    "batch_comm_trace_timing.json": "d3e1342140d70c0b755c38310b74480712a515917bbed8208b906bbf19750c01",
+    "batch_comm_event_buckets.csv": "18ca3de908b78ad5e31e741e019a3bb0049644cfec000b5fafb216fc54d3c98d",
+    "batch_comm_event_diagnostics.json": "246a82b1665f7476d322bdfd0de7216c976d58adb86e75e831d388630f2d1caa",
+    "small_payload_latency.csv": "0856a80c6b444466ecc55285c2e3b6f22aaffb2c94e25af8a5fa5a97ae8f9117",
+    "small_payload_latency.json": "0711abdd83d244653f49f07dbc7961ce921a8b1f86e90ae97cb026c0520b390c",
+    "BATCH_COMM_SENSITIVITY_RESULTS.md": "97b8685c8f7dd07dd9693430d9b6e866cf1fc5e9434ec5d1477c2b4420af361a",
+    "batch_comm_prompt_provenance.json": "fe29a51fa23c3bc773f32dd7373e2810b6b02caf2154e3f3fbacacb91f73fd6b",
+    "batch_comm_capture_B4.json": "abefa6227a5bef0912da9abcdd535a0bd8122a8b06f3ad98b0c479a60ad4f240",
+    "batch_comm_capture_B16.json": "ab83fbf8b92d5138e2da7ef0f4b0bf1117bb1053670c87e4806b39dca692e65d",
+    "batch_comm_capture_B32.json": "92141650937777926a049fe4d3c33ad612b518352a50c705de644944b0bdafb0",
+    "batch_comm_transport_validation.json": "99bae7f842f6ddc78f21c30f2264e72c492614166225f3c8351d58dfe6c30f93"
+  }
+}

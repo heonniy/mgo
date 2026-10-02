@@ -11,7 +11,7 @@ def corr(x,y):
  return sum((a-mx)*(b-my) for a,b in zip(x,y))/math.sqrt(vx*vy) if vx and vy else None
 
 def main():
- progress=json.loads((PACKET/'batch_comm_progress.json').read_text());assert progress['status']=='STAGE_PASS' and 'timing' in progress['completed']
+ progress=json.loads((PACKET/'batch_comm_progress.json').read_text());assert progress['status'] in ('STAGE_PASS','COMPLETE') and 'timing' in progress['completed']
  assert all(sha(p)==h for p,h in progress['source_sha256'].items())
  assert all(sha(PACKET/n)==h for n,h in progress['cpu_result_sha256'].items())
  source={b:json.loads((PACKET/'trace_comm_counts.json' if b==8 else ROOT/f'counts_B{b}.json').read_text()) for b in BATCHES}
@@ -100,6 +100,7 @@ def main():
   interpretations.append(dict(comparison=f'B4_to_B{end}',decision=decision,message_median_growth_ratio=msg,max_rank_bytes_median_growth_ratio=mx,message_count_growth_ratio=count,whole_cuda_ratio_increase_pp=delta*100,whole_wall_ratio_increase_pp=100*(rat[end]['whole_wall_ms_median_ratio']-rat[4]['whole_wall_ms_median_ratio'])))
  mem=dict(peak_process_tree_rss_gib=max(s.get('group_rss_bytes',0) for s in memory)/2**30,min_host_available_gib=min(s['host_available_bytes'] for s in memory)/2**30,min_target_gpu_free_mib=min(g['free_mib'] for s in memory for g in s['gpu'].values()))
  lines=['# Batch communication sensitivity — B4 through B32','',f"**B4→B32: {interpretations[-1]['decision']}**; original B4→B16 endpoint: **{interpretations[0]['decision']}**.",'',
+ 'The full batch curve is nonmonotonic: the endpoint rule is a descriptive screen, not evidence of a robust bandwidth crossover. B4 itself reverses direction between passes, and B8 exceeds both B16 and B32. The B32 endpoint increases the ratio by 10.62 percentage points, only 0.62 points beyond the predeclared 10-point threshold. No extra repetitions were added.', '',
  'Local batches 4/8/16/32 correspond to global 16/32/64/128 on R4. Cache30, exact-only P0 seed42/LRU, no replicas. B8 source reused; exactly three new diagnostic model captures. All captures/counts and communication payloads passed. Model capture times are not performance evidence.','',
  '## Message geometry','', '| Local batch | Phase | Peer MiB | Nonzero messages | Message p50/p90/p99 KiB | Self fraction |','|---:|:---|---:|---:|:---|---:|']
  for r in geom:lines.append(f"| {r['local_batch']} | {r['phase']} | {r['peer_bytes']/2**20:.3f} | {r['nonzero_remote_messages']} | {r['p50_message_bytes']/1024:.1f} / {r['p90_message_bytes']/1024:.1f} / {r['p99_message_bytes']/1024:.1f} | {r['self_byte_fraction']:.3f} |")
@@ -109,7 +110,7 @@ def main():
  for r in interpretations:lines.append(f"- {r['comparison']}: {r['decision']}; union message median {r['message_median_growth_ratio']:.3f}x, median max-rank remote bytes {r['max_rank_bytes_median_growth_ratio']:.3f}x, nonzero message count {r['message_count_growth_ratio']:.3f}x. CUDA ratio changes {r['whole_cuda_ratio_increase_pp']:+.2f} percentage points; wall ratio {r['whole_wall_ratio_increase_pp']:+.2f} points.")
  lines+=['','These are bounded descriptive measurements, not confidence-tested causal evidence. Event intervals include launch/stream scheduling gaps. Whole-trace throughput and event-level latency can differ; the older B8 IPC/SHM result is historical context, not pooled into this run.','', '## Calibration and event diagnostics','']
  for fit in fits:lines.append(f"- {fit['mode']}: alpha={fit['alpha_ms']:.6f} ms, beta={fit['beta_ms_per_byte']:.3e} ms/byte, R²={fit['r_squared']:.3f}. Five per-peer sizes only; no physical bandwidth claim.")
- lines+=['','[Event buckets](batch_comm_event_buckets.csv) report pair median/p90, R3/T0, unique event fractions and byte fractions for each batch and pooled. [Diagnostics](batch_comm_event_diagnostics.json) include correlations with bytes and fan-out; constant predictors are null. Predictors are transport-independent and fixed before timing.','', '## Validation and limits','',
+ lines+=['','The calibration fits are weak: T0 has a negative byte slope and both R² values are below 0.32. These five-size measurements do not identify a reliable positive byte-transfer cost or a clean latency/bandwidth crossover.', '', '[Event buckets](batch_comm_event_buckets.csv) report pair median/p90, R3/T0, unique event fractions and byte fractions for each batch and pooled. [Diagnostics](batch_comm_event_diagnostics.json) include correlations with bytes and fan-out; constant predictors are null. Predictors are transport-independent and fixed before timing.','', '## Validation and limits','',
  f"- Peak process-tree RSS {mem['peak_process_tree_rss_gib']:.2f} GiB; minimum host available {mem['min_host_available_gib']:.2f} GiB; minimum target GPU free {mem['min_target_gpu_free_mib']:,} MiB. No memory guard stop.",
  '- All CPU Pareto results and frozen schedule metadata retain their SHA256 hashes. No CPU screen, F/K/C run, additional decode, NCCL tuning, or NVLink-mode operation.',
  '- Fresh transport smokes accepted T0 P2P/IPC and R3 SHM only. Both use NCCL_CUMEM_ENABLE=0. INFO is absent during timing.',
@@ -117,10 +118,10 @@ def main():
  '- Raw capture/timing receipts are outside Git with hashes; compact geometry, prompt provenance, diagnostics and results are checked in. No automatic F/K model timing; stop for owner review.', '',
  'See [geometry](batch_comm_geometry.json), [trace timing](batch_comm_trace_timing.json), [calibration](small_payload_latency.json), [validation](batch_comm_validation.json), and [frozen conventions](BATCH_COMM_EXECUTION.md).','']
  (PACKET/'BATCH_COMM_SENSITIVITY_RESULTS.md').write_text('\n'.join(lines))
- outputs=['batch_comm_geometry.csv','batch_comm_geometry.json','batch_comm_trace_timing.csv','batch_comm_trace_timing.json','batch_comm_event_buckets.csv','batch_comm_event_diagnostics.json','small_payload_latency.csv','small_payload_latency.json','BATCH_COMM_SENSITIVITY_RESULTS.md']
- write(PACKET/'batch_comm_validation.json',dict(status='PASS',interpretations=interpretations,new_model_captures=3,B8_reused=True,decode_events_per_trace=384,
+ outputs=['batch_comm_geometry.csv','batch_comm_geometry.json','batch_comm_trace_timing.csv','batch_comm_trace_timing.json','batch_comm_event_buckets.csv','batch_comm_event_diagnostics.json','small_payload_latency.csv','small_payload_latency.json','BATCH_COMM_SENSITIVITY_RESULTS.md','batch_comm_prompt_provenance.json','batch_comm_capture_B4.json','batch_comm_capture_B16.json','batch_comm_capture_B32.json','batch_comm_transport_validation.json']
+ write(PACKET/'batch_comm_validation.json',dict(status='PASS',interpretations=interpretations,whole_cuda_ratio_monotonic=all(ratios[i]['whole_cuda_ms_median_ratio']<=ratios[i+1]['whole_cuda_ms_median_ratio'] for i in range(3)),robust_bandwidth_crossover_established=False,new_model_captures=3,B8_reused=True,decode_events_per_trace=384,
   trace_cells=16,timed_traces=48,warmup_traces=16,validated_global_trace_events=64*384,latency_cells=20,transport_smokes=2,
-  cpu_results_unchanged=True,cpu_result_sha256=progress['cpu_result_sha256'],sources_unchanged=True,source_sha256=progress['source_sha256'],
+  cpu_results_unchanged=True,cpu_result_sha256=progress['cpu_result_sha256'],timing_sources_unchanged=True,capture_source_sha256=progress['capture_source_sha256'],timing_source_sha256=progress['source_sha256'],
   analysis_source_sha256={str(Path(__file__)):sha(Path(__file__)),str(PACKET.parents[1]/'scripts/batch_comm_analysis.py'):sha(PACKET.parents[1]/'scripts/batch_comm_analysis.py')},memory=mem,
   output_sha256={n:sha(PACKET/n) for n in outputs}))
  print(json.dumps(dict(interpretations=interpretations,ratios=ratios,memory=mem),indent=2))

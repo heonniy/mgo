@@ -1,3 +1,19 @@
+## Completed — B4/B8/B16/B32 communication sensitivity
+
+**Batch communication packet complete (2026-10-03), including local B32.**
+B4/B8/B16/B32 union message medians are 16/32/64/128 KiB; nonzero message
+counts stay approximately 9,216. All three new source captures, two transport
+smokes, 20 calibration cells and 16 trace cells passed. Whole-trace CUDA
+R3/T0 median ratios are 1.1283/1.5915/0.9435/1.2345. B4->B16 is MIXED;
+the B4->B32 endpoint rule is BATCH_SENSITIVE (+10.62 percentage points),
+but the curve is nonmonotonic, B4 reverses direction between passes, and
+calibration fits are weak. No robust bandwidth crossover is established.
+CPU Pareto files are unchanged; no F/K/C or extra repetitions are authorized.
+Read `BATCH_COMM_SENSITIVITY_RESULTS.md` and `batch_comm_validation.json`.
+Stop research experiments; retain the owner's eight-GPU resident-model
+inference load during idle time, subject to the documented resource guards.
+Earlier experiment priorities below are historical.
+
 ## Immediate task — B4/B8/B16 communication sensitivity
 
 Current checkpoint: `a18c5d3` plus the validated IPC/SHM replay at `3e59975`.

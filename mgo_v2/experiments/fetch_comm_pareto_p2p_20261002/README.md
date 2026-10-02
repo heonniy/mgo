@@ -1,6 +1,18 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current result: NVLink bandwidth ladder BLOCKED_PRIVILEGE (2026-10-03).**
+**Current result: B4–B32 messages grow; transport timing is nonmonotonic.**
+Message medians grow 16/32/64/128 KiB while counts remain nearly constant.
+Whole-trace SHM/IPC ratios are 1.128/1.591/0.944/1.234. The original B4->B16
+endpoint is MIXED; B4->B32 narrowly meets the predeclared BATCH_SENSITIVE
+screen. This does not establish a robust bandwidth crossover. All bounded
+captures and payload checks passed without OOM; CPU Pareto results are intact.
+Read [BATCH_COMM_SENSITIVITY_RESULTS.md](BATCH_COMM_SENSITIVITY_RESULTS.md),
+[geometry](batch_comm_geometry.csv), [timing](batch_comm_trace_timing.json),
+and [validation](batch_comm_validation.json). Research experiments stop;
+eight resident-model inference workers serve the owner's requested idle load.
+Earlier results below are historical.
+
+**Prior result: NVLink bandwidth ladder BLOCKED_PRIVILEGE (2026-10-03).**
 All eight GPUs are idle, but querying the current bandwidth mode fails with
 permission return code 4. FULL cannot be verified, so no mode write or
 communication experiment was started. CPU results remain unchanged.
