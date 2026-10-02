@@ -346,7 +346,7 @@ The goal of this stage is to remove implementation overhead **without changing a
 
 ### 12.1 C0 — frozen baseline controller
 
-Use the exact existing implementation as the baseline. Preserve the already-collected P0/P1/O0 results; do not regenerate them merely to overwrite the baseline.
+Use the exact existing implementation as the baseline. Preserve the already-collected P0/P1/O0 placement/oracle results as the primary placement evidence. For a fair C0/C1/C2 controller comparison, fresh matched C0 control repeats may be run in the controller-overhead stage, but they must be reported separately and must not overwrite the primary placement/oracle packet.
 
 Record, per event and per run:
 
@@ -458,7 +458,7 @@ Before any optimized timing claim:
 
 The controller optimization is a **runtime repair**, not a new placement policy. Report its gain separately from the P0/P1/O0 placement comparison.
 
-## 12. Required artifacts
+## 13. Required artifacts
 
 Create:
 
