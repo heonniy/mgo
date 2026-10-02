@@ -1,5 +1,11 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
+For the authorized recovery after the original failure, read
+[TRANSPORT_RECOVERY_RESULTS.md](TRANSPORT_RECOVERY_RESULTS.md) and
+[transport_recovery_result.json](transport_recovery_result.json).
+Each R-condition is committed before the next attempt; the original Stage 0
+result below is retained as history.
+
 **Stage 0: BLOCKED_TRANSPORT (2026-10-03).** T0 smoke and three tiny calibration
 cells passed. With the requested P2P-disable flag, T1 selected NET/IB/GDRDMA and
 failed its first all-to-all. Read [RESULTS.md](RESULTS.md),

@@ -23,6 +23,30 @@
       "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R1_smoke",
       "peer_median_ms": null,
       "h2d_median_ms": null
+    },
+    {
+      "condition": "R2",
+      "status": "FAIL",
+      "p2p_used": false,
+      "selected_transport": "NET/IB/0/Shared; NET/IB/1/Shared; NET/IB/2/Shared; NET/IB/4/Shared; NET/IB/5/Shared; NET/IB/6/Shared",
+      "payload_validation": false,
+      "ib_error": true,
+      "external_socket_interface": false,
+      "error": "IBV_WC_RETRY_EXC_ERR",
+      "topology_lines": [
+        "comm 0x558fef110d90 rank 3 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x55928be41d00 rank 1 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x56287be86bb0 rank 2 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0",
+        "comm 0x56321bfda280 rank 0 nRanks 4 nNodes 4 localRanks 1 localRank 0 MNNVL 0"
+      ],
+      "environment": {
+        "NCCL_P2P_LEVEL": "LOC",
+        "NCCL_NET_GDR_LEVEL": "LOC",
+        "NCCL_NET_GDR_C2C": "0"
+      },
+      "raw_root": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/recovery/R2_smoke",
+      "peer_median_ms": null,
+      "h2d_median_ms": null
     }
   ],
   "calibration": null
