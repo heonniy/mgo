@@ -1,0 +1,76 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "01e05a6d59d22332f04ac236936da80b1c176a3d",
+  "primary_batch": {
+    "local": 8,
+    "global": 32
+  },
+  "secondary_batches": [
+    {
+      "local": 16,
+      "global": 64
+    },
+    {
+      "local": 32,
+      "global": 128
+    }
+  ],
+  "world_size": 4,
+  "cache_ratio": 0.3,
+  "capacities": [
+    461,
+    461,
+    461,
+    460
+  ],
+  "row_bytes": 4096,
+  "expert_bytes": 9437184,
+  "decode_steps": 8,
+  "lookahead_decode_steps": [
+    1,
+    2,
+    4,
+    "remaining_max_8"
+  ],
+  "admission_threshold_peer_bytes": [
+    0,
+    65536,
+    262144,
+    1048576
+  ],
+  "r2_gate": {
+    "top10_pair_remote_byte_share_gte": 0.4,
+    "or_remote_byte_share_reused_within_4_steps_gte": 0.25
+  },
+  "strong_headroom": {
+    "option1": "peer<=K && h2d<=0.75*K",
+    "option2": "h2d<=F+0.25*(K-F) && peer_reduction>=0.50*(F-K)"
+  },
+  "baseline_B8_decode": {
+    "F": {
+      "total_fetches": 17635,
+      "expert_h2d_bytes": 166424739840,
+      "peer_activation_bytes": 334970880,
+      "remote_token_rank_pairs": 23179
+    },
+    "K": {
+      "total_fetches": 24926,
+      "expert_h2d_bytes": 235231248384,
+      "peer_activation_bytes": 194297856,
+      "remote_token_rank_pairs": 14376
+    },
+    "C": {
+      "total_fetches": 45886,
+      "expert_h2d_bytes": 433034625024,
+      "peer_activation_bytes": 0,
+      "remote_token_rank_pairs": 0
+    }
+  },
+  "cpu_only": true,
+  "max_address_space_gib": 4,
+  "gpu_runs": 0,
+  "new_model_captures": 0,
+  "r8": false,
+  "substitution": false,
+  "automatic_physical_followup": false
+}

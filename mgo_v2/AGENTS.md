@@ -1,3 +1,15 @@
+**New owner-authorized CPU-only headroom study (2026-10-03): rank-local reuse and selective replication.**
+Read `experiments/rank_local_reuse_oracle_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Reuse the existing exact B8 capture and the same rho=0 cache/traffic semantics.
+First reproduce F exactly, then measure temporal reuse of remote
+`(layer,expert,requesting-rank)` pairs and exact future marginal peer-byte
+savings for H={1,2,4,remaining<=8}. Apply the predeclared reuse gate before
+any selective replay. If it passes, run only 4 horizons x 4 fixed future-saving
+thresholds with the real cache slots/LRU, compare the resulting H2D/peer
+coordinates against committed F/K/C, and stop. B16/B32 are secondary existing
+traces only. CPU only: no model/GPU/NCCL, no R8, no substitution, no new F/K/C
+physical timing, and do not disturb the owner's resident-model GPU workers.
+
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
 **Batch communication packet complete (2026-10-03), including local B32.**
