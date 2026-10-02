@@ -1,3 +1,21 @@
+## Immediate task — bounded CUMEM diagnosis and conditional E1 retry
+
+Current checkpoint: `b71199c`.
+
+Read `CUMEM_PREFLIGHT_RETRY.md`.
+
+Do exactly:
+
+1. snapshot current GPU/process/environment state;
+2. run default T0 32-KiB preflight in three fresh process groups;
+3. run one fresh T0 diagnostic with `NCCL_CUMEM_ENABLE=0`;
+4. commit the diagnosis immediately;
+5. only if default T0 passes 3/3 on P2P/CUMEM, re-run the original E1 measurement unchanged in a fresh result root and commit E1 separately.
+
+If any default T0 trial is unstable, do not run E1 and do not use the cuMem-disabled path as a substitute baseline.
+
+No model/E2 unless the re-run E1 later satisfies the original STRONG_GAP gate.
+
 ## Blocked — E1 preflight
 
 **E1 trace-communication stage blocked (2026-10-03): BLOCKED_PREFLIGHT.**

@@ -235,5 +235,33 @@
       "nsight": false,
       "automatic_third_repeat": false
     }
+  },
+  "cumem_preflight_retry": {
+    "checkpoint": "b71199ccd8da83d756557535484efc9cb8c8851c",
+    "default_t0_trials": 3,
+    "diagnostic_cumem_disabled_trials": 1,
+    "timeout_seconds_per_trial": 90,
+    "target_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "default_t0_env": {
+      "NCCL_P2P_DISABLE": null,
+      "NCCL_P2P_LEVEL": null,
+      "NCCL_IB_DISABLE": null,
+      "NCCL_NET_GDR_LEVEL": null,
+      "NCCL_NET_GDR_C2C": null,
+      "NCCL_SHM_DISABLE": null,
+      "NCCL_CUMEM_ENABLE": null
+    },
+    "diagnostic_env": {
+      "NCCL_CUMEM_ENABLE": "0"
+    },
+    "rerun_E1_if": "all_3_default_T0_preflights_PASS_on_P2P_CUMEM",
+    "E1_must_use_default_cumem_path": true,
+    "fresh_result_root_required": true,
+    "E2_conditional_on_existing_STRONG_GAP": true
   }
 }

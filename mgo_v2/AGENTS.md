@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `b71199c`: bounded P2P/CUMEM diagnosis and conditional E1 retry.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/CUMEM_PREFLIGHT_RETRY.md`.
+Run exactly three fresh default-T0 32-KiB preflights plus one diagnostic
+preflight with `NCCL_CUMEM_ENABLE=0`, each bounded at 90 s. Commit the
+diagnosis first. Only if default T0 passes 3/3 on P2P/CUMEM may the original
+E1 trace replay be re-run unchanged in a fresh result root. The cuMem-disabled
+path is diagnostic only and must not replace T0. If any default trial is
+unstable, stop after diagnosis. Do not start E2/model work unless a subsequent
+original-path E1 satisfies the existing STRONG_GAP gate.
+
 **E1 trace-communication stage blocked (2026-10-03): BLOCKED_PREFLIGHT.**
 The first T0 32-KiB preflight exceeded its 180-second bound. Communicators
 initialized and selected P2P/CUMEM; no validated payload receipt followed.

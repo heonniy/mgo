@@ -183,6 +183,19 @@ The clean physical stage removes heavy validation from the timed path and runs o
 
 Do not continue automatically if the communication-only gate is absent or ambiguous.
 
+## Stage 0F — bounded P2P/CUMEM retry and conditional E1 re-run
+
+The first E1 preflight at `b71199c` timed out after communicator initialization on the T0 `P2P/CUMEM` mapping path.
+
+Follow [CUMEM_PREFLIGHT_RETRY.md](CUMEM_PREFLIGHT_RETRY.md):
+
+1. run three fresh default-T0 32-KiB preflights;
+2. run one diagnostic preflight with `NCCL_CUMEM_ENABLE=0`;
+3. if and only if default T0 passes 3/3, commit the diagnosis and re-run the original E1 trace-communication experiment unchanged in a fresh result root;
+4. if default T0 is unstable, stop after diagnosis.
+
+The cuMem-disabled path is diagnostic only and must not silently replace T0.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.
