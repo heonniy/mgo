@@ -145,6 +145,30 @@ No GPU work is authorized in this stage.
 
 Continue only if at least three points are nondominated and the two endpoints differ by >=10% on **both** axes.
 
+## Stage 0D — six-cell physical F/K/C pilot
+
+The CPU Pareto screen at `dc7b099` passed with all five budgets nondominated and selected F/K/C=rho 0/.25/.75.
+
+Before longer traces or a final controller, execute only [PHYSICAL_FKC_PILOT.md](PHYSICAL_FKC_PILOT.md).
+
+Freeze the CPU replay actions first, then physically execute exactly six short cells:
+
+```text
+T0-F, R3-C, T0-K, R3-K, T0-C, R3-F
+```
+
+Each cell uses the same one-prefill + eight-decode exact-only workload. No automatic repeats.
+
+Primary question:
+
+```text
+Does the descriptively fastest rho move between T0 and R3?
+```
+
+A >=5% within-transport margin plus consistent H2D/peer mechanism counters is required to label the pilot `PROMISING_SHIFT`. Otherwise report `NO_CLEAR_SHIFT`.
+
+Do not run Stage 1/2/3 automatically after this pilot.
+
 ## Stage 1 — one exact-routing trace
 
 Capture one R4/B8 exact-expert generation with substitution disabled.

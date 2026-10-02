@@ -1,3 +1,22 @@
+## Immediate task — six-cell physical F/K/C pilot
+
+Current checkpoint: `dc7b099`.
+
+Read `PHYSICAL_FKC_PILOT.md`.
+
+Do only this:
+
+1. regenerate and hash frozen F/K/C action schedules from the validated CPU replay;
+2. add the narrow experiment-only physical replay path needed to apply those schedules;
+3. run exactly six short cells in the prescribed order:
+   T0-F, R3-C, T0-K, R3-K, T0-C, R3-F;
+4. require exact trace/cache/send-count/token parity;
+5. report decode time plus physical H2D/peer mechanism counters;
+6. commit results and stop.
+
+No substitution, no policy retuning, no more rho values, no automatic repeats,
+no Nsight, no 32/64-step run, no final weighted method.
+
 ## Completed — CPU-only replica screen
 
 **GO_FOR_OWNER_REVIEW**, all five rho points nondominated; F/K/C=0/.25/.75.

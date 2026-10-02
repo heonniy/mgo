@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Immediate follow-up after `dc7b099`: six-cell physical F/K/C pilot.**
+Read `experiments/fetch_comm_pareto_p2p_20261002/PHYSICAL_FKC_PILOT.md`.
+Freeze F/K/C=rho 0/.25/.75 CPU action schedules, then physically replay the
+same exact-only one-prefill + eight-decode workload on GPUs 0,1,4,5. Run
+exactly: T0-F, R3-C, T0-K, R3-K, T0-C, R3-F. One run per cell. Primary
+question is whether the descriptively fastest rho moves between T0 and R3.
+Require >=5% margin plus consistent H2D/peer counters for PROMISING_SHIFT.
+No automatic repeats, longer trace, Nsight, substitution or final method.
+Commit after the six cells or immediately on blocking failure and stop.
+
 **CPU-only replica screen complete (2026-10-03): GO_FOR_OWNER_REVIEW.**
 All five budgets are nondominated; F/K/C rho=0/.25/.75. F to C increases
 decode H2D by 160.20% and reduces peer activation bytes by 100%. All 2,160

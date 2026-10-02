@@ -112,5 +112,64 @@
       "minimum_endpoint_h2d_change_fraction": 0.1,
       "minimum_endpoint_peer_change_fraction": 0.1
     }
+  },
+  "physical_fkc_pilot": {
+    "checkpoint": "dc7b099d006344d862cbcd9df4e0f6f352a1ba1f",
+    "source_trace": "validated exact-only one-prefill + 8-decode capture",
+    "points": [
+      {
+        "name": "F",
+        "rho": 0
+      },
+      {
+        "name": "K",
+        "rho": 0.25
+      },
+      {
+        "name": "C",
+        "rho": 0.75
+      }
+    ],
+    "transports": {
+      "T0": {
+        "label": "normal NVSwitch P2P",
+        "env": {
+          "NCCL_P2P_DISABLE": null,
+          "NCCL_P2P_LEVEL": null,
+          "NCCL_IB_DISABLE": null,
+          "NCCL_NET_GDR_LEVEL": null,
+          "NCCL_NET_GDR_C2C": null,
+          "NCCL_SHM_DISABLE": null
+        }
+      },
+      "R3": {
+        "label": "non-P2P SHM",
+        "env": {
+          "NCCL_P2P_DISABLE": null,
+          "NCCL_P2P_LEVEL": "LOC",
+          "NCCL_IB_DISABLE": "1",
+          "NCCL_NET_GDR_LEVEL": null,
+          "NCCL_NET_GDR_C2C": null,
+          "NCCL_SHM_DISABLE": null
+        }
+      }
+    },
+    "order": [
+      "T0-F",
+      "R3-C",
+      "T0-K",
+      "R3-K",
+      "T0-C",
+      "R3-F"
+    ],
+    "runs_per_cell": 1,
+    "decode_forwards": 8,
+    "substitution": false,
+    "frozen_policy_actions": true,
+    "primary_metric": "decode_time_ms",
+    "promising_shift_min_margin_fraction": 0.05,
+    "max_primary_runs": 6,
+    "automatic_repeats": false,
+    "nsight": false
   }
 }
