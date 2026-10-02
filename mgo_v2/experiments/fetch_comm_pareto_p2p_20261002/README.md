@@ -1,6 +1,14 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current result: CPU replica screen GO_FOR_OWNER_REVIEW (2026-10-03).**
+**Current result: physical pilot NO_CLEAR_SHIFT (2026-10-03).**
+All six cells passed correctness. T0-K and R3-F are descriptively fastest,
+but the communication-cost mechanism is not supported and application/check
+CPU timing varies substantially. No repeats were added; GPUs 0,1,4,5 were
+released after completion. Read [PHYSICAL_FKC_RESULTS.md](PHYSICAL_FKC_RESULTS.md),
+[physical CSV](physical_fkc_pilot.csv), [full result](physical_fkc_pilot.json),
+and [validation](physical_fkc_validation.json). Stop for owner review.
+
+**Prior result: CPU replica screen GO_FOR_OWNER_REVIEW (2026-10-03).**
 All five rho settings are nondominated. F/K/C are rho=0/.25/.75; from F to C,
 decode H2D increases 160.20% and peer activation bytes fall 100%. This reused
 the exact-only eight-decode trace with no new GPU/model run. All 2,160 CPU

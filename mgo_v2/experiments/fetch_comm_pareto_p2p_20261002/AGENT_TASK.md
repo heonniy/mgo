@@ -1,3 +1,16 @@
+## Completed — six-cell physical F/K/C pilot
+
+**Physical F/K/C pilot complete (2026-10-03): NO_CLEAR_SHIFT.**
+All six cells passed trace/cache/action/send-count/token parity (2,592 global
+layer events). Descriptive winners differ: T0-K (8.3423 s decode) and R3-F
+(6.8918 s), with 5.19%/9.30% margins. However, R3/T0 payload intervals are
+0.769x at F and 0.866x at K, and F replay/check CPU time differs by 0.991 s;
+the proposed communication-cost mechanism is not supported. No repeat or
+follow-up is authorized by this result. Read `PHYSICAL_FKC_RESULTS.md` and
+`physical_fkc_validation.json` in the packet; stop for owner review.
+
+The instructions below are retained as history.
+
 ## Immediate task — six-cell physical F/K/C pilot
 
 Current checkpoint: `dc7b099`.
