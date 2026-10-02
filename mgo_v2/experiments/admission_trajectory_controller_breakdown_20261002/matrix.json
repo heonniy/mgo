@@ -1,7 +1,7 @@
 {
   "experiment": "admission_trajectory_controller_breakdown_20261002",
   "base_result_commit": "e61758e2b25922d56e640735f27fef382b9dbac9",
-  "goal": "explain why balanced-random vs hungarian-current changes E2E sign across cells",
+  "goal": "explain four-GPU batch-dependent admission/controller trajectory; existing R8 results are retrospective only",
   "frozen": {
     "model": "Qwen3-30B-A3B-Instruct-2507",
     "cache_pct": 30,
@@ -19,43 +19,60 @@
   "retrospective_cells": [
     {
       "world": 8,
-      "local_batch": 4
+      "local_batch": 4,
+      "launch": false
     },
     {
       "world": 8,
-      "local_batch": 8
+      "local_batch": 8,
+      "launch": false
     },
     {
       "world": 8,
-      "local_batch": 16
+      "local_batch": 16,
+      "launch": false
     },
     {
       "world": 8,
-      "local_batch": 32
+      "local_batch": 32,
+      "launch": false
     },
     {
       "world": 4,
-      "local_batch": 8
+      "local_batch": 8,
+      "launch": false
     }
   ],
   "diagnostic_gpu_cells": [
     {
-      "world": 8,
+      "world": 4,
       "local_batch": 4,
-      "global_batch": 32,
-      "role": "strong_positive"
-    },
-    {
-      "world": 8,
-      "local_batch": 8,
-      "global_batch": 64,
-      "role": "negative"
+      "global_batch": 16,
+      "role": "small_batch_probe",
+      "physical_gpus": [
+        0,
+        1,
+        4,
+        5
+      ]
     },
     {
       "world": 4,
       "local_batch": 8,
       "global_batch": 32,
-      "role": "matched_global_negative",
+      "role": "existing_negative_reference",
+      "physical_gpus": [
+        0,
+        1,
+        4,
+        5
+      ]
+    },
+    {
+      "world": 4,
+      "local_batch": 16,
+      "global_batch": 64,
+      "role": "large_batch_probe",
       "physical_gpus": [
         0,
         1,
@@ -95,5 +112,16 @@
     "eviction_candidate_count"
   ],
   "no_policy_tuning": true,
-  "no_primary_speedup_rerun": true
+  "no_primary_speedup_rerun": true,
+  "hardware_constraint": {
+    "max_gpus": 4,
+    "world_size": 4,
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "prohibit_r8_launch": true
+  }
 }

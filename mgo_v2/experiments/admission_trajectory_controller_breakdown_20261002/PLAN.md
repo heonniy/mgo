@@ -7,18 +7,20 @@ Status: prospective analysis plan. Do not launch GPU jobs from this commit.
 
 Use the completed physical study at `e61758e` as the fixed starting point.
 
-The most informative cells are:
+The completed study provides retrospective context:
 
 | Cell | Hungarian-current vs Random E2E | Role |
 |---|---:|---|
-| R8/B4 | ~38% faster | strong positive case |
-| R8/B8 | ~18% slower | negative case |
-| R4/B8 | ~5% slower | matched-global-batch negative case |
-| R8/B16 | ~8% faster, noisy | secondary check |
+| R8/B4 | ~38% faster | historical strong positive case |
+| R8/B8 | ~18% slower | historical negative case |
+| R4/B8 | ~5% slower | existing four-GPU negative case |
+| R8/B16 | ~8% faster, noisy | historical secondary case |
 
-R8/B4 and R4/B8 both have global batch 32 and use the same first 32 questions. This pair is the most important control for understanding world-size effects.
+Only four GPUs are available now. Therefore **all new physical diagnostics use R4 on GPUs 0,1,4,5**. Existing R8 measurements may be reanalyzed descriptively but must not trigger any R8 launch.
 
-The completed study already showed that remote-pair reduction alone is insufficient: Hungarian-current reduces remote pairs in every cell, while E2E direction changes.
+The new four-GPU batch sweep uses R4/B4, R4/B8 and R4/B16. This gives global batches 16, 32 and 64 and tests whether the admission/controller trajectory changes systematically with per-rank demand.
+
+The completed study already showed that remote-pair reduction alone is insufficient: Hungarian-current reduces remote pairs while E2E direction can differ.
 
 ## 2. Questions
 
@@ -148,12 +150,14 @@ Do not add a load-aware policy yet. This stage only establishes whether the miss
 
 The completed Stage-A study found only a small/non-monotonic resident-only latency response on NVSwitch. Reuse that evidence.
 
-If a new profile is needed, compare Random vs Hungarian-current, not same+path, in only:
+If a new profile is needed, compare Random vs Hungarian-current, not same+path, using only R4.
 
-- R8/B4 positive case;
-- R4/B8 matched-global negative case.
+Preselect:
 
-Measure NCCL kernel union, H2D, GPU idle/wait and expert compute. Do not infer additive percentages from overlapping intervals.
+- R4/B4;
+- R4/B8.
+
+Use physical GPUs 0,1,4,5. Measure NCCL kernel union, H2D, GPU idle/wait and expert compute. Do not infer additive percentages from overlapping intervals.
 
 ## 3. Instrumentation design
 
@@ -220,7 +224,7 @@ Do not rely on only one kind of run.
 
 Before any GPU work, reanalyze the existing `e61758e` receipts.
 
-For Random and Hungarian-current in R8/B4, R8/B8, R8/B16, R8/B32 and R4/B8:
+For Random and Hungarian-current in the already-completed R8/B4, R8/B8, R8/B16, R8/B32 and R4/B8 results:
 
 - remote pairs;
 - physical H2D;
@@ -235,18 +239,20 @@ No claim of causality from this mode.
 
 ### Mode B — diagnostic physical rerun
 
-Run only the three primary cells:
+**World size is fixed to R4. No R8 launch is permitted.**
 
-1. R8/B4 — positive;
-2. R8/B8 — negative;
-3. R4/B8 — matched-global negative.
+Run only:
+
+1. R4/B4 — global batch 16;
+2. R4/B8 — global batch 32, existing negative reference;
+3. R4/B16 — global batch 64.
 
 Policies:
 
 - Balanced Random;
 - Hungarian Current.
 
-Use the same checkpoint/workload/cache30/substitution/Coverage settings as `e61758e`.
+Use physical GPUs **0,1,4,5** for every run and the same checkpoint/workload/cache30/substitution/Coverage settings as `e61758e`.
 
 Protocol:
 
@@ -256,7 +262,7 @@ Protocol:
 - save every per-event controller/trajectory record;
 - do not use diagnostic wall time as a new speedup result.
 
-The existing five-repeat uninstrumented E2E numbers remain the primary performance evidence.
+The existing five-repeat uninstrumented R4/B8 result remains the prior performance reference. R4/B4 and R4/B16 are diagnostic batch-scaling probes, not new publication speedup claims.
 
 ### Mode C — frozen-route controller replay
 
@@ -330,7 +336,7 @@ Also plot:
 
 The key question is **when the trajectories diverge**.
 
-If R8/B4 starts saving future eviction/reload/controller work after early admissions while R8/B8 does not, that is direct evidence for trajectory value.
+Compare when R4/B4, R4/B8 and R4/B16 begin to diverge. If one batch regime saves future eviction/reload/controller work while another accumulates extra work, that is direct evidence that admission value depends on the evolving cache/controller trajectory rather than communication alone.
 
 ## 6. Counterfactual cache-state checks
 
@@ -410,18 +416,18 @@ Primary GPU diagnostic matrix:
 
 | World | Local B | Global B | Policy |
 |---:|---:|---:|---|
-| 8 | 4 | 32 | Random |
-| 8 | 4 | 32 | Hungarian-current |
-| 8 | 8 | 64 | Random |
-| 8 | 8 | 64 | Hungarian-current |
+| 4 | 4 | 16 | Random |
+| 4 | 4 | 16 | Hungarian-current |
 | 4 | 8 | 32 | Random |
 | 4 | 8 | 32 | Hungarian-current |
+| 4 | 16 | 64 | Random |
+| 4 | 16 | 64 | Hungarian-current |
 
-R4 must use the same physical GPU selection as the completed study: **0,1,4,5**, unless the owner explicitly changes it.
+Every physical run must use GPUs **0,1,4,5**. **Do not launch any R8 job.**
 
 No same+path tuning. No new admission weights. No cache-ratio sweep.
 
-Optional profiles are gated on the controller analysis and limited to Random/Current for R8/B4 and R4/B8.
+Optional profiles are gated on the controller analysis and preselected to Random/Current for R4/B4 and R4/B8 only.
 
 ## 10. Required artifacts
 
@@ -447,7 +453,7 @@ Stop after:
 
 1. instrumentation parity tests;
 2. retrospective analysis;
-3. six diagnostic GPU runs;
+3. six four-GPU diagnostic runs;
 4. own-trajectory and matched-demand CPU replays;
 5. controller/trajectory result packet.
 

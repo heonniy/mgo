@@ -10,7 +10,7 @@ Read in order:
 
 ## Objective
 
-Explain why Hungarian-current is strongly faster than Balanced Random at R8/B4 but slower at R8/B8 and R4/B8.
+Explain, using only new four-GPU runs, how Hungarian-current changes controller/cache trajectory across local batch sizes and why R4/B8 is slower than Balanced Random. Existing R8 results are retrospective context only.
 
 Do not design a new policy yet.
 
@@ -51,15 +51,15 @@ Track each admission to its next raw demand and report next-use survival/reload 
 
 ## GPU scope
 
-Run only:
+Run only on physical GPUs **0,1,4,5**:
 
-- R8/B4 Random + Hungarian-current;
-- R8/B8 Random + Hungarian-current;
-- R4/B8 Random + Hungarian-current.
+- R4/B4 Random + Hungarian-current;
+- R4/B8 Random + Hungarian-current;
+- R4/B16 Random + Hungarian-current.
 
 Use 64 decode steps, one detailed diagnostic run per condition.
 
-R4 uses physical GPUs 0,1,4,5.
+**Do not launch any R8 job.**
 
 These diagnostic wall times are not new speedup claims; use the existing five-repeat E2E study for performance.
 
