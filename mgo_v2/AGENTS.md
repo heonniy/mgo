@@ -20,7 +20,10 @@ The batch packet now has B4/B8/B16/B32, with exactly three new captures
 The owner requests idle load on all eight GPUs whenever experiments are not
 running, and then specified real model inference rather than GEMM burn.
 Use `examples/model_inference_load.py`: resident Qwen1.5-MoE-A2.7B-Chat,
-BF16, local batch8/max128 input tokens, repeated forwards without KV growth.
+BF16, current idle local batch1024/max128 input tokens, repeated forwards
+without KV growth; last-token logits only. This idle batch is separate from
+the completed B4-B32 research matrix. Read `MODEL_INFERENCE_LOAD.md` in the
+experiment packet for live settings and measured utilization.
 Pause our eight inference workers for experimental stages; resume on exit,
 including failure. Never kill another user's jobs. Workers yield to another
 compute process, temperature >=85 C, GPU free <8 GiB or host free <128 GiB.
