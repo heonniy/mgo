@@ -1,5 +1,15 @@
 ## New priority — Fetch/Communication Pareto with P2P-disabled H100 (2026-10-02)
 
+**Bounded cuMem diagnosis complete (2026-10-03): CUMEM_PATH_UNSTABLE.**
+All three fresh default-T0 trials selected P2P/CUMEM and timed out at the
+90-second bound. The single NCCL_CUMEM_ENABLE=0 diagnostic selected P2P/IPC
+and passed four-rank payload validation. This supports path-specific
+instability, not an established driver root cause. No E1 retry or model
+work was started; the alternate path is not adopted as T0. Target GPUs
+0,1,4,5 were released; other GPU jobs were not modified. Read
+`CUMEM_PREFLIGHT_RETRY_RESULTS.md` and `cumem_preflight_retry.json`.
+Stop here: do not add retries, change the timed baseline or reset drivers.
+
 **Immediate follow-up after `b71199c`: bounded P2P/CUMEM diagnosis and conditional E1 retry.**
 Read `experiments/fetch_comm_pareto_p2p_20261002/CUMEM_PREFLIGHT_RETRY.md`.
 Run exactly three fresh default-T0 32-KiB preflights plus one diagnostic

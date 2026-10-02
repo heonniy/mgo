@@ -19,6 +19,14 @@ def main():
                          target_gpus_released=t['target_gpus_released'],stop_reason=t['stop_reason']))
     for path in sorted(ROOT.glob('*/*')):
         if path.is_file():raw.append(dict(path=str(path),bytes=path.stat().st_size,sha256=sha(path)))
+    timeout_evidence=[]
+    for t in trials:
+        path=ROOT/t['trial']/'stall_evidence.json'
+        if path.exists():
+            raw_evidence=json.loads(path.read_text())
+            timeout_evidence.append(dict(trial=t['trial'],signal_elapsed_seconds=t['signal_elapsed_seconds'],
+                wait_channels=[dict(pid=x['pid'],wchan=x['wchan']) for x in raw_evidence['process_wait_channels']],
+                memory_at_last_sample=raw_evidence['last_memory_sample'],raw_path=str(path),sha256=sha(path)))
     diagnosis=progress.get('diagnosis','BLOCKED_DIAGNOSIS')
     if progress['status']=='COMPLETE':
         assert len(trials)==4 and [t['cumem_disabled'] for t in trials]==[False,False,False,True]
@@ -35,7 +43,7 @@ def main():
     result=dict(status=progress['status'],diagnosis=diagnosis,plan_commit=progress['plan_commit'],trials=rows,
                 default_passes=sum(t['status']=='PASS' for t in trials[:3]),default_trials=3,
                 E1_retry_authorized=progress.get('E1_retry_authorized',False),E1_started=False,model_runs=0,
-                memory=mem,source_sha256=progress['source_sha256'],raw_receipts=raw,
+                memory=mem,source_sha256=progress['source_sha256'],raw_receipts=raw,timeout_evidence=timeout_evidence,
                 other_gpu_jobs_modified=False,driver_reset=False,transport_knob_search=False,
                 cumem_disabled_baseline_adopted=False)
     write(PACKET/'cumem_preflight_retry.json',result)

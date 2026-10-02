@@ -1,5 +1,5 @@
 {
-  "status": "RUNNING",
+  "status": "COMPLETE",
   "plan_commit": "9d6fea4011c7c5662c109fb57b1a4dac6d4f1d07",
   "trials": [
     {
@@ -837,6 +837,543 @@
         "unix": 1790962879.259443
       },
       "target_gpus_released": true
+    },
+    {
+      "status": "TIMEOUT",
+      "trial": "D1_2",
+      "cumem_disabled": false,
+      "timeout_seconds": 90,
+      "command": [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nproc_per_node=4",
+        "/home/hwlee/mgo/mgo_v2/examples/cumem_retry_smoke.py",
+        "--output",
+        "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/cumem_retry_20261003/D1_2"
+      ],
+      "started_unix": 1790962881.3122725,
+      "memory": [
+        {
+          "host_available_bytes": 1992457129984,
+          "gpu": {
+            "0": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "1": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "4": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "5": {
+              "free_mib": 81090,
+              "used_mib": 0
+            }
+          },
+          "unix": 1790962880.9884548
+        },
+        {
+          "host_available_bytes": 1990777647104,
+          "gpu": {
+            "0": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "1": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "4": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "5": {
+              "free_mib": 81087,
+              "used_mib": 4
+            }
+          },
+          "unix": 1790962886.8951817,
+          "group_rss_bytes": 2875711488
+        },
+        {
+          "host_available_bytes": 1988762333184,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962892.4148414,
+          "group_rss_bytes": 4971675648
+        },
+        {
+          "host_available_bytes": 1988709027840,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962898.0619717,
+          "group_rss_bytes": 4971675648
+        },
+        {
+          "host_available_bytes": 1988798771200,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962903.7534926,
+          "group_rss_bytes": 4971675648
+        },
+        {
+          "host_available_bytes": 1988744765440,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962909.8169496,
+          "group_rss_bytes": 4971675648
+        },
+        {
+          "host_available_bytes": 1988714237952,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962916.6626294,
+          "group_rss_bytes": 4971675648
+        },
+        {
+          "host_available_bytes": 1988785500160,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962922.1637738,
+          "group_rss_bytes": 4971945984
+        },
+        {
+          "host_available_bytes": 1988743102464,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962927.996383,
+          "group_rss_bytes": 4972548096
+        },
+        {
+          "host_available_bytes": 1988755943424,
+          "gpu": {
+            "0": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "1": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "4": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            },
+            "5": {
+              "free_mib": 79777,
+              "used_mib": 1313
+            }
+          },
+          "unix": 1790962933.5024185,
+          "group_rss_bytes": 4972818432
+        },
+        {
+          "host_available_bytes": 1988698787840,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962938.965993,
+          "group_rss_bytes": 5011755008
+        },
+        {
+          "host_available_bytes": 1988724523008,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962944.7204728,
+          "group_rss_bytes": 5012541440
+        },
+        {
+          "host_available_bytes": 1988709584896,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962950.6043372,
+          "group_rss_bytes": 5013327872
+        },
+        {
+          "host_available_bytes": 1988702478336,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962956.7237942,
+          "group_rss_bytes": 5013327872
+        },
+        {
+          "host_available_bytes": 1988637040640,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962962.439982,
+          "group_rss_bytes": 5013327872
+        },
+        {
+          "host_available_bytes": 1988674179072,
+          "gpu": {
+            "0": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "1": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "4": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            },
+            "5": {
+              "free_mib": 78439,
+              "used_mib": 2651
+            }
+          },
+          "unix": 1790962968.4687257,
+          "group_rss_bytes": 5013327872
+        }
+      ],
+      "pid": 1961822,
+      "signal_elapsed_seconds": 90.0001567620784,
+      "exit_code": 1,
+      "stop_reason": "90-second timeout",
+      "finished_unix": 1790962973.075644,
+      "selected_transports": [
+        "P2P/CUMEM"
+      ],
+      "payload_valid_all_ranks": false,
+      "memory_after_cleanup": {
+        "host_available_bytes": 1992439111680,
+        "gpu": {
+          "0": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "1": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "4": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "5": {
+            "free_mib": 81090,
+            "used_mib": 0
+          }
+        },
+        "unix": 1790962973.213929
+      },
+      "target_gpus_released": true
+    },
+    {
+      "status": "PASS",
+      "trial": "D2",
+      "cumem_disabled": true,
+      "timeout_seconds": 90,
+      "command": [
+        "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nproc_per_node=4",
+        "/home/hwlee/mgo/mgo_v2/examples/cumem_retry_smoke.py",
+        "--output",
+        "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/cumem_retry_20261003/D2",
+        "--cumem-disabled"
+      ],
+      "started_unix": 1790962975.311227,
+      "memory": [
+        {
+          "host_available_bytes": 1992443101184,
+          "gpu": {
+            "0": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "1": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "4": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "5": {
+              "free_mib": 81090,
+              "used_mib": 0
+            }
+          },
+          "unix": 1790962974.8954635
+        },
+        {
+          "host_available_bytes": 1990790340608,
+          "gpu": {
+            "0": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "1": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "4": {
+              "free_mib": 81087,
+              "used_mib": 4
+            },
+            "5": {
+              "free_mib": 81087,
+              "used_mib": 4
+            }
+          },
+          "unix": 1790962980.7183883,
+          "group_rss_bytes": 2877521920
+        },
+        {
+          "host_available_bytes": 1992495099904,
+          "gpu": {
+            "0": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "1": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "4": {
+              "free_mib": 81090,
+              "used_mib": 0
+            },
+            "5": {
+              "free_mib": 81090,
+              "used_mib": 0
+            }
+          },
+          "unix": 1790962985.9637957,
+          "group_rss_bytes": 0
+        }
+      ],
+      "pid": 1963482,
+      "exit_code": 0,
+      "stop_reason": null,
+      "finished_unix": 1790962986.0315702,
+      "selected_transports": [
+        "P2P/IPC"
+      ],
+      "payload_valid_all_ranks": true,
+      "memory_after_cleanup": {
+        "host_available_bytes": 1992489447424,
+        "gpu": {
+          "0": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "1": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "4": {
+            "free_mib": 81090,
+            "used_mib": 0
+          },
+          "5": {
+            "free_mib": 81090,
+            "used_mib": 0
+          }
+        },
+        "unix": 1790962986.1461093
+      },
+      "target_gpus_released": true
     }
   ],
   "source_sha256": {
@@ -845,5 +1382,7 @@
   },
   "E1_started": false,
   "model_runs": 0,
-  "active_trial": "D1_2"
+  "active_trial": null,
+  "diagnosis": "CUMEM_PATH_UNSTABLE",
+  "E1_retry_authorized": false
 }

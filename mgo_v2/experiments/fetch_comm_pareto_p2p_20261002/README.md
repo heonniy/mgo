@@ -1,6 +1,15 @@
 # Fetch/Communication Pareto — H100 P2P on/off
 
-**Current status: E1 BLOCKED_PREFLIGHT (2026-10-03).**
+**Current diagnosis: CUMEM_PATH_UNSTABLE (2026-10-03).**
+Default P2P/CUMEM timed out in all three 90-second trials. The one
+cuMem-disabled diagnostic passed on P2P/IPC. This does not authorize
+adopting IPC as the T0 baseline. E1 was not retried and no model was started.
+Read [CUMEM_PREFLIGHT_RETRY_RESULTS.md](CUMEM_PREFLIGHT_RETRY_RESULTS.md),
+[diagnosis CSV](cumem_preflight_retry.csv), and
+[full evidence](cumem_preflight_retry.json). Target GPUs are released;
+stop for owner review.
+
+**Prior status: E1 BLOCKED_PREFLIGHT (2026-10-03).**
 T0 selected P2P/CUMEM but its tiny preflight did not complete within the
 180-second bound. No trace timing or E2 model run was started. This is not
 a NO_GAP measurement. The target GPUs were released without OOM. Read

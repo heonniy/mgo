@@ -1,3 +1,17 @@
+## Completed — bounded cuMem diagnosis
+
+**Bounded cuMem diagnosis complete (2026-10-03): CUMEM_PATH_UNSTABLE.**
+All three fresh default-T0 trials selected P2P/CUMEM and timed out at the
+90-second bound. The single NCCL_CUMEM_ENABLE=0 diagnostic selected P2P/IPC
+and passed four-rank payload validation. This supports path-specific
+instability, not an established driver root cause. No E1 retry or model
+work was started; the alternate path is not adopted as T0. Target GPUs
+0,1,4,5 were released; other GPU jobs were not modified. Read
+`CUMEM_PREFLIGHT_RETRY_RESULTS.md` and `cumem_preflight_retry.json`.
+Stop here: do not add retries, change the timed baseline or reset drivers.
+
+Earlier instructions below are historical.
+
 ## Immediate task — bounded CUMEM diagnosis and conditional E1 retry
 
 Current checkpoint: `b71199c`.
