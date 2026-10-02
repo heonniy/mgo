@@ -24,6 +24,7 @@ def pattern(rows,event,phase,src,dst,device):
 def main(a):
     assert BOOT['visible_gpu']==str([0,1,4,5][BOOT['local_rank']])
     want={'NCCL_P2P_LEVEL':'LOC','NCCL_IB_DISABLE':'1'} if a.mode=='R3' else {}
+    if getattr(a,'ipc_rebase',False):want['NCCL_CUMEM_ENABLE']='0'
     actual={k:v for k,v in os.environ.items() if k.startswith('NCCL_')}
     assert actual==want,(actual,want)
     source=json.loads(a.counts.read_text());validate_events(source['events'])
@@ -71,6 +72,7 @@ def main(a):
         repeats.append(dict(iteration=iteration,full_trace_cuda_interval_ms=begin.elapsed_time(end),wall_ms=wall_ms,
                             cumulative_pair_ms=sum(e['pair'] for e in event_ms),events_ms=event_ms,payload_valid=True))
     receipt=dict(status='PASS',rank=rank,boot=BOOT,mode=a.mode,pass_index=a.pass_index,transport_env=actual,
+                 ipc_rebase=getattr(a,'ipc_rebase',False),
                  counts_sha256=hashlib.sha256(a.counts.read_bytes()).hexdigest(),events=384,
                  warmup_full_traces=1,timed_full_traces=3,payload_valid=True,
                  no_model=True,no_expert_h2d=True,no_cache_controller=True,nccl_info_in_timing=False,
@@ -86,6 +88,7 @@ def main(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--counts',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--mode',choices=['T0','R3'],required=True);p.add_argument('--pass-index',type=int,choices=[0,1],required=True)
+    p.add_argument('--ipc-rebase',action='store_true')
     a=p.parse_args()
     try:main(a)
     except BaseException as exc:
