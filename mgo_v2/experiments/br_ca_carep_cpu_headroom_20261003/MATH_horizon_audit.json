@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "dataset": "MATH",
+  "requests": 512,
+  "logical_ranks": 8,
+  "local_batch": 64,
+  "new_generations_for_prefix": 0,
+  "prefix_verified_by_single_array_slicing": true,
+  "rank_receipts": [
+    {
+      "rank": 0,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank0/receipt.json",
+      "sha256": "4e0d1dbd14ff16c72de6558e376f3126cdb0a9ebc35c78fdca34ceaf24b1a06f"
+    },
+    {
+      "rank": 1,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank1/receipt.json",
+      "sha256": "3302a5e3e4f30392b7da74770eb3a47bed45eefc4bb442492c49c40f9f51cb10"
+    },
+    {
+      "rank": 2,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank2/receipt.json",
+      "sha256": "fc5aba137cb3f60b7e2f3d666101d74adbae2a83b7e9e77a184052b5ea7f4807"
+    },
+    {
+      "rank": 3,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank3/receipt.json",
+      "sha256": "25a944bad67be256bcfe7c734bef9ccf894dcac15d7db74094a95361db25c972"
+    },
+    {
+      "rank": 4,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank4/receipt.json",
+      "sha256": "0df39f135e023b26b6ae72055a59574aee886546a1d34bba9ad2cb7d76e9deca"
+    },
+    {
+      "rank": 5,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank5/receipt.json",
+      "sha256": "93d3a2ad2646302c0c026a9f427bfa8e9a138fd507c75b16fdb2b20f20e43a41"
+    },
+    {
+      "rank": 6,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank6/receipt.json",
+      "sha256": "a5e803d84f7e55f6982003b98074d81c37cc2ff3534f097c3bfc2efed2fff6d2"
+    },
+    {
+      "rank": 7,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/MATH/rank7/receipt.json",
+      "sha256": "80b78873154145316c1aee72e45967a38c8742eee59b9ebab30385418efd11b4"
+    }
+  ],
+  "definitions": {
+    "demand": "raw selected expert route count; all 1024 expert/rank pairs including zeros",
+    "top10": "top ceil(.1*128*8)=103 pairs per layer, stable expert/rank index tie",
+    "recurrence": "later same-layer raw rank demand; exclude final step from opportunity denominator",
+    "hot_overlap": "top 103 cumulative expert/rank pairs at steps 1..64 versus 65..256"
+  },
+  "horizons": [
+    {
+      "decode_steps": 64,
+      "routes": 12582912,
+      "gate_mass": 1572858.7977905273,
+      "active_experts_mean": 105.18294270833333,
+      "top10_share_mean": 0.3840061028798421,
+      "recurrence_fraction": 0.9950517110719257
+    },
+    {
+      "decode_steps": 256,
+      "routes": 50331648,
+      "gate_mass": 6291437.440444946,
+      "active_experts_mean": 109.03011067708333,
+      "top10_share_mean": 0.3454800645510356,
+      "recurrence_fraction": 0.9987928135241253
+    }
+  ],
+  "seen64_pairs_recurring_later_fraction": 0.9925125538020086,
+  "mean_hot_set_jaccard": 0.5585446360053122
+}

@@ -33,6 +33,7 @@ def main(name):
             offsets=np.cumsum(np.array([0]+[prefill]*48+[n]*(256*48),dtype=np.int64));total=int(offsets[-1]);np.save(dest/'offsets.npy',offsets);np.save(dest/'prefill_origins.npy',origins0);np.save(dest/'decode_origins.npy',origins);np.save(dest/'request_ids.npy',np.array(order,dtype=np.int32))
             selected=np.lib.format.open_memmap(dest/'selected.npy',mode='w+',dtype='uint8',shape=(total,8));weights=np.lib.format.open_memmap(dest/'weights.npy',mode='w+',dtype='float32',shape=(total,8));gates=np.lib.format.open_memmap(dest/'gates.npy',mode='w+',dtype='float32',shape=(257*48,128))
             history=GateHistory(48,128,128)
+            groups=[(np.array([j for j,req in enumerate(order) if req%8==rank]),np.array([req//8 for req in order if req%8==rank])) for rank in range(8)]
             for layer in range(48):
                 pos=int(offsets[layer]);tail=[]
                 for req,length in zip(order,lengths):
@@ -44,8 +45,9 @@ def main(name):
             for step in range(256):
                 for layer in range(48):
                     event=(step+1)*48+layer;lo=int(offsets[event]);probs=np.empty((n,128),dtype=np.float32)
-                    for j,req in enumerate(order):
-                        src=sources[req%8];idx=(step,layer,req//8);selected[lo+j]=src['decode_selected'][idx];weights[lo+j]=src['decode_weights'][idx];probs[j]=src['decode_router'][idx]
+                    for rank,(positions,locals_) in enumerate(groups):
+                        if not len(positions):continue
+                        src=sources[rank];selected[lo+positions]=src['decode_selected'][step,layer,locals_];weights[lo+positions]=src['decode_weights'][step,layer,locals_];probs[positions]=src['decode_router'][step,layer,locals_]
                     history.update(layer,probs);gates[event]=[history.score(layer,e) for e in range(128)]
             for a in (selected,weights,gates):a.flush()
             receipt=dict(status='PASS',dataset=name,world=world,local_batch=batch,requests=n,horizons=[64,256],prefill_tokens=prefill,decode_steps=256,event_count=257*48,request_order=order,order_rule='rank-major; request i -> i%R; within rank ascending request ID',W128='exact production GateHistory on active full float32 router probabilities',source_audit_sha256=sha(audit),files=[dict(name=f.name,bytes=f.stat().st_size,sha256=sha(f)) for f in sorted(dest.glob('*.npy'))])
