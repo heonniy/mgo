@@ -6,7 +6,8 @@ from run_timing_stability import ROOT,PACKET,P,PYTHON,env_for,sample,safe,write,
 def launch(label,args,world,preflight=False):
  out=ROOT/label;out.mkdir(exist_ok=False);initial=sample();safe(initial,True)
  env=env_for('env2');env['CUDA_VISIBLE_DEVICES']=','.join(map(str,range(world)))
- worker='env_offload_preflight.py' if preflight else 'stability_transport_scaling.py'
+ worker='stability_transport_scaling.py'
+ if preflight:args=['--kind','shm','--preflight']
  if preflight:env.update(NCCL_DEBUG='INFO',NCCL_DEBUG_SUBSYS='INIT,GRAPH,P2P,SHM',NCCL_DEBUG_FILE=str(out/'nccl-%h-%p.log'))
  command=[PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples'/worker),'--output',str(out),*args]
  state=dict(status='RUNNING',command=command,initial=initial,started_unix=time.time(),concurrent_monitor=False)

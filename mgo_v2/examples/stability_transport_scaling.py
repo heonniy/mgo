@@ -8,7 +8,7 @@ topo=json.loads((root/'topology.json').read_text());gpu=int(boot['visible_gpu'])
 import torch
 import torch.distributed as dist
 import numpy as np
-p=argparse.ArgumentParser();p.add_argument('--kind',choices=['h2d','shm'],required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--preflight',action='store_true');p.add_argument('--kind',choices=['h2d','shm'],required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 torch.set_num_threads(1);torch.cuda.set_device(0)
 dist.init_process_group('gloo' if a.kind=='h2d' else 'nccl',**({} if a.kind=='h2d' else {'device_id':torch.device('cuda:0')}))
 rank=dist.get_rank();world=dist.get_world_size();rows=[]
@@ -35,14 +35,17 @@ else:
    if rank in (low,high):
     send=torch.full((kib*1024,),47,dtype=torch.uint8,device='cuda');recv=torch.empty_like(send);times=[]
     begin,end=torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True);torch.cuda.synchronize()
-    for i in range(70):
+    for i in range(1 if a.preflight else 70):
      begin.record()
      if rank==low:dist.send(send,high);dist.recv(recv,high)
      else:dist.recv(recv,low);dist.send(recv,low)
      end.record();end.synchronize()
      if i>=20:times.append(begin.elapsed_time(end))
     assert torch.equal(recv,send)
-    rows.append(dict(kind='SHM_dispatch_return',gpu=gpu,pair=[low,high],initiator=rank==low,payload_bytes=kib*1024,warmups=20,repeats=50,median_ms=float(np.median(times)),p90_ms=float(np.percentile(times,90)),samples_ms=times,affinity=cpus,boot=boot))
+    if a.preflight:
+     rows.append(dict(kind='SHM_transport_preflight',pair=[low,high],payload_bytes=kib*1024,payload_valid=True))
+    else:
+     rows.append(dict(kind='SHM_dispatch_return',gpu=gpu,pair=[low,high],initiator=rank==low,payload_bytes=kib*1024,warmups=20,repeats=50,median_ms=float(np.median(times)),p90_ms=float(np.percentile(times,90)),samples_ms=times,affinity=cpus,boot=boot))
    dist.barrier(group=cpu)
  dist.destroy_process_group(cpu)
 dist.barrier();dist.destroy_process_group()
