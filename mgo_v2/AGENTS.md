@@ -1,3 +1,20 @@
+**REVISED OWNER PRIORITY (2026-10-03): BR / CA / CA-rep CPU headroom with SERE calibration + two workloads.**
+Read `experiments/br_ca_carep_cpu_headroom_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Substitution calibration is NOT MATH/ShareGPT-specific. First reuse the existing
+similarity artifact only if provenance proves the same Qwen checkpoint,
+FineWeb-Edu 400 sequences x128 tokens, and SERE Frobenius output similarity;
+otherwise calibrate exactly once with that SERE-style setting. Workloads are
+(1) MATH test 512 and (2) ShareGPT V3 cleaned 512 conversational turns selected
+for naturally long responses; both use fixed 64 generated tokens for controlled
+decode-heavy traces. Load the 8-GPU model once, optionally calibrate, then
+capture the two 512-request master traces sequentially. Derive all R={4,8},
+B={8,16,32,64} workloads offline. Sweep global cache 30/40/50/60%, LRU/Gate,
+substitution OFF/ON, and BR/CA/CA-rep. Report exact/local/substitute/effective
+hits, residual miss, turnover/reload, H2D, peer and policy headroom. Maximum
+768 main +16 seed-audit CPU replays, up to 16 single-thread cells concurrently.
+No Env timing, accuracy, NCCL, B128, Coverage eviction or workload-specific
+similarity calibration.
+
 **Owner-authorized next study (2026-10-03): dynamic stale-replica refresh.**
 Read `experiments/dynamic_replica_refresh_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 The completed d666414 sweep showed cache relief can make replicas survive while

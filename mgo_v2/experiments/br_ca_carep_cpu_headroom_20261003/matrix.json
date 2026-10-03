@@ -1,0 +1,110 @@
+{
+  "status": "PLANNED_REVISED",
+  "checkpoint": "0cd0fa015b99625371c34224cef39c5f36c62068",
+  "terminology": {
+    "env1": "NVSwitch",
+    "env2": "P2P disabled",
+    "policies": [
+      "BR",
+      "CA",
+      "CA-rep"
+    ]
+  },
+  "calibration": {
+    "method": "SERE-style Frobenius output similarity",
+    "dataset": "FineWeb-Edu",
+    "sequences": 400,
+    "tokens_per_sequence": 128,
+    "total_tokens": 51200,
+    "seed": 42,
+    "reuse_existing_if_provenance_matches": true,
+    "gate_protect_threshold": 0.2,
+    "similarity_threshold": 0.65
+  },
+  "workloads": [
+    {
+      "name": "MATH",
+      "split": "test",
+      "samples": 512,
+      "seed": 42,
+      "selection": "stratified subject/difficulty",
+      "max_input_tokens": 512,
+      "fixed_decode_tokens": 64
+    },
+    {
+      "name": "ShareGPT V3 cleaned",
+      "samples": 512,
+      "seed": 44,
+      "filter": {
+        "prompt_tokens_min": 32,
+        "prompt_tokens_max": 512,
+        "reference_assistant_tokens_min": 128
+      },
+      "max_input_tokens": 512,
+      "fixed_decode_tokens": 64
+    }
+  ],
+  "logical_grid": {
+    "ranks": [
+      4,
+      8
+    ],
+    "local_batches": [
+      8,
+      16,
+      32,
+      64
+    ],
+    "cache_ratios": [
+      0.3,
+      0.4,
+      0.5,
+      0.6
+    ],
+    "evictions": [
+      "lru",
+      "gate"
+    ],
+    "substitution": [
+      false,
+      true
+    ]
+  },
+  "cache_budget": "global slots fixed by ratio, split evenly across R",
+  "BR": {
+    "seed": 42,
+    "balanced_quota": true
+  },
+  "CA": {
+    "kind": "current-demand balanced oracle",
+    "future_knowledge": false
+  },
+  "CA_rep": {
+    "primary": "CA",
+    "max_extra_replicas_per_new_miss_expert": 1,
+    "oracle_future_raw_demand": true,
+    "admission_threshold_bytes": 9437184,
+    "replica_protected": false
+  },
+  "replay_budget": {
+    "datasets": 2,
+    "base_configs_per_dataset": 128,
+    "policies_per_config": 3,
+    "main": 768,
+    "br_seed_audit_extra_max": 16,
+    "max_total": 784,
+    "max_parallel_cpu_cells": 16
+  },
+  "gpu_plan": {
+    "model_load_sessions": 1,
+    "optional_calibration_runs_max": 1,
+    "master_captures": 2,
+    "gpus": 8
+  },
+  "no_accuracy": true,
+  "no_env_timing": true,
+  "no_nccl_timing": true,
+  "no_b128": true,
+  "no_coverage_eviction": true,
+  "automatic_followup": false
+}
