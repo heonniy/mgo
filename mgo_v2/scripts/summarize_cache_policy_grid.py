@@ -204,6 +204,10 @@ def report(grid,fixed,frontiers,labels,validation):
          'short censored copies and a known-outcome fraction are included in replica_lifecycle.csv. '
          'Decode lifetime cohorts include decode-born copies, while decode service/eviction counters '
          'include all copies used or evicted in decode.','',
+         'The trace contains one prefill and eight decode forwards; these are short-horizon, cold-start '
+         'accounting results, not steady-state estimates. W128 is a token window: B8/global32 spans '
+         'four decode events per layer, while B32/global128 spans one. Batch comparisons therefore '
+         'include both changed demand and this prescribed history horizon.','',
          'Substitution counts accepted source expert-events; route/gate-mass fractions use raw selected '
          'routes and weights before target merging. Similarities are source-event weighted. '
          'H2D avoided is the signed difference against the matched OFF replay, not a timing saving.','',
@@ -228,13 +232,14 @@ def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check-only',action='store_true');a=parser.parse_args()
  if a.check_only:return
  progress=json.loads((P/'grid_progress.json').read_text());assert progress['status']=='PASS' and len(progress['completed'])==264
+ for source,expected in progress['source_hashes'].items():assert hashlib.sha256(Path(source).read_bytes()).hexdigest()==expected
  cells=[json.loads((ROOT/'cells'/(r['id']+'.json')).read_text()) for r in progress['completed']]
  assert len({c['id'] for c in cells})==264
  grid,fixed,frontiers,labels,equal=analyze(cells)
  saved=figures(grid,fixed,frontiers)
  s0=json.loads((P/'S0_capture.json').read_text());assert s0['status']=='PASS'
  statuses=[json.loads(p.read_text()) for p in (ROOT/'captures').glob('*/status.json')];assert len(statuses)==2 and all(r['status']=='PASS' for r in statuses)
- validation=dict(status='PASS',completed_cells=len(cells),fractional_B8=sum(c['batch']==8 for c in grid),fixed_B8=len(fixed),fractional_B32=sum(c['batch']==32 for c in grid),historical_five_rho_parity=json.loads((P/'S1_parity.json').read_text()),fixed460_cache30_equality=equal,peak_cpu_rss_mib=progress['peak_rss_mib'],capture_peak_group_rss_gib=max(m.get('group_rss_bytes',0) for r in statuses for m in r['memory'])/2**30,model_captures=2,capture_token_route_cache_parity=True,cpu_address_space_limit_bytes=8*2**30,cpu_processes=1,blas_omp_threads=1,cuda_visible_devices='',labels=[k for k,v in labels.items() if v],no_quality_claim=True,no_timing_claim=True,restored_workers=s0['restored_workers'],figures=saved,grid_seconds=sum(c['seconds'] for c in cells))
+ validation=dict(status='PASS',completed_cells=len(cells),fractional_B8=sum(c['batch']==8 for c in grid),fixed_B8=len(fixed),fractional_B32=sum(c['batch']==32 for c in grid),historical_five_rho_parity=json.loads((P/'S1_parity.json').read_text()),fixed460_cache30_equality=equal,peak_cpu_rss_mib=max(progress['peak_rss_mib'],max(c['peak_rss_mib'] for c in cells)),capture_peak_group_rss_gib=max(m.get('group_rss_bytes',0) for r in statuses for m in r['memory'])/2**30,model_captures=2,capture_token_route_cache_parity=True,cpu_address_space_limit_bytes=8*2**30,cpu_processes=1,blas_omp_threads=1,cuda_visible_devices='',labels=[k for k,v in labels.items() if v],no_quality_claim=True,no_timing_claim=True,restored_workers=s0['restored_workers'],figures=saved,grid_seconds=sum(c['seconds'] for c in cells))
  write('validation.json',validation)
  write('cell_receipts.json',[dict(id=c['id'],path=str(ROOT/'cells'/(c['id']+'.json')),sha256=hashlib.sha256((ROOT/'cells'/(c['id']+'.json')).read_bytes()).hexdigest()) for c in cells])
  report(grid,fixed,frontiers,labels,validation)
