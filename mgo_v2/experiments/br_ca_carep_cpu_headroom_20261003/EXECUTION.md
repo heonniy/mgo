@@ -66,5 +66,44 @@ expert-route demand. This minimizes return expert rows; dispatch rows are
 coalesced per token/destination, so the plan's parenthetical equivalence to
 minimizing total exact peer bytes does not generally hold. Report recomputed
 dispatch + return bytes, without claiming global optimality for their sum.
-No future information is used in CA. All further tie and replica-score rules
-will be fixed before CPU execution.
+No future information is used in CA.
+
+BR permutes sorted missing experts using NumPy's seeded legacy RNG, then pairs
+them with rank-major quota slots. Quota remainders go to the lowest ranks.
+CA uses an integer Hungarian assignment over those identical quota slots,
+scanning expert IDs and rank slots ascending for deterministic ties. First-copy
+admissions are applied in ascending expert order. The independent tests check
+exact optimal local demand by exhaustive enumeration, including ties.
+
+CA-rep considers only newly admitted residual-miss experts, ascending ID, after
+all mandatory admissions. For each non-primary rank, its optimistic bound is
+`V = 2 * 4096 * strictly_later_raw_decode_route_count`: at most one dispatch
+hidden row and one returned expert row can disappear per local route. This is
+an explicit optimistic upper bound, not an exact dispatch-coalesced forecast.
+Choose the greatest V (lowest-rank tie) and admit at >=9 MiB when an ordinary
+unpinned slot/victim exists. Exclude the current event from future V; include
+all decode events when admitting during prefill. Score bins include every new
+mandatory expert, even when the threshold fails. No rho cap, migration,
+protection beyond the event, future eviction foresight or future substitution.
+
+Native frozen substitution may target a protected miss that is being admitted
+in the same event. This is not a pre-existing resident cache hit. Report it as
+`shared_admission_substitutions`, separately from resident substitute hits.
+The exact partition is exact-global + resident-substitute + shared-admission +
+residual-source-miss = raw routes (and likewise gate mass). Effective hits are
+exact-global + resident-substitute, as the plan defines. Also report all
+substituted routes/mass so avoided source fetches are not lost. This preserves
+the original policy without relabeling shared admissions as cache hits.
+
+LRU/Gate physical-copy semantics match the preceding validated replay. Gate
+ties use last-use tick, then (layer,expert). Copy service alone touches LRU;
+fresh admissions get the current tick. Removing a primary promotes the lowest
+surviving rank. A replica is reused only if it serves after its admission event.
+`replica_victim_reloads` counts reloads whose last global disappearance was a
+replica admission's eviction; it is a direct mechanism count, not causal credit
+for all differences versus CA. Report matched CA-rep-minus-CA reloads as well.
+
+The 16 extra BR seed cells are fixed before results: both datasets x both
+horizons x two anchors x seeds {7,99}. Anchors: R4/B8/cache30/LRU/OFF and
+R8/B64/cache60/Gate/ON. Seed42 is already in the main matrix. No other seed
+audit cells or repetitions are added.
