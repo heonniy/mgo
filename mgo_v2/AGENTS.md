@@ -1,3 +1,21 @@
+**Latest owner resource policy (2026-10-03, after packet completion).**
+For future authorized CPU experiments, maximize useful throughput using available
+CPU affinity and measured memory headroom. Benchmark a small initial wave, then
+increase concurrent independent cells while throughput improves; avoid nested
+BLAS/OpenMP oversubscription, redundant runs, and repeated trace loading. Reuse
+validated completed cells and shared/read-only inputs. Reserve host memory for
+other users and model workers; enforce per-worker and aggregate memory limits
+and reduce concurrency under contention. The old 16-worker limit belongs to the
+completed packet, not a universal limit for future experiments. Record the
+chosen concurrency, measured throughput and peak RSS with each future run.
+No new scientific matrix or rerun is authorized by this resource preference.
+Dynamic refresh remains stopped. After GPU experiments, the owner now explicitly
+requests resident model inference load on all GPUs 0--7, superseding the older
+four-GPU restriction. Use `examples/model_inference_load.py` (neutral process
+name), currently batch 1024. Preserve its memory/temperature/foreign-process
+guards and hand GPUs back before an authorized experiment starts. See
+`operations/model_inference_load_20261003/` for the restart verification.
+
 **BR / CA / CA-rep two-horizon packet COMPLETE (2026-10-03).**
 Read `experiments/br_ca_carep_cpu_headroom_20261003/{RESULTS.md,validation.json}`.
 Two exact 512-request 256-decode master traces completed on all eight GPUs
