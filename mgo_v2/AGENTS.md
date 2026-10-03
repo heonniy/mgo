@@ -1,3 +1,11 @@
+**OWNER TRACE AMENDMENT (2026-10-03): decode256 master captures.**
+For the active BR / CA / CA-rep packet, capture MATH and ShareGPT once each on
+8 GPUs with exactly 256 decode tokens. decode64 is the first 64-step prefix of
+the same trace; no separate 64-token GPU run. Add only the lightweight raw
+routing 64-vs-256 horizon audit from PLAN.md. Do not double the CPU matrix
+without a later owner instruction. The FineWeb-Edu SERE calibration and all
+other BR / CA / CA-rep axes remain unchanged.
+
 **REVISED OWNER PRIORITY (2026-10-03): BR / CA / CA-rep CPU headroom with SERE calibration + two workloads.**
 Read `experiments/br_ca_carep_cpu_headroom_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 Substitution calibration is NOT MATH/ShareGPT-specific. First reuse the existing

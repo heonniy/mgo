@@ -32,8 +32,10 @@ Purpose: reasoning-heavy workload with structured multi-step generations.
 - stratify by subject/category and difficulty as evenly as available;
 - max input tokens: 512;
 - greedy/deterministic generation;
-- exactly 64 new tokens per request
-  (min_new_tokens=max_new_tokens=64);
+- exactly 256 new tokens per request
+  (min_new_tokens=max_new_tokens=256);
+- the first 64 decode steps are retained as an exact prefix horizon for a
+  controlled 64-vs-256 comparison;
 - accuracy is ignored.
 
 ### 2.2 ShareGPT
@@ -53,12 +55,13 @@ Select 512 human->assistant turns:
 - preserve the selected user prompt as the model request;
 - max input tokens: 512;
 - greedy/deterministic generation;
-- exactly 64 new tokens per request;
+- exactly 256 new tokens per request;
 - accuracy/reference matching is ignored.
 
 The response-length filter selects naturally decode-heavy conversational
-requests while the fixed 64-token generated horizon keeps CPU replay cost and
-cross-dataset comparisons controlled.
+requests. A single 256-token capture provides two exact horizons from the same
+generation: decode64 = the first 64 decode steps, and decode256 = the full
+trace. No separate 64-token GPU capture is allowed.
 
 ### 2.3 Master traces
 
@@ -73,7 +76,10 @@ For each master capture:
 - local batch=64;
 - global requests=512;
 - substitution OFF while capturing;
-- one prefill + exactly 64 decode steps;
+- one prefill + exactly 256 decode steps;
+- expose two trace horizons from the same raw capture:
+  - **decode64** = first 64 decode steps;
+  - **decode256** = all 256 decode steps;
 - no timing claim.
 
 Retain per request/token/layer:
@@ -86,7 +92,8 @@ Retain per request/token/layer:
 Do not store profiler traces.
 
 All R/batch CPU workloads are repacked from the corresponding dataset's one
-master trace.
+master trace. The 64-step workload must be obtained by truncating the same
+256-step trace, never by a second generation run.
 
 For each dataset:
 
@@ -108,6 +115,36 @@ Same-global comparisons:
 - R4/B16 vs R8/B8 = 64 requests;
 - R4/B32 vs R8/B16 = 128;
 - R4/B64 vs R8/B32 = 256.
+
+---
+
+
+### 2.4 Decode-horizon trace audit
+
+Immediately after each 256-step master capture, produce a lightweight raw-routing
+comparison for **decode64 vs decode256** from the same requests and same generated
+trajectory prefix. This is a trace characterization only; it does not change the
+BR / CA / CA-rep CPU matrix in this amendment.
+
+Required per-dataset horizon statistics:
+- total routed expert routes and gate mass;
+- active unique experts per layer/step;
+- rank-local expert demand p50/p90/p99/max;
+- top-10% rank-local demand share;
+- same-layer expert/rank recurrence over future decode steps;
+- fraction of expert/rank pairs seen in decode64 that recur after step 64;
+- hot-set overlap between steps 1--64 and 65--256;
+- per-layer demand-skew summary.
+
+The purpose is to answer cheaply whether a 64-token decode trace materially
+under-represents longer-horizon expert popularity/reuse. Store compact CSV/JSON
+summaries only. No extra GPU execution is allowed for this comparison.
+
+**Important scope:** this amendment changes only the 8-GPU trace collection and
+adds the raw 64-vs-256 horizon audit. The existing CPU replay grid/budget is not
+automatically doubled to both horizons. Because the 256-step master trace stores
+both horizons, a later owner decision can run the BR / CA / CA-rep CPU matrix at
+64, 256, or a selected subset without recapturing the model.
 
 ---
 
@@ -354,8 +391,11 @@ interruption.
 
 The expensive model is loaded only once for:
 - optional one-time SERE calibration if reuse is impossible;
-- MATH master capture;
-- ShareGPT master capture.
+- MATH 256-decode master capture;
+- ShareGPT 256-decode master capture.
+
+There is no separate decode64 capture; decode64 is the first 64 steps of each
+decode256 master trace.
 
 No GPU run is repeated for R/cache/eviction/substitution/policy combinations.
 

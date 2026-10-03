@@ -21,6 +21,10 @@ Workloads:
 1. **MATH** — reasoning-heavy decode workload.
 2. **ShareGPT** — general conversational / everyday serving workload.
 
+Each dataset is captured once for **256 decode tokens** on 8 GPUs. The
+**64-token horizon is the exact first 64 steps of that same capture**, so the
+64-vs-256 trace comparison requires no extra generation run.
+
 Substitution similarity uses the original **SERE-style FineWeb-Edu calibration**,
 not a workload-specific MATH calibration.
 

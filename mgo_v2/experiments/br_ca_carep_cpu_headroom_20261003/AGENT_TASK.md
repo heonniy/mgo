@@ -5,17 +5,21 @@ Checkpoint: 0cd0fa0.
 Read PLAN.md.
 
 1. Freeze two workload manifests:
-   - MATH test: 512, seed42, stratified, fixed 64 decode tokens;
+   - MATH test: 512, seed42, stratified, fixed 256 decode tokens;
    - ShareGPT V3 cleaned: 512 human->assistant turns, seed44, prompt 32--512
-     tokens, reference assistant >=128 tokens, fixed 64 generated tokens.
+     tokens, reference assistant >=128 tokens, fixed 256 generated tokens.
+   For both datasets, decode64 is the exact first-64-step prefix of the same
+   decode256 capture; do not run a second 64-token generation.
 2. Audit the current similarity artifact provenance.
    - Reuse only if it is the same Qwen checkpoint + FineWeb-Edu 400x128 +
      SERE Frobenius calibration.
    - Otherwise run that exact SERE-style calibration once.
    - Do not use MATH/ShareGPT or co-routed cosine for calibration.
-3. In one 8-GPU model-loading session, sequentially capture one 512-request
-   master trace for MATH and one for ShareGPT.
-4. Derive every R={4,8}, B={8,16,32,64} workload offline from each master.
+3. In one 8-GPU model-loading session, sequentially capture one 512-request,
+   256-decode-step master trace for MATH and one for ShareGPT.
+4. From each master, derive decode64 (first 64 steps) and decode256 (full 256),
+   commit the lightweight horizon audit required by PLAN.md, then derive every
+   R={4,8}, B={8,16,32,64} workload offline.
 5. Use global cache={30,40,50,60}%, eviction={LRU,Gate},
    substitution={OFF,ON}.
 6. Implement/validate BR, CA, CA-rep exactly as PLAN.md defines.

@@ -1,6 +1,6 @@
 {
-  "status": "PLANNED_REVISED",
-  "checkpoint": "0cd0fa015b99625371c34224cef39c5f36c62068",
+  "status": "PLANNED_REVISED_DECODE256_CAPTURE",
+  "checkpoint": "6817010e3be83feb6771b54f3046f9185fc6dc41",
   "terminology": {
     "env1": "NVSwitch",
     "env2": "P2P disabled",
@@ -29,7 +29,11 @@
       "seed": 42,
       "selection": "stratified subject/difficulty",
       "max_input_tokens": 512,
-      "fixed_decode_tokens": 64
+      "capture_decode_tokens": 256,
+      "trace_horizons": [
+        64,
+        256
+      ]
     },
     {
       "name": "ShareGPT V3 cleaned",
@@ -41,7 +45,11 @@
         "reference_assistant_tokens_min": 128
       },
       "max_input_tokens": 512,
-      "fixed_decode_tokens": 64
+      "capture_decode_tokens": 256,
+      "trace_horizons": [
+        64,
+        256
+      ]
     }
   ],
   "logical_grid": {
@@ -99,12 +107,24 @@
     "model_load_sessions": 1,
     "optional_calibration_runs_max": 1,
     "master_captures": 2,
-    "gpus": 8
+    "gpus": 8,
+    "master_capture_decode_tokens": 256,
+    "separate_decode64_capture": false,
+    "trace_horizon_audit": [
+      "decode64",
+      "decode256"
+    ]
   },
   "no_accuracy": true,
   "no_env_timing": true,
   "no_nccl_timing": true,
   "no_b128": true,
   "no_coverage_eviction": true,
-  "automatic_followup": false
+  "automatic_followup": false,
+  "scope_amendment": {
+    "gpu_trace_only": true,
+    "cpu_replay_budget_unchanged": true,
+    "cpu_matrix_not_doubled_for_horizon": true,
+    "note": "decode64 is a prefix of decode256; later CPU horizon expansion requires owner review"
+  }
 }
