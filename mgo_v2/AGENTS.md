@@ -1,3 +1,22 @@
+**NEW OWNER PRIORITY (2026-10-03): BR / CA / CA-rep CPU headroom on a decode-heavy MATH workload.**
+This supersedes further dynamic stale-replica-refresh exploration. If a refresh
+process is already running, preserve the current bounded cell/checkpoint and
+then stop that packet; do not launch more refresh cells.
+Read `experiments/br_ca_carep_cpu_headroom_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Terminology is fixed: Env 1=NVSwitch, Env 2=P2P disabled; policies are BR, CA,
+CA-rep. This packet is CPU headroom only: no Env timing. Use one 8-GPU model
+session to calibrate substitution on disjoint MATH-train data and capture one
+512-request MATH-test master trace with exactly 64 decode tokens; derive all
+R={4,8}, local-B={8,16,32,64} cells offline. Global cache ratios are
+30/40/50/60% independent of R; eviction LRU/Gate; substitution OFF/ON. BR uses
+balanced quotas + random assignment; CA uses the identical quotas with exact
+current-demand communication-aware assignment; CA-rep adds at most one
+future-popularity replica per new miss when optimistic remaining peer saving
+is >= one 9-MiB expert payload, and replicas remain normally evictable. Report
+exact/local/substitute/effective hits, residual miss, turnover/reload, H2D,
+peer and locality. Maximum 400 CPU replays. No accuracy, NCCL/E2E, B128,
+Coverage eviction, replica ratio, protection or online-controller timing.
+
 **Owner-authorized next study (2026-10-03): dynamic stale-replica refresh.**
 Read `experiments/dynamic_replica_refresh_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 The completed d666414 sweep showed cache relief can make replicas survive while
