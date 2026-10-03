@@ -75,13 +75,9 @@ def load_model():
 
 from env_offload_layout import plan_layout
 
-def device_layout(e):
- e=dict(e);d=lambda x:torch.tensor(x,dtype=torch.int64,device='cuda')
- e['send_idx']=d(e['send_idx']);e['send_eids']=d(e['send_eids']).reshape(-1,8)
- e['groups']=[(expert,d(rows),d(cols),slot) for expert,rows,cols,slot in e['groups']]
- e['return_order']=d(e['return_order']);e['combine']=[(d(idx),d(pos)) for idx,pos in e['combine']]
- e['targets']=d(e['targets']);e['selected']=d(e['selected'])
- return e
+from env_offload_tensors import pack_layouts
+
+def device_layout(e):return pack_layouts([e])[0]
 
 class Runtime:
  def __init__(self,args,model,experts,cap):
@@ -100,7 +96,7 @@ class Runtime:
    self.plan_proof=validation['ranks'][self.rank]
    assert hashlib.sha256((args.plan/f'rank{self.rank}.pkl.gz').read_bytes()).hexdigest()==self.plan_proof['schedule_file_sha256']
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
-   self.events=[device_layout(e) for e in self.events]
+   self.events=pack_layouts(self.events)
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
   for l,block in enumerate(model.model.layers):
    block.mlp.forward=types.MethodType(self.forward_for(l),block.mlp)
@@ -133,7 +129,7 @@ class Runtime:
     frozen=self.events[self.index]
     assert e['fetches']==frozen['fetches'] and e['send_counts']==frozen['send_counts'] and e['return_counts']==frozen['return_counts']
     assert np.array_equal(e['targets'],frozen['targets'].cpu().numpy())
-   self.metrics.append(row);e=device_layout(e)
+   self.metrics.append(row);e=device_layout(e) if self.args.phase=='PLAN' else self.events[self.index]
   else:e=self.events[self.index]
   assert e['layer']==layer
   self.mismatch.logical_or_((selected!=e['selected']).any())
@@ -174,7 +170,7 @@ def generate(model,rt,initial_ids,initial_mask):
     logits=out.logits[:,-1].clone();logits[:,model.generation_config.eos_token_id]=-torch.inf
     ids=logits.argmax(-1,keepdim=True);tokens.append(ids);mask=torch.cat((mask,mask.new_ones((mask.shape[0],1))),1)
    if step==0:torch.cuda.synchronize();decode_start=time.perf_counter();begin.record();rt.valid=None
-   if rt.args.phase=='PLAN' and step%16==0:print(json.dumps(dict(phase='PLAN',rank=rt.rank,decode=step)),flush=True)
+   if rt.args.phase!='MEASURE' and step%16==0:print(json.dumps(dict(phase=rt.args.phase,rank=rt.rank,decode=step)),flush=True)
   end.record();torch.cuda.synchronize();finish=time.perf_counter()
  result=torch.cat(tokens,1).cpu().numpy()
  assert rt.index==257*48 and not rt.mismatch.item()
@@ -213,7 +209,7 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])

@@ -6,7 +6,8 @@
 - Frozen communication layout ordering: PASS in 60 explicit-reference cases.
 - First P/BR physical PLAN: PASS. All 12336 events on eight ranks passed
   route/action artifact, communication-count and physical cache-slot validation.
-  COMPILE/warmup must pass before any MEASURE is accepted.
+  First P/BR COMPILE/warmup: PASS, including exact PLAN token/route/state
+  parity. P/CA PLAN is now in progress. No MEASURE sample is accepted yet.
 - Initial preparation failures are retained in `phase_receipts/`: conservative
   RSS guard stops (no OOM) and a corrected generation-config initialization
   error. Shared-memory accounting now uses PSS plus host-available guards.

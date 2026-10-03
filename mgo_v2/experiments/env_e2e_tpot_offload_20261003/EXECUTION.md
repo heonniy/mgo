@@ -66,3 +66,15 @@ host-available guard. Raw RSS and PSS are both recorded. The earlier RSS-guard
 failures are preserved, not treated as OOM or accepted scientific samples.
 A separate initialization failure from missing generation_config was corrected
 by loading the checkpoint generation_config explicitly.
+
+## Immutable metadata packing
+
+Subsequent phase initialization packs immutable integer routing indices into one
+device allocation instead of performing millions of tiny allocations/transfers.
+CPU validation compared 363778 index elements from six saved physical PLAN
+events exactly (values, shapes, dtypes and order). No expert kernel, cache
+policy, communication count or measurement workload changes. Every fresh GPU
+warmup still must match the validated PLAN before accepting timing. COUNTERS
+recomputes policy counts independently but executes the frozen GPU index tables;
+its device route-equality flag checks against the frozen PLAN, not its own
+newly observed routes. Per-step progress is emitted only in untimed phases.
