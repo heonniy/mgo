@@ -1,25 +1,7 @@
-# In progress — no accepted timing results yet
+# MATRIX_FAILED_OR_STOPPED
 
-- R8/R4 Env 1 P2P/IPC and Env 2 SHM/direct/direct preflights: PASS.
-- Incremental live policy versus the CPU reference: PASS, including full
-  256-decode replica-admission checks on P and R source traces.
-- Frozen communication layout ordering: PASS in 60 explicit-reference cases.
-- First P/BR physical PLAN: PASS. All 12336 events on eight ranks passed
-  route/action artifact, communication-count and physical cache-slot validation.
-  First P/BR COMPILE/warmup: PASS, including exact PLAN token/route/state
-  parity. P/CA and P/CA-rep PLAN execution also finished; the latter
-  is completing its full artifact audit before COMPILE. No MEASURE sample
-  is accepted yet.
-- Initial preparation failures are retained in `phase_receipts/`: conservative
-  RSS guard stops (no OOM) and a corrected generation-config initialization
-  error. Shared-memory accounting now uses PSS plus host-available guards.
+Accepted phase counts: {"PLAN": 3, "COMPILE": 6, "MEASURE": 10, "COUNTERS": 0}.
 
-Raw logs and guarded process state:
-`/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/`.
-Resident idle-load workers remain stopped while the physical study is active.
-See EXECUTION.md for implementation, safety and interpretation conventions.
+Partial results only. Inspect matrix_driver.log and summary.log in the raw root; no automatic scientific retry.
 
-A one-shot lifecycle supervisor watches the current matrix driver. It will
-validate/report the complete bounded matrix, or record partial failure without
-retrying science, and restore guarded resident models after all scientific
-processes exit (unless the owner STOP marker exists).
+Raw root: `/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003`.
