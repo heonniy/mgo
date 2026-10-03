@@ -3,7 +3,7 @@ import copy,json
 from pathlib import Path
 import numpy as np
 from cache_policy_cpu import CachePolicyReplay
-from dynamic_refresh_cpu import DynamicReplay,FutureDemand,project,peer_rows
+from dynamic_refresh_cpu import DynamicReplay,FutureDemand,project,peer_rows,removal_rows
 from replica_pareto_cpu import traffic
 
 
@@ -27,7 +27,7 @@ def fixture(policy,sub,seed):
     return b,events
 
 
-def bytes_of(p):return traffic(p['origins'],np.split(p['dest'],np.cumsum(p['lengths'])[:-1]),2)['peer_bytes']
+def bytes_of(p):return traffic(p['origins'],np.split(p['dest'],np.cumsum(p['lengths'])[:-1]),p['occupancy'].shape[1])['peer_bytes']
 
 def brute_best(b,events,current):
     options=[];layer=0
@@ -87,6 +87,17 @@ def main():
                 assert b.duplicates==2 and all(len(b.owners[k])>0 for k in b.owners)
         checks.append(policy+': exact selected swap against enumerated before/after traffic, OFF/ON, primary promotion and same-layer coalescing')
     assert swaps>0
+    b=DynamicReplay([4]*4,.25,'lru',np.ones((48,128,128),dtype=np.float32),False,'N0')
+    b.tick=1;b.begin_event(set())
+    for r,k,slot in [(1,(0,0),0),(0,(0,1),0),(2,(0,1),0),(3,(0,1),0),(0,(0,3),1)]:b.place(r,k,(slot,None))
+    origins=np.array([0,1,2,3,0,1,2,3]);effective=[[1,3],[1,3],[1,0],[1,0]]*2
+    before=project(b,0,origins,effective)
+    for rank in (0,2,3):
+        after=copy.deepcopy(b);after.owners[0,1].remove(rank)
+        if after.primary[0,1]==rank:after.primary[0,1]=min(after.owners[0,1])
+        expected=bytes_of(before)-bytes_of(project(after,0,origins,effective))
+        assert removal_rows(before,b,0,1,rank)*4096==expected
+    checks.append('R4 three-copy victim: primary promotion and remote-origin dispatch changes match full traffic')
     p=Path(__file__).resolve().parents[1]/'experiments/dynamic_replica_refresh_20261003/policy_tests.json'
     p.write_text(json.dumps(dict(status='PASS',checks=checks,independently_checked_swaps=swaps),indent=2)+'\n');print(p.read_text())
 if __name__=='__main__':main()
