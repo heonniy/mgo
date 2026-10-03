@@ -1,3 +1,17 @@
+**Owner-authorized next study (2026-10-03): dynamic stale-replica refresh.**
+Read `experiments/dynamic_replica_refresh_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+The completed d666414 sweep showed cache relief can make replicas survive while
+peer traffic rises because the historical duplicate cap stops new admissions
+once full. Reuse the validated B8/B32 traces and test duplicate-to-duplicate
+refresh only: N0 no-refresh, C1/C2 current exact-peer refresh, and O4/OR future
+route-demand oracles. Primary B32 uses cache40/60, LRU/GATE, substitution
+OFF/ON, rho .125/.25; B8 cache60 is secondary. 120 CPU cells total. A refresh
+may evict only an inactive duplicate, never the final global copy or an active
+copy, and must preserve unique coverage at the swap instant. First reproduce
+all N0 cells exactly. Report H2D/peer/reloads/locality, stale age/lifetime and
+resource-price break-evens. No GPU/model, quality, E2E/NCCL timing, new capture,
+B64/B128, R8 or retuning. Commit and stop for owner review.
+
 **Cache/eviction/substitution packet complete (2026-10-03).**
 Read `experiments/cache_eviction_substitution_20261003/{RESULTS.md,validation.json}`.
 Two compact gate-history captures match historical tokens/routes/cache hashes.

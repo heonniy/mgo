@@ -1,0 +1,92 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "d66641405f2aaa7ebeb28659aebc3511bd6ca444",
+  "source_commit": "d66641405f2aaa7ebeb28659aebc3511bd6ca444",
+  "primary": {
+    "batch": 32,
+    "cache_ratios": [
+      0.4,
+      0.6
+    ],
+    "evictions": [
+      "lru",
+      "gate"
+    ],
+    "substitution": [
+      false,
+      true
+    ],
+    "rhos": [
+      0.125,
+      0.25
+    ]
+  },
+  "secondary": {
+    "batch": 8,
+    "cache_ratios": [
+      0.6
+    ],
+    "evictions": [
+      "lru",
+      "gate"
+    ],
+    "substitution": [
+      false,
+      true
+    ],
+    "rhos": [
+      0.125,
+      0.25
+    ]
+  },
+  "refresh_policies": [
+    {
+      "name": "N0",
+      "kind": "no_refresh"
+    },
+    {
+      "name": "C1",
+      "kind": "current_exact_peer",
+      "max_swaps_per_event": 1
+    },
+    {
+      "name": "C2",
+      "kind": "current_exact_peer",
+      "max_swaps_per_event": 2
+    },
+    {
+      "name": "O4",
+      "kind": "future_route_oracle",
+      "future_same_layer_uses": 4,
+      "max_swaps_per_event": 1
+    },
+    {
+      "name": "OR",
+      "kind": "future_route_oracle",
+      "future_same_layer_uses": "remaining",
+      "max_swaps_per_event": 1
+    }
+  ],
+  "substitution_params": {
+    "gate_protect_threshold": 0.2,
+    "similarity_threshold": 0.65
+  },
+  "gate_window": 128,
+  "j_byte_lambdas": [
+    32,
+    64,
+    96,
+    128,
+    256
+  ],
+  "cpu_cells": {
+    "B32": 80,
+    "B8": 40,
+    "total": 120
+  },
+  "no_gpu": true,
+  "no_new_capture": true,
+  "no_quality": true,
+  "no_timing": true,
+  "automatic_followup": false
+}
