@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "dataset": "ShareGPT",
+  "requests": 512,
+  "logical_ranks": 8,
+  "local_batch": 64,
+  "new_generations_for_prefix": 0,
+  "prefix_verified_by_single_array_slicing": true,
+  "rank_receipts": [
+    {
+      "rank": 0,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank0/receipt.json",
+      "sha256": "9d44c5f6cc6c2d691d6fa16e98e5f2e8a2fb6661d9aee011ac5b4b1bb6ee56d5"
+    },
+    {
+      "rank": 1,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank1/receipt.json",
+      "sha256": "737aed0f96e21d74eb5262f1fead73c09000665914984f278e3267eee8425013"
+    },
+    {
+      "rank": 2,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank2/receipt.json",
+      "sha256": "9e662950587090c882960d25dd0c2afa8ccfec070ced92780c4104b6b79bfc98"
+    },
+    {
+      "rank": 3,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank3/receipt.json",
+      "sha256": "a48f47a9833e71e679819ef8e6fd2aa268ace05be3daaaad4fd7f9aef1493a34"
+    },
+    {
+      "rank": 4,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank4/receipt.json",
+      "sha256": "f02832f6c12cdb8def55b8aaaffc56fbe92fce53ef6ce66fd34ef405774162ca"
+    },
+    {
+      "rank": 5,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank5/receipt.json",
+      "sha256": "fc649997f71509d018a2fd7f529ad0a4afceaf63423b51ec6e9dccb317e169b4"
+    },
+    {
+      "rank": 6,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank6/receipt.json",
+      "sha256": "a53fb787d772d81002f02c9a51ed4f5df73cd42a7b6c1ebdaa7bf2ffe1b24131"
+    },
+    {
+      "rank": 7,
+      "path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/captures/ShareGPT/rank7/receipt.json",
+      "sha256": "81ba6746f1069e4359c689245d7d339abc75d452217c8edc313a0273846ab9df"
+    }
+  ],
+  "definitions": {
+    "demand": "raw selected expert route count; all 1024 expert/rank pairs including zeros",
+    "top10": "top ceil(.1*128*8)=103 pairs per layer, stable expert/rank index tie",
+    "recurrence": "later same-layer raw rank demand; exclude final step from opportunity denominator",
+    "hot_overlap": "top 103 cumulative expert/rank pairs at steps 1..64 versus 65..256"
+  },
+  "horizons": [
+    {
+      "decode_steps": 64,
+      "routes": 12582912,
+      "gate_mass": 1572859.6444091797,
+      "active_experts_mean": 122.23209635416667,
+      "top10_share_mean": 0.353498379389445,
+      "recurrence_fraction": 0.9952639098786951
+    },
+    {
+      "decode_steps": 256,
+      "routes": 50331648,
+      "gate_mass": 6291440.37727356,
+      "active_experts_mean": 125.42097981770833,
+      "top10_share_mean": 0.309673547744751,
+      "recurrence_fraction": 0.9992606249908753
+    }
+  ],
+  "seen64_pairs_recurring_later_fraction": 0.9997313661066684,
+  "mean_hot_set_jaccard": 0.6183204055600771
+}
