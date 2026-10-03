@@ -1,3 +1,17 @@
+**Owner-authorized CPU-only follow-up (2026-10-03): future rank-affinity single-copy placement.**
+The selective-replication study at `6a8127c` ended `NO_HEADROOM`, but
+rank-local recurrence was high. Change the action, not the signal: on an
+unavoidable global miss/reload, keep exactly one expert copy and choose which
+currently-demanding rank owns it. Read
+`experiments/future_rank_affinity_placement_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+First reproduce B8 F exactly, then compare F, current exact-byte oracle O0,
+and OH1/OH2/OH4/OHremaining. Run the same six policies on existing B16/B32
+as secondary traces: 18 CPU cells total. No duplicates, migration, prefetch,
+substitution, model/GPU/NCCL, new capture, R8 or cache sweep. Separate F->O0
+(current placement quality) from O0->OH (future affinity value), compare B8
+against the committed old replication frontier, commit compact results, and
+stop. Do not disturb the owner's eight resident-model GPU workers.
+
 **Rank-local reuse study complete (2026-10-03): NO_HEADROOM.**
 Read `experiments/rank_local_reuse_oracle_20261003/{RESULTS.md,validation.json}`.
 B8 F was reproduced exactly. The four-step marginal-byte recurrence share

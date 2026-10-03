@@ -1,0 +1,107 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "6a8127c48c37e2cbae4f346f60ca6dc59aca3f09",
+  "primary": {
+    "world_size": 4,
+    "local_batch": 8,
+    "global_batch": 32,
+    "cache_ratio": 0.3
+  },
+  "secondary": [
+    {
+      "world_size": 4,
+      "local_batch": 16,
+      "global_batch": 64,
+      "cache_ratio": 0.3
+    },
+    {
+      "world_size": 4,
+      "local_batch": 32,
+      "global_batch": 128,
+      "cache_ratio": 0.3
+    }
+  ],
+  "capacities": [
+    461,
+    461,
+    461,
+    460
+  ],
+  "expert_bytes": 9437184,
+  "row_bytes": 4096,
+  "policies": [
+    {
+      "name": "F",
+      "lookahead": 0,
+      "score": "max_current_route_count"
+    },
+    {
+      "name": "O0",
+      "lookahead": 0,
+      "score": "exact_current_peer_bytes"
+    },
+    {
+      "name": "OH1",
+      "lookahead": 1,
+      "score": "exact_current_plus_future_peer_bytes"
+    },
+    {
+      "name": "OH2",
+      "lookahead": 2,
+      "score": "exact_current_plus_future_peer_bytes"
+    },
+    {
+      "name": "OH4",
+      "lookahead": 4,
+      "score": "exact_current_plus_future_peer_bytes"
+    },
+    {
+      "name": "OHremaining",
+      "lookahead": "remaining_max_8",
+      "score": "exact_current_plus_future_peer_bytes"
+    }
+  ],
+  "candidate_owner_rule": "positive current demand ranks only",
+  "globally_unique_copy": true,
+  "replication": false,
+  "migration": false,
+  "substitution": false,
+  "prefetch": false,
+  "eviction": "LRU",
+  "active_protection": true,
+  "total_cpu_cells": 18,
+  "historical_B8": {
+    "F": {
+      "peer_activation_bytes": 334970880,
+      "expert_h2d_bytes": 166424739840
+    },
+    "rho_0125": {
+      "peer_activation_bytes": 262500352,
+      "expert_h2d_bytes": 196878532608
+    },
+    "K": {
+      "peer_activation_bytes": 194297856,
+      "expert_h2d_bytes": 235231248384
+    }
+  },
+  "gates": {
+    "future_affinity": {
+      "incremental_peer_reduction_vs_O0": 0.1,
+      "max_h2d_ratio_vs_O0": 1.05,
+      "alternate": "dominate any old nonzero-rho point"
+    },
+    "current_only": {
+      "peer_reduction_vs_F": 0.1,
+      "max_h2d_ratio_vs_F": 1.05
+    },
+    "modest": {
+      "peer_reduction_vs_F": 0.05,
+      "max_h2d_ratio_vs_F": 1.05
+    }
+  },
+  "cpu_only": true,
+  "max_address_space_gib": 4,
+  "gpu_runs": 0,
+  "new_model_captures": 0,
+  "automatic_followup": false
+}
