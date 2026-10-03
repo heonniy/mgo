@@ -89,7 +89,7 @@ class Runtime:
   self.cache=torch.empty((cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(cap,-1,np.int32);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
   self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0
   if args.phase in ('PLAN','COUNTERS'):
-   meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());sim=np.load(meta['similarity_path'])
+   meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];sim=np.load(meta['similarity_path'])
    self.policy=Policy(args.capacities,sim,args.substitution,['BR','CA','CA-rep'].index(args.policy))
    self.future=None
    if args.policy=='CA-rep':
@@ -187,7 +187,7 @@ def main(a):
  world=cell['ranks'];assert dist.get_world_size()==world
  total=int(48*128*cell['cache_ratio']);a.capacities=[total//world+(r<total%world) for r in range(world)]
  records=json.loads((SOURCE/(a.dataset+'_requests.json')).read_text())['requests'][:world*a.batch];records=records[rank::world]
- model,backing,experts=load_model();rt=Runtime(a,model,experts,a.capacities[rank]);rt.cpu_backing=backing
+ model,backing,experts=load_model();print(json.dumps(dict(event='MODEL_LOADED',phase=a.phase,rank=rank)),flush=True);rt=Runtime(a,model,experts,a.capacities[rank]);rt.cpu_backing=backing
  length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  if a.phase in ('PLAN','COUNTERS'):
@@ -204,6 +204,7 @@ def main(a):
   warm,tokens=generate(model,rt,ids,mask)
   expected=json.loads((a.plan/f'rank{rank}.json').read_text())
   assert all(warm[k]==expected[k] for k in ['token_hash','state_hash'])
+  print(json.dumps(dict(event='WARMUP_VALIDATED',phase=a.phase,rank=rank)),flush=True)
   if a.phase=='COMPILE':receipt=warm
   else:
    from torch._dynamo.utils import counters
@@ -212,7 +213,7 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])

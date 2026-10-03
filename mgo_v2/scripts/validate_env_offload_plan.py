@@ -10,8 +10,10 @@ def validate(path):
  for r,p in enumerate(ranks):
   receipt=json.loads(p.read_text());assert receipt['status']=='PASS' and receipt['phase']=='PLAN' and receipt['rank']==r
   source=path/f'rank{r}.pkl.gz'
-  with gzip.open(source,'rb') as f:events=pickle.load(f)
-  assert len(events)==12336 and sha(pickle.dumps(events,protocol=4))==receipt['action_hash']
+  with gzip.open(source,'rb') as f:payload=f.read()
+  assert sha(payload)==receipt['action_hash'],'serialized action payload changed'
+  events=pickle.loads(payload);del payload
+  assert len(events)==12336
   keys=np.full(receipt['cache_capacity'],-1,np.int32);route=hashlib.sha256();fetches=0;replicas=0
   for i,e in enumerate(events):
    assert e['layer']==i%48
