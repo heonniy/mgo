@@ -1,5 +1,13 @@
 # AGENT TASK — hot-expert replication threshold
 
+**Complete: CURRENT_BATCH_TOO_COLD under the pooled-median H4 rule.**
+H0/H1/H2/H4 passed; H3 skipped because all measured concurrent-H2D thresholds
+exceed observed demand. R3 has substantial pass/order dependence, so no robust
+hardware threshold is established. See RESULTS.md and validation.json.
+No B64/B128 capture or extra timing follows. Keep only our restored GPU
+0/1/4/5 model workers; our GPU 2/3/6/7 workers remain stopped.
+The queued instructions below are retained as history.
+
 This packet is QUEUED. Do not preempt the active
 `future_rank_affinity_placement_20261003` study.
 

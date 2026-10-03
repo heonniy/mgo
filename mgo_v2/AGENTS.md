@@ -1,4 +1,16 @@
-**QUEUED owner-authorized follow-up (2026-10-03): hot rank-local expert replication threshold.**
+**Hot-expert threshold packet complete (2026-10-03): CURRENT_BATCH_TOO_COLD under the pooled-median gate.**
+Read `experiments/hot_expert_replication_threshold_20261003/{RESULTS.md,validation.json}`.
+H0 and the bounded H1 calibration passed. Concurrent-H2D thresholds are
+T0 >512 and R3 512; B32 max remote demand is 32, so H3 has no candidates
+and no B64/B128 capture follows. R3 pass crossovers differ (512 versus 1),
+and single-rank pooled p90 crosses at 1; no robust intrinsic crossover is
+established. Preserve these sensitivity results, not just the gate label.
+Stop research work. Only our model workers on GPU 0/1/4/5 were restored;
+do not restart our owner-stopped workers on GPU 2/3/6/7 or touch new jobs
+there. No extra calibration, model run, threshold tuning or controller is
+authorized by this result. The original scope below is historical.
+
+**Owner-authorized follow-up (2026-10-03): hot rank-local expert replication threshold.**
 Do **not** preempt the active `future_rank_affinity_placement_20261003`
 packet. After that study commits and stops, read
 `experiments/hot_expert_replication_threshold_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.

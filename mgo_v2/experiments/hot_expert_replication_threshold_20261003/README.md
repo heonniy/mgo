@@ -1,6 +1,11 @@
 # Hot rank-local expert replication threshold
 
-Queued follow-up characterization.
+**Complete: CURRENT_BATCH_TOO_COLD under the frozen pooled-median gate.**
+The concurrent-H2D thresholds are T0 >512 and R3 512, versus observed B32
+maximum remote demand 32. H3 and larger-batch capture are skipped. R3's
+pass-dependent crossovers and single-rank p90 n=1 sensitivity prevent a
+robust hardware-threshold claim. Read [RESULTS.md](RESULTS.md) and
+[validation.json](validation.json); no extra runs follow automatically.
 
 Question:
 
