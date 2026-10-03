@@ -1,3 +1,18 @@
+**Owner-authorized cache/eviction/substitution characterization (2026-10-03).**
+Read `experiments/cache_eviction_substitution_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+The historical replication frontier was cache30 + LRU + exact-only. Test whether
+that regime caused the negative result by sweeping cache={30,40,50,60}%,
+eviction={LRU,GATE,COVERAGE}, substitution={OFF,ON}, and
+rho={0,.125,.25,.5,.75}. Substitution is frozen at gate protect .20 and
+similarity .65; coverage uses W=128/k=1/lambda=2. If needed, create exactly
+two diagnostic B8/B32 exact captures that store compact per-event gate-history
+score vectors and verify tokens/routes against existing captures. Historical
+cache30/LRU/exact B8 rho coordinates must reproduce exactly before the sweep.
+Run 120 B8 cells + 24 fixed-460-duplicate B8 controls + 120 B32 cells, CPU-only
+after capture. Report H2D/peer frontiers, reloads, unique coverage, replica
+lifetime/reuse and substitution system counters. No quality claim/run, B64,
+B128, R8, NCCL timing or physical F/K/C is authorized. Stop for owner review.
+
 **Owner-authorized mechanism-isolation study (2026-10-03): synthetic communication-price crossover.**
 **Complete: TIMING_UNSTABLE; exact C0 RESOURCE_PRICE_SHIFT retained.**
 Read the packet's RESULTS.md and validation.json. Exact lambda crossovers

@@ -1,0 +1,68 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "6fadd3a19553437b48c61888a2aa8594b1fcbb1f",
+  "batches": [
+    {
+      "local": 8,
+      "global": 32,
+      "role": "primary"
+    },
+    {
+      "local": 32,
+      "global": 128,
+      "role": "secondary"
+    }
+  ],
+  "cache_ratios": [
+    0.3,
+    0.4,
+    0.5,
+    0.6
+  ],
+  "evictions": [
+    "lru",
+    "gate",
+    "coverage"
+  ],
+  "substitution": [
+    {
+      "enabled": false
+    },
+    {
+      "enabled": true,
+      "gate_protect_threshold": 0.2,
+      "similarity_threshold": 0.65
+    }
+  ],
+  "gate_history_window": 128,
+  "coverage": {
+    "k": 1,
+    "lambda": 2
+  },
+  "rhos": [
+    0,
+    0.125,
+    0.25,
+    0.5,
+    0.75
+  ],
+  "fixed_duplicate_control_slots": 460,
+  "cpu_cells": {
+    "B8_fractional": 120,
+    "B8_fixed": 24,
+    "B32_fractional": 120,
+    "total": 264
+  },
+  "max_new_model_captures": 2,
+  "capture_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "no_quality_run": true,
+  "no_b64_b128": true,
+  "no_r8": true,
+  "no_new_nccl_timing": true,
+  "automatic_followup": false
+}
