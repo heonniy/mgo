@@ -1,0 +1,50 @@
+{
+  "status": "QUEUED_AFTER_R8_BEST",
+  "source_commit": "0b6da6ec403daf0e6567c1f405ae9ed297a76830",
+  "do_not_interrupt_inflight_r8": true,
+  "dataset": "ShareGPT",
+  "ranks": 4,
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "local_batch": 8,
+  "global_requests": 32,
+  "cache_percent": 30,
+  "eviction": "Gate",
+  "gate_window": 128,
+  "substitution": false,
+  "decode_tokens": 256,
+  "sample_seed": 205,
+  "dp_seed": 4,
+  "br_seed": 73,
+  "selected_manifest": "../ca_stress_workload_search_20261004/selected_manifests/ShareGPT_R4_B8_c30.json",
+  "expected_resource": {
+    "ca_peer_bytes": 14646489088,
+    "br_chosen_seed_peer_bytes": 20957196288,
+    "br_to_ca_peer_reduction": 0.3011236385476565,
+    "audited_seed_median_reduction": 0.2985930832691277,
+    "audited_seed_min_reduction": 0.29635511151595223,
+    "audited_seed_max_reduction": 0.3011236385476565
+  },
+  "environments": [
+    "Env1",
+    "Env2"
+  ],
+  "policies": [
+    "BR",
+    "CA"
+  ],
+  "repeats": 3,
+  "max_targeted_repeats_if_unstable": 2,
+  "harness": {
+    "monitor": "BOUNDARY",
+    "fixed_disjoint_cpu_affinity": true,
+    "expert_residency": "NORMAL",
+    "no_controller_in_measure": true,
+    "no_compile_in_measure": true
+  },
+  "automatic_followup": false
+}

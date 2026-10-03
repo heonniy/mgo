@@ -1,3 +1,14 @@
+**OWNER EXTENSION (2026-10-04): add R4-best physical stress cell after current R8 run.**
+Do not interrupt or mutate the in-flight R8-best validation. After it fully
+exits and commits, run `experiments/ca_stress_physical_validation_20261004/R4_AMENDMENT.md`.
+Use ShareGPT R4/local-B8/cache30, Gate W128, substitution OFF, decode256,
+sample205/dp4/BR-seed73 on physical GPUs 0,1,2,3. Frozen CPU expectation is
+~30.1124% chosen-seed BR->CA peer reduction (eight-seed range
+29.6355%--30.1124%). Compare BR vs CA in Env1 and Env2 with three clean repeats
+using the validated BOUNDARY + fixed-affinity harness. Controller/Hungarian
+work remains outside MEASURE. Commit R4 results and stop; no further cell is
+authorized.
+
 **OWNER PRIORITY (2026-10-04): one physical CA stress validation.**
 The timing harness is HARNESS_STABLE and the CA stress search is complete.
 Run exactly `experiments/ca_stress_physical_validation_20261004/` next.
