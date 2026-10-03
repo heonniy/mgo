@@ -165,7 +165,6 @@ def figures(cells,comparisons,age_rows,histograms):
         for policy in ('C1','C2'):
             rr=[r for r in decode if (r['batch'],r['policy'])==(batch,policy) and r['OR_has_positive_peer_gain']]
             if not rr:continue
-            x=[100*r['peer_reduction_fraction']/r['oracle_peer_gain_capture_fraction'] if r['oracle_peer_gain_capture_fraction'] else 0 for r in rr]
             # Obtain OR reductions directly to handle a zero current-policy gain.
             ors={(r['cache_ratio'],r['eviction'],r['substitution'],r['rho']):r for r in decode if r['batch']==batch and r['policy']=='OR'}
             x=[100*ors[r['cache_ratio'],r['eviction'],r['substitution'],r['rho']]['peer_reduction_fraction'] for r in rr]
@@ -208,11 +207,33 @@ def report(cells,comparisons,labels,validation):
         for policy in POLICIES[1:]:
             a=lookup[g,policy]['decode'];parts.append(f"{100*(base[T]-a[T])/base[T]:+.2f}% / {100*(a[H]-base[H])/base[H]:+.2f}%")
         rows.append(f'| B{g[0]} | {g[1]:.0%} | {g[2]} | {"ON" if g[3] else "OFF"} | {g[4]} | {base[H]/2**30:.3f} / {base[T]/2**20:.3f} | '+' | '.join(parts)+' |')
+    rows+=['','## Batch and cache comparison','',
+           'Equal-weight profile medians and ranges below summarize the eight eviction/substitution/rho combinations in each batch/cache group; they are descriptive and are not confidence intervals. The matched table above retains the LRU/GATE and substitution interactions.','',
+           '| Batch/cache | Policy | Peer reduction median [min, max] % | H2D change median % | Pareto improvements / 8 |',
+           '|---|---|---:|---:|---:|']
+    for batch,cache in ((32,.4),(32,.6),(8,.6)):
+        for policy in POLICIES[1:]:
+            rr=[r for r in decode if (r['batch'],r['cache_ratio'],r['policy'])==(batch,cache,policy)]
+            peer=[100*r['peer_reduction_fraction'] for r in rr];h2d=[100*(r['h2d_ratio']-1) for r in rr]
+            rows.append(f'| B{batch}/cache{cache:.0%} | {policy} | {np.median(peer):.2f} [{min(peer):.2f}, {max(peer):.2f}] | {np.median(h2d):+.2f} | {sum(r["pareto_dominates_N0"] for r in rr)} |')
+    age_rows=json.loads((P/'stale_age_summary.json').read_text())
+    rows+=['','## Observed victim demand','',
+           'Counts pool decode swaps across each batch. No later raw demand is measured on the removed copy\'s rank, conditional on remaining same-layer decode opportunity. It does not imply no remote service or permanent death. Each cell\'s copy-age/idle-age quantiles and the pooled age distributions are supplied separately.','',
+           '| Batch | Policy | No later raw rank demand / exposed victims | No remaining opportunity | Immediate savings MiB | Downstream residual MiB |',
+           '|---|---|---:|---:|---:|---:|']
+    for batch in (32,8):
+        for policy in POLICIES[1:]:
+            aa=[r for r in age_rows if (r['batch'],r['policy'],r['scope'])==(batch,policy,'decode')]
+            rr=[r for r in decode if (r['batch'],r['policy'])==(batch,policy)]
+            dead=sum(r['victims_with_no_later_raw_rank_demand'] for r in aa);exposed=sum(r['victims_with_future_decode_opportunity'] for r in aa)
+            tail=sum(r['no_future_opportunity'] for r in aa)
+            immediate=sum(r['immediate_peer_saved'] for r in rr)/2**20;downstream=sum(r['realized_downstream_peer_saved'] for r in rr)/2**20
+            rows.append(f'| B{batch} | {policy} | {dead}/{exposed} ({100*dead/exposed:.1f}%) | {tail} | {immediate:+.2f} | {downstream:+.2f} |' if exposed else f'| B{batch} | {policy} | 0/0 (undefined) | {tail} | {immediate:+.2f} | {downstream:+.2f} |')
     rows+=['','## Mechanism and attribution','',
            'Every refresh preserves the global unique-key set and duplicate count at the swap instant. Later eviction, reload, primary-owner and substitution trajectories can diverge, so mean unique coverage is measured rather than assumed equal. Refresh fetches are included in replica and total H2D counts.','',
            'Immediate savings are exact before/after service-byte differences at the accepted swap. The realized downstream residual equals total N0-minus-refresh peer savings minus those immediate savings. It measures effects of preceding refresh decisions on the subsequent real trajectory, including admissions and substitution; it is not additive causal credit for individual swaps. Both values, including negative residuals, remain in matched_comparisons.csv.','',
            'Victim copy age and idle age are measured in global layer events. Lifecycle summaries retain right-censored observed lower bounds and decode-born replica cohorts. Never-reused means no service in a later event before eviction/end; service at admission is excluded. A replica can become primary without ending its physical lifetime.','',
-           'The post-run victim-demand diagnostic uses raw rank demand only and is never available to C1/C2. It reports no later observed demand only among victims with at least one remaining same-layer decode opportunity; end-of-trace cases with no remaining opportunity are counted separately. This does not assert death beyond the short trace or equivalent effective demand under substitution.','',
+           'The post-run victim-demand diagnostic uses raw rank demand only and is never available to C1/C2. It reports no later observed demand only among victims with at least one remaining same-layer decode opportunity; end-of-trace cases with no remaining opportunity are counted separately. This does not assert death beyond the short trace, equivalent effective demand under substitution, or absence of remote service by a primary copy.','',
            '## Oracle interpretation','',
            'O4/OR score a static present-cache counterfactual over current service and four/all future decode opportunities for both affected layers. They include exact dispatch coalescing and duplicate-primary promotion. Future global misses use a virtual deterministic first-copy destination equally in both worlds. No future eviction or cache policy trajectory is predicted. Effective future routes use the unchanged substitution policy against the present global unique set. These are future-demand diagnostics, not guaranteed optimal sequential controllers; C1/C2 can exceed their realized benefit. See EXECUTION.md.','',
            '## Resource prices','',
