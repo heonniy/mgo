@@ -43,12 +43,29 @@ def main():
    for env in ['env1','env2']:
     a=next(r for r in summaries if (r['cell'],r['environment'],r['policy'])==(cell,env,left));b=next(r for r in summaries if (r['cell'],r['environment'],r['policy'])==(cell,env,right))
     gains.append(dict(cell=cell,environment=env,comparison=left+' -> '+right,**{k+'_gain':(a[k+'_median']-b[k+'_median'])/a[k+'_median'] for k in ['E2E_wall','TPOT']}))
+ expected=json.loads((PACKET/'expected_cpu_mechanism.json').read_text())['rows'];mechanisms=[];contrasts=[]
+ for gain in gains:
+  cell= gain['cell'];env=gain['environment'];left,right=gain['comparison'].split(' -> ')
+  a=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==(cell,env,left));b=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==(cell,env,right))
+  ca=next(r['counters'] for r in expected if (r['cell'],r['policy'])==(cell,left));cb=next(r['counters'] for r in expected if (r['cell'],r['policy'])==(cell,right))
+  mechanisms.append(dict(cell=cell,environment=env,comparison=gain['comparison'],expected_CPU_peer_gain=(ca['peer_bytes']-cb['peer_bytes'])/ca['peer_bytes'],physical_peer_gain=(a['peer_bytes']-b['peer_bytes'])/a['peer_bytes'],peer_direction_agrees=np.sign(ca['peer_bytes']-cb['peer_bytes'])==np.sign(a['peer_bytes']-b['peer_bytes']),physical_H2D_change=(b['H2D_bytes']-a['H2D_bytes'])/a['H2D_bytes'],physical_reload_change=(b['reload_bytes']-a['reload_bytes'])/max(1,a['reload_bytes'])))
+ for cell in CELLS:
+  for policy in CELLS[cell]:
+   a=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==(cell,'env1',policy));b=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==(cell,'env2',policy))
+   for k in ['H2D_bytes','peer_bytes','reload_bytes','exact_global_hits','exact_local_hits','resident_substitute_hits','effective_hits','residual_miss_routes','replica_fetches','replicas_reused']:assert a[k]==b[k],(cell,policy,'Env counter drift',k)
+ for cell in ['P','E']:
+  a=next(r for r in gains if r['cell']==cell and r['environment']=='env1' and r['comparison']=='BR -> CA');b=next(r for r in gains if r['cell']==cell and r['environment']=='env2' and r['comparison']=='BR -> CA')
+  contrasts.append(dict(cell=cell,**{k+'_Env2_minus_Env1_gain':b[k+'_gain']-a[k+'_gain'] for k in ['E2E_wall','TPOT']}))
+ csvwrite('mechanism_checks.csv',mechanisms);csvwrite('environment_contrast.csv',contrasts)
  csvwrite('timed_samples.csv',timing);csvwrite('timing_summary.csv',summaries);csvwrite('counter_summary.csv',counts);csvwrite('comparisons.csv',gains)
  (PACKET/'validation.json').write_text(json.dumps(dict(status='PASS',policy_environment_cells=len(summaries),timed_generations=len(timing),counters_separate=True,transfer_bytes_verified=True,raw_receipts=receipts),indent=2)+'\n')
- lines=['# Physical Env E2E / TPOT results','','Real Qwen3 expert offloading with CPU-resident weights, bounded GPU cache,','actual miss H2D, inter-rank activations and GPU expert execution. Controller','planning, compilation and counters are outside timing. No quality or physical','PCIe-equivalence claim.','','| Cell | Env | Policy | n | E2E median [range], s | TPOT median [range], ms |','|---|---|---|---:|---:|---:|']
+ lines=['# Physical Env E2E / TPOT results','','Real Qwen3 expert offloading with CPU-resident weights, bounded GPU cache,','actual miss H2D, inter-rank activations and GPU expert execution. Controller','planning, compilation and counters are outside timing. Intervals are the maximum',
+'over ranks. No quality or physical','PCIe-equivalence claim.','','| Cell | Env | Policy | n | E2E median [range], s | TPOT median [range], ms |','|---|---|---|---:|---:|---:|']
  for r in summaries:lines.append(f"| {r['cell']} | {r['environment']} | {r['policy']} | {r['repeats']} | {r['E2E_wall_median']:.3f} [{r['E2E_wall_min']:.3f}, {r['E2E_wall_max']:.3f}] | {1000*r['TPOT_median']:.3f} [{1000*r['TPOT_min']:.3f}, {1000*r['TPOT_max']:.3f}] |")
  lines+=['','## Comparisons','','Positive gain means the right policy is faster. These are median ratios.','','| Cell | Env | Comparison | E2E gain | TPOT gain |','|---|---|---|---:|---:|']
  for r in gains:lines.append(f"| {r['cell']} | {r['environment']} | {r['comparison']} | {r['E2E_wall_gain']:.2%} | {r['TPOT_gain']:.2%} |")
- lines+=['','Separate counters are in `counter_summary.csv`; raw sample ranges are in','`timed_samples.csv`. See EXECUTION.md for the frozen-baseline demand oracle,','pageable CPU source transfers, generation convention and resource corrections.','Policy-specific substitution trajectories are validated against their own PLAN,','not forced to the exact-only master trace. Timing alone does not establish a','communication mechanism; inspect peer/H2D/reload changes alongside each pair.']
+ lines+=['','Separate counters are in `counter_summary.csv`; raw sample ranges are in','`timed_samples.csv`. CPU/physical mechanism directions and H2D/reload changes',
+'are in `mechanism_checks.csv`; the primary Env contrast is in',
+'`environment_contrast.csv`. See EXECUTION.md for the frozen-baseline demand oracle,','pageable CPU source transfers, generation convention and resource corrections.','Policy-specific substitution trajectories are validated against their own PLAN,','not forced to the exact-only master trace. Timing alone does not establish a','communication mechanism; inspect peer/H2D/reload changes alongside each pair.']
  (PACKET/'RESULTS.md').write_text('\n'.join(lines)+'\n')
 if __name__=='__main__':main()
