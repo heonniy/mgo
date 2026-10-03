@@ -1,0 +1,837 @@
+{
+  "residency": "NORMAL",
+  "status": "PASS",
+  "label": "S3_2_env2",
+  "mode": "BOUNDARY",
+  "affinity": "fixed",
+  "environment": "env2",
+  "horizon": 64,
+  "started_unix": 1791051220.195027,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/timing_stability_residency_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/timing_stability_numa_20261004/S3_2_env2",
+    "--plan",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA-rep_env1_PLAN_0",
+    "--horizon",
+    "64",
+    "--mode",
+    "BOUNDARY",
+    "--affinity",
+    "fixed",
+    "--environment",
+    "env2",
+    "--residency",
+    "NORMAL"
+  ],
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      }
+    ],
+    "host_available_bytes": 1983068020736,
+    "unix": 1791051220.037265,
+    "foreign_pids": [],
+    "collection_seconds": 0.3143013622611761
+  },
+  "source_sha256": "e1a1a3ce7eb592c362e7c5acdb1f31811ca99062ed8eff87a049be48cb2c9d21",
+  "pid": 3208012,
+  "before_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 8609,
+        "free_mib": 72481,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 8301,
+        "free_mib": 72789,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 8089,
+        "free_mib": 73001,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 3,
+        "used_mib": 8431,
+        "free_mib": 72659,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 4,
+        "used_mib": 8131,
+        "free_mib": 72959,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 8449,
+        "free_mib": 72641,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 8877,
+        "free_mib": 72213,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 8213,
+        "free_mib": 72877,
+        "temperature_c": 34
+      }
+    ],
+    "host_available_bytes": 1513835614208,
+    "unix": 1791051430.0341215,
+    "rss_bytes": 938978148352,
+    "pss_bytes": 525479061504,
+    "foreign_pids": [],
+    "collection_seconds": 16.886900327168405
+  },
+  "GO_unix": 1791051446.7754152,
+  "boundary_wait_finished_unix": 1791051531.0077443,
+  "exit_code": 0,
+  "finished_unix": 1791051531.0077488,
+  "error": null,
+  "after_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      }
+    ],
+    "host_available_bytes": 1983099248640,
+    "unix": 1791051531.1508083,
+    "foreign_pids": [],
+    "collection_seconds": 0.29841436352580786
+  },
+  "E2E_wall": 71.32316317781806,
+  "decode_wall": 68.93979427684098,
+  "TPOT": 1.077185791015625,
+  "rank_receipts": [
+    {
+      "token_hash": "09a5e73185f0b819e5885d42abfe3ded75db8c59f44154cc65296d643e1afe00",
+      "state_hash": "4c69360d41b0dbabac92155a485a59810d6fcf3c17f043cc4f5ff5d26befee80",
+      "E2E_wall": 71.32218711730093,
+      "decode_wall": 68.93934868834913,
+      "TPOT": 1.0771724853515625,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 11469964,
+        "minor_after": 11472955,
+        "major_before": 1,
+        "major_after": 1,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3902,
+      "status": "PASS",
+      "rank": 0,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 0,
+        "visible_gpu": "0",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "95df35062071f9b78a8584474f18ebb515676934db692cccce2a575a70286d81",
+      "peak_gpu_allocated_bytes": 7394652672,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "24041103de0c0f777105e4f1020b89d5a1eb29bd8eb33c2ef450e25c4ffc9071",
+      "state_hash": "eec1e86a1420156cba35e3b21331050caa3861a665dc94b9f67d1cf527326cee",
+      "E2E_wall": 71.32316317781806,
+      "decode_wall": 68.93979427684098,
+      "TPOT": 1.077185791015625,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16323533,
+        "minor_after": 16326524,
+        "major_before": 276,
+        "major_after": 276,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3487,
+      "status": "PASS",
+      "rank": 1,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 1,
+        "visible_gpu": "1",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "7205b0885288093ab265994ba27de8b36f2627f603b806c8bd96c08f76a07e56",
+      "peak_gpu_allocated_bytes": 7144659968,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "b55bc6d9216276d4864456a1951b037d1bb6fa347a93d71af7eea830117eed90",
+      "state_hash": "f63f5c53e8300bd08c80d60462915f8bfd9d789a30ac9a3f040f554a7e7461d6",
+      "E2E_wall": 71.319509729743,
+      "decode_wall": 68.93612272851169,
+      "TPOT": 1.0771240234375,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16326692,
+        "minor_after": 16329682,
+        "major_before": 384,
+        "major_after": 384,
+        "minor_delta": 2990,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3708,
+      "status": "PASS",
+      "rank": 2,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 2,
+        "visible_gpu": "2",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "73dde278a8d2fc74a2e3527d0e3ee57c70c642944cc9e4b7c079afd2a21fb7a9",
+      "peak_gpu_allocated_bytes": 6919328256,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "db701c38323d5d2ff95e56174b5caffd1725c1e1a3710c75404042d374fd9acc",
+      "state_hash": "9ad32c7f007e32652cba281cafdd05a4e60767e557ada7331d0a07572180b713",
+      "E2E_wall": 71.32149292621762,
+      "decode_wall": 68.93895634822547,
+      "TPOT": 1.077169189453125,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16231916,
+        "minor_after": 16234907,
+        "major_before": 22,
+        "major_after": 22,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3488,
+      "status": "PASS",
+      "rank": 3,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 3,
+        "visible_gpu": "3",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "037efffd5683ed0082dc164d470a6fe00a75aa6a626ac49371d17cae51eedadd",
+      "peak_gpu_allocated_bytes": 7199702528,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "bca476fc8453de9d95de9b66ecd3c9e77cce4f1f6f16bed3adfae218a4dc1e64",
+      "state_hash": "73a39b092c8a045b854547d45e90a56da6f5f493a2f84dc777fbc198976db760",
+      "E2E_wall": 71.31852373760194,
+      "decode_wall": 68.93790950160474,
+      "TPOT": 1.07715185546875,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 15716526,
+        "minor_after": 15719517,
+        "major_before": 117,
+        "major_after": 117,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3578,
+      "status": "PASS",
+      "rank": 4,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 4,
+        "visible_gpu": "4",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "20424f7d11bdfbd031a2bf5db284b920fa09d2fa8a24c119bedb5b66d4477b92",
+      "peak_gpu_allocated_bytes": 6926351360,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "84c03b57a16d30c1b4e575463958a7e3e4297bec7729e77ca78ffec896d4bd41",
+      "state_hash": "d0e31f1a1b7183dbfd26feaa2abfec4b01a36fe7a96fc113e4b50ca6f9f4fdd8",
+      "E2E_wall": 71.31642324384302,
+      "decode_wall": 68.9309111982584,
+      "TPOT": 1.0770443115234376,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16184953,
+        "minor_after": 16187943,
+        "major_before": 130,
+        "major_after": 130,
+        "minor_delta": 2990,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3871,
+      "status": "PASS",
+      "rank": 5,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 5,
+        "visible_gpu": "5",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 15,
+        "unique_graphs": 3
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "bbd7acdc0a3bffc0d77ccc4b2c48c33997864dfaab29f1fa46ee1e0938f5f2e5",
+      "peak_gpu_allocated_bytes": 7160502272,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "497da712b65f3ae3f275ea8fd2f1529121a87bd850fbac1c52b8fe1906c339be",
+      "state_hash": "c8d214edd302f87f9bd651805f5e091b5868fc0039c59f8a35d514a44e41ad1e",
+      "E2E_wall": 71.31637752149254,
+      "decode_wall": 68.93346363306046,
+      "TPOT": 1.0770814208984374,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16198868,
+        "minor_after": 16201859,
+        "major_before": 27,
+        "major_after": 27,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3526,
+      "status": "PASS",
+      "rank": 6,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 6,
+        "visible_gpu": "6",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 10,
+        "unique_graphs": 2
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "d205bfd36de3a93a94b4dc7d6fbd9e84e1ac48d05a27d9b4c56e714a19e95940",
+      "peak_gpu_allocated_bytes": 7536076800,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    },
+    {
+      "token_hash": "8b74aeabc8bd24d00190030ea7aabe8a9355906337a1a9d83fb27ecd01e812a6",
+      "state_hash": "2e71213ad83b909265e92f077d03ea68d36fd2866b30f3dda30369201812ff12",
+      "E2E_wall": 71.31625339016318,
+      "decode_wall": 68.9332730397582,
+      "TPOT": 1.07708203125,
+      "residency": "NORMAL",
+      "page_faults": {
+        "minor_before": 16176147,
+        "minor_after": 16179138,
+        "major_before": 1,
+        "major_after": 1,
+        "minor_delta": 2991,
+        "major_delta": 0,
+        "host_before": {
+          "MemAvailable": 1513595854848,
+          "Cached": 1110131937280
+        },
+        "host_after": {
+          "MemAvailable": 1513542606848,
+          "Cached": 1110133481472
+        },
+        "scope": "rank process; includes boundary barriers, excludes warmup and PRETOUCH reads"
+      },
+      "pretouch_pages": 0,
+      "scheduled_CPU_experts": 3536,
+      "status": "PASS",
+      "rank": 7,
+      "phase": "MEASURE",
+      "horizon": 64,
+      "mode": "BOUNDARY",
+      "affinity": [
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191
+      ],
+      "affinity_mode": "fixed",
+      "environment": "env2",
+      "boot": {
+        "local_rank": 7,
+        "visible_gpu": "7",
+        "numa_node": 0,
+        "numa_policy": "membind-strict",
+        "strict_numa": true
+      },
+      "no_compile_in_measure": true,
+      "compiler_stats": {
+        "calls_captured": 10,
+        "unique_graphs": 2
+      },
+      "route_validation": "all frozen raw expert selections equal on device",
+      "schedule_file_sha256": "b1072eab202aa6ee576943ad3a8f655a7316db0c1fbf02b03be912b2fa6560d1",
+      "peak_gpu_allocated_bytes": 7045398528,
+      "cpu_pool": "existing pageable file-backed pool; node0 strict policy; no new locality claim"
+    }
+  ],
+  "monitor_scan_seconds": [
+    0.6882052002474666,
+    2.2023711185902357,
+    2.8156670182943344,
+    8.480091551318765,
+    15.448064918629825,
+    16.826306661590934,
+    17.14124513976276,
+    17.41138886846602,
+    17.22513293568045,
+    17.232334456406534,
+    17.222986727952957,
+    16.974552480503917
+  ]
+}
