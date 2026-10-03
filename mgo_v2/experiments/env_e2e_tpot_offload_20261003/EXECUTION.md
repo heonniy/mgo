@@ -78,3 +78,15 @@ warmup still must match the validated PLAN before accepting timing. COUNTERS
 recomputes policy counts independently but executes the frozen GPU index tables;
 its device route-equality flag checks against the frozen PLAN, not its own
 newly observed routes. Per-step progress is emitted only in untimed phases.
+
+## Completion lifecycle
+
+`finish_env_offload_matrix.py` watches the existing matrix PID and process-start
+identity. It does not schedule or retry experiments. After successful matrix
+completion it runs the acceptance checks/report; on failure it retains partial
+receipts. It waits for all scientific GPU children to exit before restarting
+`model_inference_load` workers, respects an owner STOP marker, checks fresh
+worker telemetry, and commits/pushes the final handoff receipt. External GPU
+work remains protected by the resident-worker guards. CPU-only synthetic report
+validation covered all 48 sample slots and rejection of a corrupted H2D total;
+these fixtures are not scientific results.

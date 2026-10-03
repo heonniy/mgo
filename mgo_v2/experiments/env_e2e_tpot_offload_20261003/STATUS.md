@@ -7,7 +7,9 @@
 - First P/BR physical PLAN: PASS. All 12336 events on eight ranks passed
   route/action artifact, communication-count and physical cache-slot validation.
   First P/BR COMPILE/warmup: PASS, including exact PLAN token/route/state
-  parity. P/CA PLAN is now in progress. No MEASURE sample is accepted yet.
+  parity. P/CA and P/CA-rep PLAN execution also finished; the latter
+  is completing its full artifact audit before COMPILE. No MEASURE sample
+  is accepted yet.
 - Initial preparation failures are retained in `phase_receipts/`: conservative
   RSS guard stops (no OOM) and a corrected generation-config initialization
   error. Shared-memory accounting now uses PSS plus host-available guards.
@@ -16,3 +18,8 @@ Raw logs and guarded process state:
 `/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/`.
 Resident idle-load workers remain stopped while the physical study is active.
 See EXECUTION.md for implementation, safety and interpretation conventions.
+
+A one-shot lifecycle supervisor watches the current matrix driver. It will
+validate/report the complete bounded matrix, or record partial failure without
+retrying science, and restore guarded resident models after all scientific
+processes exit (unless the owner STOP marker exists).

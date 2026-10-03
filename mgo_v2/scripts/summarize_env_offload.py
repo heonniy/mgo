@@ -35,6 +35,8 @@ def main():
     assert h2d>0 and h2d==sum(c[k] for k in ['first_fetches','reload_fetches','replica_fetches'])*9437184
     assert peer==(c['remote_token_rank_pairs']+c['remote_expert_routes'])*4096
     c.update(cell=cell,environment=env,policy=policy,H2D_bytes=h2d,peer_bytes=peer,reload_bytes=c['reload_fetches']*9437184,local_service_fraction=c['local_services']/c['effective_routes'])
+    for key in ['exact_global_hits','exact_local_hits','resident_substitute_hits','effective_hits','residual_miss_routes']:
+     c[key+'_fraction_of_raw_routes']=c[key]/c['raw_routes']
     counts.append(c);receipts.extend(dict(path=str(p),sha256=sha(p)) for p in path.glob('rank*.json'))
  gains=[]
  for cell in CELLS:
@@ -67,5 +69,18 @@ def main():
  lines+=['','Separate counters are in `counter_summary.csv`; raw sample ranges are in','`timed_samples.csv`. CPU/physical mechanism directions and H2D/reload changes',
 'are in `mechanism_checks.csv`; the primary Env contrast is in',
 '`environment_contrast.csv`. See EXECUTION.md for the frozen-baseline demand oracle,','pageable CPU source transfers, generation convention and resource corrections.','Policy-specific substitution trajectories are validated against their own PLAN,','not forced to the exact-only master trace. Timing alone does not establish a','communication mechanism; inspect peer/H2D/reload changes alongside each pair.']
+ lines+=['','## Decode wall consistency','','| Cell | Env | Policy | Decode wall median [range], s |','|---|---|---|---:|']
+ for r in summaries:lines.append(f"| {r['cell']} | {r['environment']} | {r['policy']} | {r['decode_wall_median']:.3f} [{r['decode_wall_min']:.3f}, {r['decode_wall_max']:.3f}] |")
+ lines+=['','## Separate counters','','Fractions use raw routed selections as denominator and are not additive.','Volumes are totals over all ranks.','','| Cell | Env | Policy | Exact global hit | Effective hit | Residual miss | H2D GiB | Peer GiB | Reload GiB |','|---|---|---|---:|---:|---:|---:|---:|---:|']
+ for r in counts:lines.append(f"| {r['cell']} | {r['environment']} | {r['policy']} | {r['exact_global_hits_fraction_of_raw_routes']:.2%} | {r['effective_hits_fraction_of_raw_routes']:.2%} | {r['residual_miss_routes_fraction_of_raw_routes']:.2%} | {r['H2D_bytes']/2**30:.3f} | {r['peer_bytes']/2**30:.3f} | {r['reload_bytes']/2**30:.3f} |")
+ substitution=[]
+ for env in ['env1','env2']:
+  for policy in ['BR','CA']:
+   on=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==('P',env,policy));off=next(r for r in counts if (r['cell'],r['environment'],r['policy'])==('E',env,policy))
+   a=next(r for r in summaries if (r['cell'],r['environment'],r['policy'])==('E',env,policy));b=next(r for r in summaries if (r['cell'],r['environment'],r['policy'])==('P',env,policy))
+   substitution.append(dict(environment=env,policy=policy,H2D_reduction=(off['H2D_bytes']-on['H2D_bytes'])/off['H2D_bytes'],residual_miss_fraction_off=off['residual_miss_routes_fraction_of_raw_routes'],residual_miss_fraction_on=on['residual_miss_routes_fraction_of_raw_routes'],**{k+'_gain_with_substitution':(a[k+'_median']-b[k+'_median'])/a[k+'_median'] for k in ['E2E_wall','TPOT']}))
+ csvwrite('substitution_control.csv',substitution)
+ lines+=['','## Substitution control','','P (ON) versus E (OFF) uses identical requests but policy-specific generated','trajectories. This is not a fixed-route causal estimate or an accuracy evaluation.','','| Env | Policy | H2D reduction | Miss fraction OFF → ON | E2E gain ON | TPOT gain ON |','|---|---|---:|---:|---:|---:|']
+ for r in substitution:lines.append(f"| {r['environment']} | {r['policy']} | {r['H2D_reduction']:.2%} | {r['residual_miss_fraction_off']:.2%} → {r['residual_miss_fraction_on']:.2%} | {r['E2E_wall_gain_with_substitution']:.2%} | {r['TPOT_gain_with_substitution']:.2%} |")
  (PACKET/'RESULTS.md').write_text('\n'.join(lines)+'\n')
 if __name__=='__main__':main()
