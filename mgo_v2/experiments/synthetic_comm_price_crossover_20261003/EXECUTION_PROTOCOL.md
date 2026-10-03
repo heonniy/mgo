@@ -59,3 +59,9 @@ Gamma is a synthetic remote-price multiplier, never a bandwidth ratio.
 
 Keep R3 only as previously documented unstable context. Stop after the fixed
 matrix and result commit; no new model, H2D, R3, batch, cache or replica policy.
+
+For the zero-peer rho=.75 control, preserve raw actual-minus-self differences
+and apply the original ±10% C2 agreement gate. The proposed C4 default is
+T_remote(.75)=0 after that gate passes, because gamma must price only remote
+traffic. This convention was raised with the owner before timing; absent an
+alternate preference it prevents amplifying a measured zero-traffic residual.
