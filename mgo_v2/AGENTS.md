@@ -1,3 +1,10 @@
+**OWNER CPU HORIZON AMENDMENT (2026-10-03): run both 64 and 256.**
+The owner explicitly selected both horizons after 986ba64: 1536 main CPU
+replays plus at most 16 seed-audit cells total. Read the current packet's
+EXECUTION.md. GPU 0--7 use is explicitly authorized; previous resident load
+workers were stopped. Dynamic refresh was stopped by owner at 99/120 cells
+and must not resume automatically. Earlier scope statements below are history.
+
 **OWNER TRACE AMENDMENT (2026-10-03): decode256 master captures.**
 For the active BR / CA / CA-rep packet, capture MATH and ShareGPT once each on
 8 GPUs with exactly 256 decode tokens. decode64 is the first 64-step prefix of

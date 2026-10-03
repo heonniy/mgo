@@ -98,10 +98,11 @@
     "datasets": 2,
     "base_configs_per_dataset": 128,
     "policies_per_config": 3,
-    "main": 768,
+    "main": 1536,
     "br_seed_audit_extra_max": 16,
-    "max_total": 784,
-    "max_parallel_cpu_cells": 16
+    "max_total": 1552,
+    "max_parallel_cpu_cells": 16,
+    "horizons": 2
   },
   "gpu_plan": {
     "model_load_sessions": 1,
@@ -126,5 +127,16 @@
     "cpu_replay_budget_unchanged": true,
     "cpu_matrix_not_doubled_for_horizon": true,
     "note": "decode64 is a prefix of decode256; later CPU horizon expansion requires owner review"
+  },
+  "owner_cpu_horizon_amendment": {
+    "source": "Owner reply: 256 / 64 \uac01\uac01 \ub458\ub2e4 \uc0ac\uc6a9",
+    "horizons": [
+      64,
+      256
+    ],
+    "main_per_horizon": 768,
+    "main_total": 1536,
+    "seed_audit_extra_max_total": 16,
+    "max_total": 1552
   }
 }

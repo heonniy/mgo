@@ -1,0 +1,46 @@
+{
+  "status": "REUSE_VERIFIED",
+  "model_revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+  "source_dataset": "HuggingFaceFW/fineweb-edu",
+  "source_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+  "seed": 42,
+  "selection": "first length-eligible unique documents in pinned file order; Q1 then Q2; no chat template; add_special_tokens=True; deterministic truncation",
+  "sequences": 400,
+  "tokens_per_sequence": 128,
+  "source_text_and_tokens_verified": 400,
+  "layer_matrices_verified": 48,
+  "method": "SERE Frobenius output similarity",
+  "normalization": "S_ij=1-||BF16(Y_i-Y_j)||_F / max_ab||BF16(Y_a-Y_b)||_F; norm rounded to BF16 by reference, stored in FP32 matrix; all selected calibration sequences concatenated before normalization; see per-layer samples field",
+  "similarity_path": "/home/hwlee/mgo-results/runtime_validation_20261001/similarity.npy",
+  "similarity_sha256": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+  "original_similarity_sha256": "dc9908934f5941deb5756c7808303d2631427149954e5d2dfedf71c7eeac26ad",
+  "reference_path": "/home/hwlee/sub-moe/reference/SERE/code/calibration/utils.py",
+  "reference_sha256": "627db6591f5817e912d44465283ec7337e5dd5deb6dee94ab1dc5309366a2979",
+  "input_manifest_path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/input_manifest.json",
+  "input_manifest_sha256": "17b6f0ef16986f6a6d28d2a45ce3e94f70f307dd51298b5c674230e8ef8115fc",
+  "fineweb_path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/input/sample/10BT/000_00000.parquet",
+  "fineweb_sha256": "b1ba7b2ce4cb5ea6ef42dca40263eabb85f37700d01693a68e9b30a31d78e871",
+  "lane_receipts": [
+    {
+      "path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/c2_lane0/receipt.json",
+      "sha256": "3e039cd21db5e1ae5b71a6fc7f1463d20b846f7ee0ee6e7206e80a65b337b3c9",
+      "environment_sha256": "ec86c77ffdffbfb41349c22337e607015148fe1ff0408e1f660a6cc3a8e3dc3b"
+    },
+    {
+      "path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/c2_lane1/receipt.json",
+      "sha256": "33a093b933bcd0681ebc369a360f3fdae3ea61f81fb64b3414e2561ecacd0b1a",
+      "environment_sha256": "12ed4b96cd5974b31bf83f065d168ab7c1b3acdb8996dde6be11f00bf90e7201"
+    },
+    {
+      "path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/c2_lane2/receipt.json",
+      "sha256": "140ea7b7f9cbf199c4c9213b7f149c87d999116888c4afcfc352747da8e9fd44",
+      "environment_sha256": "6686f33c1ba45f66d9b2929834bc93152062e0d78a4c12d905f19ea626373462"
+    },
+    {
+      "path": "/home/hwlee/sub-moe-results/substitution_characterization_20260928_r1/c2_lane3/receipt.json",
+      "sha256": "38d91b54542b91c33f38f400ef94ff5c2e87e4d6f789cda83d0c4a6666be47d8",
+      "environment_sha256": "529dd283ef4115485deb2ce8505c512e8086ea3e00d568270d64e3ab680a33ea"
+    }
+  ],
+  "recalibration_runs": 0
+}
