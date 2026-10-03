@@ -1,0 +1,70 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "ef5895a0c505eb26bf539c1a195f70a06570026f",
+  "current_policy_matrix": "PAUSED",
+  "diagnostic_workload": {
+    "source_cell": "P/CA-rep/Env1",
+    "horizon_decode_tokens": 64,
+    "reuse_frozen_schedule": true,
+    "confirmation_decode_tokens": 256
+  },
+  "S1_monitor_ab": {
+    "modes": [
+      "HEAVY",
+      "BOUNDARY"
+    ],
+    "order": [
+      "HEAVY",
+      "BOUNDARY",
+      "BOUNDARY",
+      "HEAVY",
+      "HEAVY",
+      "BOUNDARY"
+    ],
+    "monitor_confound_gate": {
+      "boundary_spread_percent_max": 5,
+      "heavy_median_slowdown_percent_min": 10,
+      "heavy_spread_ratio_min": 2
+    }
+  },
+  "S2_numa": {
+    "h2d_payload_mib": 9,
+    "h2d_warmups": 20,
+    "h2d_repeats": 50,
+    "shm_payload_kib": [
+      32,
+      128,
+      512
+    ],
+    "shm_warmups": 20,
+    "shm_repeats": 50,
+    "pairs": [
+      "same_numa",
+      "cross_numa"
+    ],
+    "env": "Env2"
+  },
+  "S3_stability": {
+    "envs": [
+      "Env1",
+      "Env2"
+    ],
+    "decode64_repeats_each": 3,
+    "order": [
+      "Env1",
+      "Env2",
+      "Env2",
+      "Env1",
+      "Env1",
+      "Env2"
+    ],
+    "pass_spread_percent_max": 5,
+    "preferred_spread_percent_max": 3,
+    "decode256_confirmation_repeats": 3
+  },
+  "no_policy_comparison_until_stable": true,
+  "no_profiler": true,
+  "no_new_compile": true,
+  "no_heavy_monitor_in_clean_measure": true,
+  "automatic_resume": false
+}

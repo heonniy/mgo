@@ -1,3 +1,17 @@
+**OWNER PRIORITY (2026-10-04): PAUSE policy timing; validate measurement stability first.**
+The physical BR/CA/CA-rep E2E matrix is suspended. Preserve completed receipts
+but launch no new policy-comparison cell after any already-running bounded run
+finishes. Read `experiments/timing_stability_numa_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Use the exact noisy P/CA-rep workload, first as a decode64 prefix, to isolate
+the current heavy PSS monitor versus a boundary-only no-concurrent-monitor
+timed region. Then characterize 9-MiB local/remote NUMA H2D and Env2
+same-NUMA vs cross-NUMA SHM at only 32/128/512 KiB. Freeze rank CPU/NUMA
+affinity and require <=5% within-environment timing spread before any policy
+timing resumes. If stable, confirm with three decode256 repeats; otherwise
+stop and report instability. No BR-vs-CA, CA-vs-CA-rep, seed/sample timing, or
+broader sweep is authorized until HARNESS_STABLE. Do not automatically resume
+the old matrix.
+
 **NEW OWNER PRIORITY (2026-10-03): physical Env 1 / Env 2 E2E + TPOT offloading.**
 Read `experiments/env_e2e_tpot_offload_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 This is a real Qwen3-30B-A3B expert-offloading experiment, not a byte/NCCL-only
