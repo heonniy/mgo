@@ -4,6 +4,7 @@ import os,argparse,json
 from pathlib import Path
 from mgo_v2.bootstrap import pin_rank_before_cuda_import
 BOOT=pin_rank_before_cuda_import()
+os.environ.pop('NCCL_P2P_DISABLE',None)
 import torch
 import torch.distributed as dist
 N_ROWS=(1,2,4,8,16,32,64,128,256,512)

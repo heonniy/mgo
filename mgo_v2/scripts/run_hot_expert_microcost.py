@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Guarded GPU0/1/4/5 handoff for the bounded model-free H1 calibration."""
-import json,os,signal,subprocess,time
+import argparse,json,os,signal,subprocess,time
 from pathlib import Path
 import batch_comm_common as common
 from run_rank_oracle_study import write
@@ -30,16 +30,25 @@ def restore(original,paused):
     assert all(r['gpu'] in TARGETS for r in restored)
     return restored
 
-def main():
+def main(resume_startup=False):
     assert json.loads((P.parent/'future_rank_affinity_placement_20261003/validation.json').read_text())['status']=='PASS'
     assert json.loads((P/'H0.json').read_text())['status']=='PASS'
-    assert not ROOT.exists(),'Do not automatically repeat H1'
-    ROOT.mkdir();common.ROOT=ROOT;common.PACKET=P
+    previous=None
+    if resume_startup:
+        previous=json.loads((P/'H1_startup_failure.json').read_text())
+        assert previous['status']=='FAIL' and [r['label'] for r in previous['cells']]==['smoke_T0','smoke_R3']
+        failed=ROOT/'pair_pass0_T0'
+        assert not list(failed.glob('rank*.json')) and "NCCL_P2P_DISABLE" in (failed/'run.log').read_text()
+        assert not (ROOT/'pair_pass0_T0_corrected').exists(),'Startup correction already attempted'
+    else:
+        assert not ROOT.exists(),'Do not automatically repeat H1'
+        ROOT.mkdir()
+    common.ROOT=ROOT;common.PACKET=P
     original=json.loads((common.LOAD/'processes.json').read_text())
     paused=[r for r in original if r['gpu'] in TARGETS and common.owned(r['pid'])]
     ours={r['pid'] for r in paused}
     assert all(pid in ours for g,pid in apps() if g in TARGETS),'Foreign target-GPU job; do not touch'
-    state=dict(status='RUNNING',workers_before=original,paused_workers=paused,started_unix=time.time(),cells=[])
+    state=dict(status='RUNNING',workers_before=original,paused_workers=paused,started_unix=time.time(),cells=list(previous['cells']) if previous else [],startup_correction=resume_startup)
     write(P/'H1.json',state)
     try:
         for r in paused:os.kill(r['pid'],signal.SIGTERM)
@@ -50,12 +59,13 @@ def main():
         deadline=time.monotonic()+20
         while any(g in TARGETS for g,_ in apps()) and time.monotonic()<deadline:time.sleep(.5)
         assert not any(g in TARGETS for g,_ in apps())
-        for mode in ('T0','R3'):
+        for mode in (() if resume_startup else ('T0','R3')):
             label='smoke_'+mode
             common.run(label,'ipc_rebase_smoke.py',['--mode',mode],mode=mode,smoke=True)
             state['cells'].append(dict(label=label,kind='smoke',mode=mode));write(P/'H1.json',state)
         for index,(pass_id,mode) in enumerate(((0,'T0'),(0,'R3'),(1,'R3'),(1,'T0'))):
             label=f'pair_pass{pass_id}_{mode}'
+            if resume_startup and index==0:label+='_corrected'
             common.run(label,'hot_expert_microcost.py',['--mode',mode,'--kind','pair'],mode=mode)
             state['cells'].append(dict(label=label,kind='pair',mode=mode,pass_id=pass_id));write(P/'H1.json',state)
         common.run('h2d','hot_expert_microcost.py',['--mode','T0','--kind','h2d'],mode='T0')
@@ -71,4 +81,5 @@ def main():
             state['receipts']=[dict(path=str(f),bytes=f.stat().st_size,sha256=sha(f)) for f in ROOT.glob('*/*') if f.is_file()]
             write(P/'H1.json',state)
             print(json.dumps({k:state.get(k) for k in ('status','error','restore_error','restored_workers')}),flush=True)
-if __name__=='__main__':main()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--resume-startup',action='store_true');a=parser.parse_args();main(a.resume_startup)
