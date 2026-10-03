@@ -1,5 +1,5 @@
 {
-  "status": "PLANNED_REVISED_DECODE256_CAPTURE",
+  "status": "COMPLETE",
   "checkpoint": "6817010e3be83feb6771b54f3046f9185fc6dc41",
   "terminology": {
     "env1": "NVSwitch",
@@ -125,8 +125,9 @@
   "scope_amendment": {
     "gpu_trace_only": true,
     "cpu_replay_budget_unchanged": true,
-    "cpu_matrix_not_doubled_for_horizon": true,
-    "note": "decode64 is a prefix of decode256; later CPU horizon expansion requires owner review"
+    "cpu_matrix_not_doubled_for_horizon": false,
+    "note": "decode64 is a prefix of decode256; later CPU horizon expansion requires owner review",
+    "superseded_by": "owner_cpu_horizon_amendment"
   },
   "owner_cpu_horizon_amendment": {
     "source": "Owner reply: 256 / 64 \uac01\uac01 \ub458\ub2e4 \uc0ac\uc6a9",
@@ -138,5 +139,15 @@
     "main_total": 1536,
     "seed_audit_extra_max_total": 16,
     "max_total": 1552
+  },
+  "completion": {
+    "main_cells": 1536,
+    "seed_audit_cells": 16,
+    "total_cells": 1552,
+    "GPU_master_captures": 2,
+    "GPU_model_loading_sessions": 1,
+    "similarity_recalibration_runs": 0,
+    "validation": "validation.json",
+    "results": "RESULTS.md"
   }
 }

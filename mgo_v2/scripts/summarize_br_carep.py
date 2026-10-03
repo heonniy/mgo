@@ -34,7 +34,9 @@ def analyze(cells):
     labels={k:[] for k in ('CA_HEADROOM','CA_STRONG_HEADROOM','CA_REP_HEADROOM','CA_REP_TRADEOFF','SUBSTITUTION_RELIEVES_MISS_PRESSURE','HIGH_MISS_PRESSURE')}
     for c in cells:
         for scope in ('decode','full'):
-            grid.append(dict(**meta(c),scope=scope,global_slots=c['global_slots'],**c[scope]))
+            metrics=dict(c[scope])
+            for key in ('resident_copies','unique_resident_experts','duplicate_copies'):metrics[key+'_event_sum']=metrics.pop(key)
+            grid.append(dict(**meta(c),scope=scope,global_slots=c['global_slots'],**metrics))
         a=c['decode']
         if c['seed_audit']:
             b=lookup[base(c),'BR'];seed.append(compare(c,b,'BR_seed'));continue
@@ -79,7 +81,11 @@ def validate(cells,progress):
             assert a['exact_global_hits']+a['resident_substitute_hits']+a['shared_admission_substitutions']+a['residual_miss_routes']==a['raw_routes']
             assert a['local_services']+a['remote_expert_routes']==a['effective_routes'] and a['peak_resident_copies']<=c['global_slots']
             assert abs(a['raw_gate_mass']-a['effective_gate_mass'])<1e-6
+            assert abs(a['exact_global_hit_mass']+a['resident_substitute_mass']+a['shared_admission_mass']+a['residual_miss_mass']-a['raw_gate_mass'])<1e-6
             assert a['max_event_rank_fetch_imbalance']<=1
+            if c['policy']=='CA-rep':
+                assert sum(a[k] for k in ('replica_score_lt_quarter','replica_score_quarter_half','replica_score_half_one','replica_score_one_two','replica_score_ge_two'))==a['unique_miss_expert_events']
+                assert a['replica_fetches']+a['replica_blocked_by_pinning']==a['replica_score_one_two']+a['replica_score_ge_two']
         if c['policy'] in ('BR','CA'):assert c['full']['replica_fetches']==0 and c['full']['peak_duplicate_copies']==0
         if not c['seed_audit'] and c['horizon']==256 and c['policy'] in ('BR','CA'):
             key=tuple(c[k] for k in ('dataset','world','batch','cache','eviction','substitution','policy'))+(64,);short=refs[key];a=np.load(short['event_path']);assert np.array_equal(a['rows'],raw['rows'][:65*48]) and np.array_equal(a['rank_fetches'],raw['rank_fetches'][:65*48]);pairs+=1
@@ -172,8 +178,13 @@ def figures(cells,comp,sub,same):
     return saved
 
 def report(cells,comp,sub,seed,same,labels,groups,validation):
+    ca=[g for g in groups if g['comparison']=='BR_to_CA'];rep=[g for g in groups if g['comparison']=='CA_to_CA-rep']
+    overview=(f"CA reduces median peer bytes by {min(g['peer_reduction_percent_median'] for g in ca):.2f}–{max(g['peer_reduction_percent_median'] for g in ca):.2f}% across the four dataset/horizon groups, with median H2D changes of {min(g['H2D_change_percent_median'] for g in ca):+.2f}–{max(g['H2D_change_percent_median'] for g in ca):+.2f}%. "
+              f"Its joint headroom criterion passes in {len(labels['CA_HEADROOM'])}/512 matched comparisons. CA-rep adds median peer reductions of {min(g['peer_reduction_percent_median'] for g in rep):.2f}–{max(g['peer_reduction_percent_median'] for g in rep):.2f}%; its largest observed reduction is {max(g['peer_reduction_percent_max'] for g in rep):.2f}%. "
+              'The joint labels below determine whether these changes meet the predeclared thresholds; larger replica gains must be assessed together with their extra H2D.')
     lines=['# BR / CA / CA-rep: two-horizon resource headroom','',
            '**Complete: 1,536 main CPU replays and 16 frozen BR seed-audit replays.**','',
+           overview,'',
            'MATH and ShareGPT each have one 512-request exact-model master capture on eight GPUs: one prefill and 256 decode forwards. The same loaded model replicas served both datasets. Decode64 is a prefix of decode256, not a second GPU generation. Existing same-checkpoint FineWeb-Edu 400×128 SERE Frobenius similarity was verified and reused.','',
            'This study measures frozen-route physical resources, not latency, bandwidth equivalence, accuracy or autoregressive quality under intervention. Profile medians/ranges give equal weight to configurations and are not confidence intervals.','',
            '## Predeclared findings','']
@@ -205,7 +216,7 @@ def report(cells,comp,sub,seed,same,labels,groups,validation):
             lines.append(f"| {name} | {h} | {avg('resident_substitute_hits_fraction'):.2f} / {avg('resident_substitute_mass_fraction'):.2f} | {avg('shared_admission_substitutions_fraction'):.2f} / {avg('shared_admission_mass_fraction'):.2f} | {avg('substituted_routes_fraction'):.2f} / {avg('substituted_mass_fraction'):.2f} | {float(np.median(changes)):.2f} |")
     lines+=['','Hit fractions above are equal-profile means. Full route-count and gate-mass values are in grid_points. HIGH_MISS_PRESSURE means residual source-miss routes ≥30% or at least one global-cache turnover per decode step. Native substitution thresholds remain .20 gate protection and .65 SERE similarity.','',
             '## Placement and replica interpretation','',
-            'BR and CA have identical per-event balanced mandatory-fetch quotas (count difference ≤1). CA exactly maximizes local effective expert-route demand with an integer Hungarian assignment. This minimizes return expert rows for that event, but dispatch coalescing makes it different from globally minimizing dispatch-plus-return bytes. Every reported peer value recomputes both components. Cumulative rank-fetch imbalance is also recorded: balanced event quotas do not imply identical cumulative counts.','',
+            'BR and CA use the identical balanced quota rule for a given current miss count (rank count difference ≤1). Their realized miss sets and numerical quotas can later diverge as cache trajectories evolve, which is why H2D differences are measured. CA exactly maximizes local effective expert-route demand with an integer Hungarian assignment. This minimizes return expert rows for that event, but dispatch coalescing makes it different from globally minimizing dispatch-plus-return bytes. Every reported peer value recomputes both components. Cumulative rank-fetch imbalance is also recorded: balanced event quotas do not imply identical cumulative counts.','',
             'CA-rep only considers newly admitted residual-miss experts. Its V is an optimistic upper bound: two 4096-byte rows times strictly later raw decode demand on one non-primary rank. It admits at V≥9 MiB, at most one replica per new expert, with ordinary unprotected LRU/Gate eviction afterwards. No rho budget, migration, refresh, future eviction or future substitution is used. V bins below/above the threshold are retained for all new experts. This bound can overestimate dispatch savings; realized bytes decide the labels.','',
             'Replica reuse excludes admission-event service. Final never-reused counts include both evicted and still-alive copies without later use. Replica-victim reloads identify a last global disappearance caused directly by replica admission, not a full causal decomposition; matched reload changes versus CA are supplied separately.','',
             'Same-global comparisons use the same first N requests for R4/B16 vs R8/B8, R4/B32 vs R8/B16, and R4/B64 vs R8/B32. Origin mapping, per-rank slots and rank-major GateHistory order change with R. Full-router probabilities are retained so each W128 history is reconstructed for that actual order.','',

@@ -1,3 +1,18 @@
+# Completed results
+
+See [RESULTS.md](RESULTS.md), [validation.json](validation.json), and
+[EXECUTION.md](EXECUTION.md). Both decode64 and decode256 were authorized by
+the owner and completed: 1536 main + 16 BR seed-audit CPU replays.
+Two 512-request master captures used eight GPUs in one loading session.
+FineWeb-Edu SERE similarity was hash-verified and reused; no recalibration.
+
+CA_HEADROOM: 283/512; CA_STRONG_HEADROOM: 33/512. CA-rep reached neither
+20% headroom nor tradeoff criterion. These are frozen-route resource results,
+not quality or Env timing. CPU peak aggregate RSS 6.64 GiB; all GPU workers
+exited successfully. Stop for owner review; no automatic follow-up.
+
+---
+
 # BR / CA / CA-rep CPU headroom
 
 Main research question:

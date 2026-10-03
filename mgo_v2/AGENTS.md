@@ -1,3 +1,16 @@
+**BR / CA / CA-rep two-horizon packet COMPLETE (2026-10-03).**
+Read `experiments/br_ca_carep_cpu_headroom_20261003/{RESULTS.md,validation.json}`.
+Two exact 512-request 256-decode master traces completed on all eight GPUs
+in one loading session; no recalibration was needed. Both owner-selected CPU
+horizons completed: 1536 main + 16 BR seed-audit cells. BR/CA match exactly
+across 512 paired 64-step prefixes; 168 zero-replica cases match CA state.
+CA_HEADROOM 283/512, CA_STRONG_HEADROOM 33/512. CA median peer reduction
+is 9.32--13.07% across dataset/horizon groups; CA-rep median is 0--3.01%,
+maximum 17.67%, so neither replica 20% label passes. No quality or timing claim.
+Replay aggregate RSS peaked at 6.64 GiB; all capture workers exited and GPU
+processes were empty at completion. Dynamic refresh remains owner-stopped at
+99/120. Stop for owner review; earlier instructions below are history.
+
 **OWNER CPU HORIZON AMENDMENT (2026-10-03): run both 64 and 256.**
 The owner explicitly selected both horizons after 986ba64: 1536 main CPU
 replays plus at most 16 seed-audit cells total. Read the current packet's

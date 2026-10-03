@@ -74,6 +74,9 @@ CA uses an integer Hungarian assignment over those identical quota slots,
 scanning expert IDs and rank slots ascending for deterministic ties. First-copy
 admissions are applied in ascending expert order. The independent tests check
 exact optimal local demand by exhaustive enumeration, including ties.
+Identical quotas mean the same rule conditioned on a current miss count, not
+forcing the later CA cache trajectory to have BR's misses. Realized miss counts
+and numerical quotas can diverge; paired H2D/reload deltas measure that effect.
 
 CA-rep considers only newly admitted residual-miss experts, ascending ID, after
 all mandatory admissions. For each non-primary rank, its optimistic bound is
