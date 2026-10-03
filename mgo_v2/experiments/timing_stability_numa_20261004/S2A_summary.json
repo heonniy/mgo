@@ -1,0 +1,42 @@
+{
+  "NORMAL": {
+    "decode": {
+      "n": 2,
+      "median": 88.736350285355,
+      "min": 72.57388352323323,
+      "max": 104.89881704747677,
+      "spread_percent": 36.42806293057381
+    },
+    "minor_faults": [
+      23923,
+      23926
+    ],
+    "major_faults": [
+      0,
+      0
+    ]
+  },
+  "PRETOUCH": {
+    "decode": {
+      "n": 2,
+      "median": 81.55457145161927,
+      "min": 71.26384728122503,
+      "max": 91.84529562201351,
+      "spread_percent": 25.236412839221458
+    },
+    "minor_faults": [
+      23923,
+      23923
+    ],
+    "major_faults": [
+      0,
+      0
+    ]
+  },
+  "PAGE_RESIDENCY_CONFOUND": false,
+  "S3_residency": "NORMAL",
+  "fault_scope": "whole rank process, not expert-only; two samples per mode",
+  "NORMAL_already_touches_full_pool": true,
+  "disk_IO_attribution": "NOT_ESTABLISHED",
+  "criterion": "NORMAL spread >5%; PRETOUCH <=5% and <=half NORMAL spread; median no worse; >=50% reduction in nonzero median minor or major faults without increase in the other category"
+}
