@@ -1,3 +1,20 @@
+**NEW OWNER PRIORITY (2026-10-03): physical Env 1 / Env 2 E2E + TPOT offloading.**
+Read `experiments/env_e2e_tpot_offload_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+This is a real Qwen3-30B-A3B expert-offloading experiment, not a byte/NCCL-only
+replay: CPU-resident experts must undergo real miss H2D into bounded GPU expert
+caches and routed activations/experts must execute physically. The bounded
+matrix has P=ShareGPT256 R8/B16 cache40 Gate sub-ON, R=MATH256 R4/B64 cache30
+Gate sub-ON, and E=P with sub-OFF BR/CA control; policies are BR/CA/CA-rep as
+listed. Env 1 is validated P2P/IPC; Env 2 is P2P-disabled validated SHM.
+Crucially, every cell is split into PLAN -> COMPILE -> MEASURE -> COUNTERS.
+Controller/oracle work, compilation, profiling, per-event logs and hit/miss
+instrumentation are forbidden inside MEASURE. COUNTERS is a separate untimed
+pass. Primary timing is E2E and TPOT with three counterbalanced clean repeats;
+only the frozen noise gate can add two targeted repeats. Gate W128 is the
+physical eviction policy; replicas are not protected. Do not expand LRU/cache/
+batch/R axes or tune thresholds. Stop resident load workers before science and
+restore them only after all experiment processes exit.
+
 **Latest owner resource policy (2026-10-03, after packet completion).**
 For future authorized CPU experiments, maximize useful throughput using available
 CPU affinity and measured memory headroom. Benchmark a small initial wave, then
