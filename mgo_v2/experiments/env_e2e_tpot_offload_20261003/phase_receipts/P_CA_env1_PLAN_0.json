@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "cell": "P",
+  "policy": "CA",
+  "phase": "PLAN",
+  "environment": "env1",
+  "repeat": 0,
+  "started_unix": 1791030338.682763,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_worker.py",
+    "--cell",
+    "P",
+    "--policy",
+    "CA",
+    "--phase",
+    "PLAN",
+    "--environment",
+    "env1",
+    "--output",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env1_PLAN_0"
+  ],
+  "source_sha256": "ea9eb1b23946a9d5e552e398ab86d1bcb69299105f340621c2c4e98ff766a227",
+  "policy_sha256": "508bbca7edb8ae111b4e63372bdf98ee8c969586c71fe30db2063e0cf95f267f",
+  "layout_sha256": "609fb4d30a61aedb6a9e5713e35d06c9cf9414b8d7ee8db7743c93cb2127aa07",
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0"
+  },
+  "compile_cache": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/compile_cache/P_CA_env1",
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      }
+    ],
+    "host_available_bytes": 1983243026432
+  },
+  "pid": 2995657,
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1791031165.3233519,
+  "peak_rss_bytes": 957926506496,
+  "peak_pss_bytes": 542467615744,
+  "raw_root": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env1_PLAN_0"
+}
