@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "cell": "P",
+  "policy": "CA",
+  "phase": "MEASURE",
+  "environment": "env2",
+  "repeat": 1,
+  "started_unix": 1791039775.1595387,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_worker.py",
+    "--cell",
+    "P",
+    "--policy",
+    "CA",
+    "--phase",
+    "MEASURE",
+    "--environment",
+    "env2",
+    "--output",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env2_MEASURE_1",
+    "--plan",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env1_PLAN_0"
+  ],
+  "source_sha256": "f204afbb8fb5987f3061d375e56f7a68688ba9d3431fd818ffabfd3cac183100",
+  "policy_sha256": "508bbca7edb8ae111b4e63372bdf98ee8c969586c71fe30db2063e0cf95f267f",
+  "layout_sha256": "609fb4d30a61aedb6a9e5713e35d06c9cf9414b8d7ee8db7743c93cb2127aa07",
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0",
+    "NCCL_P2P_DISABLE": "1",
+    "NCCL_IB_DISABLE": "1"
+  },
+  "compile_cache": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/compile_cache/P_CA_env2",
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      }
+    ],
+    "host_available_bytes": 1982185033728
+  },
+  "pid": 3090214,
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1791040907.8540733,
+  "peak_rss_bytes": 932010708992,
+  "peak_pss_bytes": 512725458944,
+  "raw_root": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env2_MEASURE_1"
+}
