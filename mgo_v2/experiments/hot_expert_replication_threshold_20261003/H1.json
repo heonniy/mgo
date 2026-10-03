@@ -1,14 +1,6 @@
 {
-  "status": "FAIL",
+  "status": "PASS",
   "workers_before": [
-    {
-      "gpu": 0,
-      "pid": 2037554
-    },
-    {
-      "gpu": 1,
-      "pid": 2037555
-    },
     {
       "gpu": 2,
       "pid": 2037556
@@ -18,41 +10,49 @@
       "pid": 2037557
     },
     {
-      "gpu": 4,
-      "pid": 2037558
-    },
-    {
-      "gpu": 5,
-      "pid": 2037559
-    },
-    {
       "gpu": 6,
       "pid": 2037560
     },
     {
       "gpu": 7,
       "pid": 2037561
+    },
+    {
+      "gpu": 0,
+      "pid": 2611928
+    },
+    {
+      "gpu": 1,
+      "pid": 2611949
+    },
+    {
+      "gpu": 4,
+      "pid": 2611991
+    },
+    {
+      "gpu": 5,
+      "pid": 2612073
     }
   ],
   "paused_workers": [
     {
       "gpu": 0,
-      "pid": 2037554
+      "pid": 2611928
     },
     {
       "gpu": 1,
-      "pid": 2037555
+      "pid": 2611949
     },
     {
       "gpu": 4,
-      "pid": 2037558
+      "pid": 2611991
     },
     {
       "gpu": 5,
-      "pid": 2037559
+      "pid": 2612073
     }
   ],
-  "started_unix": 1791004727.9385986,
+  "started_unix": 1791004945.7303414,
   "cells": [
     {
       "label": "smoke_T0",
@@ -63,33 +63,122 @@
       "label": "smoke_R3",
       "kind": "smoke",
       "mode": "R3"
+    },
+    {
+      "label": "pair_pass0_T0_corrected",
+      "kind": "pair",
+      "mode": "T0",
+      "pass_id": 0
+    },
+    {
+      "label": "pair_pass0_R3",
+      "kind": "pair",
+      "mode": "R3",
+      "pass_id": 0
+    },
+    {
+      "label": "pair_pass1_R3",
+      "kind": "pair",
+      "mode": "R3",
+      "pass_id": 1
+    },
+    {
+      "label": "pair_pass1_T0",
+      "kind": "pair",
+      "mode": "T0",
+      "pass_id": 1
+    },
+    {
+      "label": "h2d",
+      "kind": "h2d",
+      "mode": "T0"
     }
   ],
-  "error": "AssertionError('/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0/run.log')",
+  "startup_correction": true,
   "restored_workers": [
     {
       "gpu": 0,
-      "pid": 2611928,
+      "pid": 2619689,
       "status": "STARTED"
     },
     {
       "gpu": 1,
-      "pid": 2611949,
+      "pid": 2619700,
       "status": "STARTED"
     },
     {
       "gpu": 4,
-      "pid": 2611991,
+      "pid": 2619722,
       "status": "STARTED"
     },
     {
       "gpu": 5,
-      "pid": 2612073,
+      "pid": 2619735,
       "status": "STARTED"
     }
   ],
-  "finished_unix": 1791004766.7356586,
+  "finished_unix": 1791005010.42957,
   "receipts": [
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/rank2.json",
+      "bytes": 10392,
+      "sha256": "da82217296cb4f3df6f3a54692e825fd3be48a326e6b0e5afc4ea9601470561b"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/rank1.json",
+      "bytes": 10083,
+      "sha256": "0e9944b66aea4ed5ecc1e90faffcd05d69330baee820ebd2f879c213250c5e21"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/rank3.json",
+      "bytes": 10387,
+      "sha256": "771932902b8752e7f324c7ca733778c193d0f691a058f4396d7f21be807e10eb"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/run.log",
+      "bytes": 2528,
+      "sha256": "680b653db95a4477f2452d6bd40aaef078ee6f91f0b3386fe2888a551e83283f"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/rank0.json",
+      "bytes": 10076,
+      "sha256": "ae94ab16ad5d27390305a2e40d51c1a4f26c7f70fbf8dca5c15d8503adf5a9df"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_R3/status.json",
+      "bytes": 2093,
+      "sha256": "ef369186be79befb535c9be27404a6ba2537ae154cb57aa2a2659ff256a3a584"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/rank2.json",
+      "bytes": 10444,
+      "sha256": "526a7506d5a3b0440a02ead77a10fb0383bf2a463fd4dafe116dff71d4cab77f"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/rank1.json",
+      "bytes": 10097,
+      "sha256": "fa8fb4599f07c3efa69f32a917da3d7d9cb1ac95979722bb7f897bfdcf9dec3b"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/rank3.json",
+      "bytes": 10376,
+      "sha256": "054a9abab0ac59f23b096e89438657de713b2928dc26597ab4af98192c3cf7be"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/run.log",
+      "bytes": 2528,
+      "sha256": "284e2a0b64676be6d8c2eb1381ddc3bf36a5675b6785b996c877c741f35faa9c"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/rank0.json",
+      "bytes": 10089,
+      "sha256": "52e5e3ada6d27a7b7e497baab0d78c69cfd4ea936e11f22df73c48224548cd38"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_R3/status.json",
+      "bytes": 2091,
+      "sha256": "3bdd3df284c8f8e87dc070a04606978d7f480e60b43496747e1d45e556861253"
+    },
     {
       "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/smoke_R3/nccl-cloud-0n58xq-2611269.log",
       "bytes": 14252,
@@ -141,6 +230,66 @@
       "sha256": "fa7e07bfe04006dec2037834dffc3c110c558cbc36012624912b180187123651"
     },
     {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/rank2.json",
+      "bytes": 2493,
+      "sha256": "51fd4dca11aa1fc704704cf038e35819c47506943bd471c8610796101e791daf"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/rank1.json",
+      "bytes": 2501,
+      "sha256": "056c7f842ac073a30a8dd04eb5ccdcfb3c4718be266c1ec1587312513430f6fc"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/rank3.json",
+      "bytes": 2494,
+      "sha256": "cdab745d90686d9a080b9dd8a64a36c2a9b6c75c36e2390b7b6b14087f14439d"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/run.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/rank0.json",
+      "bytes": 2455,
+      "sha256": "ed55843525d2d45887ee56ac02c075779b7caefdfe85a0ca91f35d3aee1722e6"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/h2d/status.json",
+      "bytes": 2026,
+      "sha256": "c62b9286a0b2368f70346e6320e1d78c24ad1168153aa2eba31b63854e69f61c"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/rank2.json",
+      "bytes": 10399,
+      "sha256": "85be37134b18cd9c6017b6b92dc8eceda81178018d6a3b8fc380e09a66e3201e"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/rank1.json",
+      "bytes": 10064,
+      "sha256": "655465871e2564bf29d1a5d4eb8b66ed36b8c9dba7cdda7b0e31c0fb58aaf306"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/rank3.json",
+      "bytes": 10363,
+      "sha256": "15bcd289740baa3c14eee470c3263d3e9a02f12b5460fa9bae586d629a6826fb"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/run.log",
+      "bytes": 2528,
+      "sha256": "161e8b86f79a65873b3bca398cd1c44e6a0fc37196a8baa2b2966a43b94a3951"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/rank0.json",
+      "bytes": 10071,
+      "sha256": "65b3a7eed4388b74feb0b5f47b56e449f4e1fa82b6bd7ab5b6ea7e2497566bf4"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0_corrected/status.json",
+      "bytes": 2044,
+      "sha256": "b5a0372278b6284ad95cc63cabe10163fc1351b075831a4984158230b3c1cc76"
+    },
+    {
       "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0/run.log",
       "bytes": 4026,
       "sha256": "503cf425297f48d8b11ac09452e0b9140c056ab9982de4bc41ee97e16d599402"
@@ -149,6 +298,36 @@
       "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass0_T0/status.json",
       "bytes": 1558,
       "sha256": "947d4e5f87ba6e241019d2c4579710c3200f2e674aafd10fab7a0f848e965731"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/rank2.json",
+      "bytes": 10373,
+      "sha256": "d58dd47f3c3ce134ef99188edd9e1da2ea02d992c0a686c9753e2322bafbc9fc"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/rank1.json",
+      "bytes": 10042,
+      "sha256": "bc517a56c03d91acd6f97950b915f3ab82cfa441781da23890de21905f3f8c1b"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/rank3.json",
+      "bytes": 10384,
+      "sha256": "da3c913cc9561bdc0812e82921cd4be781b3396d16c790c386bf8f199509db0f"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/run.log",
+      "bytes": 2528,
+      "sha256": "97158a49e37a9831f4197238b95fa0253f14e71a29bfff14422c6c992e668bc8"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/rank0.json",
+      "bytes": 10048,
+      "sha256": "39e8589162a86028dc20f6f4c222787b855ac11f0974f97178ec5f4a8e9c069b"
+    },
+    {
+      "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/pair_pass1_T0/status.json",
+      "bytes": 2023,
+      "sha256": "f4c87d4878ace049a1048b479ffe11afc995d100def44f12b56c9104dfe30927"
     },
     {
       "path": "/home/hwlee/mgo-results/hot_expert_replication_threshold_20261003/H1/smoke_T0/nccl-cloud-0n58xq-2611072.log",
