@@ -1,21 +1,19 @@
-**NEW OWNER PRIORITY (2026-10-03): BR / CA / CA-rep CPU headroom on a decode-heavy MATH workload.**
-This supersedes further dynamic stale-replica-refresh exploration. If a refresh
-process is already running, preserve the current bounded cell/checkpoint and
-then stop that packet; do not launch more refresh cells.
+**REVISED OWNER PRIORITY (2026-10-03): BR / CA / CA-rep CPU headroom with SERE calibration + two workloads.**
 Read `experiments/br_ca_carep_cpu_headroom_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
-Terminology is fixed: Env 1=NVSwitch, Env 2=P2P disabled; policies are BR, CA,
-CA-rep. This packet is CPU headroom only: no Env timing. Use one 8-GPU model
-session to calibrate substitution on disjoint MATH-train data and capture one
-512-request MATH-test master trace with exactly 64 decode tokens; derive all
-R={4,8}, local-B={8,16,32,64} cells offline. Global cache ratios are
-30/40/50/60% independent of R; eviction LRU/Gate; substitution OFF/ON. BR uses
-balanced quotas + random assignment; CA uses the identical quotas with exact
-current-demand communication-aware assignment; CA-rep adds at most one
-future-popularity replica per new miss when optimistic remaining peer saving
-is >= one 9-MiB expert payload, and replicas remain normally evictable. Report
-exact/local/substitute/effective hits, residual miss, turnover/reload, H2D,
-peer and locality. Maximum 400 CPU replays. No accuracy, NCCL/E2E, B128,
-Coverage eviction, replica ratio, protection or online-controller timing.
+Substitution calibration is NOT MATH/ShareGPT-specific. First reuse the existing
+similarity artifact only if provenance proves the same Qwen checkpoint,
+FineWeb-Edu 400 sequences x128 tokens, and SERE Frobenius output similarity;
+otherwise calibrate exactly once with that SERE-style setting. Workloads are
+(1) MATH test 512 and (2) ShareGPT V3 cleaned 512 conversational turns selected
+for naturally long responses; both use fixed 64 generated tokens for controlled
+decode-heavy traces. Load the 8-GPU model once, optionally calibrate, then
+capture the two 512-request master traces sequentially. Derive all R={4,8},
+B={8,16,32,64} workloads offline. Sweep global cache 30/40/50/60%, LRU/Gate,
+substitution OFF/ON, and BR/CA/CA-rep. Report exact/local/substitute/effective
+hits, residual miss, turnover/reload, H2D, peer and policy headroom. Maximum
+768 main +16 seed-audit CPU replays, up to 16 single-thread cells concurrently.
+No Env timing, accuracy, NCCL, B128, Coverage eviction or workload-specific
+similarity calibration.
 
 **Owner-authorized next study (2026-10-03): dynamic stale-replica refresh.**
 Read `experiments/dynamic_replica_refresh_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.

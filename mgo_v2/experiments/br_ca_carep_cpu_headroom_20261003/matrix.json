@@ -1,6 +1,6 @@
 {
-  "status": "PLANNED",
-  "checkpoint": "e97f153b24fb225591e1461e01677da0bdcf9b47",
+  "status": "PLANNED_REVISED",
+  "checkpoint": "0cd0fa015b99625371c34224cef39c5f36c62068",
   "terminology": {
     "env1": "NVSwitch",
     "env2": "P2P disabled",
@@ -10,23 +10,40 @@
       "CA-rep"
     ]
   },
-  "dataset": {
-    "name": "MATH (Hendrycks et al.)",
-    "calibration": {
-      "split": "train",
-      "samples_initial": 128,
-      "samples_max": 256,
-      "seed": 43,
-      "decode_tokens": 32
-    },
-    "workload": {
+  "calibration": {
+    "method": "SERE-style Frobenius output similarity",
+    "dataset": "FineWeb-Edu",
+    "sequences": 400,
+    "tokens_per_sequence": 128,
+    "total_tokens": 51200,
+    "seed": 42,
+    "reuse_existing_if_provenance_matches": true,
+    "gate_protect_threshold": 0.2,
+    "similarity_threshold": 0.65
+  },
+  "workloads": [
+    {
+      "name": "MATH",
       "split": "test",
       "samples": 512,
       "seed": 42,
-      "decode_tokens": 64,
-      "max_input_tokens": 512
+      "selection": "stratified subject/difficulty",
+      "max_input_tokens": 512,
+      "fixed_decode_tokens": 64
+    },
+    {
+      "name": "ShareGPT V3 cleaned",
+      "samples": 512,
+      "seed": 44,
+      "filter": {
+        "prompt_tokens_min": 32,
+        "prompt_tokens_max": 512,
+        "reference_assistant_tokens_min": 128
+      },
+      "max_input_tokens": 512,
+      "fixed_decode_tokens": 64
     }
-  },
+  ],
   "logical_grid": {
     "ranks": [
       4,
@@ -54,13 +71,6 @@
     ]
   },
   "cache_budget": "global slots fixed by ratio, split evenly across R",
-  "substitution": {
-    "gate_protect_threshold": 0.2,
-    "similarity_threshold": 0.65,
-    "pair_min_coobservations": 16,
-    "calibration_coverage_fraction": 0.95,
-    "min_neighbors_per_layer_expert": 4
-  },
   "BR": {
     "seed": 42,
     "balanced_quota": true
@@ -76,19 +86,20 @@
     "admission_threshold_bytes": 9437184,
     "replica_protected": false
   },
-  "cpu_replays": {
-    "base_configs": 128,
-    "main_policies_per_config": 3,
-    "main": 384,
-    "br_seed_audit_extra": 16,
-    "max_total": 400
+  "replay_budget": {
+    "datasets": 2,
+    "base_configs_per_dataset": 128,
+    "policies_per_config": 3,
+    "main": 768,
+    "br_seed_audit_extra_max": 16,
+    "max_total": 784,
+    "max_parallel_cpu_cells": 16
   },
-  "gpu_sessions": 1,
-  "master_capture": {
-    "ranks": 8,
-    "local_batch": 64,
-    "global_requests": 512,
-    "fixed_decode_tokens": 64
+  "gpu_plan": {
+    "model_load_sessions": 1,
+    "optional_calibration_runs_max": 1,
+    "master_captures": 2,
+    "gpus": 8
   },
   "no_accuracy": true,
   "no_env_timing": true,

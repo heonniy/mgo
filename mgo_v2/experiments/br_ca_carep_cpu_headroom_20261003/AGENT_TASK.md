@@ -1,35 +1,29 @@
 # AGENT TASK — BR / CA / CA-rep CPU headroom
 
-Checkpoint: e97f153.
-
-This owner request supersedes further dynamic stale-replica-refresh exploration.
-If a refresh process is already running, let the current bounded process/cell
-finish and preserve its checkpoint, then do not launch more refresh cells.
+Checkpoint: 0cd0fa0.
 
 Read PLAN.md.
 
-1. Freeze dataset manifests:
-   - MATH train: 128 calibration examples, disjoint, seed 43;
-   - MATH test: 512 workload examples, seed 42;
-   - stratified by subject/category and difficulty.
-2. In one 8-GPU model session:
-   - calibrate co-routed expert-output cosine similarity;
-   - extend calibration once to 256 only if the frozen coverage gate fails;
-   - capture one 512-request, fixed-64-decode master routing trace.
-3. Repack that master trace offline into every R={4,8},
-   B={8,16,32,64} workload.
-4. Use global cache ratios {30,40,50,60}% independent of R and eviction
-   {LRU,Gate}; substitution OFF/ON when calibration is valid.
-5. Implement/validate:
-   - BR balanced random seed42;
-   - CA exact current-demand balanced oracle;
-   - CA-rep = CA + one future-popularity replica when optimistic remaining
-     same-layer peer saving >=9 MiB; replica remains normally evictable.
-6. Run at most 384 main CPU replays + 16 BR seed-audit replays.
-7. Report exact/global/local/substitute/effective hits, residual misses,
-   turnover/reloads, H2D/peer/locality, and BR->CA / CA->CA-rep headroom.
-8. Apply frozen labels and commit compact results.
-9. Stop. No Env1/Env2 timing, quality eval, NCCL, B128, Coverage eviction,
-   online controller or replica protection.
+1. Freeze two workload manifests:
+   - MATH test: 512, seed42, stratified, fixed 64 decode tokens;
+   - ShareGPT V3 cleaned: 512 human->assistant turns, seed44, prompt 32--512
+     tokens, reference assistant >=128 tokens, fixed 64 generated tokens.
+2. Audit the current similarity artifact provenance.
+   - Reuse only if it is the same Qwen checkpoint + FineWeb-Edu 400x128 +
+     SERE Frobenius calibration.
+   - Otherwise run that exact SERE-style calibration once.
+   - Do not use MATH/ShareGPT or co-routed cosine for calibration.
+3. In one 8-GPU model-loading session, sequentially capture one 512-request
+   master trace for MATH and one for ShareGPT.
+4. Derive every R={4,8}, B={8,16,32,64} workload offline from each master.
+5. Use global cache={30,40,50,60}%, eviction={LRU,Gate},
+   substitution={OFF,ON}.
+6. Implement/validate BR, CA, CA-rep exactly as PLAN.md defines.
+7. Run 768 main CPU replays plus at most 16 total BR seed-audit replays,
+   up to 16 single-thread cells in parallel under the memory guards.
+8. Report exact/local/substitute/effective hits, residual miss, turnover,
+   reload, H2D, peer, locality, BR->CA headroom and CA->CA-rep headroom.
+9. Commit compact checkpoints/results and stop.
 
-Do not create one GPU trace per matrix cell.
+No Env timing, accuracy, NCCL, B128, Coverage eviction, workload-specific
+calibration, replica ratio or replica protection.

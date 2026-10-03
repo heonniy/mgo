@@ -2,92 +2,93 @@
 
 Date: 2026-10-03
 Status: prospective, owner-authorized.
-Priority: supersedes further dynamic-replica-refresh exploration after its
-current safe checkpoint.
 
 ## 1. Research question
-
-Main question:
 
 > In multi-GPU offloading, does expensive inter-GPU communication make the
 > destination rank of a missed expert a first-class admission decision?
 
-The later physical comparison will use:
+Later physical validation will use:
 - **Env 1** = NVSwitch.
 - **Env 2** = P2P disabled.
 
-This packet does not run transport timing. It characterizes the physical
-resource headroom of **BR / CA / CA-rep** first.
-
-The intended later hypotheses are:
-- Env 1: BR may already be sufficient because remote communication is cheap.
-- Env 2: CA should become more valuable.
-- If communication pressure is sufficiently strong, CA-rep may improve beyond
-  CA for persistently rank-local experts.
+This packet only measures BR / CA / CA-rep resource headroom using frozen
+routing traces. No Env timing or accuracy evaluation is included.
 
 ---
 
-## 2. Dataset and decode-heavy workload
+## 2. Workload datasets
 
-Use **MATH (Hendrycks et al.)** only.
+Use two distinct decode-heavy workloads so conclusions are not tied only to
+mathematical reasoning.
 
-### 2.1 Workload set
+### 2.1 MATH
 
-Use **512 examples from the MATH test split**.
+Purpose: reasoning-heavy workload with structured multi-step generations.
 
-Selection:
+- source: MATH test split;
+- samples: 512;
 - deterministic seed 42;
-- stratify by MATH subject/category and difficulty level as evenly as possible;
-- freeze exact example IDs, problem hashes and dataset revision in a manifest;
-- no sample is shared with substitution calibration.
-
-Prompt:
-```
-Solve the following problem step by step. Keep the reasoning explicit and put
-the final answer at the end.
-```
-
-Generation:
-- greedy / deterministic;
-- max input tokens = 512;
+- stratify by subject/category and difficulty as evenly as available;
+- max input tokens: 512;
+- greedy/deterministic generation;
 - exactly 64 new tokens per request
-  (`min_new_tokens=max_new_tokens=64`);
-- accuracy is not evaluated.
+  (min_new_tokens=max_new_tokens=64);
+- accuracy is ignored.
 
-The fixed 64-token continuation makes this a controlled decode-heavy systems
-workload and keeps all requests active for the same decode horizon.
+### 2.2 ShareGPT
 
-### 2.2 Master trace
+Purpose: general conversational / everyday serving workload with naturally
+long assistant responses. This is the second, non-reasoning workload.
 
-Make **one exact-model master capture** using all 8 GPUs:
+Use a frozen ShareGPT V3 cleaned conversation source and record the exact
+dataset path/revision in the manifest.
+
+Select 512 human->assistant turns:
+- deterministic seed 44;
+- tokenize with the target Qwen tokenizer before filtering;
+- user-prompt length: 32--512 tokens;
+- reference assistant response length: at least 128 tokens;
+- discard malformed/missing turns and duplicates;
+- preserve the selected user prompt as the model request;
+- max input tokens: 512;
+- greedy/deterministic generation;
+- exactly 64 new tokens per request;
+- accuracy/reference matching is ignored.
+
+The response-length filter selects naturally decode-heavy conversational
+requests while the fixed 64-token generated horizon keeps CPU replay cost and
+cross-dataset comparisons controlled.
+
+### 2.3 Master traces
+
+Use all 8 GPUs in **one model-loading session**.
+
+Capture two exact-model master traces sequentially:
+1. MATH: 512 requests;
+2. ShareGPT: 512 requests.
+
+For each master capture:
 - logical R=8;
 - local batch=64;
 - global requests=512;
-- one prefill plus exactly 64 decode steps;
-- substitution OFF during capture;
+- substitution OFF while capturing;
+- one prefill + exactly 64 decode steps;
 - no timing claim.
 
-The master trace must retain enough per-request data to re-pack workloads
-offline:
-- per request/token/layer top-k experts;
+Retain per request/token/layer:
+- top-k expert IDs;
 - selected routing weights;
-- full router probabilities in a compact lossless-enough representation for
-  deterministic W128 GateHistory replay; prefer float32 if required for exact
-  victim parity;
-- token IDs / active-mask;
-- per-request ordering and hashes.
+- compact full-router information sufficient to replay W128 GateScore exactly;
+- token IDs / active mask;
+- request ordering and hashes.
 
-Do not retain giant profiler traces.
+Do not store profiler traces.
 
-### 2.3 Logical packing
+All R/batch CPU workloads are repacked from the corresponding dataset's one
+master trace.
 
-All CPU cells are derived from this one master trace.
-
-For each (R,B), use the first `N=R*B` requests from the frozen stratified
-master order and assign origins round-robin so every rank has exactly B
-requests.
-
-This gives:
+For each dataset:
 
 | R | local B | global requests |
 |---:|---:|---:|
@@ -100,117 +101,102 @@ This gives:
 | 8 | 32 | 256 |
 | 8 | 64 | 512 |
 
-Therefore same-global comparisons are available:
-- R4/B16 vs R8/B8 (64);
-- R4/B32 vs R8/B16 (128);
-- R4/B64 vs R8/B32 (256).
+Use the first N requests from the frozen dataset order and assign origin ranks
+round-robin so every rank receives exactly B requests.
 
-This is a frozen-routing headroom study: changing logical R/B changes request
-aggregation/origin ranks/cache partitioning, not the already generated model
-tokens.
-
----
-
-## 3. Substitution calibration
-
-The old `similarity.npy` is not used as the primary calibration for this
-packet.
-
-Use a disjoint **128-example MATH train calibration set**, stratified by the
-same subject/difficulty metadata, deterministic seed 43.
-
-Run calibration in the same 8-GPU model session before the workload capture:
-- max input 512;
-- 32 fixed decode tokens;
-- exact model;
-- substitution disabled while collecting calibration evidence.
-
-### 3.1 Similarity definition
-
-Use **co-routed expert output similarity**, avoiding all-expert brute-force
-evaluation.
-
-For each token and MoE layer, the top-k routed experts see the same hidden
-state. For every co-routed expert pair (i,j), accumulate:
-
-```
-S_l(i,j) = mean cosine( expert_i_output(h), expert_j_output(h) )
-```
-
-over shared calibration tokens where both experts were routed.
-
-Also record co-observation counts.
-
-A pair is eligible for substitution only when:
-- cosine similarity >= 0.65; and
-- co-observation count >= 16.
-
-Gate protection remains frozen at 0.20.
-
-Unsupported pairs are never used as substitutes.
-
-### 3.2 Calibration sufficiency gate
-
-For every (layer,expert), require at least 4 eligible/observed candidate
-neighbors with count >=16 for at least 95% of layer-expert cells.
-
-Also compute split-half top-4-neighbor overlap as a stability diagnostic.
-
-If the coverage gate fails at 128 calibration examples, extend exactly once
-with 128 additional disjoint MATH-train examples (256 total). No further
-extension.
-
-If the 256-example gate still fails:
-- mark substitution calibration `INSUFFICIENT`;
-- run the full substitution-OFF matrix;
-- skip substitution-ON cells rather than inventing unsupported similarities.
-
-No accuracy/quality validation is part of this packet.
+Same-global comparisons:
+- R4/B16 vs R8/B8 = 64 requests;
+- R4/B32 vs R8/B16 = 128;
+- R4/B64 vs R8/B32 = 256.
 
 ---
 
-## 4. Global cache budget and eviction
+## 3. Substitution calibration — SERE-style
 
-R in {4,8}.
+Do **not** calibrate expert similarity on MATH or ShareGPT.
 
-Cache ratio is a **global-slot ratio**, fixed independently of R:
+The primary calibration must reproduce the SERE-style calibration already used
+in this project:
 
+- dataset: **FineWeb-Edu**;
+- data volume: **400 sequences x 128 tokens** = 51,200 tokens;
+- deterministic seed 42 for the frozen subset;
+- similarity metric: **SERE Frobenius output similarity**;
+- layer-wise expert similarity matrices normalized exactly as the existing
+  SERE-compatible implementation;
+- target model: the same Qwen3-30B-A3B checkpoint used for workload capture.
+
+Substitution thresholds remain:
+- gate protection = 0.20;
+- similarity threshold = 0.65.
+
+### 3.1 Reuse before recalibration
+
+First audit the existing similarity artifact used by the project.
+
+If provenance confirms that it was produced from:
+- this exact model checkpoint;
+- FineWeb-Edu 400 x 128;
+- the SERE Frobenius implementation;
+
+then hash-pin and **reuse it**. Do not recalibrate.
+
+If provenance is missing or mismatched, run exactly one FineWeb-Edu SERE
+calibration in the same 8-GPU session before the two workload captures.
+
+Do not replace SERE calibration with co-routed cosine or a workload-specific
+similarity matrix.
+
+No accuracy validation is required in this packet.
+
+---
+
+## 4. Cache / eviction / substitution grid
+
+Ranks:
 ```
-cache = {30%,40%,50%,60%}
-global_slots = floor(48 * 128 * cache_ratio)
+R={4,8}
 ```
 
-Split global slots across R ranks as evenly as possible. R=8 does not silently
-receive twice the total expert-cache budget of R=4.
+Local batches:
+```
+B={8,16,32,64}
+```
+
+Cache ratio is a **global-slot ratio**, independent of R:
+```
+cache={30%,40%,50%,60%}
+global_slots=floor(48*128*cache_ratio)
+```
+Split those slots across ranks as evenly as possible.
 
 Eviction:
 - LRU;
-- Gate-score (W=128).
-
-No Coverage eviction in this packet.
+- Gate-score, W=128.
 
 Substitution:
 - OFF;
-- ON using the new MATH calibration and frozen thresholds:
-  gate protect=0.20, similarity=0.65.
+- ON using the SERE-style FineWeb-Edu similarity and frozen thresholds.
+
+No Coverage eviction.
 
 ---
 
-## 5. Hit / miss metrics
+## 5. Required hit / miss accounting
 
-Report both route-count weighted and gate-mass weighted forms.
+Report route-count weighted and gate-mass weighted metrics.
 
-Before miss admission at every event:
+Before admission at each event:
 
 ### Exact global hit
-The requested exact expert has at least one resident copy on any rank.
+Requested exact expert has any resident copy.
 
 ### Exact local hit
-The requested exact expert already has a copy on the request's origin rank.
+Requested exact expert is already resident on the origin rank.
 
 ### Substitute hit
-The exact expert is globally missing, but the frozen substitution policy maps
-it to an already-resident eligible substitute, so no exact H2D fetch is needed.
+Exact expert is globally missing, but the frozen substitution policy can route
+it to a resident eligible substitute, avoiding an exact CPU fetch.
 
 ### Effective hit
 ```
@@ -219,22 +205,18 @@ effective_hit = exact_global_hit + substitute_hit
 with disjoint counting.
 
 ### Residual miss
-After optional substitution, an exact expert must still be fetched from CPU.
+After optional substitution, the exact expert must still be fetched.
 
 Also report:
-- effective local hit: local exact service or local resident substitute service;
-- global exact-hit rate;
-- local exact-hit rate;
-- substitute-hit rate;
-- effective-hit rate;
-- residual-miss rate;
+- effective local hit;
 - unique expert-event miss rate;
 - reload rate;
-- evictions / global slot / decode step (cache turnover);
+- cache turnover = evictions / global_slots / decode_step;
 - mean unique resident experts;
-- per-rank fetch counts and imbalance.
+- per-rank mandatory fetch counts and imbalance.
 
-These metrics are required before interpreting BR/CA/CA-rep.
+These metrics are required for every dataset / R / B / cache / eviction /
+substitution configuration before interpreting policy headroom.
 
 ---
 
@@ -242,27 +224,18 @@ These metrics are required before interpreting BR/CA/CA-rep.
 
 **BR = Balanced Random.**
 
-For each layer-event, collect residual exact-miss experts after substitution.
+For every layer-event after substitution, collect residual exact-miss experts.
 
-Create balanced rank quotas whose counts differ by at most one.
-
-Assign miss experts randomly to rank quota slots with deterministic seed 42.
+Create rank quotas whose counts differ by at most one, then randomly assign
+experts to quota slots with deterministic seed 42.
 
 Properties:
-- every expert gets exactly one primary copy;
-- rank fetch-count balance is enforced;
-- current rank demand is NOT used in assignment;
-- same cache/eviction/substitution state semantics as other policies.
+- one primary copy per residual miss;
+- balanced mandatory fetch count;
+- no rank-demand information in the assignment.
 
-Full grid uses seed 42.
-
-Randomness audit only:
-run seeds {7,42,99} on the following 8 substitution-OFF/Gate anchors:
-- R={4,8};
-- B={8,64};
-- cache={30%,60%}.
-
-No other seed sweep.
+Randomness audit only: use seeds 7 and 99 in addition to seed42 for 8 total
+extreme anchors across the two datasets. No full seed sweep.
 
 ---
 
@@ -272,29 +245,21 @@ No other seed sweep.
 
 Use exactly the same balanced rank quotas as BR.
 
-For each residual miss expert e and rank r, compute current-event demand
-`d[e,r]` from effective routes.
+For residual miss expert e and rank r, compute current-event effective-route
+rank demand d[e,r].
 
-Solve the exact balanced assignment:
+Solve the exact balanced assignment maximizing local demand (equivalently,
+minimizing exact peer traffic under the frozen event accounting) while keeping
+the BR quota fixed.
 
-```
-maximize sum_e,r d[e,r] * x[e,r]
-subject to:
-  each miss expert assigned to exactly one rank
-  rank assignment counts equal the BR quotas
-```
+CA:
+- uses current event demand only;
+- has no future knowledge;
+- does not migrate already-resident experts;
+- does not relax rank quotas;
+- has no controller-overhead measurement in this packet.
 
-Equivalent exact peer-byte minimization may be used when dispatch/combine
-interactions are recomputed exactly.
-
-This is a current-event oracle:
-- no future routing knowledge;
-- no controller-overhead measurement;
-- no quota relaxation;
-- no migration of already-resident experts.
-
-BR vs CA therefore isolates **where the same balanced set of mandatory H2D
-fetches is placed**.
+BR vs CA isolates the value of **where** the same mandatory fetches are placed.
 
 ---
 
@@ -302,93 +267,105 @@ fetches is placed**.
 
 **CA-rep = CA plus selective future-popularity oracle replication.**
 
-First run the mandatory CA primary placement.
+Mandatory primary placement is CA.
 
-For each newly admitted residual-miss expert e:
-- consider at most ONE extra replica;
-- candidate ranks exclude the primary;
-- choose the non-primary rank with the largest cumulative future raw demand for
-  e over the remaining same-layer decode opportunities in the frozen 64-step
-  trace.
+For each newly admitted residual-miss expert:
+- consider at most one additional replica;
+- candidate ranks exclude its CA primary rank;
+- use the remaining same-layer decode demand in the frozen trace to find the
+  best persistent non-primary rank.
 
-Define optimistic future communication value:
-
+For the one chosen rank compute:
 ```
-V(e,r) = cumulative peer activation bytes that a persistent local copy on r
-         could avoid over the remaining same-layer decode opportunities.
+V(e,r) = optimistic cumulative peer bytes a persistent local copy could avoid
+         over remaining same-layer decode opportunities.
 ```
 
 Admission rule:
 ```
-replicate e on best r only if V(e,r) >= one expert payload = 9 MiB.
+replicate only when V(e,r) >= 9 MiB
 ```
+(one expert payload).
 
-This is deliberately per-expert, not a global replica-ratio policy.
+This is a per-expert decision, not a replica-ratio policy.
 
 Replica semantics:
-- one extra copy maximum per miss expert;
-- replica costs a normal 9-MiB H2D fetch;
-- no replica protection beyond normal same-event active protection;
-- after admission, it is an ordinary cache entry;
-- LRU/Gate may evict it naturally;
-- a replica may evict another legal cache entry, causing later real reloads;
-- all those H2D/reload effects are counted;
-- no migration/refresh of an already-resident replica.
+- costs one normal 9-MiB H2D;
+- no protection except same-event active protection;
+- ordinary LRU/Gate eviction afterwards;
+- can create victim-induced future reloads;
+- no migration or refresh.
 
-The oracle sees future **raw demand only**, not future cache evictions or future
-substitution outcomes. Actual replay determines realized benefit.
+The oracle sees future raw demand only, not future cache evictions or future
+substitution decisions. Actual replay determines realized costs.
 
-For diagnosis, report `V / 9MiB` candidate fractions in bins:
-`<.25, .25-.5, .5-1, 1-2, >=2`.
-Do not add extra CA-rep policies for those bins.
+Also report V/9MiB bins:
+<.25, .25-.5, .5-1, 1-2, >=2.
 
 ---
 
-## 9. CPU matrix
+## 9. CPU matrix and cost control
 
-Base system configurations:
-
+Per dataset, base system configurations:
 ```
-R:            2  = {4,8}
-local batch:  4  = {8,16,32,64}
-cache:        4  = {30,40,50,60%}
-eviction:     2  = {LRU,Gate}
-substitution: 2  = {OFF,ON}
---------------------------------
-128 base configurations
+R:            2
+B:            4
+cache:        4
+eviction:     2
+substitution: 2
+----------------
+128 base configs
 ```
 
-For every valid base configuration run:
+Policies:
 - BR;
 - CA;
 - CA-rep.
 
-Main replay count:
+Per dataset:
 ```
-128 * 3 = 384
-```
-
-Add 16 extra BR seed-audit replays (8 anchors x two non-default seeds).
-
-Maximum CPU policy replays:
-```
-400
+128*3 = 384 main replays
 ```
 
-If substitution calibration is insufficient, skip the 64 substitution-ON base
-configurations and record the reduced matrix explicitly.
+Two datasets:
+```
+768 main CPU replays
+```
 
-One CPU process per replay; parallelize conservatively only if aggregate host
-RAM remains under the existing server guard. No GPU is used after the single
-calibration/master-capture session.
+Add at most 16 total extra BR replays for the frozen seed audit across both
+datasets.
+
+Hard maximum:
+```
+784 CPU policy replays
+```
+
+### Parallel execution
+
+CPU replay is single-threaded per cell. Run at most 16 cells concurrently,
+subject to:
+- aggregate replay RSS <=32 GiB;
+- host available memory >=512 GiB before launching a wave;
+- BLAS/OMP=1 per process;
+- CUDA hidden during CPU replay.
+
+Use deterministic cell checkpoints so completed cells are never rerun after an
+interruption.
+
+The expensive model is loaded only once for:
+- optional one-time SERE calibration if reuse is impossible;
+- MATH master capture;
+- ShareGPT master capture.
+
+No GPU run is repeated for R/cache/eviction/substitution/policy combinations.
 
 ---
 
-## 10. Required BR / CA / CA-rep headroom outputs
+## 10. Required BR / CA / CA-rep outputs
 
-For every base configuration report:
+For every base configuration:
 
-### BR -> CA
+### BR -> CA placement headroom
 - peer-byte reduction;
 - remote token-rank-pair reduction;
 - local-service increase;
@@ -396,9 +373,7 @@ For every base configuration report:
 - reload delta;
 - rank-fetch imbalance delta.
 
-This is the **single-copy placement headroom**.
-
-### CA -> CA-rep
+### CA -> CA-rep replication headroom
 - peer-byte reduction;
 - extra H2D;
 - replica admissions;
@@ -407,28 +382,26 @@ This is the **single-copy placement headroom**.
 - local-service increase;
 - duplicate occupancy.
 
-This is the **selective replication headroom**.
-
-### R / batch trends
-Primary plots:
+### Required trend views
 1. BR vs CA peer reduction over R x B;
-2. CA vs CA-rep H2D-peer tradeoff over R x B;
+2. CA vs CA-rep H2D-peer movement over R x B;
 3. exact/substitute/effective hit and residual miss over cache x batch;
-4. cache turnover/reload rate;
+4. cache turnover / reload rate;
 5. R4 vs R8 at equal global request count;
-6. substitution OFF vs ON;
-7. LRU vs Gate.
+6. MATH vs ShareGPT;
+7. substitution OFF vs ON;
+8. LRU vs Gate.
 
-No artificial weighted "winner" is required.
+Do not force a single weighted winner.
 
 ---
 
-## 11. Predeclared interpretation labels
+## 11. Descriptive labels
 
 ### CA_HEADROOM
 CA reduces peer bytes >=10% versus BR while:
-- H2D bytes are within +/-2%; and
-- maximum/minimum rank mandatory-fetch count differs by no more than BR +1.
+- H2D within +/-2%;
+- mandatory rank-fetch imbalance no worse than BR +1 expert.
 
 ### CA_STRONG_HEADROOM
 Same constraints, peer reduction >=25%.
@@ -437,55 +410,33 @@ Same constraints, peer reduction >=25%.
 CA-rep reduces peer bytes >=20% versus CA while H2D increases <=15%.
 
 ### CA_REP_TRADEOFF
-CA-rep reduces peer bytes >=20% but H2D increases >15%; report the raw Pareto
-movement without calling it a system win.
+Peer reduction >=20% but H2D increase >15%.
 
 ### SUBSTITUTION_RELIEVES_MISS_PRESSURE
 Substitution ON reduces residual-miss rate or reload bytes >=20% versus matched
-OFF while reporting the substitute route/gate-mass fraction.
+OFF, with substitute route/gate-mass fraction reported.
 
 ### HIGH_MISS_PRESSURE
 Residual-miss rate >=30% OR decode cache-turnover >=1 global cache per decode
-step. This is the regime where substitution/system admission pressure is
-explicitly flagged.
+step.
 
-Labels are descriptive CPU headroom labels only, not Env 1/Env 2 latency claims.
-
----
-
-## 12. Resource-efficient GPU execution
-
-Use all 8 GPUs for one bounded model session only:
-
-1. load the exact Qwen3-30B-A3B model/runtime once;
-2. collect 128-sample MATH-train substitution calibration;
-3. extend to 256 only if the frozen calibration coverage gate fails;
-4. capture the 512-request MATH-test master trace with 64 fixed decode tokens;
-5. hash/validate artifacts;
-6. unload and return to CPU-only replay.
-
-No separate GPU capture for each R, batch, cache, eviction, substitution or
-policy.
-
-This is the main cost-saving design.
-
-Preserve the server's existing ownership/resource guards. Do not kill unrelated
-jobs.
+These are CPU resource-headroom labels, not Env 1/Env 2 latency claims.
 
 ---
 
-## 13. Scope boundary
+## 12. Scope boundary
 
-This packet does NOT:
-- measure Env 1 or Env 2 E2E/TPOT;
-- run NCCL timing;
-- evaluate accuracy;
-- tune substitution thresholds;
-- tune an online CA controller;
-- use a replica ratio rho;
-- protect replicas;
-- run B128;
-- run Coverage eviction.
+No:
+- Env 1 / Env 2 E2E or TPOT;
+- NCCL timing;
+- accuracy evaluation;
+- substitution threshold tuning;
+- workload-specific similarity calibration;
+- online CA controller timing;
+- replica ratio rho;
+- replica protection;
+- B128;
+- Coverage eviction.
 
-After the CPU headroom result, stop for owner review. The next packet, only if
-authorized, will pick a minimal representative subset for Env 1 / Env 2 E2E.
+After CPU results, stop for owner review. A later packet may select only a
+minimal representative subset for Env 1 / Env 2 E2E.
