@@ -179,7 +179,7 @@ def generate(model,rt,initial_ids,initial_mask):
 def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'));rank=dist.get_rank()
- cell=json.loads((PACKET/'matrix.json').read_text())['cells'][a.cell];a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=cell['substitution']
+ cell=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][a.cell];a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=cell['substitution']
  world=cell['ranks'];assert dist.get_world_size()==world
  total=int(48*128*cell['cache_ratio']);a.capacities=[total//world+(r<total%world) for r in range(world)]
  records=json.loads((SOURCE/(a.dataset+'_requests.json')).read_text())['requests'][:world*a.batch];records=records[rank::world]
@@ -209,7 +209,7 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])

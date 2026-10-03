@@ -1,0 +1,131 @@
+{
+  "status": "FROZEN_EXECUTION_PROTOCOL",
+  "checkpoint": "487c479ff17a7ae9ffe7babf1271d24815e013a9",
+  "purpose": "physical E2E/TPOT validation with real GPU expert offloading",
+  "terminology": {
+    "env1": "NVSwitch P2P/IPC",
+    "env2": "P2P disabled SHM",
+    "policies": [
+      "BR",
+      "CA",
+      "CA-rep"
+    ]
+  },
+  "environments": {
+    "env1": {
+      "NCCL_CUMEM_ENABLE": "0",
+      "p2p": "enabled",
+      "preflight_expected": "P2P/IPC no NET"
+    },
+    "env2": {
+      "NCCL_CUMEM_ENABLE": "0",
+      "NCCL_P2P_DISABLE": "1",
+      "NCCL_IB_DISABLE": "1",
+      "preflight_expected": "SHM/direct/direct no P2P no NET"
+    }
+  },
+  "cells": {
+    "P": {
+      "dataset": "ShareGPT",
+      "decode_tokens": 256,
+      "ranks": 8,
+      "local_batch": 16,
+      "global_requests": 128,
+      "cache_ratio": 0.4,
+      "eviction": "gate",
+      "substitution": true,
+      "policies": [
+        "BR",
+        "CA",
+        "CA-rep"
+      ]
+    },
+    "R": {
+      "dataset": "MATH",
+      "decode_tokens": 256,
+      "ranks": 4,
+      "local_batch": 64,
+      "global_requests": 256,
+      "cache_ratio": 0.3,
+      "eviction": "gate",
+      "substitution": true,
+      "policies": [
+        "BR",
+        "CA",
+        "CA-rep"
+      ],
+      "resource_fallback": {
+        "local_batch": 32,
+        "global_requests": 128
+      }
+    },
+    "E": {
+      "dataset": "ShareGPT",
+      "decode_tokens": 256,
+      "ranks": 8,
+      "local_batch": 16,
+      "global_requests": 128,
+      "cache_ratio": 0.4,
+      "eviction": "gate",
+      "substitution": false,
+      "policies": [
+        "BR",
+        "CA"
+      ]
+    }
+  },
+  "substitution": {
+    "calibration": "FineWeb-Edu 400x128 SERE Frobenius",
+    "gate_protect": 0.2,
+    "similarity_threshold": 0.65
+  },
+  "gate_eviction": {
+    "window_tokens": 128,
+    "replica_protection": false
+  },
+  "phases": [
+    "PLAN",
+    "COMPILE",
+    "MEASURE",
+    "COUNTERS"
+  ],
+  "measure": {
+    "warmup_repeats": 1,
+    "timed_repeats": 3,
+    "targeted_noise_extra_repeats_max": 2,
+    "max_repeats_per_policy": 5,
+    "no_per_token_logging": true,
+    "no_per_layer_events": true,
+    "no_controller_optimization": true,
+    "no_compile_in_timer": true,
+    "no_profiler": true
+  },
+  "metrics": {
+    "timing": [
+      "E2E_wall",
+      "TPOT",
+      "decode_wall"
+    ],
+    "counters": [
+      "exact_global_hit",
+      "exact_local_hit",
+      "resident_substitute_hit",
+      "effective_hit",
+      "residual_miss",
+      "H2D_bytes",
+      "reload_bytes",
+      "peer_bytes",
+      "local_service_fraction",
+      "cache_turnover",
+      "replica_admissions",
+      "replica_reuse",
+      "replica_victim_reloads"
+    ]
+  },
+  "primary_policy_environment_cells": 16,
+  "primary_timed_generations_at_3_repeats": 48,
+  "lru_physical_sweep": false,
+  "no_accuracy": true,
+  "no_nsight": true,
+  "automatic_followup": false
+}

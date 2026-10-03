@@ -9,7 +9,7 @@ def snapshot():
  rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.used,memory.free,temperature.gpu','--format=csv,noheader,nounits'],text=True)
  return dict(gpus=[dict(zip(['gpu','used_mib','free_mib','temperature_c'],map(int,r.split(',')))) for r in rows.splitlines()],host_available_bytes=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:')))
 def run(cell,policy,phase,environment,repeat=0):
- spec=json.loads((PACKET/'matrix.json').read_text())['cells'][cell];world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
+ spec=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][cell];world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
  label=f'{cell}_{policy}_{environment}_{phase}_{repeat}';out=ROOT/label;out.mkdir(exist_ok=False);state=dict(status='RUNNING',cell=cell,policy=policy,phase=phase,environment=environment,repeat=repeat,started_unix=time.time(),samples=[])
  initial=snapshot();cooldown=time.monotonic()
  while any(g['temperature_c']>=65 for g in initial['gpus']) and time.monotonic()-cooldown<180:
