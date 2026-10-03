@@ -1,5 +1,11 @@
 # Future rank-affinity single-copy placement
 
+**Complete: NO_PLACEMENT_HEADROOM.** All 18 fixed CPU cells and their
+deterministic verification invocations passed. B8 O0 saves 4.9645% peer
+bytes, just below the frozen 5% modest gate. Every OH policy increases peer
+bytes versus O0, although some reduce H2D. See [RESULTS.md](RESULTS.md)
+and [validation.json](validation.json). No GPU run belongs to this packet.
+
 This packet follows the completed selective-replication study
 (`6a8127c`, `NO_HEADROOM`).
 

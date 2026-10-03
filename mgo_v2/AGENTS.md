@@ -15,6 +15,14 @@ substitution, future predictor, cache sweep, Nsight, NCCL tuning, or physical
 F/K/C model timing.
 
 **Owner-authorized CPU-only follow-up (2026-10-03): future rank-affinity single-copy placement.**
+**Completed: NO_PLACEMENT_HEADROOM.** All 18 CPU cells and 18 deterministic
+verification invocations passed. B8 O0 peer reduction is 4.9645%, below the
+frozen 5% modest gate; every OH policy has more peer bytes than O0. Peak RSS
+707.75 MiB. Read the packet's RESULTS.md and validation.json. Do not rerun.
+The owner explicitly requested the queued hot-expert threshold packet next.
+Preserve the owner's shutdown of GPU 2/3/6/7; only workers on 0/1/4/5 may
+be paused/restored for that new packet. Original scope below is historical.
+
 The selective-replication study at `6a8127c` ended `NO_HEADROOM`, but
 rank-local recurrence was high. Change the action, not the signal: on an
 unavoidable global miss/reload, keep exactly one expert copy and choose which

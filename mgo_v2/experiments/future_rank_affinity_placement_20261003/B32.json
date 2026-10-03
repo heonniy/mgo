@@ -1,0 +1,819 @@
+{
+  "status": "PASS",
+  "batch": 32,
+  "provenance": {
+    "summary": {
+      "path": "/home/hwlee/mgo/mgo_v2/experiments/fetch_comm_pareto_p2p_20261002/batch_comm_capture_B32.json",
+      "bytes": 1669,
+      "sha256": "92141650937777926a049fe4d3c33ad612b518352a50c705de644944b0bdafb0"
+    },
+    "raw_receipts": [
+      {
+        "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/capture32/rank0.json",
+        "bytes": 141604541,
+        "sha256": "4d0953d00b1ad2ec863ff2f614d561c9681447defa1e1d54e3c492a2aa9fa715"
+      },
+      {
+        "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/capture32/rank1.json",
+        "bytes": 141604496,
+        "sha256": "6ca0f2ed94f99b52d6f12a896e2f8172422795744854e334f43f09d5f7032e54"
+      },
+      {
+        "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/capture32/rank2.json",
+        "bytes": 141604497,
+        "sha256": "803486272e26353c43a01f1719ed6690d6bae4854eaf4a809928b3279902902f"
+      },
+      {
+        "path": "/home/hwlee/mgo-results/fetch_comm_pareto_p2p_20261002/batch_comm_20261003/capture32/rank3.json",
+        "bytes": 141604491,
+        "sha256": "fa43e637c50c39b2840d48612d466a0de61463352990da84d296028fdcbc9d74"
+      }
+    ],
+    "cross_rank_validation": true
+  },
+  "points": [
+    {
+      "batch": 32,
+      "policy": "F",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24671,
+      "replica_fetches": 0,
+      "total_fetches": 24801,
+      "expert_h2d_bytes": 234051600384,
+      "peer_activation_bytes": 1467256832,
+      "dispatch_bytes": 402190336,
+      "combine_bytes": 1065066496,
+      "remote_token_rank_pairs": 98191,
+      "remote_expert_routes": 260026,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.3387196858723958,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        7917,
+        6919,
+        5307,
+        4658
+      ],
+      "owner_choice_histogram": [
+        7917,
+        6919,
+        5307,
+        4658
+      ],
+      "owner_decisions": 24801,
+      "owner_changes": 0,
+      "fraction_owner_differs_F": 0.0,
+      "next_demand_eligible": 20113,
+      "survived_next_demand": 116,
+      "fraction_survived_next_demand": 0.005767414110276935,
+      "changed_next_demand_eligible": 0,
+      "changed_survived_next_demand": 0,
+      "admissions_without_observed_next_demand": 4688,
+      "owner_attributable_peer_bytes_saved": 0,
+      "deterministic_sha256": "ee879bbc518e98e171fbb3923663b4b74e91a278ca05a4f4bcdc90fccd46d89d",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "F",
+          "expert_h2d_bytes": 14118027264,
+          "peer_activation_bytes": 198090752,
+          "reload_fetches": 1487,
+          "owner_changes": 0
+        },
+        {
+          "step": 2,
+          "policy": "F",
+          "expert_h2d_bytes": 25895632896,
+          "peer_activation_bytes": 191193088,
+          "reload_fetches": 2716,
+          "owner_changes": 0
+        },
+        {
+          "step": 3,
+          "policy": "F",
+          "expert_h2d_bytes": 29236396032,
+          "peer_activation_bytes": 179486720,
+          "reload_fetches": 3078,
+          "owner_changes": 0
+        },
+        {
+          "step": 4,
+          "policy": "F",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 183242752,
+          "reload_fetches": 3192,
+          "owner_changes": 0
+        },
+        {
+          "step": 5,
+          "policy": "F",
+          "expert_h2d_bytes": 32397852672,
+          "peer_activation_bytes": 180989952,
+          "reload_fetches": 3409,
+          "owner_changes": 0
+        },
+        {
+          "step": 6,
+          "policy": "F",
+          "expert_h2d_bytes": 32445038592,
+          "peer_activation_bytes": 175329280,
+          "reload_fetches": 3429,
+          "owner_changes": 0
+        },
+        {
+          "step": 7,
+          "policy": "F",
+          "expert_h2d_bytes": 32869711872,
+          "peer_activation_bytes": 184258560,
+          "reload_fetches": 3467,
+          "owner_changes": 0
+        },
+        {
+          "step": 8,
+          "policy": "F",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 174665728,
+          "reload_fetches": 3893,
+          "owner_changes": 0
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_F_primary.jsonl.gz",
+        "bytes": 121275,
+        "sha256": "63989db95cb5362cf4548e751cc41653da2fc401d438d517b646e859d491712c"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_F_primary_lifetimes.json.gz",
+        "bytes": 130382,
+        "sha256": "b736792d62daad98cb47cadc3563af3850b7ccc235513f7000b1bf76f38ac89d"
+      }
+    },
+    {
+      "batch": 32,
+      "policy": "O0",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24466,
+      "replica_fetches": 0,
+      "total_fetches": 24596,
+      "expert_h2d_bytes": 232116977664,
+      "peer_activation_bytes": 1372041216,
+      "dispatch_bytes": 288493568,
+      "combine_bytes": 1083547648,
+      "remote_token_rank_pairs": 70433,
+      "remote_expert_routes": 264538,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.3272450764973958,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        8274,
+        6465,
+        5232,
+        4625
+      ],
+      "owner_choice_histogram": [
+        8274,
+        6465,
+        5232,
+        4625
+      ],
+      "owner_decisions": 24596,
+      "owner_changes": 3510,
+      "fraction_owner_differs_F": 0.1427061310782241,
+      "next_demand_eligible": 19909,
+      "survived_next_demand": 189,
+      "fraction_survived_next_demand": 0.009493194032849464,
+      "changed_next_demand_eligible": 2963,
+      "changed_survived_next_demand": 21,
+      "admissions_without_observed_next_demand": 4687,
+      "owner_attributable_peer_bytes_saved": 96940032,
+      "deterministic_sha256": "a16fc7c82af3869d5bac237b466e3342e6ca22957a907629661e77dbd4d7cdf7",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "O0",
+          "expert_h2d_bytes": 13306429440,
+          "peer_activation_bytes": 182239232,
+          "reload_fetches": 1401,
+          "owner_changes": 274
+        },
+        {
+          "step": 2,
+          "policy": "O0",
+          "expert_h2d_bytes": 24791482368,
+          "peer_activation_bytes": 175505408,
+          "reload_fetches": 2599,
+          "owner_changes": 405
+        },
+        {
+          "step": 3,
+          "policy": "O0",
+          "expert_h2d_bytes": 29217521664,
+          "peer_activation_bytes": 167493632,
+          "reload_fetches": 3076,
+          "owner_changes": 399
+        },
+        {
+          "step": 4,
+          "policy": "O0",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 172949504,
+          "reload_fetches": 3192,
+          "owner_changes": 468
+        },
+        {
+          "step": 5,
+          "policy": "O0",
+          "expert_h2d_bytes": 32397852672,
+          "peer_activation_bytes": 170008576,
+          "reload_fetches": 3409,
+          "owner_changes": 455
+        },
+        {
+          "step": 6,
+          "policy": "O0",
+          "expert_h2d_bytes": 32445038592,
+          "peer_activation_bytes": 166383616,
+          "reload_fetches": 3429,
+          "owner_changes": 442
+        },
+        {
+          "step": 7,
+          "policy": "O0",
+          "expert_h2d_bytes": 32869711872,
+          "peer_activation_bytes": 171466752,
+          "reload_fetches": 3467,
+          "owner_changes": 542
+        },
+        {
+          "step": 8,
+          "policy": "O0",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 165994496,
+          "reload_fetches": 3893,
+          "owner_changes": 525
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_O0_primary.jsonl.gz",
+        "bytes": 355693,
+        "sha256": "be74483fcf23bed7762eec26a40a0779544c831520c87111959f08545b73cfb2"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_O0_primary_lifetimes.json.gz",
+        "bytes": 392956,
+        "sha256": "6bd9710e129a97b6275f4b72b7bd89fc7e0660ef4d3b5d74b0349f707b5393c3"
+      }
+    },
+    {
+      "batch": 32,
+      "policy": "OH1",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24288,
+      "replica_fetches": 0,
+      "total_fetches": 24418,
+      "expert_h2d_bytes": 230437158912,
+      "peer_activation_bytes": 1387196416,
+      "dispatch_bytes": 282165248,
+      "combine_bytes": 1105031168,
+      "remote_token_rank_pairs": 68888,
+      "remote_expert_routes": 269783,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.31390635172526044,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        8513,
+        5938,
+        5314,
+        4653
+      ],
+      "owner_choice_histogram": [
+        8513,
+        5938,
+        5314,
+        4653
+      ],
+      "owner_decisions": 24418,
+      "owner_changes": 6491,
+      "fraction_owner_differs_F": 0.26582848718158736,
+      "next_demand_eligible": 19732,
+      "survived_next_demand": 327,
+      "fraction_survived_next_demand": 0.01657206568011352,
+      "changed_next_demand_eligible": 5943,
+      "changed_survived_next_demand": 83,
+      "admissions_without_observed_next_demand": 4686,
+      "owner_attributable_peer_bytes_saved": 83087360,
+      "deterministic_sha256": "c09231ff51f681cc845e4dca48fb5e08cb66807b96ba93a17cf95c8bfb77258c",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "OH1",
+          "expert_h2d_bytes": 13315866624,
+          "peer_activation_bytes": 182046720,
+          "reload_fetches": 1402,
+          "owner_changes": 403
+        },
+        {
+          "step": 2,
+          "policy": "OH1",
+          "expert_h2d_bytes": 23819452416,
+          "peer_activation_bytes": 177545216,
+          "reload_fetches": 2496,
+          "owner_changes": 756
+        },
+        {
+          "step": 3,
+          "policy": "OH1",
+          "expert_h2d_bytes": 28698476544,
+          "peer_activation_bytes": 171450368,
+          "reload_fetches": 3021,
+          "owner_changes": 777
+        },
+        {
+          "step": 4,
+          "policy": "OH1",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 174800896,
+          "reload_fetches": 3192,
+          "owner_changes": 948
+        },
+        {
+          "step": 5,
+          "policy": "OH1",
+          "expert_h2d_bytes": 32397852672,
+          "peer_activation_bytes": 171839488,
+          "reload_fetches": 3409,
+          "owner_changes": 1016
+        },
+        {
+          "step": 6,
+          "policy": "OH1",
+          "expert_h2d_bytes": 32445038592,
+          "peer_activation_bytes": 170770432,
+          "reload_fetches": 3429,
+          "owner_changes": 910
+        },
+        {
+          "step": 7,
+          "policy": "OH1",
+          "expert_h2d_bytes": 32671531008,
+          "peer_activation_bytes": 172748800,
+          "reload_fetches": 3446,
+          "owner_changes": 1156
+        },
+        {
+          "step": 8,
+          "policy": "OH1",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 165994496,
+          "reload_fetches": 3893,
+          "owner_changes": 525
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH1_primary.jsonl.gz",
+        "bytes": 400309,
+        "sha256": "f0f2f6db39bb9f1844c013b20dfd898e9de45d384b446d3c3b88701a7324d13b"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH1_primary_lifetimes.json.gz",
+        "bytes": 438418,
+        "sha256": "65ef050c4a2811e14638112681d5012a0fad8f8369e878b33b54c379710d984d"
+      }
+    },
+    {
+      "batch": 32,
+      "policy": "OH2",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24279,
+      "replica_fetches": 0,
+      "total_fetches": 24409,
+      "expert_h2d_bytes": 230352224256,
+      "peer_activation_bytes": 1395343360,
+      "dispatch_bytes": 283119616,
+      "combine_bytes": 1112223744,
+      "remote_token_rank_pairs": 69121,
+      "remote_expert_routes": 271539,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.30944061279296875,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        8689,
+        5770,
+        5102,
+        4848
+      ],
+      "owner_choice_histogram": [
+        8689,
+        5770,
+        5102,
+        4848
+      ],
+      "owner_decisions": 24409,
+      "owner_changes": 7282,
+      "fraction_owner_differs_F": 0.2983325822442542,
+      "next_demand_eligible": 19723,
+      "survived_next_demand": 361,
+      "fraction_survived_next_demand": 0.018303503523804696,
+      "changed_next_demand_eligible": 6735,
+      "changed_survived_next_demand": 118,
+      "admissions_without_observed_next_demand": 4686,
+      "owner_attributable_peer_bytes_saved": 76677120,
+      "deterministic_sha256": "923e75198c14ca8fafc2814d8280d3ffb599528783d72478355b8c6d74cdbc38",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "OH2",
+          "expert_h2d_bytes": 13325303808,
+          "peer_activation_bytes": 184012800,
+          "reload_fetches": 1403,
+          "owner_changes": 442
+        },
+        {
+          "step": 2,
+          "policy": "OH2",
+          "expert_h2d_bytes": 24027070464,
+          "peer_activation_bytes": 177377280,
+          "reload_fetches": 2518,
+          "owner_changes": 852
+        },
+        {
+          "step": 3,
+          "policy": "OH2",
+          "expert_h2d_bytes": 28877783040,
+          "peer_activation_bytes": 171515904,
+          "reload_fetches": 3040,
+          "owner_changes": 862
+        },
+        {
+          "step": 4,
+          "policy": "OH2",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 177012736,
+          "reload_fetches": 3192,
+          "owner_changes": 1160
+        },
+        {
+          "step": 5,
+          "policy": "OH2",
+          "expert_h2d_bytes": 32397852672,
+          "peer_activation_bytes": 174465024,
+          "reload_fetches": 3409,
+          "owner_changes": 1152
+        },
+        {
+          "step": 6,
+          "policy": "OH2",
+          "expert_h2d_bytes": 31765561344,
+          "peer_activation_bytes": 173142016,
+          "reload_fetches": 3357,
+          "owner_changes": 1125
+        },
+        {
+          "step": 7,
+          "policy": "OH2",
+          "expert_h2d_bytes": 32869711872,
+          "peer_activation_bytes": 171823104,
+          "reload_fetches": 3467,
+          "owner_changes": 1164
+        },
+        {
+          "step": 8,
+          "policy": "OH2",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 165994496,
+          "reload_fetches": 3893,
+          "owner_changes": 525
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH2_primary.jsonl.gz",
+        "bytes": 418881,
+        "sha256": "6376464bb8999eb69901185b124f96a4782cb7596fe1f6fc8c232a50c6468663"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH2_primary_lifetimes.json.gz",
+        "bytes": 458953,
+        "sha256": "a044fc8a0cca5a6ca050460430523aa28041220d6d755e6345e83f661e6cc203"
+      }
+    },
+    {
+      "batch": 32,
+      "policy": "OH4",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24324,
+      "replica_fetches": 0,
+      "total_fetches": 24454,
+      "expert_h2d_bytes": 230776897536,
+      "peer_activation_bytes": 1405968384,
+      "dispatch_bytes": 287330304,
+      "combine_bytes": 1118638080,
+      "remote_token_rank_pairs": 70149,
+      "remote_expert_routes": 273105,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.30545806884765625,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        8736,
+        5748,
+        4859,
+        5111
+      ],
+      "owner_choice_histogram": [
+        8736,
+        5748,
+        4859,
+        5111
+      ],
+      "owner_decisions": 24454,
+      "owner_changes": 7753,
+      "fraction_owner_differs_F": 0.31704424634006706,
+      "next_demand_eligible": 19770,
+      "survived_next_demand": 334,
+      "fraction_survived_next_demand": 0.01689428426909459,
+      "changed_next_demand_eligible": 7209,
+      "changed_survived_next_demand": 110,
+      "admissions_without_observed_next_demand": 4684,
+      "owner_attributable_peer_bytes_saved": 63836160,
+      "deterministic_sha256": "ae73aa1fd4316b0923077f618506e7a53a98572289679a21b9b5adaabe49fc3c",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "OH4",
+          "expert_h2d_bytes": 13391364096,
+          "peer_activation_bytes": 185700352,
+          "reload_fetches": 1410,
+          "owner_changes": 472
+        },
+        {
+          "step": 2,
+          "policy": "OH4",
+          "expert_h2d_bytes": 24461180928,
+          "peer_activation_bytes": 180244480,
+          "reload_fetches": 2564,
+          "owner_changes": 926
+        },
+        {
+          "step": 3,
+          "policy": "OH4",
+          "expert_h2d_bytes": 29217521664,
+          "peer_activation_bytes": 178765824,
+          "reload_fetches": 3076,
+          "owner_changes": 1078
+        },
+        {
+          "step": 4,
+          "policy": "OH4",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 174481408,
+          "reload_fetches": 3192,
+          "owner_changes": 1157
+        },
+        {
+          "step": 5,
+          "policy": "OH4",
+          "expert_h2d_bytes": 32369541120,
+          "peer_activation_bytes": 175636480,
+          "reload_fetches": 3406,
+          "owner_changes": 1302
+        },
+        {
+          "step": 6,
+          "policy": "OH4",
+          "expert_h2d_bytes": 31454134272,
+          "peer_activation_bytes": 173273088,
+          "reload_fetches": 3324,
+          "owner_changes": 1131
+        },
+        {
+          "step": 7,
+          "policy": "OH4",
+          "expert_h2d_bytes": 32794214400,
+          "peer_activation_bytes": 171872256,
+          "reload_fetches": 3459,
+          "owner_changes": 1162
+        },
+        {
+          "step": 8,
+          "policy": "OH4",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 165994496,
+          "reload_fetches": 3893,
+          "owner_changes": 525
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH4_primary.jsonl.gz",
+        "bytes": 435843,
+        "sha256": "78b53312b2fa3b47366756646ef56080a79b62ba61a65caa0d539ae45cb73f57"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OH4_primary_lifetimes.json.gz",
+        "bytes": 476843,
+        "sha256": "59f204b731364c2d26ae1a903b98f0b6945d823df063845926ca50905e165275"
+      }
+    },
+    {
+      "batch": 32,
+      "policy": "OHremaining",
+      "first_copy_fetches": 130,
+      "reload_fetches": 24371,
+      "replica_fetches": 0,
+      "total_fetches": 24501,
+      "expert_h2d_bytes": 231220445184,
+      "peer_activation_bytes": 1411399680,
+      "dispatch_bytes": 289730560,
+      "combine_bytes": 1121669120,
+      "remote_token_rank_pairs": 70735,
+      "remote_expert_routes": 273845,
+      "events": 384,
+      "duplicate_slot_mean": 0,
+      "duplicate_slot_peak": 0,
+      "unique_resident_experts_mean": 1843,
+      "local_service_fraction": 0.30357615152994794,
+      "mean_unique_per_rank": [
+        461.0,
+        461.0,
+        461.0,
+        460.0
+      ],
+      "peak_unique_per_rank": [
+        461,
+        461,
+        461,
+        460
+      ],
+      "evictions_per_rank": [
+        8763,
+        5825,
+        4722,
+        5191
+      ],
+      "owner_choice_histogram": [
+        8763,
+        5825,
+        4722,
+        5191
+      ],
+      "owner_decisions": 24501,
+      "owner_changes": 7978,
+      "fraction_owner_differs_F": 0.325619362475001,
+      "next_demand_eligible": 19816,
+      "survived_next_demand": 334,
+      "fraction_survived_next_demand": 0.016855066612838112,
+      "changed_next_demand_eligible": 7434,
+      "changed_survived_next_demand": 127,
+      "admissions_without_observed_next_demand": 4685,
+      "owner_attributable_peer_bytes_saved": 58290176,
+      "deterministic_sha256": "b3a321e2d0e033c213438d4d3d39664b89fd04658fde7948acbcf4a453c20c28",
+      "steps": [
+        {
+          "step": 1,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 13447987200,
+          "peer_activation_bytes": 185171968,
+          "reload_fetches": 1416,
+          "owner_changes": 510
+        },
+        {
+          "step": 2,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 24961351680,
+          "peer_activation_bytes": 182317056,
+          "reload_fetches": 2617,
+          "owner_changes": 997
+        },
+        {
+          "step": 3,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 29104275456,
+          "peer_activation_bytes": 182652928,
+          "reload_fetches": 3064,
+          "owner_changes": 1194
+        },
+        {
+          "step": 4,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 30293360640,
+          "peer_activation_bytes": 174481408,
+          "reload_fetches": 3192,
+          "owner_changes": 1157
+        },
+        {
+          "step": 5,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 32369541120,
+          "peer_activation_bytes": 175636480,
+          "reload_fetches": 3406,
+          "owner_changes": 1302
+        },
+        {
+          "step": 6,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 31454134272,
+          "peer_activation_bytes": 173273088,
+          "reload_fetches": 3324,
+          "owner_changes": 1131
+        },
+        {
+          "step": 7,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 32794214400,
+          "peer_activation_bytes": 171872256,
+          "reload_fetches": 3459,
+          "owner_changes": 1162
+        },
+        {
+          "step": 8,
+          "policy": "OHremaining",
+          "expert_h2d_bytes": 36795580416,
+          "peer_activation_bytes": 165994496,
+          "reload_fetches": 3893,
+          "owner_changes": 525
+        }
+      ],
+      "event_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OHremaining_primary.jsonl.gz",
+        "bytes": 442385,
+        "sha256": "4adea1c11b1fc63fb217e9aee807c6676614cfac8d37bdfa150989cf45b3bb82"
+      },
+      "lifetime_receipt": {
+        "path": "/home/hwlee/mgo-results/future_rank_affinity_placement_20261003/B32_OHremaining_primary_lifetimes.json.gz",
+        "bytes": 483501,
+        "sha256": "500cb1d505ca60a7157032b80435b9d1504008916ba506447c9456445b1c5659"
+      }
+    }
+  ],
+  "deterministic_verification": false,
+  "elapsed_seconds": 143.52786007337272,
+  "peak_rss_mib": 707.73828125
+}

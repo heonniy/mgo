@@ -2,6 +2,11 @@
 
 Checkpoint: `6a8127c`.
 
+**Completed: NO_PLACEMENT_HEADROOM.** All 18 cells and full deterministic
+verification passed; peak RSS 707.75 MiB. Read RESULTS.md and validation.json.
+Do not rerun this packet. The separately owner-requested hot-expert threshold
+packet may proceed after this result is committed.
+
 Read [PLAN.md](PLAN.md).
 
 Implement this as a small extension/reuse of the existing rho=0 cache and
