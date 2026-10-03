@@ -50,13 +50,15 @@ def commit(message):
   subprocess.run(['git','commit','-m',message],cwd=P.parent,check=True)
   subprocess.run(['git','push','origin','HEAD:codex/mgo-r4-trajectory-results-20261002'],cwd=P.parent,check=True)
 
-def run(label,mode,affinity,environment,horizon):
+def run(label,mode,affinity,environment,horizon,residency=None):
  out=ROOT/label
  if (out/'status.json').exists():
   state=json.loads((out/'status.json').read_text());assert state['status']=='PASS',str(out);return state
  out.mkdir(exist_ok=False);initial=sample();safe(initial,True)
- cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/timing_stability_worker.py'),'--output',str(out),'--plan',str(PLAN),'--horizon',str(horizon),'--mode',mode,'--affinity',affinity,'--environment',environment]
- state=dict(status='RUNNING',label=label,mode=mode,affinity=affinity,environment=environment,horizon=horizon,started_unix=time.time(),command=cmd,initial=initial,samples=[],source_sha256=hashlib.sha256((P/'examples/timing_stability_worker.py').read_bytes()).hexdigest())
+ worker='timing_stability_worker.py' if residency is None else 'timing_stability_residency_worker.py'
+ cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples'/worker),'--output',str(out),'--plan',str(PLAN),'--horizon',str(horizon),'--mode',mode,'--affinity',affinity,'--environment',environment]
+ if residency is not None:cmd+=['--residency',residency]
+ state=dict(residency=residency,status='RUNNING',label=label,mode=mode,affinity=affinity,environment=environment,horizon=horizon,started_unix=time.time(),command=cmd,initial=initial,samples=[],source_sha256=hashlib.sha256((P/'examples'/worker).read_bytes()).hexdigest())
  reason=None;timed=False
  with (out/'run.log').open('w') as log:
   proc=subprocess.Popen(cmd,env=env_for(environment),stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(out/'status.json',state)

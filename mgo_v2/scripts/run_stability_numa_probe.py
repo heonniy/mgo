@@ -19,6 +19,25 @@ def launch(label,worker,args,gpus,preflight=False):
  return out
 
 def main():
+ # Owner amendment handoff only after the unchanged six-run S1 completes.
+ if (ROOT/'amendment_f317328.json').exists():
+  import time,sys
+  request=json.loads((ROOT/'amendment_f317328.json').read_text())
+  parent=os.getppid();assert parent==request['original_driver_pid']
+  args=open(f'/proc/{parent}/cmdline','rb').read().split(b'\0')
+  assert any(x.endswith(b'/run_timing_stability.py') for x in args)
+  deadline=time.monotonic()+900
+  while not (ROOT/'amendment_ready').exists():
+   if time.monotonic()>deadline:raise TimeoutError('amended continuation not ready')
+   time.sleep(1)
+  for i,mode in enumerate(['HEAVY','BOUNDARY','BOUNDARY','HEAVY','HEAVY','BOUNDARY'],1):
+   assert json.loads((ROOT/f'S1_{i}_{mode}'/'status.json').read_text())['status']=='PASS'
+  write(ROOT/'amendment_handoff.json',dict(status='S1_COMPLETE_HANDOFF',old_driver_pid=parent,new_driver_pid=os.getpid(),unix=time.time()))
+  os.kill(parent,signal.SIGTERM)  # coordinator only; no science children are active
+  os.setsid()
+  with (ROOT/'amendment_driver.log').open('w') as log:
+   os.dup2(log.fileno(),1);os.dup2(log.fileno(),2)
+  os.execv(sys.executable,[sys.executable,'-u',str(P/'scripts/run_timing_stability_amended.py')])
  topology=json.loads((ROOT/'topology.json').read_text());assert len(topology['nodes'])==1
  assert all(topology['gpu_numa'][str(g)]['effective_os_node']==0 for g in [0,1])
  h2d=launch('S2_local_H2D','stability_numa_probe.py',['--kind','h2d'],[0])
