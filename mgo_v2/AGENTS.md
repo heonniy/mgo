@@ -1,4 +1,13 @@
 **Owner-authorized mechanism-isolation study (2026-10-03): synthetic communication-price crossover.**
+**Complete: TIMING_UNSTABLE; exact C0 RESOURCE_PRICE_SHIFT retained.**
+Read the packet's RESULTS.md and validation.json. Exact lambda crossovers
+are 420.223139, 562.335956, 905.702210 and 1339.761831. Original five-rho
+totals/state hashes and all 20 T0 actual/self cells passed correctness,
+but negative remote premiums and rho=.75 control disagreement fail C2.
+No C3/C4 time-price model, extra timing, H2D or R3 run is accepted.
+Stop this packet. Our GPU 0/1/4/5 model workers were restored; 2/3/6/7
+and their jobs were untouched. The original authorized scope below is history.
+
 Read `experiments/synthetic_comm_price_crossover_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 Use only the existing B8 five-rho frontier. First commit the exact CPU
 resource-price sweep, then freeze all five communication/fetch schedules and
