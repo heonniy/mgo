@@ -66,5 +66,67 @@
   "no_profiler": true,
   "no_new_compile": true,
   "no_heavy_monitor_in_clean_measure": true,
-  "automatic_resume": false
+  "automatic_resume": false,
+  "amendment_20261004": {
+    "guest_topology": {
+      "virtualization": "KVM",
+      "guest_numa_nodes": 1,
+      "gpu_pci_numa_exposed": false,
+      "physical_host_numa": "UNKNOWN_DO_NOT_INFER"
+    },
+    "hypotheses": [
+      "H1_heavy_PSS_monitor_interference",
+      "H2_pageable_file_backed_expert_page_residency",
+      "H3_cpu_scheduler_affinity_variability",
+      "H4_shared_H2D_PCIe_host_memory_contention",
+      "H5_Env2_SHM_pair_cost_nonuniformity",
+      "H6_hidden_host_NUMA_or_hypervisor_placement"
+    ],
+    "finish_existing_S1_sequence": true,
+    "S2A_page_residency": {
+      "modes": [
+        "NORMAL",
+        "PRETOUCH"
+      ],
+      "order": [
+        "NORMAL",
+        "PRETOUCH",
+        "PRETOUCH",
+        "NORMAL"
+      ],
+      "horizon": 64,
+      "monitor": "BOUNDARY",
+      "no_gpu_prefetch": true,
+      "no_page_cache_drop": true
+    },
+    "S2B_h2d_concurrency": {
+      "payload_mib": 9,
+      "concurrent_gpu_counts": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "warmups": 20,
+      "repeats": 50
+    },
+    "S2C_env2_pair_matrix": {
+      "env": "Env2",
+      "pair_labels": "GPU_ID_ONLY_NO_NUMA_INFERENCE",
+      "all_unordered_pairs_preferred": true,
+      "payload_kib": [
+        32,
+        128,
+        512
+      ],
+      "warmups": 20,
+      "repeats": 50
+    },
+    "S3": {
+      "fixed_disjoint_cpu_affinity": true,
+      "monitor": "BOUNDARY",
+      "pretouch_if_S2A_confounded": true,
+      "stability_spread_percent_max": 5
+    }
+  }
 }

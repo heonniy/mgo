@@ -1,3 +1,13 @@
+**OWNER AMENDMENT (2026-10-04): broaden timing-stability diagnosis; guest NUMA is not host NUMA.**
+S0 shows a KVM guest with one visible NUMA node and no exposed GPU PCI NUMA ID.
+Do not infer that the physical host has one NUMA domain, and do not attempt to
+invent same/cross-NUMA labels. Finish the already-started S1 HEAVY/BOUNDARY
+sequence unchanged, then test: (H2) pageable file-backed expert page residency
+via NORMAL/PRETOUCH, (H4) 1/2/4/8-GPU concurrent 9-MiB H2D scaling, and (H5)
+an empirical Env2 SHM GPU-pair matrix at 32/128/512 KiB. Use fixed disjoint CPU
+affinity for S3. See `experiments/timing_stability_numa_20261004/HYPOTHESES.md`
+and the appended PLAN amendment. No policy timing resumes before <=5% stability.
+
 **OWNER PRIORITY (2026-10-04): PAUSE policy timing; validate measurement stability first.**
 The physical BR/CA/CA-rep E2E matrix is suspended. Preserve completed receipts
 but launch no new policy-comparison cell after any already-running bounded run

@@ -18,3 +18,17 @@ Checkpoint: ef5895a.
    repeats as specified.
 9. Commit compact diagnostic results and stop. Do not resume BR/CA/CA-rep
    timing automatically.
+
+## Owner amendment — include all current timing hypotheses
+
+Finish the in-flight six-run S1 sequence unchanged. After S1:
+- do **not** attempt a guest same-NUMA/cross-NUMA comparison; S0 exposes only one
+  KVM guest NUMA node and no GPU PCI NUMA IDs;
+- execute PLAN.md S2A NORMAL-vs-PRETOUCH page-residency A/B;
+- execute S2B 1/2/4/8-GPU concurrent 9-MiB H2D scaling;
+- execute S2C Env2 empirical GPU-pair SHM matrix at 32/128/512 KiB;
+- retain disjoint CPU affinity for S3;
+- treat hidden physical NUMA as an unverified hypothesis, not a measured fact;
+- do not resume BR/CA/CA-rep timing automatically.
+
+Read HYPOTHESES.md before interpreting any result.
