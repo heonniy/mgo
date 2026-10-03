@@ -85,3 +85,11 @@ savings, avoiding zero/negative-denominator automatic passes. The H2D bound is
 cache30/eviction/substitution/rho coordinate. NO_REFRESH_HEADROOM applies if
 none of the current-only/oracle headroom labels passes, even if a cache-relief
 context label passes. No accuracy, latency or hardware-slowdown claim.
+
+The post-run stale-victim diagnostic additionally checks whether that victim
+expert has any later observed raw demand on its former rank. It is computed
+only by the result summarizer, after all policy runs, and is not provided to
+C1/C2. Report the fraction with no later raw demand only among victims with a
+remaining same-layer decode opportunity; count horizon-censored victims
+separately. This is a demand diagnostic, not a claim of permanent expert death
+or unchanged substitution-effective future demand.
