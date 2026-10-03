@@ -201,4 +201,4 @@ def replay(selected,weights,offsets,origins0,origins,gates_by_event,similarity,c
             if key>=0:assert not reconstructed[key]&(1<<r);reconstructed[key]|=1<<r
     assert np.array_equal(reconstructed,owner)
     alive_replicas=np.count_nonzero(birth>=0);alive_unused=np.count_nonzero((birth>=0)&(reuses==0))
-    return rows,rank_fetches,slots,owner,primary,last,np.array([alive_replicas,alive_unused],np.int64)
+    return rows,rank_fetches,slots,owner,primary,last,seen,lost,birth,reuses,np.array([alive_replicas,alive_unused],np.int64)

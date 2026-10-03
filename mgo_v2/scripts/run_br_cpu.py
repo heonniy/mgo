@@ -3,7 +3,7 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES']=''
 for key in ('OMP_NUM_THREADS','MKL_NUM_THREADS','OPENBLAS_NUM_THREADS','NUMBA_NUM_THREADS'):os.environ[key]='1'
-import argparse,hashlib,itertools,json,math,resource,signal,subprocess,sys,time
+import argparse,fcntl,hashlib,itertools,json,math,resource,signal,subprocess,sys,time
 from pathlib import Path
 import numpy as np
 import psutil
@@ -55,21 +55,23 @@ def run_cell(spec):
     out=dict(**spec,status='PASS',global_slots=slots,per_rank_slots=cap.tolist(),full=summarize(rows,fetches,slots,spec['horizon']),decode=summarize(rows[48:],fetches[48:],slots,spec['horizon']),final_state_sha256=state.hexdigest(),alive_replicas=int(result[-1][0]),alive_unused_replicas=int(result[-1][1]),seconds=time.monotonic()-started,peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,pack_receipt_sha256=sha(pack/'receipt.json'),source_hashes={p.name:sha(p) for p in (Path(__file__),Path(__file__).with_name('br_carep_cpu.py'))},event_path=str(events),event_sha256=sha(events))
     out['full']['replicas_never_reused']=out['full']['replicas_evicted_without_reuse']+out['alive_unused_replicas'];assert out['full']['replicas_never_reused']+out['full']['replicas_reused']==out['full']['replica_fetches']
     write(dest,out);print(json.dumps(dict(id=spec['id'],status='PASS',seconds=out['seconds'],peak_rss_mib=out['peak_rss_bytes']/2**20)),flush=True)
-def drive(limit):
+def drive(limit,dataset=None):
+    lock=(ROOT/'cpu_driver.lock').open('a+')
+    fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     assert json.loads((P/'policy_tests.json').read_text())['status']=='PASS'
-    assert json.loads((ROOT/'capture_status.json').read_text())['status']=='PASS'
     tasks=specs();source_hashes={p.name:sha(p) for p in (Path(__file__),Path(__file__).with_name('br_carep_cpu.py'))}
-    for dataset in ('MATH','ShareGPT'):
-        receipts=json.loads((P/(dataset+'_pack_receipts.json')).read_text());assert len(receipts)==8
+    for name in ((dataset,) if dataset else ('MATH','ShareGPT')):
+        assert json.loads((P/(name+'_horizon_audit.json')).read_text())['status']=='PASS'
+        receipts=json.loads((P/(name+'_pack_receipts.json')).read_text());assert len(receipts)==8
         for receipt in receipts:
-            pack=ROOT/'packed'/dataset/f"R{receipt['world']}_B{receipt['local_batch']}"
+            pack=ROOT/'packed'/name/f"R{receipt['world']}_B{receipt['local_batch']}"
             assert all(sha(pack/f['name'])==f['sha256'] for f in receipt['files'])
     done=[];pending=[]
     for spec in tasks:
         path=ROOT/'cells'/(spec['id']+'.json')
         if path.exists():
             c=json.loads(path.read_text());assert c['status']=='PASS' and c['source_hashes']==source_hashes and c['id']==spec['id'];assert sha(Path(c['event_path']))==c['event_sha256'];done.append(dict(id=c['id'],sha256=sha(path),seconds=c['seconds'],peak_rss_bytes=c['peak_rss_bytes']))
-        else:pending.append(spec)
+        elif dataset is None or spec['dataset']==dataset:pending.append(spec)
     if limit:pending=pending[:limit]
     stopping=[False]
     def stop(*args):stopping[0]=True
@@ -104,4 +106,4 @@ def drive(limit):
             except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
             f.close()
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--cell');parser.add_argument('--limit',type=int,default=0);a=parser.parse_args();run_cell(json.loads(a.cell)) if a.cell else drive(a.limit)
+    parser=argparse.ArgumentParser();parser.add_argument('--cell');parser.add_argument('--limit',type=int,default=0);parser.add_argument('--dataset',choices=['MATH','ShareGPT']);a=parser.parse_args();run_cell(json.loads(a.cell)) if a.cell else drive(a.limit,a.dataset)
