@@ -1,3 +1,13 @@
+**OWNER PRIORITY (2026-10-04): one physical CA stress validation.**
+The timing harness is HARNESS_STABLE and the CA stress search is complete.
+Run exactly `experiments/ca_stress_physical_validation_20261004/` next.
+Use ShareGPT R8/local-B8/cache30, Gate W128, substitution OFF, decode256,
+sample_seed81, dp_seed86, BR seed42. Compare BR vs CA physically in Env1 and
+Env2 with three clean repeats each using the validated BOUNDARY + fixed-affinity
+harness. Hungarian/controller work remains PLAN-only, outside MEASURE.
+This is an optimized communication-stress workload, not dataset-average.
+Commit results and stop; do not expand the matrix automatically.
+
 **OWNER QUEUED FOLLOW-UP (2026-10-04): CA-favorable sample/DP search after timing diagnosis.**
 Do not interrupt the active `timing_stability_numa_20261004` packet. When that
 diagnostic finishes, regardless of PASS/FAIL, proceed directly to
