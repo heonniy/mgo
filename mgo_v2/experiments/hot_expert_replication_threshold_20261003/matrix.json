@@ -1,0 +1,88 @@
+{
+  "status": "QUEUED",
+  "checkpoint": "38b84cc3c1b7e3b89f7b9b5561934f9c4399121c",
+  "do_not_preempt": "future_rank_affinity_placement_20261003",
+  "question": "rank-local current token-demand threshold for local replication vs remote service",
+  "existing_batches": [
+    {
+      "local": 8,
+      "global": 32
+    },
+    {
+      "local": 16,
+      "global": 64
+    },
+    {
+      "local": 32,
+      "global": 128
+    }
+  ],
+  "world_size": 4,
+  "cache_ratio": 0.3,
+  "row_bytes": 4096,
+  "expert_bytes": 9437184,
+  "hotness_route_thresholds": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "peer_saving_threshold_bytes": [
+    65536,
+    131072,
+    262144,
+    524288,
+    1048576,
+    2097152,
+    4194304,
+    8388608
+  ],
+  "microcost": {
+    "n_rows": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "warmups": 10,
+    "timed_samples": 30,
+    "transports": [
+      "T0-IPC",
+      "R3-SHM"
+    ],
+    "h2d": [
+      "single-rank",
+      "four-rank-concurrent"
+    ],
+    "break_even_metrics": [
+      "median",
+      "p90"
+    ],
+    "no_extrapolation": true
+  },
+  "threshold_policy": {
+    "source": "measured H1 break-even thresholds only",
+    "future_predictor": false,
+    "migration": false,
+    "substitution": false,
+    "max_cpu_cells": 12
+  },
+  "larger_batch_gate": {
+    "automatic_capture": false,
+    "b64_proposal_if": "B32 has R3 threshold coverage OR B32 max >= 0.5*n*_R3 with monotonic p99/max scaling",
+    "b128_never_automatic": true
+  },
+  "r3_interpretation": "synthetic P2P-disabled SHM stress, not physical PCIe-only",
+  "r8": false,
+  "nsight": false
+}

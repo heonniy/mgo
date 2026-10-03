@@ -1,3 +1,19 @@
+**QUEUED owner-authorized follow-up (2026-10-03): hot rank-local expert replication threshold.**
+Do **not** preempt the active `future_rank_affinity_placement_20261003`
+packet. After that study commits and stops, read
+`experiments/hot_expert_replication_threshold_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+First characterize current `(layer,expert,rank)` token-demand hotness on the
+existing B8/B16/B32 traces. Then run only the bounded model-free calibration
+that compares one remote dispatch+combine pair for n={1..512} rows against one
+9-MiB expert H2D under T0-IPC and R3-SHM (isolated and four-rank concurrent
+H2D). Derive measured median/p90 demand crossovers without extrapolation and
+map them back to trace coverage. Only measured thresholds may drive the
+capacity-aware threshold replay. B64/B128 are not automatic; use the
+predeclared H4 gate to decide whether B64 is worth proposing. R3 remains a
+synthetic P2P-disabled SHM stress condition, not PCIe-only. No R8,
+substitution, future predictor, cache sweep, Nsight, NCCL tuning, or physical
+F/K/C model timing.
+
 **Owner-authorized CPU-only follow-up (2026-10-03): future rank-affinity single-copy placement.**
 The selective-replication study at `6a8127c` ended `NO_HEADROOM`, but
 rank-local recurrence was high. Change the action, not the signal: on an
