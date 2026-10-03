@@ -1,0 +1,65 @@
+{
+  "status": "PLANNED",
+  "checkpoint": "34c870c63788b4e0d9282c86be5750daaa8f9f65",
+  "workload": {
+    "world_size": 4,
+    "local_batch": 8,
+    "global_batch": 32,
+    "cache_ratio": 0.3,
+    "decode_events": 384
+  },
+  "rhos": [
+    0,
+    0.125,
+    0.25,
+    0.5,
+    0.75
+  ],
+  "lambda_grid": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096
+  ],
+  "gamma_grid": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096
+  ],
+  "T0_only": true,
+  "comm_repeats": {
+    "warmup": 1,
+    "timed": 5,
+    "orders": [
+      "ascending_rho",
+      "descending_rho"
+    ]
+  },
+  "h2d_existing_ms": {
+    "concurrent4_median": 0.18876799941062927,
+    "concurrent4_p90": 0.24464640468359
+  },
+  "no_model": true,
+  "no_new_h2d": true,
+  "no_r3_rerun": true,
+  "no_r8": true
+}

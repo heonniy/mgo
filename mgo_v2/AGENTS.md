@@ -1,3 +1,14 @@
+**Owner-authorized mechanism-isolation study (2026-10-03): synthetic communication-price crossover.**
+Read `experiments/synthetic_comm_price_crossover_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Use only the existing B8 five-rho frontier. First commit the exact CPU
+resource-price sweep, then freeze all five communication/fetch schedules and
+run only T0 actual-vs-matched-self communication traces on GPU 0/1/4/5.
+Reuse the existing 9-MiB H2D calibration. If the frozen timing gate passes,
+sweep `J=H2D_model+T_self+gamma*T_remote` and solve policy crossovers.
+R3 is historical unstable context only: no R3 rerun and no PCIe equivalence.
+No model, R8, longer decode, batch/cache sweep, substitution, new replica
+policy or physical F/K/C timing. Do not touch GPU 2/3/6/7.
+
 **Hot-expert threshold packet complete (2026-10-03): CURRENT_BATCH_TOO_COLD under the pooled-median gate.**
 Read `experiments/hot_expert_replication_threshold_20261003/{RESULTS.md,validation.json}`.
 H0 and the bounded H1 calibration passed. Concurrent-H2D thresholds are
