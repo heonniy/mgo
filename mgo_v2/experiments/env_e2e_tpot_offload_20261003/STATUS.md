@@ -1,7 +1,8 @@
-# MATRIX_FAILED_OR_STOPPED
+# Paused: timing invalid for policy comparison
 
-Accepted phase counts: {"PLAN": 3, "COMPILE": 6, "MEASURE": 10, "COUNTERS": 0}.
-
-Partial results only. Inspect matrix_driver.log and summary.log in the raw root; no automatic scientific retry.
-
-Raw root: `/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003`.
+Owner diagnostic 780e969 supersedes this matrix. Ten completed timing samples
+are preserved but not valid for policy comparisons until stability is established.
+No automatic resume. P/CA/Env2 repeat 2 was interrupted by the transition STOP
+marker before completion; it is not an accepted timing sample. The transition
+should have waited for the bounded run to finish; this deviation is recorded.
+Resident models remain stopped while the timing-stability packet runs.
