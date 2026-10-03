@@ -2,6 +2,7 @@
 import json,statistics,subprocess,time
 from pathlib import Path
 from run_env_offload_cell import run,ROOT,PACKET,P
+from validate_env_offload_plan import validate
 CELLS={'P':['BR','CA','CA-rep'],'R':['BR','CA','CA-rep'],'E':['BR','CA']}
 ENVS={'P':['env1','env2'],'R':['env2','env1'],'E':['env1','env2']}
 def commit(message):
@@ -18,8 +19,13 @@ def phase(cell,policy,name,env,repeat=0):
   path=candidates[0]
   if (path/'status.json').exists():
    assert json.loads((path/'status.json').read_text())['status']=='PASS',str(path)
+   if name=='PLAN' and not (path/'schedule_validation.json').exists():
+    proof=validate(path);(PACKET/f'{cell}_{policy}_plan_validation.json').write_text(json.dumps(proof,indent=2)+'\n');commit(f'results: validate {cell} {policy} frozen PLAN')
    return path
- out=run(cell,policy,name,env,repeat);commit(f'results: checkpoint {cell} {policy} {env} {name} {repeat}');return out
+ out=run(cell,policy,name,env,repeat)
+ if name=='PLAN':
+  proof=validate(out);(PACKET/f'{cell}_{policy}_plan_validation.json').write_text(json.dumps(proof,indent=2)+'\n')
+ commit(f'results: checkpoint {cell} {policy} {env} {name} {repeat}');return out
 def samples(cell,policy,env):
  result=[]
  for path in ROOT.glob(f'{cell}_{policy}_{env}_MEASURE_*'):

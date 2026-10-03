@@ -73,46 +73,7 @@ def load_model():
  model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
  model.eval();return model,backing,experts
 
-def plan_layout(effective,lengths,destinations,origins,counts,rank):
- world=len(counts);offsets=np.cumsum([0]+counts);packets=[]
- for src in range(world):
-  per=[]
-  for dst in range(world):
-   items=[]
-   for t in range(offsets[src],offsets[src+1]):
-    ids=sorted(int(effective[t,j]) for j in range(lengths[t]) if destinations[t,j]==dst)
-    if ids:items.append((t-offsets[src],ids))
-   per.append(items)
-  packets.append(per)
- send_counts=[len(x) for x in packets[rank]];recv_counts=[len(packets[s][rank]) for s in range(world)]
- send_idx=[];send_eids=[]
- for items in packets[rank]:
-  for t,es in items:send_idx.append(t);send_eids.append(es+[-1]*(8-len(es)))
- recv=[]
- for src in range(world):
-  for t,es in packets[src][rank]:recv.append((src,t,es))
- groups=[];partial_meta=[]
- for e in sorted({e for _,_,es in recv for e in es}):
-  rows=[];cols=[]
-  for i,(src,t,es) in enumerate(recv):
-   if e in es:rows.append(i);cols.append(es.index(e));partial_meta.append((src,t,e))
-  groups.append((e,rows,cols))
- order=sorted(range(len(partial_meta)),key=lambda i:partial_meta[i][0])
- return_counts=[sum(src==dst for src,_,_ in partial_meta) for dst in range(world)]
- # Other ranks also return in expert-major order, grouped stably by destination.
- local_return=[];return_recv_counts=[]
- for remote in range(world):
-  rows=[]
-  for src in range(world):
-   for t,es in packets[src][remote]:
-    for e in es:rows.append((src,t,e))
-  rows=sorted(rows,key=lambda x:x[2]);mine=[x for x in rows if x[0]==rank]
-  return_recv_counts.append(len(mine));local_return.extend(mine)
- combine=[]
- for e in sorted({e for _,_,e in local_return}):
-  positions=[i for i,(_,_,j) in enumerate(local_return) if j==e]
-  combine.append(([local_return[i][1] for i in positions],positions))
- return dict(send_counts=send_counts,recv_counts=recv_counts,send_idx=send_idx,send_eids=send_eids,groups=groups,return_order=order,return_counts=return_counts,return_recv_counts=return_recv_counts,combine=combine)
+from env_offload_layout import plan_layout
 
 def device_layout(e):
  e=dict(e);d=lambda x:torch.tensor(x,dtype=torch.int64,device='cuda')
@@ -135,6 +96,9 @@ class Runtime:
     path=SOURCE/'packed'/args.dataset/f'R{self.world}_B{args.batch}'
     self.future=suffix_demand(*(np.load(path/(k+'.npy'),mmap_mode='r') for k in ['selected','offsets','decode_origins']),48,128,self.world,256)
   if args.phase!='PLAN':
+   validation=json.loads((args.plan/'schedule_validation.json').read_text());assert validation['status']=='PASS'
+   self.plan_proof=validation['ranks'][self.rank]
+   assert hashlib.sha256((args.plan/f'rank{self.rank}.pkl.gz').read_bytes()).hexdigest()==self.plan_proof['schedule_file_sha256']
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
    self.events=[device_layout(e) for e in self.events]
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
@@ -168,6 +132,7 @@ class Runtime:
    else:
     frozen=self.events[self.index]
     assert e['fetches']==frozen['fetches'] and e['send_counts']==frozen['send_counts'] and e['return_counts']==frozen['return_counts']
+    assert np.array_equal(e['targets'],frozen['targets'].cpu().numpy())
    self.metrics.append(row);e=device_layout(e)
   else:e=self.events[self.index]
   assert e['layer']==layer
@@ -250,6 +215,7 @@ def main(a):
  receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
+ if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
  write(a.output/f'rank{rank}.json',receipt);dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())

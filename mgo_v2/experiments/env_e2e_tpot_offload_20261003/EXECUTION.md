@@ -41,7 +41,7 @@ Expert buffer contents may remain allocated, but every initial slot is empty
 and must incur the scheduled H2D again. No expert cache hit survives reset.
 
 Start with all GPUs empty, >=768 GiB host available and GPU temperatures <65 C.
-The phase launcher checks at five-second intervals: >=256 GiB host available,
+The phase launcher waits five seconds between resource polls (PSS scan time is additional): >=256 GiB host available,
 aggregate proportional set size (PSS) <=768 GiB, GPU free >=8 GiB and temperature <85 C;
 foreign GPU work or a STOP file ends the phase. Torch allocation cap is 85%.
 One phase has a two-hour safety timeout. No scientific samples are accepted

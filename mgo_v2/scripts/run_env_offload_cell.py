@@ -11,7 +11,10 @@ def snapshot():
 def run(cell,policy,phase,environment,repeat=0):
  spec=json.loads((PACKET/'matrix.json').read_text())['cells'][cell];world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
  label=f'{cell}_{policy}_{environment}_{phase}_{repeat}';out=ROOT/label;out.mkdir(exist_ok=False);state=dict(status='RUNNING',cell=cell,policy=policy,phase=phase,environment=environment,repeat=repeat,started_unix=time.time(),samples=[])
- initial=snapshot();assert initial['host_available_bytes']>=768*2**30 and all(g['free_mib']>76000 and g['temperature_c']<65 for g in initial['gpus'])
+ initial=snapshot();cooldown=time.monotonic()
+ while any(g['temperature_c']>=65 for g in initial['gpus']) and time.monotonic()-cooldown<180:
+  time.sleep(5);initial=snapshot()
+ assert initial['host_available_bytes']>=768*2**30 and all(g['free_mib']>76000 and g['temperature_c']<65 for g in initial['gpus'])
  assert not subprocess.check_output(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader'],text=True).strip()
  env=dict(os.environ,PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{P}:{P}/scripts',CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',TORCHINDUCTOR_COMPILE_THREADS='2')
  for k in list(env):
@@ -25,8 +28,8 @@ def run(cell,policy,phase,environment,repeat=0):
   plans=[p for p in ROOT.glob(f'{cell}_{policy}_env1_PLAN_*') if (p/'status.json').exists() and json.loads((p/'status.json').read_text())['status']=='PASS']
   assert len(plans)==1,plans
   cmd+=['--plan',str(plans[0])]
- state.update(command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
- (out/'worker_source.py').write_bytes((P/'examples/env_offload_worker.py').read_bytes());(out/'policy_source.py').write_bytes((P/'scripts/env_offload_policy.py').read_bytes())
+ state.update(command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),layout_sha256=hashlib.sha256((P/'scripts/env_offload_layout.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
+ (out/'worker_source.py').write_bytes((P/'examples/env_offload_worker.py').read_bytes());(out/'policy_source.py').write_bytes((P/'scripts/env_offload_policy.py').read_bytes());(out/'layout_source.py').write_bytes((P/'scripts/env_offload_layout.py').read_bytes())
  reason=None
  with (out/'run.log').open('w') as f:
   proc=subprocess.Popen(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(out/'status.json',state)
@@ -34,14 +37,15 @@ def run(cell,policy,phase,environment,repeat=0):
    try:proc.wait(timeout=5)
    except subprocess.TimeoutExpired:pass
    if proc.poll() is not None:break
-   sample=snapshot();pids,rss=process_tree(proc.pid);pss=0
+   sample_started=time.monotonic();sample=snapshot();pids,rss=process_tree(proc.pid);pss=0
    for pid in pids:
     try:pss+=next(int(l.split()[1])*1024 for l in Path(f'/proc/{pid}/smaps_rollup').read_text().splitlines() if l.startswith('Pss:'))
     except (FileNotFoundError,ProcessLookupError):pass
-   sample.update(unix=time.time(),rss_bytes=rss,pss_bytes=pss);state['samples'].append(sample);write(out/'status.json',state)
+   sample.update(unix=time.time(),rss_bytes=rss,pss_bytes=pss,collection_seconds=time.monotonic()-sample_started);state['samples'].append(sample);write(out/'status.json',state)
    if sample['host_available_bytes']<256*2**30 or pss>768*2**30 or any(g['free_mib']<8192 or g['temperature_c']>=85 for g in sample['gpus']):reason='memory_or_temperature_guard'
    if (ROOT/'STOP').exists():reason='owner_stop'
    if time.time()-state['started_unix']>7200:reason='bounded_2h_phase_timeout'
+   pids,_=process_tree(proc.pid)
    current=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader,nounits'],text=True)
    if any(int(pid) not in pids and int(pid)!=proc.pid for pid in current.splitlines()):reason='foreign_gpu_process'
    if reason:
