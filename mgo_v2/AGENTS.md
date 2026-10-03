@@ -1,3 +1,20 @@
+**Cache/eviction/substitution packet complete (2026-10-03).**
+Read `experiments/cache_eviction_substitution_20261003/{RESULTS.md,validation.json}`.
+Two compact gate-history captures match historical tokens/routes/cache hashes.
+All 264 CPU cells passed; the five historical B8 points and final states match
+exactly, and six cache30 fixed-460 controls match their rho=.25 counterparts.
+CACHE_RELIEF, EVICTION_HEADROOM, SUBSTITUTION_SYSTEM_HEADROOM and
+REPLICATION_REGIME_SHIFT have predeclared witnesses. Fixed-460 B8/LRU cache30
+versus cache60 cuts H2D 219.076->39.797 GiB but raises peer 185.297->328.332 MiB;
+replica survival>=48 rises .87%->85.37%. B32/cache30/LRU/OFF lambda_first is
+97.071643 versus the B8 420.223139 anchor. No B8 configuration meets the 4x
+price-reduction clause (minimum 154.174); B8 regime witnesses use historical
+point dominance instead. These are frozen-route byte results, not timing or
+quality evidence. CPU replay peak RSS 893.18 MiB under hard 8-GiB address space.
+GPU 0/1/4/5 model workers were restored; 2/3/6/7 were untouched. Stop for owner
+review: no quality run, new model capture, timing, tuning or policy follows
+automatically. The original authorized scope below is retained as history.
+
 **Owner-authorized cache/eviction/substitution characterization (2026-10-03).**
 Read `experiments/cache_eviction_substitution_20261003/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
 The historical replication frontier was cache30 + LRU + exact-only. Test whether

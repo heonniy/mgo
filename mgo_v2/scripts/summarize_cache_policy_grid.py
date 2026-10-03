@@ -20,7 +20,7 @@ def table(name,rows):
  write(name+'.json',rows)
  fields=list(dict.fromkeys(k for row in rows for k in row))
  with (P/(name+'.csv')).open('w') as f:
-  w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
+  w=csv.DictWriter(f,fieldnames=fields,lineterminator="\n");w.writeheader()
   w.writerows({k:json.dumps(v,separators=(',',':')) if isinstance(v,(list,dict)) else v for k,v in row.items()} for row in rows)
 def meta(c):return {k:c[k] for k in ('id','batch','cache_ratio','eviction','substitution','rho','fixed_duplicate_cap','duplicate_cap')}
 def flat(c):
@@ -115,7 +115,7 @@ def figures(grid,fixed,frontiers):
     rr=sorted([r for r in frontiers if (r['batch'],r['substitution'],r['eviction'],r['scope'])==(b,sub,ev,'decode')],key=lambda r:r['cache_ratio'])
     ax.plot([r['cache_ratio']*100 for r in rr],[r['lambda_first'] if r['lambda_first'] is not None else np.nan for r in rr],color=color,marker='o',label=ev)
    ax.axhline(float(ANCHOR),color='gray',linestyle=':',label='historical');ax.axhline(float(ANCHOR/4),color='gray',linestyle='--',label='quarter anchor')
-   ax.set(title=panel_title(b,sub),xlabel='Cache (%)',ylabel='First nonzero-rho byte price');ax.grid(alpha=.2)
+   ax.set(title=panel_title(b,sub),xlabel='Cache (%)',ylabel='First nonzero-rho byte price');ax.set_ylim(bottom=0);ax.grid(alpha=.2)
  axes[0,0].legend(fontsize=8);fig.suptitle('Decode resource crossover; zero = replication wins immediately')
  save(fig,'lambda_first')
  fig,axes=plt.subplots(2,4,figsize=(15,7))
@@ -126,7 +126,7 @@ def figures(grid,fixed,frontiers):
     for sub in (False,True):
      rr=sorted([r for r in grid if (r['batch'],r['cache_ratio'],r['eviction'],r['substitution'])==(b,cache,ev,sub)],key=lambda r:r['rho'])
      ax.plot([r['decode'][C]/2**20 for r in rr],[r['decode'][H]/2**30 for r in rr],color=color,linestyle='--' if sub else '-',marker='.',label=f'{ev} {"ON" if sub else "OFF"}')
-   ax.set(title=f'B{b} cache{round(cache*100)}',xlabel='Peer MiB',ylabel='H2D GiB');ax.grid(alpha=.2)
+   ax.set(title=f'B{b} cache{round(cache*100)}',xlabel='Peer MiB',ylabel='H2D GiB');ax.set_xlim(left=0);ax.set_ylim(bottom=0);ax.grid(alpha=.2)
  axes[0,0].legend(fontsize=7);fig.suptitle('Decode raw rho trajectories (all five points, including dominated points)');save(fig,'byte_frontiers')
  for metric,label,name in (('reload_fetches','Exact reload fetches','reloads'),('replica_survival48_fraction','Observed survival >=48 (lower bound)','replica_survival')):
   fig,axes=plt.subplots(2,2,figsize=(11,8))
@@ -165,13 +165,16 @@ def report(grid,fixed,frontiers,labels,validation):
  base=lookup[8,.3,'lru',False,None,460]['decode']
  large=lookup[8,.6,'lru',False,None,460]['decode']
  b32_first=next(r['lambda_first'] for r in frontiers if (r['batch'],r['cache_ratio'],r['eviction'],r['substitution'],r['scope'])==(32,.3,'lru',False,'decode'))
+ b8_min=min(r['lambda_first'] for r in frontiers if r['batch']==8 and r['scope']=='decode' and r['lambda_first'] is not None)
  rows=['# Cache, eviction and substitution: bounded system accounting','',
        'Status: complete. Labels: **'+', '.join(k for k,v in labels.items() if v)+'**.','',
-       f"At fixed 460 duplicate slots, B8/LRU/OFF cache30 to cache60 changes decode H2D from {base[H]/2**30:.3f} to {large[H]/2**30:.3f} GiB "
+       f"At a fixed 460-duplicate-slot cap, B8/LRU/OFF cache30 to cache60 changes decode H2D from {base[H]/2**30:.3f} to {large[H]/2**30:.3f} GiB "
        f"and peer traffic from {base[C]/2**20:.3f} to {large[C]/2**20:.3f} MiB. Observed replica survival>=48 rises from {base['replica_survival48_fraction']:.2%} "
        f"to {large['replica_survival48_fraction']:.2%}. This rescues lifetime and fetch pressure, but increases communication; it is not joint byte dominance.",'',
        f"B32/cache30/LRU/OFF has a first replication crossover of {b32_first:.6f}, compared with the historical B8 anchor {float(ANCHOR):.6f}. "
        'This cross-batch result meets the predeclared quarter-anchor rule. The complete same-batch cache/policy comparisons follow below.','',
+       f"No B8 configuration meets that 4x price-reduction rule: its lowest first crossover is {b8_min:.6f}, above {float(ANCHOR/4):.6f}. "
+       'B8 replication-regime witnesses instead come from the separately declared dominance of matched historical B8 points.','',
        'All 264 CPU cells completed: 120 B8 fractional-rho, 24 B8 fixed-460, and 120 B32 fractional-rho. '
        'The five historical cache30/LRU/OFF points match full/decode counters and final cache hashes exactly; '
        'their S1 runs are reused, not repeated. Both diagnostic captures match historical tokens, routes, '
@@ -220,7 +223,7 @@ def report(grid,fixed,frontiers,labels,validation):
          'routes and weights before target merging. Similarities are source-event weighted. '
          'H2D avoided is the signed difference against the matched OFF replay, not a timing saving.','',
          '## Validation and resource use','',
-         f"- CPU peak RSS: {validation['peak_cpu_rss_mib']:.2f} MiB; hard 8-GiB address-space limit, one process and one BLAS/OMP thread.",
+         f"- CPU replay peak RSS: {validation['peak_cpu_rss_mib']:.2f} MiB; hard 8-GiB address-space limit, one process and one BLAS/OMP thread.",
          f"- Capture peak process-tree RSS: {validation['capture_peak_group_rss_gib']:.2f} GiB; no OOM or memory-guard failure.",
          '- GPU 0/1/4/5 resident-model workers were restored after capture; GPU 2/3/6/7 were untouched.',
          '- All cells enforce physical capacities, duplicate caps, active protection, legal destinations and independent send/receive transpose counting.',
@@ -234,7 +237,7 @@ def report(grid,fixed,frontiers,labels,validation):
          'Raw capture/cell receipt paths and hashes: S0_capture.json, trace_readiness.json and cell_receipts.json.','',
          '## Figures','']
  for name in ('lambda_first','byte_frontiers','reloads','replica_survival','unique_coverage','substitution','fixed460'):rows+=['![ '+name+' ](figures/'+name+'.png)','']
- (P/'RESULTS.md').write_text('\n'.join(rows)+'\n')
+ (P/'RESULTS.md').write_text('\n'.join(rows).rstrip()+'\n')
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check-only',action='store_true');a=parser.parse_args()
@@ -247,7 +250,15 @@ def main():
  saved=figures(grid,fixed,frontiers)
  s0=json.loads((P/'S0_capture.json').read_text());assert s0['status']=='PASS'
  statuses=[json.loads(p.read_text()) for p in (ROOT/'captures').glob('*/status.json')];assert len(statuses)==2 and all(r['status']=='PASS' for r in statuses)
+ gate_audit=[]
+ for batch in (8,32):
+  captured=json.loads((ROOT/f'captures/B{batch}/rank0.json').read_text())
+  vectors=[r['gate_scores'] for r in captured['events']]
+  assert len(vectors)==432 and all(len(v)==128 and all(math.isfinite(x) and 0<=x<=1 for x in v) and sum(v)>0 for v in vectors)
+  gate_audit.append(dict(batch=batch,events=len(vectors),score_min=min(min(v) for v in vectors),score_max=max(max(v) for v in vectors),sum_min=min(sum(v) for v in vectors),sum_max=max(sum(v) for v in vectors),layer0_distinct_vectors=len({tuple(vectors[i]) for i in range(0,432,48)})))
+  del captured,vectors
  validation=dict(status='PASS',completed_cells=len(cells),fractional_B8=sum(c['batch']==8 for c in grid),fixed_B8=len(fixed),fractional_B32=sum(c['batch']==32 for c in grid),historical_five_rho_parity=json.loads((P/'S1_parity.json').read_text()),fixed460_cache30_equality=equal,peak_cpu_rss_mib=max(progress['peak_rss_mib'],max(c['peak_rss_mib'] for c in cells)),capture_peak_group_rss_gib=max(m.get('group_rss_bytes',0) for r in statuses for m in r['memory'])/2**30,model_captures=2,capture_token_route_cache_parity=True,cpu_address_space_limit_bytes=8*2**30,cpu_processes=1,blas_omp_threads=1,cuda_visible_devices='',labels=[k for k,v in labels.items() if v],no_quality_claim=True,no_timing_claim=True,restored_workers=s0['restored_workers'],figures=saved,grid_seconds=sum(c['seconds'] for c in cells))
+ validation['gate_vector_audit']=gate_audit
  write('validation.json',validation)
  write('cell_receipts.json',[dict(id=c['id'],path=str(ROOT/'cells'/(c['id']+'.json')),sha256=hashlib.sha256((ROOT/'cells'/(c['id']+'.json')).read_bytes()).hexdigest()) for c in cells])
  report(grid,fixed,frontiers,labels,validation)
