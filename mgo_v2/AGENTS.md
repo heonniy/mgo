@@ -1,3 +1,18 @@
+**OWNER QUEUED FOLLOW-UP (2026-10-04): CA-favorable sample/DP search after timing diagnosis.**
+Do not interrupt the active `timing_stability_numa_20261004` packet. When that
+diagnostic finishes, regardless of PASS/FAIL, proceed directly to
+`experiments/ca_stress_workload_search_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+This follow-up is resource accounting, not E2E timing. Freeze Gate W128,
+decode256 and substitution OFF. BR and CA must retain the identical per-event
+balanced mandatory-miss quota (rank max-min <=1). Reuse the existing 512 exact
+traces and, using all 8 H100s, extend each dataset candidate pool to 2048
+requests when the current filter permits. Then search sample selection and
+equal-size DP rank assignment on CPU; exact-replay the top candidates across
+R={4,8}, local B={8,16,32,64}, cache={30,40,50,60}. Select structural
+CA-favorable sample/DP pairs using median savings across fixed BR seeds, and
+also report the best observed BR seed separately. Commit results and stop;
+do not auto-launch physical timing.
+
 **OWNER AMENDMENT (2026-10-04): broaden timing-stability diagnosis; guest NUMA is not host NUMA.**
 S0 shows a KVM guest with one visible NUMA node and no exposed GPU PCI NUMA ID.
 Do not infer that the physical host has one NUMA domain, and do not attempt to
