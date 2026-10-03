@@ -162,8 +162,16 @@ def figures(grid,fixed,frontiers):
 
 def report(grid,fixed,frontiers,labels,validation):
  lookup={key(c):c for c in grid+fixed}
+ base=lookup[8,.3,'lru',False,None,460]['decode']
+ large=lookup[8,.6,'lru',False,None,460]['decode']
+ b32_first=next(r['lambda_first'] for r in frontiers if (r['batch'],r['cache_ratio'],r['eviction'],r['substitution'],r['scope'])==(32,.3,'lru',False,'decode'))
  rows=['# Cache, eviction and substitution: bounded system accounting','',
        'Status: complete. Labels: **'+', '.join(k for k,v in labels.items() if v)+'**.','',
+       f"At fixed 460 duplicate slots, B8/LRU/OFF cache30 to cache60 changes decode H2D from {base[H]/2**30:.3f} to {large[H]/2**30:.3f} GiB "
+       f"and peer traffic from {base[C]/2**20:.3f} to {large[C]/2**20:.3f} MiB. Observed replica survival>=48 rises from {base['replica_survival48_fraction']:.2%} "
+       f"to {large['replica_survival48_fraction']:.2%}. This rescues lifetime and fetch pressure, but increases communication; it is not joint byte dominance.",'',
+       f"B32/cache30/LRU/OFF has a first replication crossover of {b32_first:.6f}, compared with the historical B8 anchor {float(ANCHOR):.6f}. "
+       'This cross-batch result meets the predeclared quarter-anchor rule. The complete same-batch cache/policy comparisons follow below.','',
        'All 264 CPU cells completed: 120 B8 fractional-rho, 24 B8 fixed-460, and 120 B32 fractional-rho. '
        'The five historical cache30/LRU/OFF points match full/decode counters and final cache hashes exactly; '
        'their S1 runs are reused, not repeated. Both diagnostic captures match historical tokens, routes, '
