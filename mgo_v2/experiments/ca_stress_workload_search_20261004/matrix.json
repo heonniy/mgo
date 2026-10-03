@@ -1,0 +1,61 @@
+{
+  "status": "QUEUED_AFTER_TIMING_DIAGNOSTIC",
+  "run_regardless_of_timing_diagnostic_result": true,
+  "substitution": false,
+  "eviction": "Gate",
+  "gate_window": 128,
+  "horizon": 256,
+  "datasets": [
+    "MATH",
+    "ShareGPT"
+  ],
+  "candidate_pool_target_per_dataset": 2048,
+  "use_existing_512_prefix": true,
+  "capture_gpus": 8,
+  "ranks": [
+    4,
+    8
+  ],
+  "local_batches": [
+    8,
+    16,
+    32,
+    64
+  ],
+  "cache_ratios": [
+    30,
+    40,
+    50,
+    60
+  ],
+  "policies": [
+    "BR",
+    "CA"
+  ],
+  "sample_seed_range": [
+    0,
+    255
+  ],
+  "dp_seed_range": [
+    0,
+    255
+  ],
+  "br_seeds": [
+    7,
+    19,
+    42,
+    73,
+    99,
+    131,
+    181,
+    251
+  ],
+  "prescreen_topk_per_dataset_R_B": 32,
+  "primary_selection": [
+    "max_median_absolute_peer_savings",
+    "tie_max_median_relative_peer_savings",
+    "tie_min_CA_peer_bytes"
+  ],
+  "physical_timing": false,
+  "automatic_next_stage": false
+}
