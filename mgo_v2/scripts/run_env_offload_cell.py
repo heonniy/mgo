@@ -21,8 +21,12 @@ def run(cell,policy,phase,environment,repeat=0):
  cache=ROOT/'compile_cache'/f'{cell}_{policy}_{environment}';cache.mkdir(parents=True,exist_ok=True)
  env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
  cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples/env_offload_worker.py'),'--cell',cell,'--policy',policy,'--phase',phase,'--environment',environment,'--output',str(out)]
- if phase!='PLAN':cmd+=['--plan',str(ROOT/f'{cell}_{policy}_env1_PLAN_0')]
+ if phase!='PLAN':
+  plans=[p for p in ROOT.glob(f'{cell}_{policy}_env1_PLAN_*') if (p/'status.json').exists() and json.loads((p/'status.json').read_text())['status']=='PASS']
+  assert len(plans)==1,plans
+  cmd+=['--plan',str(plans[0])]
  state.update(command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
+ (out/'worker_source.py').write_bytes((P/'examples/env_offload_worker.py').read_bytes());(out/'policy_source.py').write_bytes((P/'scripts/env_offload_policy.py').read_bytes())
  reason=None
  with (out/'run.log').open('w') as f:
   proc=subprocess.Popen(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(out/'status.json',state)
@@ -30,8 +34,12 @@ def run(cell,policy,phase,environment,repeat=0):
    try:proc.wait(timeout=5)
    except subprocess.TimeoutExpired:pass
    if proc.poll() is not None:break
-   sample=snapshot();pids,rss=process_tree(proc.pid);sample.update(unix=time.time(),rss_bytes=rss);state['samples'].append(sample);write(out/'status.json',state)
-   if sample['host_available_bytes']<256*2**30 or rss>768*2**30 or any(g['free_mib']<8192 or g['temperature_c']>=85 for g in sample['gpus']):reason='memory_or_temperature_guard'
+   sample=snapshot();pids,rss=process_tree(proc.pid);pss=0
+   for pid in pids:
+    try:pss+=next(int(l.split()[1])*1024 for l in Path(f'/proc/{pid}/smaps_rollup').read_text().splitlines() if l.startswith('Pss:'))
+    except (FileNotFoundError,ProcessLookupError):pass
+   sample.update(unix=time.time(),rss_bytes=rss,pss_bytes=pss);state['samples'].append(sample);write(out/'status.json',state)
+   if sample['host_available_bytes']<256*2**30 or pss>768*2**30 or any(g['free_mib']<8192 or g['temperature_c']>=85 for g in sample['gpus']):reason='memory_or_temperature_guard'
    if (ROOT/'STOP').exists():reason='owner_stop'
    if time.time()-state['started_unix']>7200:reason='bounded_2h_phase_timeout'
    current=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader,nounits'],text=True)
@@ -41,7 +49,7 @@ def run(cell,policy,phase,environment,repeat=0):
     try:proc.wait(timeout=15)
     except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
   state.update(status='PASS' if proc.returncode==0 and reason is None else 'FAIL',exit_code=proc.returncode,stop_reason=reason,finished_unix=time.time());write(out/'status.json',state)
- receipt={k:v for k,v in state.items() if k!='samples'};receipt['peak_rss_bytes']=max((s['rss_bytes'] for s in state['samples']),default=0);receipt['raw_root']=str(out)
+ receipt={k:v for k,v in state.items() if k!='samples'};receipt['peak_rss_bytes']=max((s['rss_bytes'] for s in state['samples']),default=0);receipt['peak_pss_bytes']=max((s.get('pss_bytes',0) for s in state['samples']),default=0);receipt['raw_root']=str(out)
  (PACKET/'phase_receipts').mkdir(exist_ok=True);write(PACKET/'phase_receipts'/f'{label}.json',receipt);print(json.dumps(receipt),flush=True)
  if state['status']!='PASS':raise RuntimeError(str(out/'run.log'))
  return out

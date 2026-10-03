@@ -42,7 +42,7 @@ and must incur the scheduled H2D again. No expert cache hit survives reset.
 
 Start with all GPUs empty, >=768 GiB host available and GPU temperatures <65 C.
 The phase launcher checks at five-second intervals: >=256 GiB host available,
-aggregate process RSS <=768 GiB, GPU free >=8 GiB and temperature <85 C;
+aggregate proportional set size (PSS) <=768 GiB, GPU free >=8 GiB and temperature <85 C;
 foreign GPU work or a STOP file ends the phase. Torch allocation cap is 85%.
 One phase has a two-hour safety timeout. No scientific samples are accepted
 from a failed phase. Only the declared R/B64 resource failure permits B32.
@@ -57,3 +57,12 @@ before each generation. Pageable-source transfer staging is included in real
 H2D execution cost. Matrix axes, thresholds and resource limits are unchanged.
 Merged substitution weights accumulate in float32 then round once to BF16,
 matching the CPU policy mass semantics. The failed attempt is retained.
+
+The shared-pool attempt exposed aggregate RSS double counting across shared
+file mappings and compiler subprocesses: 861 GiB summed RSS while host available
+remained 1421 GiB. The guard now counts aggregate PSS (shared pages counted
+proportionally) at the same 768-GiB cap, and retains the independent 256-GiB
+host-available guard. Raw RSS and PSS are both recorded. The earlier RSS-guard
+failures are preserved, not treated as OOM or accepted scientific samples.
+A separate initialization failure from missing generation_config was corrected
+by loading the checkpoint generation_config explicitly.

@@ -1,0 +1,93 @@
+{
+  "status": "FAIL",
+  "cell": "P",
+  "policy": "BR",
+  "phase": "PLAN",
+  "environment": "env1",
+  "repeat": 1,
+  "started_unix": 1791028371.020001,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_worker.py",
+    "--cell",
+    "P",
+    "--policy",
+    "BR",
+    "--phase",
+    "PLAN",
+    "--environment",
+    "env1",
+    "--output",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_BR_env1_PLAN_1"
+  ],
+  "source_sha256": "6c9383f7aab710b00c92f8983c8dfa06bc53376f33940e846ef11b2a69dc2dd8",
+  "policy_sha256": "508bbca7edb8ae111b4e63372bdf98ee8c969586c71fe30db2063e0cf95f267f",
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0"
+  },
+  "compile_cache": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/compile_cache/P_BR_env1",
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      }
+    ],
+    "host_available_bytes": 1983213916160
+  },
+  "pid": 2977543,
+  "exit_code": 1,
+  "stop_reason": null,
+  "finished_unix": 1791028411.8040226,
+  "peak_rss_bytes": 288783798272,
+  "raw_root": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_BR_env1_PLAN_1"
+}

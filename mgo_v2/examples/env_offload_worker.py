@@ -4,7 +4,7 @@ os.environ['CUBLAS_WORKSPACE_CONFIG']=':4096:8'
 os.environ['TOKENIZERS_PARALLELISM']='false'
 from mgo_v2.bootstrap import pin_rank_before_cuda_import
 BOOT=pin_rank_before_cuda_import()
-import argparse,gzip,hashlib,json,pickle,struct,time,types
+import argparse,ctypes,gzip,hashlib,json,pickle,struct,time,types
 from pathlib import Path
 import numpy as np
 import torch
@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from accelerate import init_empty_weights
 from accelerate.utils import set_module_tensor_to_device
 from safetensors import safe_open
-from transformers import AutoConfig,AutoModelForCausalLM
+from transformers import AutoConfig,AutoModelForCausalLM,GenerationConfig
 from mgo_v2.model_loader import checkpoint_identity,prepare_checkpoint_store,EXPERT
 from mgo_v2.eviction import GateHistory
 from mgo_v2.runtime import gather_global_routes
@@ -31,6 +31,14 @@ def digest(x):return hashlib.sha256(pickle.dumps(x,protocol=4)).hexdigest()
 def array_hash(x):return hashlib.sha256(np.ascontiguousarray(x).tobytes()).hexdigest()
 def write(p,x):
  t=p.with_suffix('.tmp');t.write_text(json.dumps(x,indent=2)+'\n');t.replace(p)
+def check_cpu_residency(backing):
+ page=os.sysconf('SC_PAGE_SIZE');count=(backing.numel()+page-1)//page
+ flags=np.empty(count,np.uint8);lib=ctypes.CDLL(None,use_errno=True)
+ rc=lib.mincore(ctypes.c_void_p(backing.data_ptr()),ctypes.c_size_t(backing.numel()),ctypes.c_void_p(flags.ctypes.data))
+ if rc:raise OSError(ctypes.get_errno(),'mincore expert pool')
+ assert np.all(flags&1),'CPU expert pool contains nonresident pages'
+ return count
+
 def expert_kernel(x,gate,up,down):return F.linear(F.silu(F.linear(x,gate))*F.linear(x,up),down)
 
 def load_model():
@@ -62,6 +70,7 @@ def load_model():
    offset,size,shape=index[key*3+i];tensors.append(backing[offset:offset+size].view(torch.bfloat16).view(shape))
   experts.append(tensors)
  assert all(sum(t.numel()*2 for t in group)==EB and all(t.device.type=='cpu' for t in group) for group in experts)
+ model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
  model.eval();return model,backing,experts
 
 def plan_layout(effective,lengths,destinations,origins,counts,rank):
@@ -186,6 +195,7 @@ class Runtime:
   self.index+=1;return output
 
 def generate(model,rt,initial_ids,initial_mask):
+ check_cpu_residency(rt.cpu_backing)
  ids=initial_ids;mask=initial_mask;past=None;tokens=[]
  # Padding selection is precomputed before boundaries; decode has no padding.
  rt.valid=initial_mask.reshape(-1).nonzero().flatten()
@@ -212,7 +222,7 @@ def main(a):
  world=cell['ranks'];assert dist.get_world_size()==world
  total=int(48*128*cell['cache_ratio']);a.capacities=[total//world+(r<total%world) for r in range(world)]
  records=json.loads((SOURCE/(a.dataset+'_requests.json')).read_text())['requests'][:world*a.batch];records=records[rank::world]
- model,backing,experts=load_model();rt=Runtime(a,model,experts,a.capacities[rank])
+ model,backing,experts=load_model();rt=Runtime(a,model,experts,a.capacities[rank]);rt.cpu_backing=backing
  length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  if a.phase in ('PLAN','COUNTERS'):
