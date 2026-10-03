@@ -111,7 +111,7 @@ class ReplicaReplay:
         return (self.tick, [[(k, e.slot, e.used) for k, e in sorted(rank.items())] for rank in self.ranks],
                 sorted(self.primary.items()), sorted(self.seen))
 
-    def event(self, layer, origins, selected, audit_greedy=False, candidate_score=None):
+    def event(self, layer, origins, selected, audit_greedy=False, candidate_score=None, owner_selector=None):
         origins = np.asarray(origins, dtype=np.int64)
         selected = np.asarray(selected, dtype=np.int64)
         assert selected.ndim == 2 and len(selected) == len(origins)
@@ -126,6 +126,11 @@ class ReplicaReplay:
         # Freeze pre-event residency for hit accounting. Active copies are pinned.
         pre = {key: set(self.owners.get(key, ())) for key in active}
         first = {e: int(np.argmax(counts[e])) for e in experts if not pre[layer, e]}
+        if owner_selector is not None:
+            chosen = owner_selector(self, layer, origins, selected, counts, dict(first))
+            assert set(chosen) == set(first)
+            assert all(0 <= r < self.world and counts[e][r] > 0 for e, r in chosen.items())
+            first = chosen
         # Atomic failure: preflight all mandatory destinations before ANY mutation.
         needed = Counter(first.values())
         for r, n in needed.items():
