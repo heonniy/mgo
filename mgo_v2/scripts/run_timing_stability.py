@@ -48,7 +48,16 @@ def commit(message):
  subprocess.run(['git','add',str(PACKET)],cwd=P.parent,check=True)
  if subprocess.run(['git','diff','--cached','--quiet'],cwd=P.parent).returncode:
   subprocess.run(['git','commit','-m',message],cwd=P.parent,check=True)
-  subprocess.run(['git','push','origin','HEAD:codex/mgo-r4-trajectory-results-20261002'],cwd=P.parent,check=True)
+  pushed=subprocess.run(['git','push','origin','HEAD:codex/mgo-r4-trajectory-results-20261002'],cwd=P.parent)
+  if pushed.returncode:
+   # Owner may publish the next plan while a bounded phase is running.
+   # Preserve both histories; never force-push or discard either side.
+   subprocess.run(['git','fetch','origin','codex/mgo-r4-trajectory-results-20261002'],cwd=P.parent,check=True)
+   merged=subprocess.run(['git','merge','--no-edit','FETCH_HEAD'],cwd=P.parent)
+   if merged.returncode:
+    subprocess.run(['git','merge','--abort'],cwd=P.parent,check=True)
+    raise RuntimeError('Publication merge conflict; scientific receipts retained')
+   subprocess.run(['git','push','origin','HEAD:codex/mgo-r4-trajectory-results-20261002'],cwd=P.parent,check=True)
 
 def run(label,mode,affinity,environment,horizon,residency=None):
  out=ROOT/label

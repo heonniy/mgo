@@ -4,7 +4,12 @@ from pathlib import Path
 from run_timing_stability import ROOT,PACKET,P,PYTHON,env_for,sample,safe,write,run,spread,commit,csvout,restore
 
 def launch(label,args,world,preflight=False):
- out=ROOT/label;out.mkdir(exist_ok=False);initial=sample();safe(initial,True)
+ out=ROOT/label
+ if (out/'status.json').exists():
+  state=json.loads((out/'status.json').read_text());assert state['status']=='PASS',str(out)
+  ranks=[json.loads((out/f'rank{i}.json').read_text()) for i in range(world)];assert all(r['status']=='PASS' for r in ranks)
+  return out,ranks,state
+ out.mkdir(exist_ok=False);initial=sample();safe(initial,True)
  env=env_for('env2');env['CUDA_VISIBLE_DEVICES']=','.join(map(str,range(world)))
  worker='stability_transport_scaling.py'
  if preflight:args=['--kind','shm','--preflight']
@@ -108,5 +113,8 @@ def main():
   write(PACKET/'status.json',outcome)
   try:report(outcome)
   finally:
-   outcome['resident_model_handoff']=restore();write(PACKET/'status.json',outcome);commit('results: finish amended timing stability diagnostic and GPU handoff')
+   if (ROOT/'queued_followup.json').exists() and not (ROOT/'STOP').exists():
+    outcome['resident_model_handoff']='DEFERRED_TO_AUTHORIZED_CA_STRESS_FOLLOWUP'
+   else:outcome['resident_model_handoff']=restore()
+   write(PACKET/'status.json',outcome);commit('results: finish amended timing stability diagnostic and GPU handoff')
 if __name__=='__main__':main()
