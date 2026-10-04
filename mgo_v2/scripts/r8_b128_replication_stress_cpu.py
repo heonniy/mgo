@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from numba import njit
 
-from ca_stress_cpu import Pool
+from ca_stress_cpu import Pool,exact as reference_exact
 from ca_stress_common import ROOT as POOL_ROOT, sha, write
 from br_carep_cpu import balanced_assignment,choose_slot,place,EXPERT_BYTES,ROW_BYTES
 
@@ -229,8 +229,27 @@ def prescreen_dataset(name):
     triples.sort(key=lambda x:(-x['critical_proxy'],-x['peer_proxy_rows'],-x['hotness_score'],x['sample_seed'],x['placement_seed'],x['dp_seed']))
     return sample_rows,triples[:TRIPLES_PER_DATASET]
 
+def validate_reference():
+    """Require exact resource parity with the completed R8/B64/c60 replay."""
+    pool=Pool('MATH');world=8;batch=64;sample_seed=8;dp_seed=228
+    order=pool.candidate(world,batch,sample_seed,dp_seed);arrays=pool.pack(order,world,batch)
+    slots=48*128*60//100;cap=np.array([slots//world+(r<slots%world) for r in range(world)],np.int64)
+    rows=[]
+    for policy,randomized,seed in [('BR',True,42),('CA',False,42)]:
+        diag=replay_diag(arrays['selected'],arrays['offsets'],arrays['prefill_origins'],arrays['decode_origins'],arrays['gates'],cap,256,randomized,seed)
+        ref=reference_exact(arrays,world,60,policy,seed)
+        rank_rows,peer,hit,miss=diag[:4]
+        raw=int(rank_rows.sum());peer_bytes=int(peer.sum());h2d=int(miss.sum())*EXPERT_BYTES;hit_rate=float(hit.sum()/raw)
+        assert peer_bytes==ref['full']['peer_bytes'],(policy,'peer',peer_bytes,ref['full']['peer_bytes'])
+        assert h2d==ref['full']['H2D_bytes'],(policy,'H2D',h2d,ref['full']['H2D_bytes'])
+        assert abs(hit_rate-ref['full']['exact_global_hits_fraction'])<1e-12,(policy,'hit',hit_rate,ref['full']['exact_global_hits_fraction'])
+        rows.append(dict(policy=policy,peer_bytes=peer_bytes,H2D_bytes=h2d,exact_global_hit_rate=hit_rate,reference_state_sha256=ref['final_state_sha256']))
+    receipt=dict(status='PASS',reference='MATH R8/B64/c60 sample8/dp228 seed42',rows=rows)
+    write(PACKET/'implementation_validation.json',receipt);return receipt
+
 def main():
     OUT.mkdir(parents=True,exist_ok=True);started=time.time()
+    validate_reference()
     stage_a={};retained=[]
     for dataset in ('MATH','ShareGPT'):
         samples,triples=prescreen_dataset(dataset);stage_a[dataset]=dict(top_samples=samples[:SAMPLE_TOP],retained_triples=triples);retained.extend(triples)
