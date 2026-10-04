@@ -21,7 +21,7 @@ def intersection(left,right):
   else:j+=1
  return out
 
-def analyze(path):
+def analyze(path,receipt):
  db=sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
  strings={r['id']:r['value'] for r in db.execute('SELECT id,value FROM StringIds')}
  ranges=defaultdict(list);decode=[];cpu=defaultdict(list)
@@ -60,17 +60,26 @@ def analyze(path):
  assert counts['moe.forward_a2a']>0 and counts['moe.return_a2a']>0,'missing collective attribution'
  # CUDA memcpy enum names are provided by Nsight, not guessed from kernel names.
  kinds={r['id']:r['label'] for r in db.execute('SELECT id,label FROM ENUM_CUDA_MEMCPY_OPER')}
- h2d=[];h2d_bytes=0;h2d_count=0
+ h2d=[];h2d_bytes=0;h2d_count=0;other_h2d=[];other_bytes=0;other_count=0
  for r in db.execute('SELECT start,end,copyKind,bytes FROM CUPTI_ACTIVITY_KIND_MEMCPY'):
   label=kinds[r['copyKind']].lower().replace(' ','')
   if label not in ('htod','h2d','hosttodevice'):continue
-  clipped=intersection([(r['start'],r['end'])],window)
-  if clipped:h2d+=clipped;h2d_count+=1;h2d_bytes+=r['bytes']
- assert h2d,'missing actual H2D DMA events'
+  if r['end']<=window[0][0]:continue
+  assert r['start']>=window[0][0],'H2D crosses synchronized prefill/decode boundary'
+  interval=(r['start'],r['end'])
+  if r['bytes']==9437184:h2d.append(interval);h2d_count+=1;h2d_bytes+=r['bytes']
+  else:other_h2d.append(interval);other_count+=1;other_bytes+=r['bytes']
+ assert h2d,'missing actual expert-weight H2D DMA events'
+ assert receipt['status']=='PASS'
+ assert h2d_count==receipt['decode_expert_copies'],('CUDA expert-copy count mismatch',h2d_count,receipt['decode_expert_copies'])
+ assert h2d_bytes==receipt['decode_expert_bytes']
+ # The capture ends only after generation and scheduler synchronization. Keep
+ # trailing decode DMA/kernel work instead of clipping to CPU launch spans.
+ window=[(window[0][0],max([window[0][1]]+[b for a,b in h2d+other_h2d+decode_kernels]))]
  comm=kernels['moe.forward_a2a']+kernels['moe.return_a2a'];expert=kernels['moe.expert_compute'];cover=comm+expert
  total=duration(h2d);hidden=duration(intersection(h2d,cover));cpu_report={}
  for name,ints in cpu.items():
   ints=intersection(ints,window);full=duration(ints);overlap=duration(intersection(ints,cover));cpu_report[name]=dict(total_ms=full/1e6,overlap_comm_expert_ms=overlap/1e6,outside_comm_expert_ms=(full-overlap)/1e6)
- return dict(status='PASS',source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes_for_events_intersecting_window=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Copy intervals are clipped to the decode CPU-event window. GPU phases use actual correlated CUDA kernels; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
+ return dict(status='PASS',source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),other_H2D=dict(count=other_count,bytes=other_bytes,total_union_ms=duration(other_h2d)/1e6),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Expert DMA uses the 9-MiB copy size and exactly reconciles the scheduler decode-copy count; smaller control/input copies are reported separately. Capture includes trailing decode work after CPU launch spans. GPU phases use actual correlated CUDA kernels; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('sqlite',type=Path);p.add_argument('--output',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.sqlite),indent=2)+'\n')
+ p=argparse.ArgumentParser();p.add_argument('sqlite',type=Path);p.add_argument('--output',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.sqlite,json.loads(a.receipt.read_text())),indent=2)+'\n')

@@ -5,7 +5,9 @@ class ProfileRuntime(DecodeOffloadRuntime):
  def execute(self,*args):
   if not getattr(self,'capture',False):return super().execute(*args)
   with nvtx_phase(f'{"decode" if self.index>=48 else "prefill"}.event.{self.index}'):
-   return super().execute(*args)
+   result=super().execute(*args)
+  if self.index==48:self.profile_prefill_metrics=dict(self.h2d.metrics)
+  return result
 
 def main(a):
  rank=int(os.environ['RANK']);a.output.mkdir(parents=True,exist_ok=True)
@@ -37,7 +39,7 @@ def main(a):
  finally:
   torch.cuda.profiler.stop();h2d_module.copy_expert_to_stage=original_stage
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
- write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
+ write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--case',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())
