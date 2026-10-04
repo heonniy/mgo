@@ -29,3 +29,10 @@
 
 Optional later calibration, which does not require the offloading runtime:
 `torchrun --standalone --nproc_per_node=4 examples/replica_phase_microbench.py --output <dir>`.
+
+## Required execution order
+
+Do not run the CPU GO packet against guessed D2D costs. First run
+`scripts/run_replica_phase_microbench.py` for Env1/Env2 on four free GPUs, or
+use the chained `scripts/run_replica_calibrated_cpu_packet.py`. Only after
+`microbench_calibration.json` is PASS may the B128/B256 CPU replay run.
