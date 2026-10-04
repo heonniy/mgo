@@ -1,0 +1,58 @@
+[
+  {
+    "batch": 128,
+    "horizon": 256,
+    "paired": true,
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      }
+    ]
+  },
+  {
+    "batch": 256,
+    "horizon": 256,
+    "paired": true,
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      }
+    ]
+  }
+]

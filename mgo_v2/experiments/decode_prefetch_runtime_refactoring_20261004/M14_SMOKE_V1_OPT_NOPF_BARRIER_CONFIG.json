@@ -1,0 +1,30 @@
+[
+  {
+    "batch": 128,
+    "horizon": 8,
+    "paired": true,
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 8,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 8,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      }
+    ]
+  }
+]

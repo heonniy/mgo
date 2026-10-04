@@ -1,0 +1,30 @@
+[
+  {
+    "batch": 128,
+    "horizon": 8,
+    "paired": true,
+    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 8,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 8,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      }
+    ]
+  }
+]

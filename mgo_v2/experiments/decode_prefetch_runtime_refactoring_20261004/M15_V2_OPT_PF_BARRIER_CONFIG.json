@@ -1,0 +1,58 @@
+[
+  {
+    "batch": 128,
+    "horizon": 256,
+    "paired": true,
+    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      }
+    ]
+  },
+  {
+    "batch": 256,
+    "horizon": 256,
+    "paired": true,
+    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 256,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V2_OPT_PF_BARRIER"
+      }
+    ]
+  }
+]
