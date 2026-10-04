@@ -1,5 +1,5 @@
 """Run the bounded R8/B128/c60 stress search and publish the result."""
-import json,os,subprocess,time
+import json,os,subprocess,time,resource
 from pathlib import Path
 
 P=Path(__file__).resolve().parents[1]
@@ -17,13 +17,22 @@ def publish(message):
  subprocess.run(['git','add',str(PACKET)],cwd=P.parent,check=True)
  if subprocess.run(['git','diff','--cached','--quiet'],cwd=P.parent).returncode:
   subprocess.run(['git','commit','-m',message],cwd=P.parent,check=True)
-  subprocess.run(['git','push','origin','HEAD:'+BRANCH],cwd=P.parent,check=True)
+  result=subprocess.run(['git','push','origin','HEAD:'+BRANCH],cwd=P.parent)
+  if result.returncode:write(ROOT/'publication_pending.json',dict(status='LOCAL_COMMIT_SAVED_PUSH_PENDING',unix=time.time()))
+
+def cpu_limits():
+ resource.setrlimit(resource.RLIMIT_AS,(128*2**30,128*2**30))
+ resource.setrlimit(resource.RLIMIT_DATA,(16*2**30,16*2**30))
+ cpus=sorted(os.sched_getaffinity(0));os.sched_setaffinity(0,{cpus[-1]})
 
 def main():
  ROOT.mkdir(parents=True,exist_ok=True)
  state=dict(status='RUNNING',started_unix=time.time(),stage='PREFLIGHT')
  write(PACKET/'status.json',state)
  try:
+  available=next(int(x.split()[1])*1024 for x in Path('/proc/meminfo').read_text().splitlines() if x.startswith('MemAvailable:'))
+  assert available>=256*2**30,'host memory reserve guard'
+  state['resource_limits']=dict(address_space_GiB=128,private_data_GiB=16,CPU_threads=1)
   for dataset in ('MATH','ShareGPT'):
    receipt=POOL/dataset/'receipt.json'
    if not receipt.exists():raise FileNotFoundError(f'missing completed exact pool: {receipt}')
@@ -34,7 +43,7 @@ def main():
   state.update(stage='CPU_STRESS_SEARCH',pool_source=str(POOL));write(PACKET/'status.json',state)
   log=ROOT/'run.log'
   with log.open('w') as f:
-   subprocess.run([PYTHON,'-u',str(P/'scripts/r8_b128_replication_stress_cpu.py')],cwd=P,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
+   subprocess.run([PYTHON,'-u',str(P/'scripts/r8_b128_replication_stress_cpu.py')],cwd=P,env=env,stdout=f,stderr=subprocess.STDOUT,check=True,preexec_fn=cpu_limits)
   result=json.loads((PACKET/'RESULT.json').read_text());assert result['status']=='PASS'
   state.update(status='COMPLETE',stage='FINISHED',finished_unix=time.time(),oracle_gate=result['oracle_gate'],winner=result['winner']['manifest'])
   write(PACKET/'status.json',state);publish('results: R8 B128 c60 replication stress upper bound')

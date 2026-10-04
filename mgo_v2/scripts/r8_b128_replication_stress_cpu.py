@@ -172,6 +172,8 @@ def summarize(result):
         decode_peer_bytes=int(peer[sl].sum()),
         decode_H2D_bytes=int(miss[sl].sum())*EXPERT_BYTES,
         decode_exact_global_hit_rate=float(hit[sl].sum()/raw),
+        oracle_local_peak_max_rank_rows=int(local[sl].max()),
+        oracle_split_peak_max_rank_rows=int(split[sl].max()),
         oracle_local_sum_max_rank_rows=int(local[sl].sum()),
         oracle_local_reduction=float(1-local[sl].sum()/base),
         oracle_split_sum_max_rank_rows=int(split[sl].sum()),
@@ -195,7 +197,7 @@ def exact(pool,dataset,sample_seed,dp_seed,placement_seed):
     cap=np.array([slots//WORLD+(r<slots%WORLD) for r in range(WORLD)],np.int64)
     br_raw=replay_diag(arrays['selected'],arrays['offsets'],arrays['prefill_origins'],arrays['decode_origins'],arrays['gates'],cap,HORIZON,True,placement_seed)
     ca_raw=replay_diag(arrays['selected'],arrays['offsets'],arrays['prefill_origins'],arrays['decode_origins'],arrays['gates'],cap,HORIZON,False,42)
-    manifest=dict(dataset=dataset,world=WORLD,batch=BATCH,cache=CACHE,sample_seed=sample_seed,dp_seed=dp_seed,placement_seed=placement_seed,request_ids=order.tolist(),ranks=[order[r*BATCH:(r+1)*BATCH].tolist() for r in range(WORLD)])
+    manifest=dict(route_sha256=hashlib.sha256(arrays['selected'].tobytes()).hexdigest(),gate_sha256=hashlib.sha256(arrays['gates'].tobytes()).hexdigest(),pool_receipt_sha256=sha(pool.path/'receipt.json'),dataset=dataset,world=WORLD,batch=BATCH,cache=CACHE,sample_seed=sample_seed,dp_seed=dp_seed,placement_seed=placement_seed,request_ids=order.tolist(),ranks=[order[r*BATCH:(r+1)*BATCH].tolist() for r in range(WORLD)])
     return dict(manifest=manifest,manifest_sha256=digest(manifest),BR={**summarize(br_raw), 'final_state_sha256':state_hash(br_raw)},CA={**summarize(ca_raw),'final_state_sha256':state_hash(ca_raw)})
 
 def prescreen_dataset(name):
@@ -244,7 +246,7 @@ def validate_reference():
         assert h2d==ref['full']['H2D_bytes'],(policy,'H2D',h2d,ref['full']['H2D_bytes'])
         assert abs(hit_rate-ref['full']['exact_global_hits_fraction'])<1e-12,(policy,'hit',hit_rate,ref['full']['exact_global_hits_fraction'])
         rows.append(dict(policy=policy,peer_bytes=peer_bytes,H2D_bytes=h2d,exact_global_hit_rate=hit_rate,reference_state_sha256=ref['final_state_sha256']))
-    receipt=dict(status='PASS',reference='MATH R8/B64/c60 sample8/dp228 seed42',rows=rows)
+    receipt=dict(status='PASS',validation_kind='fresh unchanged reference implementation replay; not an archived receipt comparison',reference_source_sha256=sha(Path(__file__).with_name('ca_stress_cpu.py')),reference='MATH R8/B64/c60 sample8/dp228 seed42',rows=rows)
     write(PACKET/'implementation_validation.json',receipt);return receipt
 
 def main():
