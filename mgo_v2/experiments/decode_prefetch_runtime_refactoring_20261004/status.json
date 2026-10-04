@@ -1,12 +1,12 @@
 {
   "status": "PASS",
-  "stage": "M14_SMOKE_V2_OPT_PF_BARRIER",
-  "label": "M14_SMOKE_V2_OPT_PF_BARRIER_B128_H8",
+  "stage": "M14_SMOKE_V3_OPT_PF_OVERLAP",
+  "label": "M14_SMOKE_V3_OPT_PF_OVERLAP_B128_H8",
   "group": {
     "batch": 128,
     "horizon": 8,
     "paired": true,
-    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
     "cases": [
       {
         "label": "BR",
@@ -14,9 +14,9 @@
         "P": 2,
         "trigger": "T2",
         "horizon": 8,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER"
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
       },
       {
         "label": "LA",
@@ -24,14 +24,14 @@
         "P": 2,
         "trigger": "T2",
         "horizon": 8,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER"
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
       }
     ]
   },
-  "started_unix": 1791156820.4056246,
-  "source_sha": "b7ef9050bde101767abaa4f2cd2c81964de892be",
+  "started_unix": 1791157275.319034,
+  "source_sha": "8af4425fb766f099b5cee2262e7113382c599549",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
@@ -110,7 +110,7 @@
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 378008,
+  "pid": 383832,
   "completed": [
     "BR_r1",
     "LA_r1",
@@ -121,8 +121,12 @@
     "LA_r4",
     "BR_r4",
     "BR_r5",
-    "LA_r5"
+    "LA_r5",
+    "LA_r6",
+    "BR_r6",
+    "BR_r7",
+    "LA_r7"
   ],
   "exit_code": 0,
-  "finished_unix": 1791157248.3477678
+  "finished_unix": 1791157799.4452024
 }
