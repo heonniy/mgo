@@ -933,9 +933,32 @@ def write_summary(winners,top5,rows,cal):
               "See RESULT.json and prefill_decode_comparison.json for prefill/decode separation, serial-vs-overlap D2D transfer models, p90 H2D and D2D sensitivity."]
     (PACKET/"RESULTS.md").write_text("\n".join(lines)+"\n")
 
+def validate_b128_compatibility(cal):
+    old=json.loads(OLD_B128.read_text())["winner"]
+    m=old["manifest"]
+    assert m["dataset"]=="MATH" and m["world"]==8 and m["batch"]==128 and m["cache"]==60
+    pool=Pool("MATH")
+    _,_,res=run_replay(pool,128,m["sample_seed"],m["dp_seed"],m["placement_seed"],0,
+                       False,horizon=HORIZON)
+    now=summarize(res,"decode",HORIZON,cal)
+    before=old["BR"]
+    checks={
+        "critical_rows":(now["critical_rows_sum"],int(before["decode_sum_max_rank_expert_rows"])),
+        "peak_rows":(now["critical_rows_peak"],int(before["decode_peak_max_rank_expert_rows"])),
+        "peer_bytes":(now["peer_bytes"],int(before["decode_peer_bytes"])),
+        "H2D_bytes":(now["H2D_bytes"],int(before["decode_H2D_bytes"])),
+    }
+    for key,(a,b) in checks.items():
+        assert a==b,(key,a,b)
+    assert abs(now["exact_global_hit_rate"]-float(before["decode_exact_global_hit_rate"]))<1e-12
+    receipt=dict(status="PASS",source=str(OLD_B128),manifest=m,checks=checks,
+                 exact_global_hit_rate=now["exact_global_hit_rate"])
+    write(PACKET/"implementation_validation.json",receipt)
+    return receipt
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     cal=load_calibration()
+    validate_b128_compatibility(cal)
     write(PACKET/"calibration.json",cal)
     started=time.time()
     winners,top5=exact_seed_search(cal)
