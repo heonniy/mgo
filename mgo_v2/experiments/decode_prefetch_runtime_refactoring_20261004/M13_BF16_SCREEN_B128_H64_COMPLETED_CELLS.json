@@ -1,93 +1,11 @@
 {
-  "status": "PARTIAL_SCREEN",
-  "snapshot_unix": 1791141616.5673623,
+  "status": "B128_SCREEN_COMPLETE",
+  "snapshot_unix": 1791142525.5163527,
   "batch": 128,
   "horizon": 64,
   "precision": "bf16",
+  "source_result_sha256": "e6cb65b14703e8fdfecce219bfaee0fdef779d1bdbeebb53b72ee1f92f96edf1",
   "completed_cells": [
-    {
-      "status": "PASS",
-      "case": {
-        "label": "P1_T0",
-        "policy": "BR",
-        "P": 1,
-        "trigger": "T0",
-        "horizon": 64,
-        "overlap": true,
-        "partial_precision": "bf16"
-      },
-      "numerical_comparison": {
-        "actual_argmax_hash": "f71d5aa38355e414ac9df3515982a4768c6480343f768a40669d88644296a633",
-        "partial_precision": "bf16",
-        "legacy_comparison": "not collected: owner BF16-only amendment"
-      },
-      "samples": [
-        {
-          "E2E_wall": 88.87236438225955,
-          "TPOT": 1.1925595703125
-        },
-        {
-          "E2E_wall": 89.25467158760875,
-          "TPOT": 1.1961495361328125
-        }
-      ],
-      "gate": {
-        "status": "STABLE",
-        "target_repeats": 2,
-        "complete": true,
-        "unstable": false,
-        "summary": {
-          "E2E_wall": {
-            "n": 2,
-            "mean": 89.06351798493415,
-            "median": 89.06351798493415,
-            "min": 88.87236438225955,
-            "max": 89.25467158760875,
-            "range_relative": 0.004292523066671108,
-            "mean_CI95": [
-              86.63468117325019,
-              91.49235479661812
-            ],
-            "relative_CI_half_width": 0.027270838460421342,
-            "early_late_drift": 0.0
-          },
-          "TPOT": {
-            "n": 2,
-            "mean": 1.1943545532226563,
-            "median": 1.1943545532226563,
-            "min": 1.1925595703125,
-            "max": 1.1961495361328125,
-            "range_relative": 0.003005778988011445,
-            "mean_CI95": [
-              1.1715471328678722,
-              1.2171619735774404
-            ],
-            "relative_CI_half_width": 0.019096021607021313,
-            "early_late_drift": 0.0
-          }
-        },
-        "estimate": {
-          "E2E_wall": 89.06351798493415,
-          "TPOT": 1.1943545532226563
-        },
-        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
-      },
-      "estimate": {
-        "E2E_wall": 89.06351798493415,
-        "TPOT": 1.1943545532226563
-      },
-      "initial_gate": {
-        "status": "STABLE_TWO",
-        "target_repeats": 2,
-        "relative_difference": {
-          "E2E_wall": 0.004292523066671108,
-          "TPOT": 0.003005778988011445
-        },
-        "estimator": "mean_and_median",
-        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
-      },
-      "unstable": false
-    },
     {
       "status": "PASS",
       "case": {
@@ -194,6 +112,89 @@
     {
       "status": "PASS",
       "case": {
+        "label": "P1_T0",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "f71d5aa38355e414ac9df3515982a4768c6480343f768a40669d88644296a633",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 88.87236438225955,
+          "TPOT": 1.1925595703125
+        },
+        {
+          "E2E_wall": 89.25467158760875,
+          "TPOT": 1.1961495361328125
+        }
+      ],
+      "gate": {
+        "status": "STABLE",
+        "target_repeats": 2,
+        "complete": true,
+        "unstable": false,
+        "summary": {
+          "E2E_wall": {
+            "n": 2,
+            "mean": 89.06351798493415,
+            "median": 89.06351798493415,
+            "min": 88.87236438225955,
+            "max": 89.25467158760875,
+            "range_relative": 0.004292523066671108,
+            "mean_CI95": [
+              86.63468117325019,
+              91.49235479661812
+            ],
+            "relative_CI_half_width": 0.027270838460421342,
+            "early_late_drift": 0.0
+          },
+          "TPOT": {
+            "n": 2,
+            "mean": 1.1943545532226563,
+            "median": 1.1943545532226563,
+            "min": 1.1925595703125,
+            "max": 1.1961495361328125,
+            "range_relative": 0.003005778988011445,
+            "mean_CI95": [
+              1.1715471328678722,
+              1.2171619735774404
+            ],
+            "relative_CI_half_width": 0.019096021607021313,
+            "early_late_drift": 0.0
+          }
+        },
+        "estimate": {
+          "E2E_wall": 89.06351798493415,
+          "TPOT": 1.1943545532226563
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 89.06351798493415,
+        "TPOT": 1.1943545532226563
+      },
+      "initial_gate": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.004292523066671108,
+          "TPOT": 0.003005778988011445
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
         "label": "P1_T2",
         "policy": "BR",
         "P": 1,
@@ -277,10 +278,10 @@
     {
       "status": "PASS",
       "case": {
-        "label": "P2_T0",
+        "label": "P2_T2",
         "policy": "BR",
         "P": 2,
-        "trigger": "T0",
+        "trigger": "T2",
         "horizon": 64,
         "overlap": true,
         "partial_precision": "bf16"
@@ -292,32 +293,32 @@
       },
       "samples": [
         {
-          "E2E_wall": 87.84619807172567,
-          "TPOT": 1.18269580078125
+          "E2E_wall": 99.93123807571828,
+          "TPOT": 1.363354736328125
         },
         {
-          "E2E_wall": 82.33625506237149,
-          "TPOT": 1.091203125
+          "E2E_wall": 99.74993267841637,
+          "TPOT": 1.3289417724609376
         },
         {
-          "E2E_wall": 86.6702687535435,
-          "TPOT": 1.15840185546875
+          "E2E_wall": 86.78660066705197,
+          "TPOT": 1.161305419921875
         },
         {
-          "E2E_wall": 87.59866691287607,
-          "TPOT": 1.174445068359375
+          "E2E_wall": 88.37565693166107,
+          "TPOT": 1.1845889892578125
         },
         {
-          "E2E_wall": 87.23213426675647,
-          "TPOT": 1.169159912109375
+          "E2E_wall": 88.59228284936398,
+          "TPOT": 1.1852972412109375
         },
         {
-          "E2E_wall": 90.63980513811111,
-          "TPOT": 1.2236807861328125
+          "E2E_wall": 90.43982845917344,
+          "TPOT": 1.2175303955078125
         },
         {
-          "E2E_wall": 86.75591523759067,
-          "TPOT": 1.16157470703125
+          "E2E_wall": 85.97275005280972,
+          "TPOT": 1.1488916015625
         }
       ],
       "gate": {
@@ -328,51 +329,51 @@
         "summary": {
           "E2E_wall": {
             "n": 7,
-            "mean": 87.01132049185357,
-            "median": 87.23213426675647,
-            "min": 82.33625506237149,
-            "max": 90.63980513811111,
-            "range_relative": 0.09600808419518454,
+            "mean": 91.40689853059926,
+            "median": 88.59228284936398,
+            "min": 85.97275005280972,
+            "max": 99.93123807571828,
+            "range_relative": 0.1501687851178117,
             "mean_CI95": [
-              84.73667493094626,
-              89.28596605276087
+              85.91991233851346,
+              96.89388472268507
             ],
-            "relative_CI_half_width": 0.026141949668724542,
-            "early_late_drift": 0.0415058699961853
+            "relative_CI_half_width": 0.06002814098597815,
+            "early_late_drift": 0.1237382556214037
           },
           "TPOT": {
             "n": 7,
-            "mean": 1.1658801792689732,
-            "median": 1.169159912109375,
-            "min": 1.091203125,
-            "max": 1.2236807861328125,
-            "range_relative": 0.11445728271357082,
+            "mean": 1.2271300223214285,
+            "median": 1.1852972412109375,
+            "min": 1.1488916015625,
+            "max": 1.363354736328125,
+            "range_relative": 0.1707341605247966,
             "mean_CI95": [
-              1.1293538180653346,
-              1.2024065404726119
+              1.1488099038758834,
+              1.3054501407669736
             ],
-            "relative_CI_half_width": 0.031329429776000804,
-            "early_late_drift": 0.04780119196307736
+            "relative_CI_half_width": 0.06382381411986218,
+            "early_late_drift": 0.12883678399630213
           }
         },
         "estimate": {
-          "E2E_wall": 87.01132049185357,
-          "TPOT": 1.1658801792689732
+          "E2E_wall": 91.40689853059926,
+          "TPOT": 1.2271300223214285
         },
         "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
       },
       "estimate": {
-        "E2E_wall": 87.01132049185357,
-        "TPOT": 1.1658801792689732
+        "E2E_wall": 91.40689853059926,
+        "TPOT": 1.2271300223214285
       },
       "initial_gate": {
-        "status": "UNSTABLE",
-        "target_repeats": 2,
+        "status": "THIRD_REQUIRED",
+        "target_repeats": 3,
         "relative_difference": {
-          "E2E_wall": 0.06475336214612623,
-          "TPOT": 0.08047206913545252
+          "E2E_wall": 0.0018159488610486139,
+          "TPOT": 0.025564022205463336
         },
-        "estimator": "mean_and_median",
+        "estimator": "median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
       "unstable": true
@@ -483,10 +484,10 @@
     {
       "status": "PASS",
       "case": {
-        "label": "P2_T2",
+        "label": "P2_T0",
         "policy": "BR",
         "P": 2,
-        "trigger": "T2",
+        "trigger": "T0",
         "horizon": 64,
         "overlap": true,
         "partial_precision": "bf16"
@@ -498,32 +499,32 @@
       },
       "samples": [
         {
-          "E2E_wall": 99.93123807571828,
-          "TPOT": 1.363354736328125
+          "E2E_wall": 87.84619807172567,
+          "TPOT": 1.18269580078125
         },
         {
-          "E2E_wall": 99.74993267841637,
-          "TPOT": 1.3289417724609376
+          "E2E_wall": 82.33625506237149,
+          "TPOT": 1.091203125
         },
         {
-          "E2E_wall": 86.78660066705197,
-          "TPOT": 1.161305419921875
+          "E2E_wall": 86.6702687535435,
+          "TPOT": 1.15840185546875
         },
         {
-          "E2E_wall": 88.37565693166107,
-          "TPOT": 1.1845889892578125
+          "E2E_wall": 87.59866691287607,
+          "TPOT": 1.174445068359375
         },
         {
-          "E2E_wall": 88.59228284936398,
-          "TPOT": 1.1852972412109375
+          "E2E_wall": 87.23213426675647,
+          "TPOT": 1.169159912109375
         },
         {
-          "E2E_wall": 90.43982845917344,
-          "TPOT": 1.2175303955078125
+          "E2E_wall": 90.63980513811111,
+          "TPOT": 1.2236807861328125
         },
         {
-          "E2E_wall": 85.97275005280972,
-          "TPOT": 1.1488916015625
+          "E2E_wall": 86.75591523759067,
+          "TPOT": 1.16157470703125
         }
       ],
       "gate": {
@@ -534,51 +535,51 @@
         "summary": {
           "E2E_wall": {
             "n": 7,
-            "mean": 91.40689853059926,
-            "median": 88.59228284936398,
-            "min": 85.97275005280972,
-            "max": 99.93123807571828,
-            "range_relative": 0.1501687851178117,
+            "mean": 87.01132049185357,
+            "median": 87.23213426675647,
+            "min": 82.33625506237149,
+            "max": 90.63980513811111,
+            "range_relative": 0.09600808419518454,
             "mean_CI95": [
-              85.91991233851346,
-              96.89388472268507
+              84.73667493094626,
+              89.28596605276087
             ],
-            "relative_CI_half_width": 0.06002814098597815,
-            "early_late_drift": 0.1237382556214037
+            "relative_CI_half_width": 0.026141949668724542,
+            "early_late_drift": 0.0415058699961853
           },
           "TPOT": {
             "n": 7,
-            "mean": 1.2271300223214285,
-            "median": 1.1852972412109375,
-            "min": 1.1488916015625,
-            "max": 1.363354736328125,
-            "range_relative": 0.1707341605247966,
+            "mean": 1.1658801792689732,
+            "median": 1.169159912109375,
+            "min": 1.091203125,
+            "max": 1.2236807861328125,
+            "range_relative": 0.11445728271357082,
             "mean_CI95": [
-              1.1488099038758834,
-              1.3054501407669736
+              1.1293538180653346,
+              1.2024065404726119
             ],
-            "relative_CI_half_width": 0.06382381411986218,
-            "early_late_drift": 0.12883678399630213
+            "relative_CI_half_width": 0.031329429776000804,
+            "early_late_drift": 0.04780119196307736
           }
         },
         "estimate": {
-          "E2E_wall": 91.40689853059926,
-          "TPOT": 1.2271300223214285
+          "E2E_wall": 87.01132049185357,
+          "TPOT": 1.1658801792689732
         },
         "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
       },
       "estimate": {
-        "E2E_wall": 91.40689853059926,
-        "TPOT": 1.2271300223214285
+        "E2E_wall": 87.01132049185357,
+        "TPOT": 1.1658801792689732
       },
       "initial_gate": {
-        "status": "THIRD_REQUIRED",
-        "target_repeats": 3,
+        "status": "UNSTABLE",
+        "target_repeats": 2,
         "relative_difference": {
-          "E2E_wall": 0.0018159488610486139,
-          "TPOT": 0.025564022205463336
+          "E2E_wall": 0.06475336214612623,
+          "TPOT": 0.08047206913545252
         },
-        "estimator": "median",
+        "estimator": "mean_and_median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
       "unstable": true
@@ -748,6 +749,109 @@
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
       "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P4_T1",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "7af2596c4902dc4caa9ff28c9b3241714643d473e44785e89905e10954a16cab",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 92.28152344375849,
+          "TPOT": 1.2440255126953126
+        },
+        {
+          "E2E_wall": 86.56131649576128,
+          "TPOT": 1.1558758544921874
+        },
+        {
+          "E2E_wall": 85.01415776833892,
+          "TPOT": 1.12886083984375
+        },
+        {
+          "E2E_wall": 92.62078362703323,
+          "TPOT": 1.2492012939453125
+        },
+        {
+          "E2E_wall": 87.10950537398458,
+          "TPOT": 1.165208984375
+        },
+        {
+          "E2E_wall": 97.17732204124331,
+          "TPOT": 1.323921875
+        },
+        {
+          "E2E_wall": 90.56608590763062,
+          "TPOT": 1.2179063720703125
+        }
+      ],
+      "gate": {
+        "status": "UNRESOLVED_JITTER",
+        "target_repeats": 7,
+        "complete": true,
+        "unstable": true,
+        "summary": {
+          "E2E_wall": {
+            "n": 7,
+            "mean": 90.1900992368215,
+            "median": 90.56608590763062,
+            "min": 85.01415776833892,
+            "max": 97.17732204124331,
+            "range_relative": 0.13352067051232858,
+            "mean_CI95": [
+              86.25373468717851,
+              94.12646378646448
+            ],
+            "relative_CI_half_width": 0.043645195902344704,
+            "early_late_drift": 0.048559202974051176
+          },
+          "TPOT": {
+            "n": 7,
+            "mean": 1.2121429617745536,
+            "median": 1.2179063720703125,
+            "min": 1.12886083984375,
+            "max": 1.323921875,
+            "range_relative": 0.15905284555030455,
+            "mean_CI95": [
+              1.1498475957258234,
+              1.2744383278232838
+            ],
+            "relative_CI_half_width": 0.051392754826156,
+            "early_late_drift": 0.05744016405645792
+          }
+        },
+        "estimate": {
+          "E2E_wall": 90.1900992368215,
+          "TPOT": 1.2121429617745536
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 90.1900992368215,
+        "TPOT": 1.2121429617745536
+      },
+      "initial_gate": {
+        "status": "UNSTABLE",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.06396909096200491,
+          "TPOT": 0.07346106753247929
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": true
     }
   ],
   "selection": "No shared setting chosen until B256 screen and full256 BR confirmation."
