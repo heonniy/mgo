@@ -68,7 +68,7 @@ def main():
  actual={k:v for k,v in os.environ.items() if k.startswith('NCCL_')}
  for k,v in expected.items():assert actual.get(k)==v,(actual,expected)
  if a.environment=='env1':
-  assert 'NCCL_P2P_DISABLE' not in actual and 'NCCL_IB_DISABLE' not in actual,(actual,expected)
+  assert actual.get('NCCL_P2P_DISABLE','0')=='0' and actual.get('NCCL_IB_DISABLE','0')=='0',(actual,expected)
 
  torch.set_num_threads(1);torch.cuda.set_device(0)
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
