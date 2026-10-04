@@ -16,6 +16,7 @@ def main(a):
  first=candidates[0];a.policy=first['policy'];a.arena_budget=first['P'];a.trigger=first['trigger'];a.streaming=first['overlap'];a.ready_first=a.streaming;a.partial_precision=first.get('partial_precision');a.physical_prefetch=True;a.fused=True;a.debug_plan=False
  rt=DecodeOffloadRuntime(a,model,backing,experts);rt.stage_frozen_inputs(horizon)
  proofs={c['policy']:json.loads((a.inputs/f'{c["policy"]}_P{a.arena_budget}_proof.json').read_text()) for c in candidates};warm_tokens={};numeric={};by_policy={c['policy']:c for c in candidates}
+ assert all(p['horizon']==horizon for p in proofs.values())
  def configure(policy,phase):
   a.policy=policy;a.phase=phase;rt.policy_kind={'BR':0,'CA':1,'LA':4}[policy]
   rt.proof=source['proofs'][policy];rt.reference=json.loads((a.inputs/f'{policy}_fetches.json').read_text());rt.reset()

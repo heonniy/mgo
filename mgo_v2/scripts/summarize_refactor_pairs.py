@@ -35,12 +35,15 @@ def evaluate(records):
  return dict(status='TIMING_CANDIDATE' if ranked else 'NO_VALIDATED_GAIN',winner=ranked[0]['arm'] if ranked else None,rows=rows,selection_scope='BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA',gain_estimator='1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained')
 
 def main(a):
- records={};sources={}
+ records={};sources={};identities={}
  for arm in ARMS:
   records[arm]={}
   for batch in (128,256):
    path=ROOT/f'{a.stage_prefix}_{arm}_B{batch}_H256/result.json';raw=path.read_bytes();records[arm][batch]=json.loads(raw);sources[str(path)]=hashlib.sha256(raw).hexdigest()
- out=evaluate(records);out['source_hashes']=sources
+   state_path=path.with_name('status.json');state_raw=state_path.read_bytes();state=json.loads(state_raw);assert state['status']=='PASS';identities[(arm,batch)]=state['common_stack'];sources[str(state_path)]=hashlib.sha256(state_raw).hexdigest()
+ from refactor_fingerprint import assert_equivalent
+ assert_equivalent(identities)
+ out=evaluate(records);out['source_hashes']=sources;out['common_stack_equivalence']='PASS: source/input/environment fingerprints match across arms'
  (PACKET/'THREE_ARM_RESULTS.json').write_text(json.dumps(out,indent=2)+'\n')
  lines=['# BF16 three-arm paired timing','',f'Status: {out["status"]}. Timing candidate: {out["winner"]}.','',out['selection_scope'], '', '| Arm | Batch | BR TPOT (s) | LA TPOT (s) | Paired LA gain | 95% interval | Repeats | Eligible |','|---|---:|---:|---:|---:|---|---:|---|']
  for r in out['rows']:
