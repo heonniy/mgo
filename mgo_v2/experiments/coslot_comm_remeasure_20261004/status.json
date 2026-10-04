@@ -1,0 +1,44 @@
+{
+  "status": "BLOCKED_MISSING_FROZEN_R_PLAN",
+  "owner_commit": "f778cf9443a54fb1040cb8a3803df8346a5798f4",
+  "previous_experiment_cancelled_commit": "d45e624",
+  "required_cell": {
+    "dataset": "MATH",
+    "decode_tokens": 256,
+    "ranks": 4,
+    "local_batch": 64,
+    "global_requests": 256,
+    "cache_ratio": 0.3,
+    "eviction": "gate",
+    "substitution": true,
+    "policies": [
+      "BR",
+      "CA",
+      "CA-rep"
+    ],
+    "resource_fallback": {
+      "local_batch": 32,
+      "global_requests": 128
+    }
+  },
+  "required_plan_patterns": [
+    "R_BR_env1_PLAN_*",
+    "R_CA_env1_PLAN_*"
+  ],
+  "matching_plan_directories": {
+    "R_BR_env1_PLAN_*": [],
+    "R_CA_env1_PLAN_*": []
+  },
+  "available_validated_schedules": [
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA-rep_env1_PLAN_0/schedule_validation.json",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_CA_env1_PLAN_0/schedule_validation.json",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/P_BR_env1_PLAN_3/schedule_validation.json"
+  ],
+  "historical_STOP_preserved": true,
+  "new_PLAN_created": false,
+  "new_GPU_run_started": false,
+  "CPU_layout_tests_passed": 3,
+  "pytest_available": false,
+  "test_runner": "direct invocation of all test functions",
+  "updated_unix": 1791096375.606002
+}

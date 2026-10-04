@@ -1,3 +1,10 @@
+**OWNER REPLACEMENT (2026-10-04): CoSLoT remeasurement at f778cf9.**
+OldCA R8 was cancelled; do not resume it. Follow
+`experiments/coslot_comm_remeasure_20261004/{README.md,PLAN.md,EXECUTION_CHECK.md}`.
+The original R-cell BR/CA frozen PLANs are missing from the configured root.
+Do not create a replacement PLAN or silently switch datasets/cells. Await the
+owner-provided schedule location or cell amendment. No GPU run has started.
+
 **OWNER QUEUED FOLLOW-UP (2026-10-04): OLD-CA token->rank fan-out isolation.**
 Do not interrupt the active `fetch_matched_b32_a2a_20261004/tolerance_001`
 study. After it fully exits and commits, run

@@ -84,7 +84,7 @@ class Runtime:
   self.args=args;self.rank=dist.get_rank();self.world=dist.get_world_size();self.experts=experts;self.cap=cap;self.events=[];self.metrics=[];self.index=0
   self.cache=torch.empty((cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(cap,-1,np.int32);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
   self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0;self.actual_wire_bytes=0;self.actual_collective_calls=0
-  if args.phase in ('PLAN','COUNTERS'):
+  if args.phase=='PLAN' or (args.phase=='COUNTERS' and args.comm_mode=='current'):
    meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];sim=np.load(meta['similarity_path'])
    self.policy=Policy(args.capacities,sim,args.substitution,['BR','CA','CA-rep'].index(args.policy))
    self.future=None
@@ -98,6 +98,7 @@ class Runtime:
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
    if args.comm_mode=='coslot':self.events=[add_coslot_layout(e,self.world) for e in self.events]
    self.events=pack_layouts(self.events)
+   if args.phase=='COUNTERS' and args.comm_mode=='coslot':self.metrics=np.load(args.plan/f'rank{self.rank}_metrics.npy').tolist()
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
   for l,block in enumerate(model.model.layers):
    block.mlp.forward=types.MethodType(self.forward_for(l),block.mlp)
@@ -137,7 +138,7 @@ class Runtime:
   recv_weights=torch.empty(recv_k,dtype=send_weights.dtype,device='cuda');recv_weights.view(torch.uint8).view(recv_k,ew).copy_(recv_buf[:,hb+ee:])
   return recv_hidden,recv_eids,recv_weights
  def execute(self,layer,hidden,selected,weights,probs):
-  if self.args.phase in ('PLAN','COUNTERS'):
+  if self.args.phase=='PLAN' or (self.args.phase=='COUNTERS' and self.args.comm_mode=='current'):
    g=gather_global_routes(layer,selected,weights,probs);r=g.routes;self.history.update(layer,r.full_router_probs)
    scores=np.array([self.history.score(layer,e) for e in range(128)],np.float32)
    future=self.future[self.index//48,layer] if self.future is not None else np.zeros((128,self.world),np.int32)
@@ -174,7 +175,7 @@ class Runtime:
    values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
    returned=self.exchange(values[e['coslot_return_order']],e['coslot_return_counts'],e['coslot_return_recv_counts'])
    output=torch.zeros_like(hidden)
-   if e['coslot_send_idx'].numel():output.index_add_(0,e['coslot_send_idx'],returned)
+   for idx,pos in e['coslot_combine']:output.index_add_(0,idx,returned[pos])
   else:
    send_w=dense[e['send_idx'][:,None],e['send_eids'].clamp_min(0)]*(e['send_eids']>=0)
    received=self.exchange(hidden[e['send_idx']],e['send_counts'],e['recv_counts'])
@@ -211,6 +212,9 @@ def generate(model,rt,initial_ids,initial_mask):
  return dict(token_hash=array_hash(result),state_hash=array_hash(rt.keys),E2E_wall=finish-start,decode_wall=finish-decode_start,TPOT=begin.elapsed_time(end)/1000/256),result
 
 def main(a):
+ if a.comm_mode=='coslot':
+  rank=int(os.environ['RANK']);cpus=list(range(24*rank,24*(rank+1)))
+  for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'));rank=dist.get_rank()
  cell=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][a.cell];a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=cell['substitution']
@@ -239,6 +243,11 @@ def main(a):
   else:
    from torch._dynamo.utils import counters
    before=dict(counters['stats']);rt.reset();torch.manual_seed(42)
+   if a.comm_mode=='coslot':
+    write(a.output/f'ready_rank{rank}.json',dict(rank=rank,status='READY'));dist.barrier();deadline=time.monotonic()+600
+    while not (a.output/'GO').exists():
+     if time.monotonic()>deadline:raise TimeoutError('measurement boundary timeout')
+     time.sleep(.1)
    with torch._dynamo.config.patch(error_on_recompile=True):receipt,tokens=generate(model,rt,ids,mask)
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'

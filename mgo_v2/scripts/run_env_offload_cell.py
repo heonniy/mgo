@@ -34,7 +34,22 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current'):
  reason=None
  with (out/'run.log').open('w') as f:
   proc=subprocess.Popen(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(out/'status.json',state)
+  timed=False
   while proc.poll() is None:
+   if comm_mode=='coslot' and phase=='MEASURE' and len(list(out.glob('ready_rank*.json')))==world:
+    boundary=snapshot();assert boundary['host_available_bytes']>=256*2**30 and all(g['free_mib']>8192 and g['temperature_c']<85 for g in boundary['gpus'])
+    state['before_measure']=boundary;state['GO_unix']=time.time();write(out/'status.json',state);(out/'GO').touch();timed=True
+    while proc.poll() is None:
+     if (ROOT/'STOP').exists() or time.time()-state['GO_unix']>3600:
+      reason='owner_stop_or_timing_timeout';os.killpg(proc.pid,signal.SIGTERM)
+      try:proc.wait(timeout=15)
+      except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
+      break
+     try:proc.wait(timeout=1)
+     except subprocess.TimeoutExpired:pass
+    state['after_measure']=snapshot()
+    if any(g['temperature_c']>=85 or g['free_mib']<8192 for g in state['after_measure']['gpus']):reason='post_measure_guard'
+    break
    try:proc.wait(timeout=5)
    except subprocess.TimeoutExpired:pass
    if proc.poll() is not None:break

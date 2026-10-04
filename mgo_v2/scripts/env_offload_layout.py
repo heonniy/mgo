@@ -73,6 +73,7 @@ def add_coslot_layout(event,world):
  coslot_return_counts=np.bincount(part_origins,minlength=world).tolist()
  assert coslot_recv_counts==coslot_return_counts
  e.update(
+  coslot_combine=[(route_send_idx[route_send_eids==expert].tolist(),np.flatnonzero(route_send_eids==expert).tolist()) for expert in np.unique(route_send_eids)],
   coslot_send_idx=route_send_idx.tolist(),
   coslot_send_eids=route_send_eids.tolist(),
   coslot_send_counts=coslot_send_counts,

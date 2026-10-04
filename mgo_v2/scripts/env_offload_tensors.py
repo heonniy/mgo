@@ -17,6 +17,7 @@ def pack_layouts(events,device='cuda'):
   e['return_order']=reserve(e['return_order']);e['combine']=[(reserve(idx),reserve(pos)) for idx,pos in e['combine']]
   e['targets']=reserve(e['targets']);e['selected']=reserve(e['selected'])
   if 'coslot_send_idx' in e:
+   e['coslot_combine']=[(reserve(idx),reserve(pos)) for idx,pos in e['coslot_combine']]
    e['coslot_send_idx']=reserve(e['coslot_send_idx']);e['coslot_send_eids']=reserve(e['coslot_send_eids'])
    e['coslot_groups']=[(expert,reserve(rows),slot) for expert,rows,slot in e['coslot_groups']]
    e['coslot_return_order']=reserve(e['coslot_return_order'])
@@ -30,6 +31,7 @@ def pack_layouts(events,device='cuda'):
   e['groups']=[(expert,view(rows),view(cols),slot) for expert,rows,cols,slot in e['groups']]
   e['combine']=[(view(idx),view(pos)) for idx,pos in e['combine']]
   if 'coslot_send_idx' in e:
+   e['coslot_combine']=[(view(idx),view(pos)) for idx,pos in e['coslot_combine']]
    e['coslot_send_idx']=view(e['coslot_send_idx']);e['coslot_send_eids']=view(e['coslot_send_eids'])
    e['coslot_groups']=[(expert,view(rows),slot) for expert,rows,slot in e['coslot_groups']]
    e['coslot_return_order']=view(e['coslot_return_order'])
