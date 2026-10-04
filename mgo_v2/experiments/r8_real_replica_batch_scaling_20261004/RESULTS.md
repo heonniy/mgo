@@ -2,6 +2,18 @@
 
 **Overall engineering gate: STRONG_GO**
 
+The overall gate is carried by **LA without replication** in all four cases;
+it is not a GO for persistent replication. The selected replica variants
+increase H2D by 6.67–9.40% versus their corresponding non-replica baseline,
+exceeding both the 2% GO cap and the 5% MARGINAL cap. Under the stated gate,
+these selected replica comparisons are NO_GO despite modeled phase savings.
+LA+REP adds only 0.98–2.43% robust phase savings over LA.
+
+These percentages are calibrated CPU MoE phase-model estimates, not measured
+full-model E2E or TPOT gains. Four-GPU pair calibration does not reproduce
+R8 collective contention. The COMM batch-scaling gate passes (+2.13 percentage
+points); the LOAD gate does not (+0.93 percentage points).
+
 Stress workloads are optimized headroom cases, not dataset averages.
 
 ## Stress winners
