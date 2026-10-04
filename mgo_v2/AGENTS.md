@@ -1,9 +1,12 @@
-**OWNER REPLACEMENT (2026-10-04): CoSLoT remeasurement at f778cf9.**
-OldCA R8 was cancelled; do not resume it. Follow
-`experiments/coslot_comm_remeasure_20261004/{README.md,PLAN.md,EXECUTION_CHECK.md}`.
-The original R-cell BR/CA frozen PLANs are missing from the configured root.
-Do not create a replacement PLAN or silently switch datasets/cells. Await the
-owner-provided schedule location or cell amendment. No GPU run has started.
+**OWNER RESTART (2026-10-04): transport stack at ac6d6bc.**
+Follow `experiments/transport_stack_remeasure_20261004/{README.md,PLAN.md,EXECUTION.md}`.
+The missing-PLAN block is superseded: create current/pageable R/BR and R/CA
+reference PLANs if absent, validate once, freeze, and reuse across all cells.
+Run R4 GPUs 0,1,4,5, pinned H2D with two buffers, BR/CA, current/coslot/
+coslot-active, three MEASURE samples per condition. Env1 first; Env2 only if
+all E2E and TPOT ranges/medians are <=5%. No additional repetitions.
+OldCA remains cancelled. Commit each phase and restore owned model workers
+on completion/failure. Do not resume old experiment queues.
 
 **OWNER QUEUED FOLLOW-UP (2026-10-04): OLD-CA token->rank fan-out isolation.**
 Do not interrupt the active `fetch_matched_b32_a2a_20261004/tolerance_001`
