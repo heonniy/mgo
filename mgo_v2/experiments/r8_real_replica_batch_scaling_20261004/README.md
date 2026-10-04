@@ -63,3 +63,18 @@ Report both `decode-only` replication and `all-phase` replication. The latter
 captures whether a prefill-created replica helps enough to justify its slot and
 its effect on the initial decode cache state. Full TTFT still requires physical
 attention/dense timing and is not inferred from this CPU MoE model.
+
+## Calibrated run order
+
+With four free GPUs, run the microbench and CPU decision packet together:
+
+```bash
+cd /home/hwlee/mgo/mgo_v2
+PYTHONPATH="$PWD:$PWD/scripts" \
+/home/hwlee/sub-moe/phase01/.venv/bin/python -u \
+  scripts/run_replica_calibrated_cpu_packet.py --gpus 0,1,2,3
+```
+
+This first measures Env1 and Env2 activation G2G, expert D2D, concurrent H2D,
+overlap and strict serial H2D->D2D. The CPU phase-aware B128/B256 replay then
+requires that calibration and writes `GO_DECISION.json`.
