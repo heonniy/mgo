@@ -1,3 +1,5 @@
+> **Repetition override:** `REPETITION_AMENDMENT.md` supersedes all earlier three-repeat / two-extra-repeat instructions below. Use two clean samples, at most one conditional third, independently per environment/policy.
+
 # Frozen physical execution
 
 Owner commit: ead25216ddedca87ecdf30eb8f5491cdeca92d14.

@@ -1,3 +1,5 @@
+> **Repetition override:** `REPETITION_AMENDMENT.md` supersedes all earlier three-repeat / two-extra-repeat instructions below. Use two clean samples, at most one conditional third, independently per environment/policy.
+
 # R4 extension — best CA stress cell
 
 Date: 2026-10-04

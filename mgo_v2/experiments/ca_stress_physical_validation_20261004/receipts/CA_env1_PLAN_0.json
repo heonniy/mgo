@@ -1,0 +1,140 @@
+{
+  "status": "PASS",
+  "label": "CA_env1_PLAN_0",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/ca_stress_physical_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/CA_env1_PLAN_0",
+    "--policy",
+    "CA",
+    "--environment",
+    "env1",
+    "--phase",
+    "PLAN"
+  ],
+  "started_unix": 1791071854.0211964,
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      }
+    ],
+    "host_available_bytes": 1982653603840,
+    "unix": 1791071853.8559265,
+    "foreign_pids": [],
+    "collection_seconds": 0.3221947569400072
+  },
+  "monitor": "untimed safety polling",
+  "pid": 3468082,
+  "last_safety": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 6891,
+        "free_mib": 74199,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 1,
+        "used_mib": 6861,
+        "free_mib": 74229,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 6651,
+        "free_mib": 74439,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 3,
+        "used_mib": 6751,
+        "free_mib": 74339,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 4,
+        "used_mib": 6619,
+        "free_mib": 74471,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 5,
+        "used_mib": 6709,
+        "free_mib": 74381,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 6,
+        "used_mib": 6645,
+        "free_mib": 74445,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 7,
+        "used_mib": 6981,
+        "free_mib": 74109,
+        "temperature_c": 35
+      }
+    ],
+    "host_available_bytes": 1558836842496,
+    "unix": 1791072342.4420736,
+    "rss_bytes": 890265968640,
+    "foreign_pids": [],
+    "collection_seconds": 0.4526950167492032
+  },
+  "exit_code": 0,
+  "finished_unix": 1791072363.0622084,
+  "handoff": "Owner repetition amendment; original PLAN workers completed without interruption; paused coordinator retired after worker exit"
+}

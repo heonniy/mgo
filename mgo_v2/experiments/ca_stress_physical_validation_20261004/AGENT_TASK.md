@@ -1,3 +1,5 @@
+> **Repetition override:** `REPETITION_AMENDMENT.md` supersedes all earlier three-repeat / two-extra-repeat instructions below. Use two clean samples, at most one conditional third, independently per environment/policy.
+
 # AGENT TASK — physical CA stress validation
 
 Execute exactly the one frozen cell in PLAN.md.

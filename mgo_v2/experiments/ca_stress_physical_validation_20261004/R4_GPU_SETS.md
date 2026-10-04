@@ -1,3 +1,5 @@
+> **Repetition override:** `REPETITION_AMENDMENT.md` supersedes all earlier three-repeat / two-extra-repeat instructions below. Use two clean samples, at most one conditional third, independently per environment/policy.
+
 # Owner amendment: two fixed physical GPU sets
 
 The owner's message following a121c85 authorizes the same frozen R4 study twice:

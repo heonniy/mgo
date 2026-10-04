@@ -117,17 +117,8 @@ def main():
   audit_native_trace()
   for env in ['env1','env2']:
    for policy in ['BR','CA']:phase(policy,env,'COMPILE')
-  orders=[[('env1','BR'),('env1','CA'),('env2','CA'),('env2','BR')],[('env2','BR'),('env2','CA'),('env1','CA'),('env1','BR')],[('env1','CA'),('env1','BR'),('env2','BR'),('env2','CA')]]
-  for repeat,order in enumerate(orders,1):
-   for env,policy in order:phase(policy,env,'MEASURE',repeat)
-  gates=[]
-  for env in ['env1','env2']:
-   checks={policy:{key:harness.spread(samples(policy,env),key) for key in ['E2E_wall','decode_wall','TPOT']} for policy in ['BR','CA']}
-   trigger=any(v['spread_percent']>5 for c in checks.values() for v in c.values());gates.append(dict(environment=env,initial=checks,additional_repeats_per_policy=2 if trigger else 0))
-   write(PACKET/'noise_gate.json',gates);commit('results: physical CA stress '+env+' frozen noise gate')
-   if trigger:
-    for repeat,order in [(4,['CA','BR']),(5,['BR','CA'])]:
-     for policy in order:phase(policy,env,'MEASURE',repeat)
+  from physical_repeat_rule import run as adaptive_measure
+  adaptive_measure(phase,samples,write,PACKET,commit)
   for env in ['env1','env2']:
    for policy in ['BR','CA']:phase(policy,env,'COUNTERS')
   subprocess.run([PYTHON,str(P/'scripts/summarize_ca_stress_physical.py')],env=env_for('env1'),check=True)

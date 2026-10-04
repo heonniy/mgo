@@ -37,8 +37,7 @@
     "BR",
     "CA"
   ],
-  "repeats": 3,
-  "max_targeted_repeats_if_unstable": 2,
+  "repeats": 2,
   "harness": {
     "monitor": "BOUNDARY",
     "fixed_disjoint_cpu_affinity": true,
@@ -46,5 +45,18 @@
     "no_controller_in_measure": true,
     "no_compile_in_measure": true
   },
-  "automatic_followup": false
+  "automatic_followup": false,
+  "max_total_repeats": 3,
+  "repetition_rule": {
+    "metrics": [
+      "E2E",
+      "TPOT"
+    ],
+    "relative_difference": "abs(T1-T2)/mean(T1,T2)",
+    "stop_at_two_if_both_le": 0.02,
+    "third_if_max_gt": 0.02,
+    "third_if_max_le": 0.05,
+    "unstable_without_extra_if_either_gt": 0.05,
+    "single_sample_primary_forbidden": true
+  }
 }

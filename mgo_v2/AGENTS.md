@@ -1,3 +1,5 @@
+**OWNER TIMING REPETITION AMENDMENT:** Active/queued physical R8 and both R4 GPU-set studies use two clean MEASURE repeats per cell/environment/policy. Gate E2E and TPOT with abs(T1-T2)/mean(T1,T2): both <=2% stop at two; maximum >2% and <=5% adds exactly one third; either >5% stops at two and is unstable. Never use one sample as primary evidence or add further repeats. This overrides earlier three-plus-two repetition text. See `experiments/ca_stress_physical_validation_20261004/REPETITION_AMENDMENT.md`.
+
 **OWNER EXTENSION (2026-10-04): add R4-best physical stress cell after current R8 run.**
 Do not interrupt or mutate the in-flight R8-best validation. After it fully
 exits and commits, run `experiments/ca_stress_physical_validation_20261004/R4_AMENDMENT.md`.
