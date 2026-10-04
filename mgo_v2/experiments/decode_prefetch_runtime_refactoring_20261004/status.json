@@ -1,17 +1,17 @@
 {
   "status": "PASS",
-  "stage": "M13_T2_SYNC_REPAIR",
-  "label": "M13_T2_SYNC_REPAIR_B256_H64",
+  "stage": "M13_CONFIRM",
+  "label": "M13_CONFIRM_B128_H256",
   "group": {
-    "batch": 256,
-    "horizon": 64,
+    "batch": 128,
+    "horizon": 256,
     "cases": [
       {
-        "label": "P4_T2",
+        "label": "P1_T0",
         "policy": "BR",
-        "P": 4,
-        "trigger": "T2",
-        "horizon": 64,
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 256,
         "overlap": true,
         "partial_precision": "bf16"
       },
@@ -20,39 +20,23 @@
         "policy": "BR",
         "P": 2,
         "trigger": "T2",
-        "horizon": 64,
-        "overlap": true,
-        "partial_precision": "bf16"
-      },
-      {
-        "label": "P1_T2",
-        "policy": "BR",
-        "P": 1,
-        "trigger": "T2",
-        "horizon": 64,
+        "horizon": 256,
         "overlap": true,
         "partial_precision": "bf16"
       }
     ]
   },
-  "started_unix": 1791148444.9003766,
-  "source_sha": "1a5dad9203a7df265b5f0678b322c63057727ad5",
+  "started_unix": 1791150527.6168897,
+  "source_sha": "714e91b89dbe19cec3500bedeff2e8c18e6af16e",
   "monitor": "boundaries only; file polling during MEASURE",
-  "pid": 288218,
+  "pid": 316213,
   "completed": [
-    "P4_T2_r1",
-    "P4_T2_r2",
-    "P4_T2_r3",
+    "P1_T0_r1",
+    "P1_T0_r2",
     "P2_T2_r1",
     "P2_T2_r2",
-    "P1_T2_r1",
-    "P1_T2_r2",
-    "P1_T2_r3",
-    "P1_T2_r4",
-    "P1_T2_r5",
-    "P1_T2_r6",
-    "P1_T2_r7"
+    "P2_T2_r3"
   ],
   "exit_code": 0,
-  "finished_unix": 1791150342.908299
+  "finished_unix": 1791153013.5601475
 }
