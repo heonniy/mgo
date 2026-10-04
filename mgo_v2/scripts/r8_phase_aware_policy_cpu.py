@@ -728,6 +728,15 @@ def exact_seed_search(cal):
         for dataset in ("MATH","ShareGPT"):
             pool=Pool(dataset)
             cand=candidate_proxies(pool,batch,dataset)
+            if batch==128 and dataset=="MATH":
+                anchor=dict(dataset="MATH",batch=128,family="LOAD",
+                            sample_seed=97,dp_seed=200,placement_seed=172,
+                            proxy_remote_routes=-1,proxy_critical_rows=-1,
+                            proxy_peak_rows=-1,dp_divergence=-1,
+                            anchor="prior B128 load-stress winner")
+                if not any((x["family"],x["sample_seed"],x["dp_seed"],x["placement_seed"])==
+                           ("LOAD",97,200,172) for x in cand):
+                    cand.append(anchor)
             for i,row in enumerate(cand):
                 _,arrays,result=run_replay(pool,batch,row["sample_seed"],row["dp_seed"],
                                            row["placement_seed"],0,False,horizon=HORIZON)
