@@ -12,6 +12,7 @@ from .runtime import gather_global_routes
 from .controller import DecodePrefetchController
 from .predictor import TransitionPredictor
 from .compact_metadata import CompactMetadata
+from .pinned_h2d import PriorityH2DScheduler
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
@@ -19,8 +20,11 @@ class DecodeOffloadRuntime(LiveRuntime):
   super().__init__(a,model,backing,experts)
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
+  if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache)
   self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//8)
  def reset(self):
+  if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):
+   self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache)
   super().reset()
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena
@@ -30,14 +34,24 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.metadata'):
    if self.index<48:g=gather_global_routes(layer,selected,weights,probs)
    else:g=self.metadata.collect(self.index,selected,probs,self.arrays['gates'][self.index])
-  r=g.routes
+  r=g.routes;self.current_histogram=getattr(g,'histogram',None)
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
    out,promotions,discards=self.controller.plan_current(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,self.arrays['gates'][self.index])
    if self.index>=48:self.controller_times.append((time.perf_counter()-start)*1000)
    targets,effective,masses,lengths,destinations,fetches,row=out
-   assert not promotions and not discards,'prefetch integration starts at M9'
-   assert [list(f) for f in fetches]==self.reference[self.index]
+   if getattr(self.args,'physical_prefetch',False):
+    for promotion in promotions:
+     if promotion.rank==self.rank:
+      assert self.keys[promotion.promoted_physical_slot]==promotion.key
+      assert self.keys[promotion.recycled_physical_slot]==promotion.victim
+      self.h2d.promote(promotion.promoted_physical_slot,promotion.key)
+      self.keys[promotion.recycled_physical_slot]=-1
+    for rank,slot,key in discards:
+     if rank==self.rank:self.h2d.discard(slot,key);self.keys[slot]=-1
+   else:
+    assert not promotions and not discards
+    assert [list(f) for f in fetches]==self.reference[self.index]
    self.current_global_fetch_count=len(fetches)
    e=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
    e.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
@@ -50,8 +64,42 @@ class DecodeOffloadRuntime(LiveRuntime):
    self.debug_plan_checks+=1
   if self.args.phase!='MEASURE' and self.index%768==0:print(f'{self.args.policy} event={self.index} split_controller',flush=True)
   return device_layout(e)
+ def prefetch_next(self):
+  if self.index<48:return
+  with nvtx_phase('moe.prefetch_controller'):
+   reservations=self.controller.plan_prefetch_next(self.current_histogram)
+  for rank,key,pfslot in reservations:
+   if rank==self.rank:
+    physical=int(self.arena.prefetch_physical[rank][pfslot])
+    self.h2d.enqueue_prefetch(physical,key,self.experts[key]);self.keys[physical]=key
+ def apply_fetches(self,e):
+  if not getattr(self.args,'physical_prefetch',False):return super().apply_fetches(e)
+  for key,slot,victim,rep in e['fetches']:
+   assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
+   self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
+ def close(self):
+  if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
  def execute(self,*args):
-  result=super().execute(*args)
+  if not getattr(self.args,'physical_prefetch',False):result=super().execute(*args)
+  else:
+   layer,hidden,selected,weights,probs=args
+   e=self.plan_event(layer,selected,weights,probs)
+   dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
+   with nvtx_phase('moe.dispatch'):packet=self.dispatch(hidden,dense,e)
+   # Complete forward only, without draining speculative copies on another stream.
+   forward_done=torch.cuda.Event();forward_done.record();forward_done.synchronize()
+   with nvtx_phase('moe.h2d_fetch'):self.apply_fetches(e)
+   with nvtx_phase('moe.h2d_global_barrier'):
+    self.h2d.wait_slots([slot for _,_,_,slot in e['groups']],host=True)
+    dist.barrier();torch.cuda.current_stream().synchronize()
+   self.prefetch_next()
+   with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
+   with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])
+   self.index+=1
+   if self.args.phase!='MEASURE':
+    self.arena.assert_consistent()
+    assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
+    self.actual_h2d_bytes=self.h2d.metrics['bytes']
   if self.index==48:
    self.arena.assert_consistent();assert not self.arena.reservations and np.all(self.keys[self.cap:]<0)
    self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))

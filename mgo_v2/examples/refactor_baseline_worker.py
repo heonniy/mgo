@@ -82,15 +82,27 @@ def main(a):
     base.nvtx_phase,live.nvtx_phase=old_base,old_live
     write(a.output/f'phases_rank{rank}.json',recorder.receipt())
     rt.recorder=None;rt.h2d.trace=None
-   assert array_hash(rt.keys[:rt.cap])==rt.proof['rank_state_hashes'][rank]
-   assert rt.actual_h2d_bytes==rt.proof['H2D_bytes'][rank] and not rt.mismatch.item()
+   if a.physical_prefetch:
+    rt.h2d.synchronize()
+    proof=json.loads((a.inputs/f'{name}_P{a.arena_budget}_proof.json').read_text())
+    assert array_hash(rt.policy.slots[rank,:rt.cap])==proof['rank_state_hashes'][rank]
+    assert rt.controller.counters==proof['counters']
+    assert rt.h2d.metrics['copies']<=proof['max_copy_counts'][rank]
+    baseline=json.loads((Path(__file__).resolve().parents[1]/'experiments/decode_prefetch_runtime_refactoring_20261004/M0_gpu_gate.json').read_text())
+    old=next(x for x in baseline['ranks'][rank]['rows'] if x['policy']==name)
+    assert row['argmax_hash']==old['argmax_hash'],('baseline argmax mismatch',name,rank)
+   else:
+    assert array_hash(rt.keys[:rt.cap])==rt.proof['rank_state_hashes'][rank]
+    assert rt.actual_h2d_bytes==rt.proof['H2D_bytes'][rank]
+   assert not rt.mismatch.item()
    if expected is not None:assert np.array_equal(expected,tokens)
    expected=tokens
-   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),controller_times=getattr(rt,'controller_times',[]),debug_plan_checks=getattr(rt,'debug_plan_checks',0),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
+   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),controller_times=getattr(rt,'controller_times',[]),debug_plan_checks=getattr(rt,'debug_plan_checks',0),scheduler_metrics=(rt.h2d.metrics if a.physical_prefetch else None),controller_counters=(rt.controller.counters if a.physical_prefetch else None),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
   if a.compact:live.gather_global_routes=original_collect
+  if hasattr(rt,'close'):rt.close()
   # Detach closures before reclaiming the arena for the next policy.
   for block in model.model.layers:block.mlp.forward=lambda *args: None
   del rt;gc.collect();torch.cuda.empty_cache()
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,horizon=8,rows=rows,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated()));dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');p.add_argument('--split-controller',action='store_true');p.add_argument('--debug-plan',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');p.add_argument('--split-controller',action='store_true');p.add_argument('--debug-plan',action='store_true');p.add_argument('--physical-prefetch',action='store_true');main(p.parse_args())
