@@ -1,3 +1,13 @@
+**OWNER PRIORITY (2026-10-04): decode-only prefetch runtime refactoring.**
+Read `experiments/decode_prefetch_runtime_refactoring_20261004/` in this order:
+README -> INVARIANTS -> PLAN -> MILESTONES -> MEASUREMENT -> IMPLEMENTATION_MAP -> AGENT_TASK.
+This branch is plan-first. Replication is out of scope. Prefill keeps the existing
+balanced mandatory-miss path with prefetch disabled. Decode adds EdgeMoE-style
+batch next-layer prediction, per-rank C+P MAIN/PREFETCH slots with zero-copy
+role-swap promotion, compact replicated metadata/controller decisions, urgent
+early H2D plus background prefetch, ready-first compute, and exactly two payload
+A2As (forward/return). Implement milestones sequentially and stop at checkpoints.
+
 **OWNER AMENDMENT (2026-10-04): calibration before GO.**
 For the active R8 B128/B256 packet, first run the four-GPU Env1/Env2 model-free
 microbenchmark (activation G2G, 9-MiB D2D, H2D, overlap and strict serial
