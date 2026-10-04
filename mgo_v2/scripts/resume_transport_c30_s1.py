@@ -1,4 +1,4 @@
-"""Owner-authorized c60/s0 transport matrix with checkpoints and conditional Env2."""
+"""Owner-authorized c30/s1 transport matrix with checkpoints and conditional Env2."""
 import hashlib,json,os,signal,statistics,subprocess,time,sys
 from pathlib import Path
 import run_env_offload_cell as launcher
@@ -7,13 +7,13 @@ from batch_comm_common import stop_idle_load
 import run_timing_stability as harness
 
 P=launcher.P
-ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004/c60_s0')
-PACKET=P/'experiments/transport_stack_remeasure_20261004/c60_s0'
+ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004/c30_s1')
+PACKET=P/'experiments/transport_stack_remeasure_20261004/c30_s1'
 BRANCH='codex/coslot-comm-remeasure-20261004'
-CACHE_RATIO=0.60
-SUBSTITUTION=False
-CACHE_TAG='c60'
-SUB_TAG='s0'
+CACHE_RATIO=0.30
+SUBSTITUTION=True
+CACHE_TAG='c30'
+SUB_TAG='s1'
 launcher.PACKET=PACKET
 harness.ROOT=ROOT
 write=launcher.write
@@ -36,7 +36,7 @@ def run_cpu_validation():
   stdout=proc.stdout,stderr=proc.stderr,cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION)
  write(PACKET/'CPU_validation.json',receipt)
  if proc.returncode:raise RuntimeError('CPU validation failed')
- publish('test: validate c60 s0 transport packet')
+ publish('test: validate c30 s1 transport packet')
 
 def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
  state.update(stage=name,environment=env,policy=policy,transport=transport,repeat=repeat);checkpoint()
@@ -52,7 +52,7 @@ def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
      time.sleep(1)
     if cmd.exists():os.killpg(pid,signal.SIGKILL)
   raise
- state['completed'].append(str(out));checkpoint();publish(f'results: c60 s0 {env} {policy} {transport} {name} {repeat}')
+ state['completed'].append(str(out));checkpoint();publish(f'results: c30 s1 {env} {policy} {transport} {name} {repeat}')
  return out
 
 def result_dir(policy,env,phase_name,transport,repeat):
@@ -107,7 +107,7 @@ def summarize(env):
  write(PACKET/(env+'_results.json'),dict(status='PASS',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,stable=stable,
   stability_gate='(max-min)/median <=5% for E2E and TPOT, all six conditions; no extra repeats',
   summaries=summaries,comparisons=comparisons,raw_receipts=raw))
- lines=[f'# {env} c60/s0 transport stack results','',
+ lines=[f'# {env} c30/s1 transport stack results','',
   'Three measurements per condition. Raw medians and full ranges are in the JSON.',
   'Stable timing does not imply a statistically established BR/CA difference.','',
   '| Policy | Transport | TPOT median (s) | E2E median (s) | TPOT spread |',
@@ -115,7 +115,7 @@ def summarize(env):
  for x in summaries:lines.append(f"| {x['policy']} | {x['transport']} | {x['metrics']['TPOT']['median']:.6f} | {x['metrics']['E2E_wall']['median']:.3f} | {x['metrics']['TPOT']['spread_relative']:.2%} |")
  lines+=['',f'Stability gate: {stable}. Env2 is conditional on all Env1 conditions passing.']
  (PACKET/(env+'_RESULTS.md')).write_text('\n'.join(lines)+'\n')
- publish('results: summarize c60 s0 transport stack '+env);return stable
+ publish('results: summarize c30 s1 transport stack '+env);return stable
 
 def main():
  ROOT.mkdir(parents=True,exist_ok=True);PACKET.mkdir(parents=True,exist_ok=True);checkpoint()
@@ -139,8 +139,8 @@ def main():
     while (launcher.ROOT/f'R_{policy}_env1_PLAN_{CACHE_TAG}_{SUB_TAG}_{repeat}').exists():repeat+=1
     plan=phase(policy,'PLAN','env1','current','pageable',repeat)
     validate(plan)
-    write(PACKET/(policy+'_c60_s0_plan_validation.json'),json.loads((plan/'schedule_validation.json').read_text()))
-    publish('results: freeze c60 s0 reference R '+policy+' PLAN')
+    write(PACKET/(policy+'_c30_s1_plan_validation.json'),json.loads((plan/'schedule_validation.json').read_text()))
+    publish('results: freeze c30 s1 reference R '+policy+' PLAN')
    state['plans'][policy]=str(plan);checkpoint()
   for env in ('env1','env2'):
    for policy in ('BR','CA'):
@@ -153,6 +153,6 @@ def main():
  except BaseException as exc:
   state.update(status='FAILED_OR_STOPPED',error=repr(exc));raise
  finally:
-  state['finished_unix']=time.time();checkpoint();state['resident_models']=harness.restore();checkpoint();publish('results: c60 s0 transport checkpoint and GPU handoff')
+  state['finished_unix']=time.time();checkpoint();state['resident_models']=harness.restore();checkpoint();publish('results: c30 s1 transport checkpoint and GPU handoff')
 
 if __name__=='__main__':main()

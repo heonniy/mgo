@@ -1,3 +1,12 @@
+**OWNER QUEUE CLARIFICATION (2026-10-04): 70780ff is a follow-up.**
+The owner's latest chat explicitly adds c60/s0 after the previously authorized
+c30/s1 packet. Resume c30/s1 from its successful BR PLAN, then run c60/s0.
+Use `scripts/queue_transport_cache_followup.py`; packet/raw state is separated
+into c30_s1 and c60_s0. Do not replace c30/s1 with the new default. A scientific
+failure stops the queue; an ordinary unstable timing conclusion ends that arm
+without extra repeats. Publication failure preserves local commits and does
+not abort a valid GPU run. See `transport_stack_remeasure_20261004/QUEUE.md`.
+
 **OWNER OVERRIDE (2026-10-04): transport follow-up is c60, substitution OFF.**
 For `experiments/transport_stack_remeasure_20261004`, ignore the older cache30/sub-ON wording below. Run R=MATH/R4/local-B64/Gate/decode256 on GPUs 0,1,4,5 with cache=60% and substitution OFF. Use CoSLoT-style pinned H2D for all timed cells and compare current/coslot/coslot-active for BR/CA. PLAN identity is keyed by c60+s0; create and validate missing c60/s0 reference PLANs outside timing rather than requesting a path from the owner. Execute `scripts/run_transport_stack_packet.py`. Env1 first, Env2 only if all six Env1 conditions meet <=5% E2E and TPOT spread. Commit each checkpoint and stop after the packet.
 
