@@ -1,0 +1,283 @@
+{
+  "status": "PASS",
+  "environments": {
+    "env1": {
+      "environment": "env1",
+      "raw_receipts": [
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env1/rank0.json",
+          "sha256": "2e980f0deb8d4fdbd648f43961db6e49906f50e8b9c9366d06772ba4eb869fbb"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env1/rank1.json",
+          "sha256": "7f200d385158347be9f871fb86aad4faf525e3c4e2614bc8405728713e9490c0"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env1/rank2.json",
+          "sha256": "d586941371fd69d3156d0cb33d608f5fb5609faf9600f9a777b1da9573aed5fd"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env1/rank3.json",
+          "sha256": "f86eead864ee1f75d05d7f62507ec28bcc0237fd6f294fdb558c9a85f9a9bab3"
+        }
+      ],
+      "transport_env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_P2P_DISABLE": "0"
+      },
+      "H2D_9MiB": {
+        "median_ms": 0.20374399423599243,
+        "p90_ms": 0.2112320065498352
+      },
+      "D2D_9MiB_onepair": {
+        "median_ms": 0.08026231080293655,
+        "p90_ms": 0.08208863437175751
+      },
+      "D2D_9MiB_twopair": {
+        "median_ms": 0.0795368105173111,
+        "p90_ms": 0.08493475615978241
+      },
+      "resident_D2D_overlap_H2D": {
+        "median_ms": 0.21071545779705048,
+        "p90_ms": 0.21844729781150818
+      },
+      "miss_overlap": {
+        "median_ms": 0.3849370405077934,
+        "p90_ms": 0.3986163064837456
+      },
+      "miss_serial": {
+        "median_ms": 0.45843981206417084,
+        "p90_ms": 0.47197379171848297
+      },
+      "activation": {
+        "1": {
+          "oneway_median_ms": 0.04081800580024719,
+          "oneway_p90_ms": 0.047052279114723206,
+          "roundtrip_median_ms": 0.06871018558740616,
+          "roundtrip_p90_ms": 0.08068792521953583
+        },
+        "8": {
+          "oneway_median_ms": 0.041000545024871826,
+          "oneway_p90_ms": 0.048510730266571045,
+          "roundtrip_median_ms": 0.06692297756671906,
+          "roundtrip_p90_ms": 0.07885042577981949
+        },
+        "16": {
+          "oneway_median_ms": 0.04103314131498337,
+          "oneway_p90_ms": 0.0449279323220253,
+          "roundtrip_median_ms": 0.06938446313142776,
+          "roundtrip_p90_ms": 0.07890444248914719
+        },
+        "32": {
+          "oneway_median_ms": 0.042168423533439636,
+          "oneway_p90_ms": 0.0561615452170372,
+          "roundtrip_median_ms": 0.06654765456914902,
+          "roundtrip_p90_ms": 0.07572583854198456
+        },
+        "64": {
+          "oneway_median_ms": 0.039703212678432465,
+          "oneway_p90_ms": 0.044588930904865265,
+          "roundtrip_median_ms": 0.06929785013198853,
+          "roundtrip_p90_ms": 0.07502082735300064
+        },
+        "128": {
+          "oneway_median_ms": 0.04129670560359955,
+          "oneway_p90_ms": 0.04767533391714096,
+          "roundtrip_median_ms": 0.07393304258584976,
+          "roundtrip_p90_ms": 0.08112844079732895
+        },
+        "256": {
+          "oneway_median_ms": 0.043029896914958954,
+          "oneway_p90_ms": 0.04838872700929642,
+          "roundtrip_median_ms": 0.06993208080530167,
+          "roundtrip_p90_ms": 0.0769076868891716
+        },
+        "512": {
+          "oneway_median_ms": 0.04716496914625168,
+          "oneway_p90_ms": 0.05006138235330582,
+          "roundtrip_median_ms": 0.07402617484331131,
+          "roundtrip_p90_ms": 0.07760897278785706
+        },
+        "1024": {
+          "oneway_median_ms": 0.05881860852241516,
+          "oneway_p90_ms": 0.061794184148311615,
+          "roundtrip_median_ms": 0.0947117805480957,
+          "roundtrip_p90_ms": 0.09770598262548447
+        },
+        "2048": {
+          "oneway_median_ms": 0.07432233542203903,
+          "oneway_p90_ms": 0.0775577500462532,
+          "roundtrip_median_ms": 0.12590084224939346,
+          "roundtrip_p90_ms": 0.12708548456430435
+        }
+      },
+      "expert_compute": {
+        "64": {
+          "median_ms": 0.06838399916887283,
+          "p90_ms": 0.08406399935483932
+        },
+        "128": {
+          "median_ms": 0.07023999840021133,
+          "p90_ms": 0.07958400249481201
+        },
+        "256": {
+          "median_ms": 0.06860800087451935,
+          "p90_ms": 0.07971200346946716
+        },
+        "512": {
+          "median_ms": 0.06860800087451935,
+          "p90_ms": 0.08060800284147263
+        },
+        "1024": {
+          "median_ms": 0.06940799951553345,
+          "p90_ms": 0.07952000200748444
+        },
+        "2048": {
+          "median_ms": 0.07443200051784515,
+          "p90_ms": 0.08163200318813324
+        }
+      },
+      "miss_overlap_saving_vs_serial": 0.1603324354083121
+    },
+    "env2": {
+      "environment": "env2",
+      "raw_receipts": [
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env2/rank0.json",
+          "sha256": "0aea8ab4a2e9d38a262d44f0eddeeedd91cee6d277c4d47ee69ccbaf6f008f42"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env2/rank1.json",
+          "sha256": "525f7a4bfe989c2e10e2d3dba6fc8f9f629a7f64390f1a0c9b28b41ef6408d8a"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env2/rank2.json",
+          "sha256": "5d791c48d1a7aa334fa0ca809dcba84a64222eb0dfb14c39ec9c40db2a54e6a0"
+        },
+        {
+          "path": "/home/hwlee/mgo-results/r8_real_replica_batch_scaling_20261004/microbench/env2/rank3.json",
+          "sha256": "6f40da6dc7d5e1f7d8fcf2790573467bb6ea704d031af245127c02f58983627b"
+        }
+      ],
+      "transport_env": {
+        "NCCL_CUMEM_ENABLE": "0",
+        "NCCL_P2P_DISABLE": "1",
+        "NCCL_IB_DISABLE": "1"
+      },
+      "H2D_9MiB": {
+        "median_ms": 0.22566400468349457,
+        "p90_ms": 0.23472000658512115
+      },
+      "D2D_9MiB_onepair": {
+        "median_ms": 0.3416389226913452,
+        "p90_ms": 0.34785177558660507
+      },
+      "D2D_9MiB_twopair": {
+        "median_ms": 0.33804215490818024,
+        "p90_ms": 0.3495616838335991
+      },
+      "resident_D2D_overlap_H2D": {
+        "median_ms": 0.47972798347473145,
+        "p90_ms": 0.4885997623205185
+      },
+      "miss_overlap": {
+        "median_ms": 0.5413880571722984,
+        "p90_ms": 0.5552582442760468
+      },
+      "miss_serial": {
+        "median_ms": 0.7073711603879929,
+        "p90_ms": 0.7196478545665741
+      },
+      "activation": {
+        "1": {
+          "oneway_median_ms": 0.14149583876132965,
+          "oneway_p90_ms": 0.2148076891899109,
+          "roundtrip_median_ms": 0.16378704458475113,
+          "roundtrip_p90_ms": 0.2655303105711937
+        },
+        "8": {
+          "oneway_median_ms": 0.14315731823444366,
+          "oneway_p90_ms": 0.1797899603843689,
+          "roundtrip_median_ms": 0.19816681742668152,
+          "roundtrip_p90_ms": 0.23242924362421036
+        },
+        "16": {
+          "oneway_median_ms": 0.1072268933057785,
+          "oneway_p90_ms": 0.13841595500707626,
+          "roundtrip_median_ms": 0.13618264347314835,
+          "roundtrip_p90_ms": 0.20810216665267944
+        },
+        "32": {
+          "oneway_median_ms": 0.07904693484306335,
+          "oneway_p90_ms": 0.14006532728672028,
+          "roundtrip_median_ms": 0.14377012848854065,
+          "roundtrip_p90_ms": 0.17462950199842453
+        },
+        "64": {
+          "oneway_median_ms": 0.07312465459108353,
+          "oneway_p90_ms": 0.07901806384325027,
+          "roundtrip_median_ms": 0.11862814426422119,
+          "roundtrip_p90_ms": 0.14012213796377182
+        },
+        "128": {
+          "oneway_median_ms": 0.07616821676492691,
+          "oneway_p90_ms": 0.07907580584287643,
+          "roundtrip_median_ms": 0.1325393095612526,
+          "roundtrip_p90_ms": 0.14235824346542358
+        },
+        "256": {
+          "oneway_median_ms": 0.10359380394220352,
+          "oneway_p90_ms": 0.11257827281951904,
+          "roundtrip_median_ms": 0.1766495406627655,
+          "roundtrip_p90_ms": 0.18002279102802277
+        },
+        "512": {
+          "oneway_median_ms": 0.15916582196950912,
+          "oneway_p90_ms": 0.16394257545471191,
+          "roundtrip_median_ms": 0.2842685207724571,
+          "roundtrip_p90_ms": 0.29103364795446396
+        },
+        "1024": {
+          "oneway_median_ms": 0.26627350598573685,
+          "oneway_p90_ms": 0.27474574744701385,
+          "roundtrip_median_ms": 0.49562379717826843,
+          "roundtrip_p90_ms": 0.5029160529375076
+        },
+        "2048": {
+          "oneway_median_ms": 0.30438508838415146,
+          "oneway_p90_ms": 0.31602103263139725,
+          "roundtrip_median_ms": 0.5781874060630798,
+          "roundtrip_p90_ms": 0.5890009924769402
+        }
+      },
+      "expert_compute": {
+        "64": {
+          "median_ms": 0.06761600077152252,
+          "p90_ms": 0.07807999849319458
+        },
+        "128": {
+          "median_ms": 0.06716799736022949,
+          "p90_ms": 0.07894399762153625
+        },
+        "256": {
+          "median_ms": 0.06729599833488464,
+          "p90_ms": 0.07753600180149078
+        },
+        "512": {
+          "median_ms": 0.06777600198984146,
+          "p90_ms": 0.07638400048017502
+        },
+        "1024": {
+          "median_ms": 0.06684800237417221,
+          "p90_ms": 0.08268799632787704
+        },
+        "2048": {
+          "median_ms": 0.07228799909353256,
+          "p90_ms": 0.08291199803352356
+        }
+      },
+      "miss_overlap_saving_vs_serial": 0.23464782353390368
+    }
+  },
+  "interpretation": "4-GPU model-free calibration; pair costs can calibrate the R8 CPU phase model but do not reproduce R8 collective contention"
+}
