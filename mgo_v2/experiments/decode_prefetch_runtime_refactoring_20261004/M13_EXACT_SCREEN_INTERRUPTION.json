@@ -1,0 +1,50 @@
+{
+  "status": "INTENTIONAL_REPLAN",
+  "unix": 1791135452.3206086,
+  "reason": "Owner authorizes coalesced rank-partial candidates with numerical/token differences reported. Preserve complete P1/T1 pair; interrupt only subsequent untimed warmup to validate true coalesced candidates before further tuning.",
+  "interrupted_phase": {
+    "stage": "WARMUP_VALIDATION",
+    "case": "P1_T0",
+    "case_spec": {
+      "label": "P1_T0",
+      "policy": "BR",
+      "P": 1,
+      "trigger": "T0",
+      "horizon": 64,
+      "overlap": true
+    }
+  },
+  "completed_result": {
+    "status": "PASS",
+    "case": {
+      "label": "P1_T1",
+      "policy": "BR",
+      "P": 1,
+      "trigger": "T1",
+      "horizon": 64,
+      "overlap": true
+    },
+    "samples": [
+      {
+        "E2E_wall": 115.85207865666598,
+        "TPOT": 1.600255126953125
+      },
+      {
+        "E2E_wall": 121.22709761280566,
+        "TPOT": 1.6848134765625
+      }
+    ],
+    "gate": {
+      "status": "UNSTABLE",
+      "target_repeats": 2,
+      "relative_difference": {
+        "E2E_wall": 0.04534366147814069,
+        "TPOT": 0.05148041628042836
+      },
+      "estimator": "mean_and_median",
+      "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+    },
+    "unstable": true
+  },
+  "torchrun_pid": 128381
+}

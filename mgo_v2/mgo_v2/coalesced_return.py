@@ -1,0 +1,18 @@
+"""True one-partial-per-token/rank return, with explicit accumulation precision.
+
+This remains a separately validated candidate. It does not claim legacy BF16
+expert-order bitwise equivalence. Input contributions and ordering are checked
+independently; physical model output/argmax differences must be reported.
+"""
+import torch
+
+def combine_rank_partials(transport,hidden,parts,event,accumulation=torch.float32):
+ if accumulation not in (torch.bfloat16,torch.float32,torch.float64):raise ValueError(accumulation)
+ partial=torch.zeros((sum(event['recv_counts']),hidden.shape[-1]),device=hidden.device,dtype=accumulation)
+ for (_,rows,_,_),values in zip(event['groups'],parts):partial.index_add_(0,rows,values.to(accumulation))
+ returned,_=transport.exchange(partial,event['recv_counts'],event['send_counts'])
+ transport.return_bytes+=(sum(event['recv_counts'])-event['recv_counts'][transport.rank])*hidden.shape[-1]*partial.element_size()
+ output=torch.zeros_like(hidden,dtype=accumulation);offset=0
+ for count in event['send_counts']:
+  output.index_add_(0,event['send_idx'][offset:offset+count],returned[offset:offset+count]);offset+=count
+ return output.to(hidden.dtype)

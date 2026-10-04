@@ -15,7 +15,8 @@ def main():
  if args.stage in ('M6_NATIVE','M6_PERF'):cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/compact_metadata_check.py'),'--output',str(out)]
  if args.stage.startswith('M8_NCCL'):cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/priority_h2d_collective_check.py'),'--output',str(out)]
  if args.stage.startswith('M11'):cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/fused_transport_check.py'),'--output',str(out)]
- if args.stage=='M11_ENV2':env=h.env_for('env2')
+ if args.stage.startswith('M11_PARTIAL'):cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/coalesced_return_check.py'),'--output',str(out)]
+ if args.stage in ('M11_ENV2','M11_PARTIAL_ENV2'):env=h.env_for('env2')
  if args.stage=='M6_PERF':cmd+=['--benchmark']
  if args.stage=='M1':cmd+=['--instrument']
  if args.stage=='M5':cmd+=['--arena-budget','2']
