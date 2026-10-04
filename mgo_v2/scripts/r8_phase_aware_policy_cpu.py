@@ -275,6 +275,12 @@ def replay_policy(selected, offsets, origins0, origins, gates_by_event, capaciti
         else:
             assignment=load_assignment(demand,misses,owner,layer)
 
+        # Every placement policy must preserve identical balanced mandatory-miss
+        # pressure: floor(M/R) or ceil(M/R) H2D fetches per rank.
+        quota_check=np.zeros(WORLD,np.int32)
+        for i in range(len(misses)): quota_check[assignment[i]]+=1
+        if len(misses): assert quota_check.max()-quota_check.min()<=1
+
         newly_missed=np.zeros(EXPERTS,np.bool_)
         row=np.zeros(48,np.float64)
         for i in range(len(misses)):
@@ -302,7 +308,11 @@ def replay_policy(selected, offsets, origins0, origins, gates_by_event, capaciti
             best_gain=0
             best_e=-1;best_q=-1;best_slot=-1;best_victim=-1;best_p=-1
             best_victim_is_dup=False
-            hot_threshold=hot_mult*local_batch
+            # Decode has n/WORLD == local_batch.  Prefill can have orders of
+            # magnitude more token rows, so scale hotness by the current
+            # per-rank event volume rather than using the decode batch alone.
+            event_rank_volume=max(local_batch,(n+WORLD-1)//WORLD)
+            hot_threshold=hot_mult*event_rank_volume
             if base_max>0:
                 order=np.argsort(-totals)
                 for oi in range(EXPERTS):
