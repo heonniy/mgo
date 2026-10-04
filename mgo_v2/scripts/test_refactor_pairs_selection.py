@@ -17,12 +17,12 @@ def main():
  for b in (128,256):
   noisy[ARMS[1]][b]['pairs']=[dict(BR=dict(TPOT=1,E2E_wall=10),LA=dict(TPOT=x,E2E_wall=x*10)) for x in [.3,.9,.4,.8,.3,.9,.4]]
  out=evaluate(noisy);assert not out['rows'][1]['eligible']
- # All regressions must yield no validated gain, not a least-bad "winner".
+ # Ranking and a positive improvement claim are distinct requirements.
  bad=deepcopy(records)
  for bybatch in bad.values():
   for row in bybatch.values():
    for pair in row['pairs']:pair['LA']={k:v*1.1 for k,v in pair['BR'].items()}
- assert evaluate(bad)['winner'] is None
+ outcome=evaluate(bad);assert outcome['winner'] is not None and not outcome['improvement_supported']
  changed=deepcopy(records);changed[ARMS[2]][256]['cases'][1]['P']=4
  try:evaluate(changed)
  except AssertionError:pass

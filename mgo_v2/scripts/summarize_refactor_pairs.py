@@ -29,10 +29,10 @@ def evaluate(records):
    if other is row or not other['stable']:continue
    ratios=[other['batches'][b]['LA_TPOT']/row['batches'][b]['LA_TPOT'] for b in ('128','256')]
    if max(ratios)<=1 and min(ratios)<.98:row['dominated_by'].append(other['arm'])
-  row['eligible']=row['stable'] and row['positive_supported'] and not row['dominated_by']
+  row['eligible']=row['stable'] and not row['dominated_by']
  eligible=[r for r in rows if r['eligible']]
  ranked=sorted(eligible,key=lambda r:(-r['score'],-r['mean_gain'],sum(b['LA_TPOT'] for b in r['batches'].values())))
- return dict(status='TIMING_CANDIDATE' if ranked else 'NO_VALIDATED_GAIN',winner=ranked[0]['arm'] if ranked else None,rows=rows,selection_scope='BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA',gain_estimator='1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained')
+ return dict(status='TIMING_CANDIDATE' if ranked else 'NO_STABLE_CANDIDATE',winner=ranked[0]['arm'] if ranked else None,improvement_supported=bool(ranked and ranked[0]['positive_supported']),rows=rows,selection_scope='BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA',gain_estimator='1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained')
 
 def main(a):
  records={};sources={};identities={}
@@ -45,7 +45,7 @@ def main(a):
  assert_equivalent(identities)
  out=evaluate(records);out['source_hashes']=sources;out['common_stack_equivalence']='PASS: source/input/environment fingerprints match across arms'
  (PACKET/'THREE_ARM_RESULTS.json').write_text(json.dumps(out,indent=2)+'\n')
- lines=['# BF16 three-arm paired timing','',f'Status: {out["status"]}. Timing candidate: {out["winner"]}.','',out['selection_scope'], '', '| Arm | Batch | BR TPOT (s) | LA TPOT (s) | Paired LA gain | 95% interval | Repeats | Eligible |','|---|---:|---:|---:|---:|---|---:|---|']
+ lines=['# BF16 three-arm paired timing','',f'Status: {out["status"]}. Timing candidate: {out["winner"]}. Positive LA gain supported in both batches: {out["improvement_supported"]}.','',out['selection_scope'], '', '| Arm | Batch | BR TPOT (s) | LA TPOT (s) | Paired LA gain | 95% interval | Repeats | Eligible |','|---|---:|---:|---:|---:|---|---:|---|']
  for r in out['rows']:
   for batch,b in r['batches'].items():
    g=b['gate']['gain']['TPOT'];lo,hi=g['CI95']

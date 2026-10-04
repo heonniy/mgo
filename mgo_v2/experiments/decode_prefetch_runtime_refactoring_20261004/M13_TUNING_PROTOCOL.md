@@ -41,3 +41,9 @@ seeing LA measurements, define material absolute-time domination as: another
 stable arm is no slower in either batch and is >2% faster in at least one batch.
 A dominated arm cannot win solely by making BR slower. Keep descriptive gains
 for all arms, including unstable or rejected arms, clearly marked ineligible.
+
+Ranking selects the largest stable, undominated measured robust gain, even if
+all candidates are nonpositive or their intervals include zero. Ranking is not
+a positive-improvement claim: report that claim only when the paired gain
+confidence interval is above zero in both batches. Do not silently add a
+positive-sign eligibility constraint absent from the original selection plan.
