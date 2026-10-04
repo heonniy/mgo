@@ -1,0 +1,225 @@
+{
+  "status": "PASS",
+  "cell": "R",
+  "policy": "CA",
+  "phase": "MEASURE",
+  "environment": "env1",
+  "repeat": 0,
+  "started_unix": 1791107037.1133606,
+  "decode_steps": 64,
+  "cache_ratio": 0.6,
+  "cache_tag": "c60",
+  "substitution": false,
+  "sub_tag": "s0",
+  "comm_mode": "coslot",
+  "h2d_mode": "pinned",
+  "h2d_stages": 2,
+  "plan_path": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_CA_env1_PLAN_c60_s0_h64_0",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_worker.py",
+    "--cell",
+    "R",
+    "--policy",
+    "CA",
+    "--phase",
+    "MEASURE",
+    "--environment",
+    "env1",
+    "--comm-mode",
+    "coslot",
+    "--h2d-mode",
+    "pinned",
+    "--decode-steps",
+    "64",
+    "--h2d-stages",
+    "2",
+    "--cache-ratio",
+    "0.6",
+    "--substitution-mode",
+    "off",
+    "--output",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_CA_env1_MEASURE_c60_s0_h64_coslot_pinned_0",
+    "--plan",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_CA_env1_PLAN_c60_s0_h64_0"
+  ],
+  "source_sha256": "7558c245d2c4c8c9c5cc701c7e800da2dc1ff76e95f992b4f4afcfaa72e269c8",
+  "policy_sha256": "e4609f0d1c0f58c503d7ec0e05297b931bf5bb0899152ad7336a8c5acd449727",
+  "layout_sha256": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0"
+  },
+  "compile_cache": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/compile_cache/R_CA_env1_c60_s0_coslot_pinned_h64",
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      }
+    ],
+    "host_available_bytes": 1979406737408
+  },
+  "pid": 3865966,
+  "before_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 17833,
+        "free_mib": 63257,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 1,
+        "used_mib": 19353,
+        "free_mib": 61737,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 21069,
+        "free_mib": 60021,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 5,
+        "used_mib": 18741,
+        "free_mib": 62349,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      }
+    ],
+    "host_available_bytes": 1751942967296
+  },
+  "GO_unix": 1791107272.6001527,
+  "after_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      }
+    ],
+    "host_available_bytes": 1979504021504
+  },
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1791107394.3296735,
+  "peak_rss_bytes": 465031692288,
+  "peak_pss_bytes": 284933534720,
+  "raw_root": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_CA_env1_MEASURE_c60_s0_h64_coslot_pinned_0"
+}
