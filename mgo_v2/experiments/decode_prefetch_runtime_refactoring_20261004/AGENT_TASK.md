@@ -68,9 +68,28 @@ Stop and validate.
 
 ## Final checkpoint
 
-M13-M15:
-- physical trigger/P sweep;
-- phase exposure;
-- BR/CA/LA final comparison.
+M13-M17:
+- tune P/trigger on BR only;
+- build V1/V2/V3 from one common optimized stack;
+- run stable BR-vs-LA B128/B256 measurements;
+- choose the final runtime by robust LA gain;
+- run phase-exposure attribution;
+- characterize CA only after the winning runtime is frozen.
+
+### Three-arm selection is mandatory
+
+Do not assume the full-overlap runtime wins.
+
+Build and compare:
+1. V1 OPT-NOPF-BARRIER;
+2. V2 OPT-PF-BARRIER;
+3. V3 OPT-PF-OVERLAP.
+
+All three must share the same optimized metadata, controller, fused 2-round
+A2A/NCCL path, kernel, NUMA binding, prefill path and timing boundary.
+
+The final default runtime is the stable arm with maximum:
+`min(LA_gain_B128, LA_gain_B256)`, subject to the anti-gaming dominance rule
+in PLAN.md.
 
 Every performance claim must be reproduced without profiler instrumentation.
