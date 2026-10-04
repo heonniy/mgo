@@ -1,32 +1,71 @@
-# Execution of ac6d6bc
+# Execution — c60 / substitution-OFF transport stack
 
-Owner authorized the latest branch on 2026-10-04. This supersedes the earlier
-missing-R-PLAN block. R means MATH, R4, local batch 64, decode256, cache30,
-substitution ON, physical GPUs 0,1,4,5 as specified by the frozen matrix.
+Owner update: the follow-up is **cache 60%, substitution OFF**. This supersedes
+the earlier cache30/substitution-ON transport-stack wording.
 
-Create any missing current/pageable BR and CA reference PLANs outside timing,
-validate route/action/cache hashes, commit each, and freeze them for all runs.
-Use the owner's current/pinned, coslot/pinned and coslot-active/pinned code;
-two expert-sized pinned buffers per rank. No full-model pinned allocation.
-Six CPU layout/staging/peer tests pass; GPU parity gates remain mandatory.
+## Frozen workload
 
-Each policy/transport/environment uses COMPILE x1, MEASURE x3, COUNTERS x1.
-This latest explicit protocol overrides the older single-shot screen. Env1
-has 18 timed runs; a stable Env1 permits the same 18 Env2 runs. Use the
-previously validated stability threshold: (max-min)/median <=5% for both
-E2E and TPOT in every condition. No extra noise repeats. Also report when
-BR/CA median differences fall within within-policy ranges; a stable harness
-does not prove a policy gain. Env2 is SHM stress, not a different PCIe host.
+- Cell family: R = MATH, R4, local batch 64, decode256, Gate eviction.
+- Physical GPUs: 0,1,4,5.
+- Cache ratio: **0.60**.
+- Expert substitution: **OFF**.
+- Policies: BR and CA.
+- H2D: CoSLoT-style pinned two-buffer staging for all timed cells.
+- Transport variants: current, coslot, coslot-active.
+
+## PLAN handling
+
+Do not request a PLAN path from the owner.
+
+For BR and CA independently:
+1. search only for a validated **c60/s0** PLAN;
+2. if absent, generate current/pageable c60/s0 PLAN outside timing;
+3. run validate_env_offload_plan.py;
+4. freeze that PLAN;
+5. reuse it for current/coslot/coslot-active.
+
+The launcher verifies both cache_ratio=0.60 and substitution=false from rank0
+receipt before allowing PLAN reuse.
+
+## Timing protocol
+
+Per policy/transport/environment:
+- COMPILE x1;
+- MEASURE x3;
+- COUNTERS x1.
+
+Run Env1 first. Env2 is allowed only if every Env1 E2E and TPOT
+(max-min)/median spread is <=5%. No additional noise repetitions.
 
 All pinned measurements use fixed 24-CPU affinity and ready/GO boundaries;
-resource scans stay outside MEASURE. Existing host/GPU memory and thermal
-guards remain active. The prior historical STOP marker is archived when this
-explicit restart begins. Completed historical artifacts are retained.
+resource monitoring stays outside MEASURE.
 
-Driver: scripts/run_transport_stack_packet.py. Raw matrix artifacts remain
-under /home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/ using transport and
-pinned suffixes; orchestration logs are in
-/home/hwlee/mgo-results/transport_stack_remeasure_20261004/.
-Commits and pushes target codex/coslot-comm-remeasure-20261004. On any failure,
-stop the matrix and preserve the failed receipt. Restore resident-model load
-workers after cleanup. No further experiment follows automatically.
+## Why c60/s0
+
+Completed CPU replay for the matching substitution-OFF condition:
+- c30 BR: exact hit ~59.9%, residual miss ~40.1%, H2D ~7.16 TiB;
+- c60 BR: exact hit ~86.5%, residual miss ~13.5%, H2D ~3.26 TiB;
+- BR peer bytes remain ~104.5 GiB.
+
+Thus c60 sharply lowers fetch pressure without substitution. Note that CA's
+peer-byte advantage is smaller at c60 than c30, so no TPOT improvement is
+assumed in advance; this experiment tests whether reduced H2D masking or
+reduced placement headroom dominates.
+
+## Driver
+
+Use:
+scripts/run_transport_stack_packet.py
+
+Raw artifacts remain under:
+/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/
+
+Orchestration receipts/results are under:
+/home/hwlee/mgo-results/transport_stack_remeasure_20261004/
+
+Commit and push checkpoints to:
+codex/coslot-comm-remeasure-20261004
+
+On failure, stop the matrix, preserve the receipt, clean experiment processes,
+and restore resident model workers. No further experiment follows
+automatically.
