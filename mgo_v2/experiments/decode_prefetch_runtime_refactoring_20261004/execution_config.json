@@ -127,7 +127,7 @@
   ],
   "calibration_dataset": "ShareGPT",
   "evaluation_dataset": "MATH",
-  "return_precision_main": "fp32",
+  "return_precision_main": "bf16",
   "return_format": "one coalesced partial vector per token/rank packet",
   "legacy_numerical_parity": "owner permits reported numerical and token differences",
   "adaptive_repeats": {
@@ -141,5 +141,5 @@
     ],
     "protocol": "OWNER_JITTER_AMENDMENT.md"
   },
-  "additional_candidate": "BF16 coalesced V3 using the same BR-frozen P/trigger; compare after common FP32 three-arm study"
+  "precision_validation": "Owner BF16-only amendment: no further precision comparisons or legacy numerical validation runs; retain existing evidence and structural correctness gates."
 }

@@ -21,11 +21,11 @@ def single_decision(rows):
  status='EXTEND_JITTER' if not complete and target>=5 else 'THIRD_REQUIRED' if not complete else 'UNRESOLVED_JITTER' if unstable else 'STABLE_JITTER_ESTIMATE' if n>=5 else 'STABLE'
  estimate={k:(s['mean'] if n!=3 else s['median']) for k,s in summary.items()}
  return dict(status=status,target_repeats=target,complete=complete,unstable=unstable,summary=summary,estimate=estimate,rule='2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion.')
-def paired_decision(pairs):
+def paired_decision(pairs,baseline="BR",candidate="LA"):
  n=len(pairs);assert 2<=n<=7
- single={p:single_decision([r[p] for r in pairs]) for p in ('BR','LA')};gain={}
+ single={p:single_decision([r[p] for r in pairs]) for p in (baseline,candidate)};gain={}
  for k in KEYS:
-  logs=[math.log(r['BR'][k]/r['LA'][k]) for r in pairs];mean=statistics.mean(logs);half=T95[n-1]*statistics.stdev(logs)/math.sqrt(n)
+  logs=[math.log(r[baseline][k]/r[candidate][k]) for r in pairs];mean=statistics.mean(logs);half=T95[n-1]*statistics.stdev(logs)/math.sqrt(n)
   ci=[1-math.exp(-(mean-half)),1-math.exp(-(mean+half))];early=1-math.exp(-statistics.mean(logs[:2]));late=1-math.exp(-statistics.mean(logs[-2:]))
   gain[k]=dict(estimate=1-math.exp(-mean),median=statistics.median(1-math.exp(-x) for x in logs),CI95=ci,CI_half_width=(ci[1]-ci[0])/2,early_late_drift=abs(early-late),positive_supported=ci[0]>0,paired_gains=[1-math.exp(-x) for x in logs])
  if n<=3:
@@ -35,4 +35,4 @@ def paired_decision(pairs):
  else:
   resolved=all(g['CI_half_width']<=.02 and g['early_late_drift']<=.02 for g in gain.values());target=5 if resolved and n==5 else 7
  complete=n>=target;unstable=complete and n>=5 and not all(g['CI_half_width']<=.02 and g['early_late_drift']<=.02 for g in gain.values())
- return dict(status='UNRESOLVED_JITTER' if unstable else 'STABLE_PAIRED_GAIN' if complete else 'EXTEND',complete=complete,unstable=unstable,target_repeats=target,gain=gain,absolute=single,rule='Alternate BR/LA order. Noisy comparisons use 5 or at most 7 complete pairs. Require paired gain CI95 half-width <=2 percentage points and early/late paired-gain drift <=2 points. All observations retained; positive claim requires CI lower bound >0.')
+ return dict(baseline=baseline,candidate=candidate,status='UNRESOLVED_JITTER' if unstable else 'STABLE_PAIRED_GAIN' if complete else 'EXTEND',complete=complete,unstable=unstable,target_repeats=target,gain=gain,absolute=single,rule='Alternate BR/LA order. Noisy comparisons use 5 or at most 7 complete pairs. Require paired gain CI95 half-width <=2 percentage points and early/late paired-gain drift <=2 points. All observations retained; positive claim requires CI lower bound >0.')

@@ -47,7 +47,8 @@ def main(a):
     old=Path('/home/hwlee/mgo-results/la_physical_validation_20261004')/f'B{batch}_BR_env1'/f'validation_rank{rank}.json'
     assert warm['argmax_hash']==json.loads(old.read_text())['argmax_hash']
   elif not a.partial_precision:assert warm['argmax_hash']==references[horizon]['hash'],('reference output mismatch',label,rank)
-  numeric=dict(legacy_argmax_agreement=float(np.mean(tokens==references[horizon]['tokens'])),legacy_argmax_hash=references[horizon]['hash'],actual_argmax_hash=warm['argmax_hash'],partial_precision=a.partial_precision)
+  numeric=dict(actual_argmax_hash=warm['argmax_hash'],partial_precision=a.partial_precision,legacy_comparison='not collected: owner BF16-only amendment')
+  if horizon in references:numeric.update(legacy_argmax_agreement=float(np.mean(tokens==references[horizon]['tokens'])),legacy_argmax_hash=references[horizon]['hash'])
   write(a.output/f'{label}_validation_rank{rank}.json',dict(status='PASS',rank=rank,case=case,numerical_comparison=numeric,finite_logits=True,argmax_hash=warm['argmax_hash'],state_hash=warm['state_hash'],peak_gpu_bytes=torch.cuda.max_memory_allocated(),frozen_input_bytes=getattr(rt,'frozen_input_bytes',0),scheduler_metrics=(rt.h2d.metrics if not baseline else None)))
   if case.get('measure',True):
    samples=[]
