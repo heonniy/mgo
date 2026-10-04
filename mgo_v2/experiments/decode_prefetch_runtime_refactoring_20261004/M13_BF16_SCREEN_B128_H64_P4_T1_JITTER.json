@@ -2073,5 +2073,25 @@
       }
     }
   ],
-  "causal_conclusion": "Not established: identical logical/copy work excludes workload-count changes, but does not distinguish CPU scheduling, staging latency, NCCL waits, thermal or clock variation during the measured interval. Boundary snapshots are not continuous telemetry. No samples excluded."
+  "submitted_copies": [
+    140674,
+    140670,
+    140672,
+    140674,
+    140674,
+    140674,
+    140673
+  ],
+  "canceled_copies": [
+    0,
+    4,
+    2,
+    0,
+    0,
+    0,
+    1
+  ],
+  "submitted_plus_canceled_identical": true,
+  "copy_bytes_relative_range": 2.8434738720294583e-05,
+  "causal_conclusion": "Logical work is identical, but actual submitted-copy volume differs; retain cancellation and scheduling differences. Causal timing attribution remains unestablished. Boundary snapshots are not continuous telemetry. No samples excluded."
 }

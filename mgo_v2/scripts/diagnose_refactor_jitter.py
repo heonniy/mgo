@@ -16,6 +16,12 @@ def diagnose(out,case):
  state=json.loads((out/'status.json').read_text())
  result_path=out/f'{case}_result.json';gate=json.loads(result_path.read_text())['gate'] if result_path.exists() else single_decision(records)
  boundaries=[b for b in state.get('boundaries',[]) if b['key'].startswith(case+'_r')]
- return dict(status='DIAGNOSTIC_SNAPSHOT',case=case,completed_repeats=len(records),timing_gate=gate,copy_bytes_identical=identical('copy_bytes'),per_rank_logical_work_identical=identical('rank_controller'),per_rank_scheduler_identical=identical('rank_scheduler'),samples=records,boundaries=boundaries,causal_conclusion='Not established: identical logical/copy work excludes workload-count changes, but does not distinguish CPU scheduling, staging latency, NCCL waits, thermal or clock variation during the measured interval. Boundary snapshots are not continuous telemetry. No samples excluded.')
+ submitted=[sum(s['copies'] for s in r['rank_scheduler']) for r in records]
+ canceled=[sum(s['canceled'] for s in r['rank_scheduler']) for r in records]
+ totals=[a+b for a,b in zip(submitted,canceled)]
+ volume=[r['copy_bytes'] for r in records]
+ conclusion=('Logical work and submitted-copy bytes are identical.' if identical('rank_controller') and identical('copy_bytes') else 'Logical work is identical, but actual submitted-copy volume differs; retain cancellation and scheduling differences.' if identical('rank_controller') else 'Logical work differs; investigate configuration or controller consistency before timing interpretation.')
+ conclusion+=' Causal timing attribution remains unestablished. Boundary snapshots are not continuous telemetry. No samples excluded.'
+ return dict(status='DIAGNOSTIC_SNAPSHOT',case=case,completed_repeats=len(records),timing_gate=gate,copy_bytes_identical=identical('copy_bytes'),per_rank_logical_work_identical=identical('rank_controller'),per_rank_scheduler_identical=identical('rank_scheduler'),samples=records,boundaries=boundaries,submitted_copies=submitted,canceled_copies=canceled,submitted_plus_canceled_identical=len(set(totals))==1,copy_bytes_relative_range=(max(volume)-min(volume))/statistics.mean(volume),causal_conclusion=conclusion)
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--label',required=True);p.add_argument('--case',required=True);a=p.parse_args();r=diagnose(ROOT/a.label,a.case);path=PACKET/f'{a.label}_{a.case}_JITTER.json';path.write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({k:r[k] for k in ('completed_repeats','copy_bytes_identical','per_rank_logical_work_identical','per_rank_scheduler_identical')}))
