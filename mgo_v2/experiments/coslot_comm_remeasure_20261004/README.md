@@ -83,3 +83,6 @@ Interpretation should compare both:
    expert-route transport?
 2. current vs CoSLoT for the same policy: is the observed TPOT dominated by
    NCCL launch count or by transferred bytes?
+
+
+> Superseded by `transport_stack_remeasure_20261004`. The new runner automatically creates and validates a missing reference PLAN, so no external PLAN path is required.

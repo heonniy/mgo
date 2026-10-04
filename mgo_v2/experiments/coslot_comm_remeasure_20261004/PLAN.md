@@ -13,7 +13,7 @@ Only the communication representation changes.
 - coslot: effective token-expert routes, fused forward payload, 2 A2A
   calls/layer.
 
-No new policy planning is allowed for the CoSLoT run.
+No transport-specific replanning is allowed. If the reference PLAN is absent, the runner creates a current/pageable PLAN outside timing, validates it, freezes it, and reuses it across transports.
 
 ## Primary matrix
 
@@ -46,3 +46,6 @@ A larger CA gain under CoSLoT would support the hypothesis that transport
 representation changes the visibility of placement benefits.  A similarly
 small gain would indicate that the bottleneck is elsewhere rather than merely
 the current token->rank coalescing path.
+
+
+> Superseded by `transport_stack_remeasure_20261004`. The new runner automatically creates and validates a missing reference PLAN, so no external PLAN path is required.
