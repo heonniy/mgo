@@ -58,7 +58,15 @@ def run(world,preflight=False):
 def main():
  state=dict(status='RUNNING',stage='PREPARATION',horizon=64,tolerance=.001,denominator='BR',started_unix=time.time(),new_trace_capture=False);write(PACKET/'status.json',state)
  try:
-  assert (ROOT/'physical_plans.json').exists(),'offline plans must finish before launch'
+  deadline=time.monotonic()+3600
+  while not (ROOT/'physical_plans.json').exists():
+   if (ROOT/'STOP').exists():raise RuntimeError('Owner STOP')
+   meta=json.loads((ROOT/'prepare_process.json').read_text());proc=Path('/proc')/str(meta['pid'])/'stat'
+   if not proc.exists() or proc.read_text().rsplit(')',1)[1].split()[0]=='Z':raise RuntimeError('Offline PLAN builder exited without completed plans; inspect prepare.log')
+   if time.monotonic()>deadline:raise TimeoutError('offline preparation deadline')
+   time.sleep(5)
+  assert json.loads((PACKET/'layout_validation.json').read_text())['status']=='PASS'
+  publish('results: freeze validated common-route decode64 schedules')
   from batch_comm_common import stop_idle_load
   stop_idle_load();deadline=time.monotonic()+180
   while any(g['temperature_c']>=65 for g in h.snapshot()['gpus']) and time.monotonic()<deadline:time.sleep(5)
