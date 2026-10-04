@@ -13,6 +13,8 @@ def select(stage,horizon):
  common=sorted(set(bybatch[128]) & set(bybatch[256]));eligible=[];rejected=[]
  for label in common:
   rows=[bybatch[b][label] for b in [128,256]]
+  if any(r['case']['trigger']=='T2' and not r['case'].get('t2_host_completion',False) for r in rows):
+   rejected.append(dict(label=label,reason='legacy T2 only ordered CUDA streams; host completion not established',rows=rows));continue
   if any(r['unstable'] for r in rows):rejected.append(dict(label=label,reason='unstable',rows=rows));continue
   tpots={str(b):bybatch[b][label].get('estimate',{}).get('TPOT',statistics.median(x['TPOT'] for x in bybatch[b][label]['samples'])) for b in [128,256]}
   eligible.append(dict(label=label,P=rows[0]['case']['P'],trigger=rows[0]['case']['trigger'],TPOT=tpots,rows=rows))

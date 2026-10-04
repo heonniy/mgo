@@ -23,6 +23,14 @@ def main():
   config=json.loads((s.PACKET/'M13_CONFIRM_CONFIG.json').read_text())
   assert all(c['partial_precision']=='bf16' for g in config for c in g['cases'] if not c.get('baseline'))
   assert all(not c.get('baseline') for g in config for c in g['cases'])
+  for b in [128,256]:
+   f=s.ROOT/f'TEST_B{b}_H64/result.json';d=json.loads(f.read_text())
+   d['results'].append(dict(case=dict(label='P1_T2',P=1,trigger='T2',policy='BR',partial_precision='bf16'),samples=[dict(TPOT=.1,E2E_wall=1)]*2,unstable=False))
+   f.write_text(json.dumps(d))
+  s.select('TEST',64)
+  selected=json.loads((s.PACKET/'M13_SCREEN_SELECTION.json').read_text())
+  assert selected['chosen']['trigger']=='T1'
+  assert any(r['label']=='P1_T2' and 'host completion' in r['reason'] for r in selected['rejected'])
   bad=s.ROOT/'TEST_B128_H64/result.json';d=json.loads(bad.read_text());d['results'][0]['case']['policy']='LA';bad.write_text(json.dumps(d))
   try:s.select('TEST',64)
   except AssertionError:pass

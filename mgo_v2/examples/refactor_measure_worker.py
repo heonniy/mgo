@@ -30,6 +30,7 @@ def main(a):
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda');references={};results=[]
  for case in cases:
+  if case['trigger']=='T2':case['t2_host_completion']=True
   label=case['label'];horizon=case['horizon'];a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision=case.get('partial_precision');a.streaming=case.get('overlap',True);a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
   proof=json.loads((a.inputs/f'{a.policy}_P{a.arena_budget}_proof.json').read_text());assert proof['horizon']==horizon
   baseline=case.get('baseline',False);rt=(PrefixRuntime if baseline else DecodeOffloadRuntime)(a,model,backing,experts)

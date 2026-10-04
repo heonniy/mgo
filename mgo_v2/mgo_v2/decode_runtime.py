@@ -124,8 +124,11 @@ class DecodeOffloadRuntime(LiveRuntime):
     if trigger=='T1':self.prefetch_next()
     with nvtx_phase('moe.forward_complete'):
      received,rw,recv_ids=pending.finish();packet=('current',received,recv_ids,rw)
-    if not overlap:
+    if not overlap or trigger=='T2':
+     # NCCL Work.wait() orders CUDA streams; it need not block the host.
+     # T2 predicts only after forward payload/unpack has physically completed.
      done=torch.cuda.Event();done.record();done.synchronize()
+    if not overlap:
      with nvtx_phase('moe.demand_h2d'):self.apply_fetches(e)
     if trigger=='T2':self.prefetch_next()
    else:
