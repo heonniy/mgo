@@ -1,0 +1,61 @@
+{
+  "status": "OWNER_AUTHORIZED",
+  "purpose": "stress upper-bound for one-copy CA versus hot-expert replication",
+  "dataset_candidates": [
+    "MATH",
+    "ShareGPT"
+  ],
+  "ranks": 8,
+  "local_batch": 128,
+  "global_batch": 1024,
+  "cache_ratio": 0.6,
+  "eviction": "Gate W128",
+  "substitution": false,
+  "decode_tokens": 256,
+  "candidate_pool_reuse": "ca_stress_workload_search_20261004 exact 2048-request pools",
+  "sample_seed_range": [
+    0,
+    255
+  ],
+  "dp_seed_range": [
+    0,
+    255
+  ],
+  "placement_seed_range": [
+    0,
+    255
+  ],
+  "stage_a_proxy_events": 48,
+  "stage_a_top_samples": 16,
+  "stage_a_top_sample_placement_pairs": 8,
+  "stage_a_final_triples_per_dataset": 8,
+  "exact_final_triples_total": 16,
+  "policies": [
+    "BR-one-copy",
+    "CA-one-copy",
+    "BR+temporary-1rep-oracle",
+    "CA+temporary-1rep-oracle"
+  ],
+  "primary_baseline_selection": [
+    "max_BR_decode_sum_max_rank_expert_rows",
+    "tie_max_BR_decode_peer_bytes",
+    "tie_max_BR_decode_peak_max_rank_expert_rows",
+    "tie_lexicographic_dataset_sample_dp_placement_seed"
+  ],
+  "oracle": {
+    "type": "event-local temporary one-replica upper bound",
+    "cache_cost": "ignored for upper-bound stage only",
+    "variants": [
+      "local-origin-shift",
+      "free-split-compute"
+    ],
+    "physical_claim": false
+  },
+  "actual_replica_followup_gate": {
+    "min_BR_critical_row_reduction": 0.1,
+    "min_CA_critical_row_reduction": 0.1,
+    "action": "implement same-capacity persistent replica replay only if either passes"
+  },
+  "physical_timing": false,
+  "automatic_next_stage": false
+}
