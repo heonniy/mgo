@@ -73,7 +73,7 @@ def load_model():
  model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
  model.eval();return model,backing,experts
 
-from env_offload_layout import plan_layout
+from env_offload_layout import add_coslot_layout,plan_layout
 
 from env_offload_tensors import pack_layouts
 
@@ -83,7 +83,7 @@ class Runtime:
  def __init__(self,args,model,experts,cap):
   self.args=args;self.rank=dist.get_rank();self.world=dist.get_world_size();self.experts=experts;self.cap=cap;self.events=[];self.metrics=[];self.index=0
   self.cache=torch.empty((cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(cap,-1,np.int32);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
-  self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0
+  self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0;self.actual_wire_bytes=0;self.actual_collective_calls=0
   if args.phase in ('PLAN','COUNTERS'):
    meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];sim=np.load(meta['similarity_path'])
    self.policy=Policy(args.capacities,sim,args.substitution,['BR','CA','CA-rep'].index(args.policy))
@@ -96,6 +96,7 @@ class Runtime:
    self.plan_proof=validation['ranks'][self.rank]
    assert hashlib.sha256((args.plan/f'rank{self.rank}.pkl.gz').read_bytes()).hexdigest()==self.plan_proof['schedule_file_sha256']
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
+   if args.comm_mode=='coslot':self.events=[add_coslot_layout(e,self.world) for e in self.events]
    self.events=pack_layouts(self.events)
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
   for l,block in enumerate(model.model.layers):
@@ -113,8 +114,28 @@ class Runtime:
    return result.view(shape),logits
   return forward
  def exchange(self,x,send,recv):
-  if self.args.phase=='COUNTERS' and x.shape[-1]==2048:self.actual_peer_bytes+=(sum(send)-send[self.rank])*2048*x.element_size()
+  if self.args.phase=='COUNTERS':
+   row_bytes=x.element_size()
+   for dim in x.shape[1:]:row_bytes*=dim
+   remote=sum(send)-send[self.rank];self.actual_wire_bytes+=remote*row_bytes;self.actual_collective_calls+=1
+   if x.dim()>=2 and x.shape[-1]==2048:self.actual_peer_bytes+=remote*2048*x.element_size()
   y=torch.empty((sum(recv),)+tuple(x.shape[1:]),dtype=x.dtype,device='cuda');dist.all_to_all_single(y,x.contiguous(),output_split_sizes=recv,input_split_sizes=send);return y
+ def exchange_coslot_routes(self,hidden,dense,e):
+  idx=e['coslot_send_idx'];eids=e['coslot_send_eids'];send_hidden=hidden.index_select(0,idx).contiguous();send_weights=dense[idx,eids].contiguous()
+  k=send_hidden.shape[0];h=hidden.shape[-1];eh=hidden.element_size();ee=eids.element_size();ew=send_weights.element_size();hb=h*eh;row=hb+ee+ew
+  send_buf=torch.empty((k,row),dtype=torch.uint8,device='cuda')
+  send_buf[:,:hb]=send_hidden.view(torch.uint8).view(k,hb)
+  send_buf[:,hb:hb+ee]=eids.contiguous().reshape(k,1).view(torch.uint8)
+  send_buf[:,hb+ee:]=send_weights.reshape(k,1).view(torch.uint8)
+  recv_k=sum(e['coslot_recv_counts']);recv_buf=torch.empty((recv_k,row),dtype=torch.uint8,device='cuda')
+  if self.args.phase=='COUNTERS':
+   remote=sum(e['coslot_send_counts'])-e['coslot_send_counts'][self.rank]
+   self.actual_wire_bytes+=remote*row;self.actual_peer_bytes+=remote*hb;self.actual_collective_calls+=1
+  dist.all_to_all_single(recv_buf,send_buf,output_split_sizes=e['coslot_recv_counts'],input_split_sizes=e['coslot_send_counts'])
+  recv_hidden=torch.empty((recv_k,h),dtype=hidden.dtype,device='cuda');recv_hidden.view(torch.uint8).view(recv_k,hb).copy_(recv_buf[:,:hb])
+  recv_eids=torch.empty(recv_k,dtype=eids.dtype,device='cuda');recv_eids.view(torch.uint8).view(recv_k,ee).copy_(recv_buf[:,hb:hb+ee])
+  recv_weights=torch.empty(recv_k,dtype=send_weights.dtype,device='cuda');recv_weights.view(torch.uint8).view(recv_k,ew).copy_(recv_buf[:,hb+ee:])
+  return recv_hidden,recv_eids,recv_weights
  def execute(self,layer,hidden,selected,weights,probs):
   if self.args.phase in ('PLAN','COUNTERS'):
    g=gather_global_routes(layer,selected,weights,probs);r=g.routes;self.history.update(layer,r.full_router_probs)
@@ -124,6 +145,7 @@ class Runtime:
    e=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
    e.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,slot,victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
    e['groups']=[(expert,rows,cols,int(np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0])) for expert,rows,cols in e['groups']]
+   if self.args.comm_mode=='coslot':e=add_coslot_layout(e,self.world)
    if self.args.phase=='PLAN':self.events.append(e)
    else:
     frozen=self.events[self.index]
@@ -142,17 +164,29 @@ class Runtime:
    assert pos*2==EB;self.keys[slot]=key
    if self.args.phase=='COUNTERS':self.actual_h2d_bytes+=pos*2
   dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
-  send_w=dense[e['send_idx'][:,None],e['send_eids'].clamp_min(0)]*(e['send_eids']>=0)
-  received=self.exchange(hidden[e['send_idx']],e['send_counts'],e['recv_counts'])
-  rw=self.exchange(send_w,e['send_counts'],e['recv_counts']);parts=[]
-  for expert,rows,cols,slot in e['groups']:
-   assert self.keys[slot]==layer*128+expert
-   w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
-   parts.append(self.kernel(received[rows],gate,up,down)*rw[rows,cols,None])
-  values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
-  returned=self.exchange(values[e['return_order']],e['return_counts'],e['return_recv_counts'])
-  output=torch.zeros_like(hidden)
-  for idx,pos in e['combine']:output.index_add_(0,idx,returned[pos])
+  if self.args.comm_mode=='coslot':
+   received,recv_eids,rw=self.exchange_coslot_routes(hidden,dense,e);parts=[]
+   for expert,rows,slot in e['coslot_groups']:
+    assert self.keys[slot]==layer*128+expert
+    if self.args.phase!='MEASURE':self.mismatch.logical_or_((recv_eids[rows]!=expert).any())
+    w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
+    parts.append(self.kernel(received[rows],gate,up,down)*rw[rows,None])
+   values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
+   returned=self.exchange(values[e['coslot_return_order']],e['coslot_return_counts'],e['coslot_return_recv_counts'])
+   output=torch.zeros_like(hidden)
+   if e['coslot_send_idx'].numel():output.index_add_(0,e['coslot_send_idx'],returned)
+  else:
+   send_w=dense[e['send_idx'][:,None],e['send_eids'].clamp_min(0)]*(e['send_eids']>=0)
+   received=self.exchange(hidden[e['send_idx']],e['send_counts'],e['recv_counts'])
+   rw=self.exchange(send_w,e['send_counts'],e['recv_counts']);parts=[]
+   for expert,rows,cols,slot in e['groups']:
+    assert self.keys[slot]==layer*128+expert
+    w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
+    parts.append(self.kernel(received[rows],gate,up,down)*rw[rows,cols,None])
+   values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
+   returned=self.exchange(values[e['return_order']],e['return_counts'],e['return_recv_counts'])
+   output=torch.zeros_like(hidden)
+   for idx,pos in e['combine']:output.index_add_(0,idx,returned[pos])
   self.index+=1;return output
 
 def generate(model,rt,initial_ids,initial_mask):
@@ -194,7 +228,7 @@ def main(a):
   if a.phase=='PLAN':receipt['action_hash']=digest(rt.events)
   else:
    expected=json.loads((a.plan/f'rank{rank}.json').read_text());assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
-   receipt.update(actual_H2D_bytes=rt.actual_h2d_bytes,actual_peer_bytes=rt.actual_peer_bytes,logical_counters=np.asarray(rt.metrics).sum(axis=0).tolist())
+   receipt.update(actual_H2D_bytes=rt.actual_h2d_bytes,actual_peer_bytes=rt.actual_peer_bytes,actual_wire_bytes=rt.actual_wire_bytes,actual_collective_calls=rt.actual_collective_calls,logical_counters=np.asarray(rt.metrics).sum(axis=0).tolist())
  else:
   # Populate/load compiler caches and exercise the complete frozen schedule.
   warm,tokens=generate(model,rt,ids,mask)
@@ -209,10 +243,10 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
  write(a.output/f'rank{rank}.json',receipt);dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot'],default='current');p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())

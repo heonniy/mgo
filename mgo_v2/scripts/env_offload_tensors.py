@@ -15,7 +15,12 @@ def pack_layouts(events,device='cuda'):
   e['send_idx']=reserve(e['send_idx']);e['send_eids']=reserve(e['send_eids'],(-1,8))
   e['groups']=[(expert,reserve(rows),reserve(cols),slot) for expert,rows,cols,slot in e['groups']]
   e['return_order']=reserve(e['return_order']);e['combine']=[(reserve(idx),reserve(pos)) for idx,pos in e['combine']]
-  e['targets']=reserve(e['targets']);e['selected']=reserve(e['selected']);layouts.append(e)
+  e['targets']=reserve(e['targets']);e['selected']=reserve(e['selected'])
+  if 'coslot_send_idx' in e:
+   e['coslot_send_idx']=reserve(e['coslot_send_idx']);e['coslot_send_eids']=reserve(e['coslot_send_eids'])
+   e['coslot_groups']=[(expert,reserve(rows),slot) for expert,rows,slot in e['coslot_groups']]
+   e['coslot_return_order']=reserve(e['coslot_return_order'])
+  layouts.append(e)
  storage=torch.from_numpy(np.concatenate(pieces) if pieces else np.empty(0,np.int64)).to(device);pieces.clear()
  def view(spec):
   offset,length,shape=spec;x=storage[offset:offset+length]
@@ -24,4 +29,8 @@ def pack_layouts(events,device='cuda'):
   for key in ['send_idx','send_eids','return_order','targets','selected']:e[key]=view(e[key])
   e['groups']=[(expert,view(rows),view(cols),slot) for expert,rows,cols,slot in e['groups']]
   e['combine']=[(view(idx),view(pos)) for idx,pos in e['combine']]
+  if 'coslot_send_idx' in e:
+   e['coslot_send_idx']=view(e['coslot_send_idx']);e['coslot_send_eids']=view(e['coslot_send_eids'])
+   e['coslot_groups']=[(expert,view(rows),slot) for expert,rows,slot in e['coslot_groups']]
+   e['coslot_return_order']=view(e['coslot_return_order'])
  return layouts
