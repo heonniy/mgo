@@ -4,56 +4,138 @@
   "cache_percent": 60,
   "eviction": "Gate W128",
   "substitution": false,
+  "prefill": true,
   "decode_tokens": 256,
-  "batches": [
+  "local_batches": [
     128,
     256
   ],
-  "b128_frozen": {
-    "dataset": "MATH",
-    "sample_seed": 97,
-    "dp_seed": 200,
-    "placement_seed": 172
+  "policies": [
+    "BR",
+    "CA",
+    "LA",
+    "BR+REP",
+    "CA+REP",
+    "LA+REP"
+  ],
+  "mandatory_miss_rule": "balanced floor/ceil count per rank for every placement policy",
+  "stress_families": {
+    "COMM": {
+      "objective": "max BR decode peer activation bytes",
+      "ties": [
+        "critical rows",
+        "deterministic seeds"
+      ]
+    },
+    "LOAD": {
+      "objective": "max BR decode sum(event max-rank expert rows)",
+      "ties": [
+        "peak rows",
+        "peer bytes",
+        "deterministic seeds"
+      ]
+    }
   },
-  "b256": {
-    "datasets": [
-      "MATH",
-      "ShareGPT"
-    ],
-    "uses_all_2048_requests": true,
-    "dp_seeds": [
-      0,
-      255
-    ],
-    "placement_seeds": [
-      0,
-      255
-    ],
-    "stage_a_placement_topk": 8,
-    "stage_a_dp_topk_per_placement": 2
+  "seed_search": {
+    "B128": {
+      "datasets": [
+        "MATH",
+        "ShareGPT"
+      ],
+      "sample_seed": [
+        0,
+        255
+      ],
+      "dp_seed": [
+        0,
+        255
+      ],
+      "placement_seed": [
+        0,
+        255
+      ],
+      "prior_anchor": "MATH 97/200/172"
+    },
+    "B256": {
+      "datasets": [
+        "MATH",
+        "ShareGPT"
+      ],
+      "sample_membership": "all 2048 requests",
+      "sample_seed": "fixed/redundant",
+      "dp_seed": [
+        0,
+        255
+      ],
+      "placement_seed": [
+        0,
+        255
+      ]
+    }
   },
-  "replica_grid": {
+  "replica": {
+    "max_copies_per_expert": 2,
+    "max_new_replicas_per_event": 1,
+    "persistent": true,
+    "real_slot": true,
+    "candidate_sources": [
+      "already resident",
+      "current miss after mandatory H2D"
+    ],
     "hotness_multiplier": [
       1,
       1.5,
-      2,
-      3
+      2
     ],
     "min_event_gain_fraction": [
       0.02,
       0.05
     ],
     "duplicate_budget_fraction_of_cache": [
-      0.01,
       0.02,
       0.05
     ],
-    "max_copies_per_expert": 2,
-    "max_new_replicas_per_event": 1
+    "transfer": "D2D expert copy",
+    "current_miss_dependency": "source H2D completes before D2D",
+    "overlap": "D2D overlaps remaining per-rank H2D queues",
+    "counterfactual": "also report H2D then D2D serial transfer"
   },
-  "reporting": {
-    "h2d_safe_threshold": 0.02,
-    "physical_timing": false,
-    "weighted_objective": false
-  }
+  "phase_model": {
+    "order": [
+      "metadata",
+      "decision",
+      "dispatch",
+      "H2D+D2D",
+      "fetch barrier",
+      "expert compute",
+      "combine"
+    ],
+    "h2d": "existing 9-MiB measured median+p90",
+    "d2d_ms_sensitivity": [
+      0.02,
+      0.05,
+      0.1,
+      0.2
+    ],
+    "compute": [
+      "archived GEMM-only slope",
+      "archived enclosing expert-kernel slope"
+    ],
+    "communication": [
+      "fast P2P microcost",
+      "conservative measured bandwidth"
+    ],
+    "controller_time": "excluded from GPU phase estimate; report separately"
+  },
+  "scopes": [
+    "prefill",
+    "decode",
+    "moe_total"
+  ],
+  "replica_scope_checks": [
+    "decode-only",
+    "all-phase"
+  ],
+  "physical_timing": false,
+  "automatic_gpu_followup": false
 }
