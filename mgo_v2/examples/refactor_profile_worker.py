@@ -9,6 +9,40 @@ class ProfileRuntime(DecodeOffloadRuntime):
   if self.index==48:self.profile_prefill_metrics=dict(self.h2d.metrics)
   return result
 
+ def arm_profile(self):
+  scheduler=self.h2d;scheduler.profile=True;self.profile_tickets=[]
+  for method,origin in [('enqueue_demand','demand'),('enqueue_prefetch','prefetch')]:
+   original=getattr(scheduler,method)
+   def enqueue(slot,key,tensors,_original=original,_origin=origin):
+    event=self.index;t=_original(slot,key,tensors)
+    if not hasattr(t,'profile_meta'):
+     t.profile_meta=dict(source_event=event,key=int(key),origin=_origin,use_event=None,discard_event=None,readiness_at_use=None);self.profile_tickets.append(t)
+    return t
+   setattr(scheduler,method,enqueue)
+  original_promote=scheduler.promote
+  def promote(slot,key):
+   with scheduler.cv:
+    t=scheduler.tickets[slot]
+    readiness='ready' if t.submitted and t.done.query() else 'inflight' if t.submitted else 'queued'
+    t.profile_meta.update(use_event=self.index,readiness_at_use=readiness)
+   return original_promote(slot,key)
+  scheduler.promote=promote
+  original_discard=scheduler.discard
+  def discard(slot,key):
+   t=scheduler.tickets.get(slot)
+   if t is not None and t.key==key:t.profile_meta['discard_event']=self.index
+   return original_discard(slot,key)
+  scheduler.discard=discard
+ def copy_trace(self):
+  rows=[]
+  for t in self.h2d.trace:
+   if t.profile_meta['source_event']<48:continue
+   row=dict(t.profile_meta)
+   row.update(kind='demand' if row['origin']=='demand' else 'useful_prefetch' if row['use_event'] is not None else 'wasted_prefetch',bytes=9437184,event_dma_ms=t.begin.elapsed_time(t.done))
+   rows.append(row)
+  assert len(rows)==self.h2d.metrics['copies']-self.profile_prefill_metrics['copies']
+  return rows
+
 def main(a):
  rank=int(os.environ['RANK']);a.output.mkdir(parents=True,exist_ok=True)
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(rank)]
@@ -23,7 +57,7 @@ def main(a):
  proof=json.loads((a.inputs/f'{a.policy}_P{a.arena_budget}_proof.json').read_text());assert proof['horizon']==horizon
  rt=ProfileRuntime(a,model,backing,experts);rt.stage_frozen_inputs(horizon)
  warm,expected=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
- rt.reset();a.phase='MEASURE';rt.capture=True;torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
+ rt.reset();a.phase='MEASURE';rt.capture=True;rt.arm_profile();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
  from torch._dynamo.utils import counters
  # Attribute pageable-to-pinned staging on its actual worker thread. This
  # monkeypatch exists only in this dedicated diagnostic process, never timing.
@@ -39,7 +73,8 @@ def main(a):
  finally:
   torch.cuda.profiler.stop();h2d_module.copy_expert_to_stage=original_stage
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
- write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
+ trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
+ write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--case',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())
