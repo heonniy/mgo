@@ -1,0 +1,105 @@
+{
+  "status": "PASS",
+  "cell": "R",
+  "policy": "BR",
+  "phase": "PLAN",
+  "environment": "env1",
+  "repeat": 0,
+  "started_unix": 1791098153.0954306,
+  "comm_mode": "current",
+  "h2d_mode": "pageable",
+  "h2d_stages": 2,
+  "plan_path": null,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_worker.py",
+    "--cell",
+    "R",
+    "--policy",
+    "BR",
+    "--phase",
+    "PLAN",
+    "--environment",
+    "env1",
+    "--comm-mode",
+    "current",
+    "--h2d-mode",
+    "pageable",
+    "--h2d-stages",
+    "2",
+    "--output",
+    "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_BR_env1_PLAN_0"
+  ],
+  "source_sha256": "8f82a93a52892c5af543598765d9a988579bc7576b75ea786ee5c71a92019e10",
+  "policy_sha256": "e4609f0d1c0f58c503d7ec0e05297b931bf5bb0899152ad7336a8c5acd449727",
+  "layout_sha256": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0"
+  },
+  "compile_cache": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/compile_cache/R_BR_env1_current_pageable",
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      }
+    ],
+    "host_available_bytes": 1981905420288
+  },
+  "pid": 3749446,
+  "exit_code": 0,
+  "stop_reason": null,
+  "finished_unix": 1791099299.4979548,
+  "peak_rss_bytes": 462011285504,
+  "peak_pss_bytes": 294159774720,
+  "raw_root": "/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003/R_BR_env1_PLAN_0"
+}
