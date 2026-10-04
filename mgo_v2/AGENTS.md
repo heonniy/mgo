@@ -1,3 +1,13 @@
+**OWNER PRIORITY (2026-10-04): R8 B128/B256 phase-aware CPU policy replay.**
+Read `experiments/r8_real_replica_batch_scaling_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json,PHYSICAL_EXECUTION_ORDER.md}`.
+Run the CPU-only packet before any new full-model GPU timing. Reuse the exact
+2048-request pools; no route recapture. Compare BR / CA / LA and their
+persistent-real-replica variants at cache60, substitution OFF, with balanced
+mandatory miss fetches. Search COMM-worst and LOAD-worst seeds separately.
+Replica D2D may overlap remaining H2D after its source expert is available.
+Report prefill/decode separately and commit results. Do not automatically
+launch physical inference after the CPU packet.
+
 **OWNER PRIORITY (2026-10-04): R8/B128/cache60 replication stress upper bound.**
 Read `experiments/r8_b128_c60_replication_stress_20261004/{README.md,PLAN.md,AGENT_TASK.md,EXECUTION.md,matrix.json}`.
 After any active physical timing process exits, run the CPU-only stress search.
