@@ -299,6 +299,10 @@ def replay_policy(selected, offsets, origins0, origins, gates_by_event, capaciti
             else: first_fetches[event]+=1
             newly_missed[e]=True
 
+        # All placement policies share the same balanced mandatory-miss quota.
+        # Replica creation happens only after this invariant is satisfied.
+        assert h2d_counts[event].max()-h2d_counts[event].min()<=1
+
         allow_replica=replica_enabled and (replica_all_phase or step>0)
         if allow_replica:
             loads=estimate_loads(demand,owner,layer)
