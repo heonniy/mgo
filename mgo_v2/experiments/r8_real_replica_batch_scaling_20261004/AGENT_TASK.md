@@ -1,25 +1,31 @@
-# AGENT TASK
+# AGENT TASK — phase-aware B128/B256 policy headroom
 
-1. Reuse the completed exact 2048-request pools; no GPU capture.
-2. Reuse the frozen B128 MATH stress winner exactly.
-3. Search B256 DP and BR placement seeds as specified in PLAN.md; all 2048
-   requests are used, so do not invent a sample seed.
-4. Implement persistent online replicas with actual cache-slot victims and
-   expert-sized D2D creation accounting.
-5. The replica decision may use current routing/cache state only; no suffix or
-   future route oracle.
-6. Evaluate the predeclared 24-policy grid for BR and CA at B128 and B256.
-7. Compute the B256 free one-replica oracle only as an upper-bound reference.
-8. Report critical rows, H2D, D2D, peer bytes, hit rate, replica creation/reuse
-   and victim statistics.
-9. Mark the best <=2% H2D-growth policy separately and provide the Pareto
-   frontier. Do not combine H2D and compute into an arbitrary lambda score.
-10. Commit results and stop. No physical GPU timing automatically follows.
+1. Read PLAN.md and PHYSICAL_EXECUTION_ORDER.md.
+2. Reuse the completed 2048-request exact MATH/ShareGPT pools. No GPU capture.
+3. Run the B128/B256 CPU packet with:
+   `python scripts/run_r8_phase_aware_policy_cpu.py`
+   or the guarded wrapper `python scripts/run_r8_phase_aware_policy_cpu.py` through
+   `scripts/run_r8_phase_aware_policy_cpu.py`.
+4. The implementation-validation gate must reproduce the archived B128
+   MATH sample97/dp200/placement172 BR critical rows, H2D, peer bytes and hit
+   rate exactly before the new search proceeds.
+5. Search two separate stress families:
+   - COMM-worst random BR one-copy seed/subset/rank assignment;
+   - LOAD-worst random BR one-copy seed/subset/rank assignment.
+6. Freeze R8, cache60, Gate W128, substitution OFF, prefill+decode256.
+7. Mandatory misses must remain balanced across ranks for every policy.
+8. Evaluate BR, CA, LA, BR+REP, CA+REP and LA+REP.
+9. Real replicas consume actual slots, can evict unique/duplicate victims, and
+   are created by D2D from either a resident source or a current miss after its
+   H2D completes.
+10. Model D2D overlapping remaining H2D exactly as PLAN.md specifies and also
+    report the no-overlap serial counterfactual.
+11. Use existing H2D/peer/GPU-profile microbenchmarks for calibrated phase
+    estimates; keep D2D as a 0.02/0.05/0.10/0.20-ms sensitivity until the new
+    four-GPU model-free microbenchmark is run.
+12. Report prefill, decode and MoE-total separately. TPOT interpretation is
+    decode-only; prefill model excludes attention/dense time.
+13. Commit results and stop. Do not automatically launch full-model GPU timing.
 
-## Physical validation order
-
-Before any later GPU timing, read `PHYSICAL_EXECUTION_ORDER.md`. Use the new
-`--execution-order fetch-barrier --schedule-mode live` mode so the measured
-MoE layer order is metadata exchange -> rank decision -> dispatch -> all miss
-H2D -> global fetch barrier -> expert compute -> combine. Keep the historical
-streaming/frozen path only as a comparison baseline.
+Optional later calibration, which does not require the offloading runtime:
+`torchrun --standalone --nproc_per_node=4 examples/replica_phase_microbench.py --output <dir>`.
