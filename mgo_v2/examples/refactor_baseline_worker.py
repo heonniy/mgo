@@ -88,7 +88,7 @@ def main(a):
     proof=json.loads((a.inputs/f'{name}_P{a.arena_budget}_proof.json').read_text())
     assert array_hash(rt.policy.slots[rank,:rt.cap])==proof['rank_state_hashes'][rank]
     assert rt.controller.counters==proof['counters']
-    assert rt.h2d.metrics['copies']<=proof['max_copy_counts'][rank]
+    assert rt.h2d.metrics['copies']+rt.h2d.metrics['canceled']==proof['max_copy_counts'][rank],('copy accounting drift',rank,rt.h2d.metrics,proof['max_copy_counts'][rank])
     baseline=json.loads((Path(__file__).resolve().parents[1]/'experiments/decode_prefetch_runtime_refactoring_20261004/M0_gpu_gate.json').read_text())
     old=next(x for x in baseline['ranks'][rank]['rows'] if x['policy']==name)
     assert row['argmax_hash']==old['argmax_hash'],('baseline argmax mismatch',name,rank)

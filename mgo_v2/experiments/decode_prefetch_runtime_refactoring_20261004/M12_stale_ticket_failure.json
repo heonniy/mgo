@@ -1,0 +1,12 @@
+{
+  "status": "REPAIR_REQUIRED",
+  "finding": "Retired MAIN physical slot retained a valid old H2D ticket; enqueue with same key incorrectly deduplicated a logically new prefetch reservation.",
+  "evidence": "M9 rank1 LA repeats0/1 each copied one fewer expert than logical mandatory+issued-canceled. Output/state parity passed but copy accounting was insufficient.",
+  "fix": "Explicit ticket invalidation on MAIN role retirement and PREFETCH discard; exact per-rank issued/mandatory/canceled reconciliation.",
+  "supersedes_physical_accounting_gates": [
+    "M9",
+    "M10",
+    "M12"
+  ],
+  "source_commit": "e5cf4c7"
+}

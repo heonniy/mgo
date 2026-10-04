@@ -65,7 +65,7 @@ from collections import deque
 class CopyTicket:
     def __init__(self, slot, key, tensors, urgent, profile):
         from .prefetch import TransferState
-        self.slot=int(slot);self.key=int(key);self.tensors=tensors
+        self.slot=int(slot);self.key=int(key);self.tensors=tensors;self.valid=True
         self.state=TransferState(key)
         if urgent:self.state.demand()
         self.done=torch.cuda.Event(enable_timing=profile)
@@ -108,7 +108,7 @@ class PriorityH2DScheduler:
             self._check()
             if self.stopping:raise RuntimeError('scheduler closed')
             old=self.tickets.get(slot)
-            if old is not None and old.key==key and old.state.state!='EMPTY':
+            if old is not None and old.key==key and old.valid and old.state.state!='EMPTY':
                 if urgent and not old.state.urgent:
                     old.state.demand();self.metrics['escalated']+=1
                     if not old.submitted:self.urgent.append(old)
@@ -133,16 +133,22 @@ class PriorityH2DScheduler:
                 t.state.demand();self.metrics['escalated']+=1
                 if not t.submitted:self.urgent.append(t)
             self.cv.notify_all();return t
+    def invalidate(self,slot,key):
+        # Retiring a logical role must invalidate deduplication even though its
+        # physical bytes remain until overwrite. Keep hazard events intact.
+        with self.cv:
+            t=self.tickets.get(slot)
+            if t is not None and t.key==key:t.valid=False
     def cancel_if_queued(self,slot,key):
         with self.cv:
             t=self.tickets.get(slot)
             if t is None or t.key!=key or t.state.urgent or t.submitted:return False
-            t.state.discard();self._retire_pending(t);self.metrics['canceled']+=1;self.cv.notify_all();return True
+            t.valid=False;t.state.discard();self._retire_pending(t);self.metrics['canceled']+=1;self.cv.notify_all();return True
     def discard(self,slot,key):
         with self.cv:
             t=self.tickets.get(slot)
             if t is None or t.key!=key:return
-            t.state.discard()
+            t.valid=False;t.state.discard()
             if not t.submitted:self._retire_pending(t);self.metrics['canceled']+=1
             self.cv.notify_all()
     def _pop(self):
@@ -201,7 +207,7 @@ class PriorityH2DScheduler:
     def ready(self,slot):
         with self.cv:
             self._check();t=self.tickets.get(slot)
-            if t is None:return False
+            if t is None or not t.valid:return False
             if t.state.state=='READY':return True
             if not t.submitted:return False
             if t.done.query():t.state.complete();return t.state.state=='READY'

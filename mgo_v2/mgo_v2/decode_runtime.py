@@ -49,6 +49,7 @@ class DecodeOffloadRuntime(LiveRuntime):
       assert self.keys[promotion.promoted_physical_slot]==promotion.key
       assert self.keys[promotion.recycled_physical_slot]==promotion.victim
       self.h2d.promote(promotion.promoted_physical_slot,promotion.key)
+      self.h2d.invalidate(promotion.recycled_physical_slot,promotion.victim)
       self.keys[promotion.recycled_physical_slot]=-1
     for rank,slot,key in discards:
      if rank==self.rank:self.h2d.discard(slot,key);self.keys[slot]=-1
