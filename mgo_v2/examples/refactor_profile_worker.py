@@ -11,6 +11,10 @@ class ProfileRuntime(DecodeOffloadRuntime):
 
  def arm_profile(self):
   scheduler=self.h2d;scheduler.profile=True;self.profile_tickets=[]
+  original_predict=self.predictor.predict_next
+  def predict(*args,**kwargs):
+   with nvtx_phase('moe.prefetch_predictor'):return original_predict(*args,**kwargs)
+  self.predictor.predict_next=predict
   for method,origin in [('enqueue_demand','demand'),('enqueue_prefetch','prefetch')]:
    original=getattr(scheduler,method)
    def enqueue(slot,key,tensors,_original=original,_origin=origin):
