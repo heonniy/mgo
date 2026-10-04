@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    6
+  ],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_preflight.py",
+    "--output",
+    "/home/hwlee/mgo-results/fetch_matched_b32_a2a_20261004/tolerance_001/R4_preflight"
+  ],
+  "started_unix": 1791089616.9890103,
+  "timed_boundaries": [],
+  "pid": 3660817,
+  "transports": [
+    "SHM/direct/direct"
+  ],
+  "exit_code": 0,
+  "finished_unix": 1791089627.7758143
+}
