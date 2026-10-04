@@ -1,7 +1,103 @@
 {
-  "status": "PASS",
-  "stage": "M12_RETRY",
-  "started_unix": 1791134311.5104785,
-  "pid": 121336,
-  "finished_unix": 1791134557.693877
+  "status": "FAIL",
+  "stage": "M13_SCREEN",
+  "label": "M13_SCREEN_B128_H64",
+  "group": {
+    "batch": 128,
+    "horizon": 64,
+    "cases": [
+      {
+        "label": "REFERENCE",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T1",
+        "horizon": 64,
+        "baseline": true,
+        "measure": false
+      },
+      {
+        "label": "P1_T1",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P1_T0",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P1_T2",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T2",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T1",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T0",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T0",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T2",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T1",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      }
+    ]
+  },
+  "started_unix": 1791134799.5683885,
+  "source_sha": "5365db594b14e39f805344c5a72815429d392762",
+  "monitor": "boundaries only; file polling during MEASURE",
+  "pid": 128381,
+  "completed": [
+    "P1_T1_r1",
+    "P1_T1_r2"
+  ],
+  "error": "AssertionError('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M13_SCREEN_B128_H64/run.log')",
+  "exit_code": 1,
+  "finished_unix": 1791135465.4896438
 }

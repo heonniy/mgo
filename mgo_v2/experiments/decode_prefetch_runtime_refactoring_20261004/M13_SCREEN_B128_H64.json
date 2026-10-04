@@ -1,0 +1,225 @@
+{
+  "status": "FAIL",
+  "stage": "M13_SCREEN",
+  "label": "M13_SCREEN_B128_H64",
+  "group": {
+    "batch": 128,
+    "horizon": 64,
+    "cases": [
+      {
+        "label": "REFERENCE",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T1",
+        "horizon": 64,
+        "baseline": true,
+        "measure": false
+      },
+      {
+        "label": "P1_T1",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P1_T0",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P1_T2",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T2",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T1",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P2_T0",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T0",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T2",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true
+      },
+      {
+        "label": "P4_T1",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true
+      }
+    ]
+  },
+  "started_unix": 1791134799.5683885,
+  "source_sha": "5365db594b14e39f805344c5a72815429d392762",
+  "monitor": "boundaries only; file polling during MEASURE",
+  "pid": 128381,
+  "boundaries": [
+    {
+      "key": "P1_T1_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21231,
+            "free_mib": 59859,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18529,
+            "free_mib": 62561,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18369,
+            "free_mib": 62721,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19303,
+            "free_mib": 61787,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19957,
+            "free_mib": 61133,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498156568576,
+        "unix": 1791135130.1438682,
+        "rss_bytes": 955296677888,
+        "foreign_pids": [],
+        "collection_seconds": 0.42376334872096777
+      }
+    },
+    {
+      "key": "P1_T1_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21231,
+            "free_mib": 59859,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18529,
+            "free_mib": 62561,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18369,
+            "free_mib": 62721,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23323,
+            "free_mib": 57767,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19303,
+            "free_mib": 61787,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19957,
+            "free_mib": 61133,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498204807168,
+        "unix": 1791135250.221847,
+        "rss_bytes": 955357995008,
+        "foreign_pids": [],
+        "collection_seconds": 0.4592332625761628
+      }
+    }
+  ],
+  "completed": [
+    "P1_T1_r1",
+    "P1_T1_r2"
+  ],
+  "error": "AssertionError('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M13_SCREEN_B128_H64/run.log')",
+  "exit_code": 1,
+  "finished_unix": 1791135465.4896438
+}
