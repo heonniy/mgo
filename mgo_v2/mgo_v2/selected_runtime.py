@@ -10,6 +10,17 @@ ARMS = ('V1_OPT_NOPF_BARRIER', 'V2_OPT_PF_BARRIER', 'V3_OPT_PF_OVERLAP')
 DEFAULT_SELECTION = Path(__file__).resolve().parents[1] / 'experiments/decode_prefetch_runtime_refactoring_20261004/FINAL_RUNTIME_SELECTION.json'
 
 
+def arm_options(arm, budget, trigger):
+    if arm not in ARMS or trigger not in ('T0', 'T1', 'T2'):
+        raise ValueError('Unknown runtime arm or trigger')
+    if budget not in ((0,) if arm == ARMS[0] else (1, 2, 4)):
+        raise ValueError('Invalid arena budget for the runtime arm')
+    overlap = arm == ARMS[2]
+    return dict(runtime_arm=arm, arena_budget=budget, trigger=trigger,
+                partial_precision='bf16', streaming=overlap, ready_first=overlap,
+                physical_prefetch=True, fused=True)
+
+
 def selected_options(selection_path=None, arm=None):
     path = Path(selection_path) if selection_path is not None else DEFAULT_SELECTION
     selection = json.loads(path.read_text())
@@ -26,10 +37,22 @@ def selected_options(selection_path=None, arm=None):
     prefetch = selection['prefetch']
     if prefetch['P'] not in (1, 2, 4) or prefetch['trigger'] not in ('T0', 'T1', 'T2'):
         raise ValueError('Invalid frozen BR-only prefetch configuration')
-    overlap = chosen == ARMS[2]
-    return dict(runtime_arm=chosen, arena_budget=0 if chosen == ARMS[0] else prefetch['P'],
-                trigger=prefetch['trigger'], partial_precision='bf16',
-                streaming=overlap, ready_first=overlap, physical_prefetch=True, fused=True)
+    return arm_options(chosen, 0 if chosen == ARMS[0] else prefetch['P'], prefetch['trigger'])
+
+
+def _create_runtime(args, model, backing, experts, options):
+    for name, value in options.items():
+        setattr(args, name, value)
+    from .decode_runtime import DecodeOffloadRuntime
+    return DecodeOffloadRuntime(args, model, backing, experts)
+
+
+def create_explicit_runtime(args, model, backing, experts, case):
+    """Construct an explicit experimental arm using the default's same path."""
+    options = arm_options(case['runtime_arm'], case['P'], case['trigger'])
+    if case['partial_precision'] != 'bf16' or case['overlap'] != options['streaming']:
+        raise ValueError('Case disagrees with the common BF16 runtime arm')
+    return _create_runtime(args, model, backing, experts, options)
 
 
 def create_selected_runtime(args, model, backing, experts, *, selection_path=None, arm=None):
@@ -39,7 +62,4 @@ def create_selected_runtime(args, model, backing, experts, *, selection_path=Non
     frozen-input arguments and placement policy. No second cache is created.
     """
     options = selected_options(selection_path, arm)
-    for name, value in options.items():
-        setattr(args, name, value)
-    from .decode_runtime import DecodeOffloadRuntime
-    return DecodeOffloadRuntime(args, model, backing, experts)
+    return _create_runtime(args, model, backing, experts, options)

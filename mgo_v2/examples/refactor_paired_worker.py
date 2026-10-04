@@ -1,6 +1,7 @@
 """Counterbalanced policy pairs with one physical C+P arena and bounded repeats."""
 from refactor_measure_worker import *
 from adaptive_timing import paired_decision
+from mgo_v2.selected_runtime import create_explicit_runtime
 
 def main(a):
  rank=int(os.environ['RANK']);a.output.mkdir(parents=True,exist_ok=True)
@@ -9,12 +10,12 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//8+(r<3686%8) for r in range(8)];a.comm_mode='current';a.phase='COUNTERS'
  cases=json.loads(a.cases.read_text());candidates=[c for c in cases if not c.get('baseline')];assert len(candidates)==2
- for key in ['P','trigger','horizon','overlap','partial_precision']:assert candidates[0].get(key)==candidates[1].get(key)
+ for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm']:assert candidates[0].get(key)==candidates[1].get(key)
  baseline,candidate=[c['policy'] for c in candidates];assert baseline!=candidate;horizon=candidates[0]['horizon'];assert all(c['horizon']==horizon for c in candidates)
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')
- first=candidates[0];a.policy=first['policy'];a.arena_budget=first['P'];a.trigger=first['trigger'];a.streaming=first['overlap'];a.ready_first=a.streaming;a.partial_precision=first.get('partial_precision');a.physical_prefetch=True;a.fused=True;a.debug_plan=False
- rt=DecodeOffloadRuntime(a,model,backing,experts);rt.stage_frozen_inputs(horizon)
+ first=candidates[0];a.policy=first['policy'];a.debug_plan=False
+ rt=create_explicit_runtime(a,model,backing,experts,first);rt.stage_frozen_inputs(horizon)
  proofs={c['policy']:json.loads((a.inputs/f'{c["policy"]}_P{a.arena_budget}_proof.json').read_text()) for c in candidates};warm_tokens={};numeric={};by_policy={c['policy']:c for c in candidates}
  assert all(p['horizon']==horizon for p in proofs.values())
  def configure(policy,phase):
