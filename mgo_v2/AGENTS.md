@@ -1,3 +1,10 @@
+**OWNER DECODE AMENDMENT: c60/s0 decode64; report TPOT and E2E only.**
+Stop the decode256 attempt. Run only the c60/substitution-OFF packet with
+64 decode steps. PLAN identity and output paths include horizon; never reuse
+256-step PLANs as 64-step references. Preserve correctness/resource counters
+internally, but owner-facing results report TPOT and E2E only. This supersedes
+all older decode256 wording for the active transport packet.
+
 **OWNER QUEUE REDUCTION: run c60/s0 ONLY.**
 The owner cancelled c30/s1 before any timed measurement. Do not resume it.
 Run only `scripts/run_transport_stack_packet.py` (cache60, substitution OFF).

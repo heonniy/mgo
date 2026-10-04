@@ -16,4 +16,8 @@ with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
  from test_cache_substitution_plan import test_plan_discovery_separates_cache_and_substitution
  test_plan_discovery_separates_cache_and_substitution(Path(directory),MonkeyPatch())
  checks.append('test_cache_substitution_plan.test_plan_discovery_separates_cache_and_substitution')
+with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
+ from test_cache_substitution_plan import test_plan_discovery_separates_decode_horizons
+ test_plan_discovery_separates_decode_horizons(Path(directory),MonkeyPatch())
+ checks.append('test_cache_substitution_plan.test_plan_discovery_separates_decode_horizons')
 print(json.dumps(dict(status='PASS',tests=checks)))

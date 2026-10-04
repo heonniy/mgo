@@ -209,6 +209,7 @@ class Runtime:
   self.index+=1;return output
 
 def generate(model,rt,initial_ids,initial_mask):
+ horizon=getattr(rt.args,'decode_steps',256)
  check_cpu_residency(rt.cpu_backing)
  ids=initial_ids;mask=initial_mask;past=None;tokens=[]
  # Padding selection is precomputed before boundaries; decode has no padding.
@@ -216,18 +217,18 @@ def generate(model,rt,initial_ids,initial_mask):
  dist.barrier();torch.cuda.synchronize();start=time.perf_counter()
  begin,end=torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True)
  with torch.inference_mode():
-  for step in range(257):
+  for step in range(horizon+1):
    position=mask.cumsum(-1)-1;position.masked_fill_(mask==0,0)
    out=model(input_ids=ids,attention_mask=mask,position_ids=position[:,-ids.shape[1]:],past_key_values=past,use_cache=True,logits_to_keep=1);past=out.past_key_values
-   if step<256:
+   if step<horizon:
     logits=out.logits[:,-1].clone();logits[:,model.generation_config.eos_token_id]=-torch.inf
     ids=logits.argmax(-1,keepdim=True);tokens.append(ids);mask=torch.cat((mask,mask.new_ones((mask.shape[0],1))),1)
    if step==0:torch.cuda.synchronize();decode_start=time.perf_counter();begin.record();rt.valid=None
    if rt.args.phase!='MEASURE' and step%16==0:print(json.dumps(dict(phase=rt.args.phase,rank=rt.rank,decode=step)),flush=True)
   end.record();torch.cuda.synchronize();finish=time.perf_counter()
  result=torch.cat(tokens,1).cpu().numpy()
- assert rt.index==257*48 and not rt.mismatch.item()
- return dict(token_hash=array_hash(result),state_hash=array_hash(rt.keys),E2E_wall=finish-start,decode_wall=finish-decode_start,TPOT=begin.elapsed_time(end)/1000/256),result
+ assert rt.index==(horizon+1)*48 and not rt.mismatch.item()
+ return dict(token_hash=array_hash(result),state_hash=array_hash(rt.keys),E2E_wall=finish-start,decode_wall=finish-decode_start,TPOT=begin.elapsed_time(end)/1000/horizon),result
 
 def main(a):
  if a.comm_mode in ('coslot','coslot-active') or a.h2d_mode=='pinned':
@@ -239,6 +240,7 @@ def main(a):
  if a.cache_ratio is not None:
   assert 0.0<a.cache_ratio<=1.0;cell['cache_ratio']=float(a.cache_ratio)
  if a.substitution_mode!='matrix':cell['substitution']=(a.substitution_mode=='on')
+ cell['decode_tokens']=a.decode_steps
  a.cache_ratio=float(cell['cache_ratio']);a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=bool(cell['substitution'])
  world=cell['ranks'];assert dist.get_world_size()==world
  total=int(48*128*a.cache_ratio);a.capacities=[total//world+(r<total%world) for r in range(world)]
@@ -274,10 +276,10 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,cache_ratio=a.cache_ratio,substitution=a.substitution,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',decode_steps=a.decode_steps,phase=a.phase,cell=a.cell,cache_ratio=a.cache_ratio,substitution=a.substitution,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
- if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
+ if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation=f'device equality for all {(a.decode_steps+1)*48} events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
  write(a.output/f'rank{rank}.json',receipt);dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution-mode',choices=['matrix','on','off'],default='matrix');p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution-mode',choices=['matrix','on','off'],default='matrix');p.add_argument('--decode-steps',type=int,choices=[64,256],default=256);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())

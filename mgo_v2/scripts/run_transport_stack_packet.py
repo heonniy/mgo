@@ -7,17 +7,18 @@ from batch_comm_common import stop_idle_load
 import run_timing_stability as harness
 
 P=launcher.P
-ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004/c60_s0')
-PACKET=P/'experiments/transport_stack_remeasure_20261004/c60_s0'
+ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004/c60_s0_h64')
+PACKET=P/'experiments/transport_stack_remeasure_20261004/c60_s0_h64'
 BRANCH='codex/coslot-comm-remeasure-20261004'
 CACHE_RATIO=0.60
 SUBSTITUTION=False
 CACHE_TAG='c60'
 SUB_TAG='s0'
+DECODE_STEPS=64
 launcher.PACKET=PACKET
 harness.ROOT=ROOT
 write=launcher.write
-state=dict(status='RUNNING',cell='R',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,
+state=dict(status='RUNNING',decode_steps=DECODE_STEPS,cell='R',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,
  physical_gpus=[0,1,4,5],stage='STARTING',started_unix=time.time(),plans={},completed=[])
 
 def publish(message):
@@ -41,7 +42,7 @@ def run_cpu_validation():
 def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
  state.update(stage=name,environment=env,policy=policy,transport=transport,repeat=repeat);checkpoint()
  try:
-  out=launcher.run('R',policy,name,env,repeat,transport,h2d,plan,2,CACHE_RATIO,SUBSTITUTION)
+  out=launcher.run('R',policy,name,env,repeat,transport,h2d,plan,2,CACHE_RATIO,SUBSTITUTION,DECODE_STEPS)
  except BaseException:
   for path in launcher.ROOT.glob(f'R_{policy}_{env}_{name}_{CACHE_TAG}_{SUB_TAG}*/status.json'):
    receipt=json.loads(path.read_text());pid=receipt.get('pid');cmd=Path('/proc')/str(pid)/'cmdline'
@@ -56,7 +57,7 @@ def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
  return out
 
 def result_dir(policy,env,phase_name,transport,repeat):
- tags=[CACHE_TAG,SUB_TAG]
+ tags=[CACHE_TAG,SUB_TAG,'h64']
  if transport!='current':tags.append(transport)
  tags.append('pinned')
  return launcher.ROOT/f"R_{policy}_{env}_{phase_name}_{'_'.join(tags)}_{repeat}"
@@ -70,7 +71,7 @@ def summarize(env):
    for rep in range(3):
     out=result_dir(policy,env,'MEASURE',transport,rep)
     rs=[json.loads((out/f'rank{r}.json').read_text()) for r in range(4)]
-    assert all(x['status']=='PASS' and x['no_compile_in_measure'] for x in rs)
+    assert all(x['status']=='PASS' and x['no_compile_in_measure'] and x['decode_steps']==64 for x in rs)
     assert all(abs(x['cache_ratio']-CACHE_RATIO)<1e-9 and x['substitution'] is SUBSTITUTION for x in rs)
     for rank,x in enumerate(rs):
      for key in ('token_hash','state_hash','action_hash','schedule_file_sha256'):
@@ -81,16 +82,16 @@ def summarize(env):
    for rank,x in enumerate(rs):
     assert x['status']=='PASS' and x['actual_H2D_bytes']==proof['ranks'][rank]['physical_H2D_bytes']
     assert abs(x['cache_ratio']-CACHE_RATIO)<1e-9 and x['substitution'] is SUBSTITUTION
-    assert x['actual_collective_calls']==(37008 if transport=='current' else 24672 if transport=='coslot' else 0)
+    assert x['actual_collective_calls']==(9360 if transport=='current' else 6240 if transport=='coslot' else 0)
     for key in ('token_hash','state_hash','action_hash','schedule_file_sha256'):
      assert x[key]==proof['ranks'][rank][key]
     assert x['pinned_stage_bytes']==2*9437184
     if transport=='coslot-active':
-     assert x['actual_p2p_batches']+x['actual_zero_remote_rounds']==24672
+     assert x['actual_p2p_batches']+x['actual_zero_remote_rounds']==6240
    metrics={k:dict(median=statistics.median(x[k] for x in samples),min=min(x[k] for x in samples),max=max(x[k] for x in samples)) for k in ('E2E_wall','decode_wall','TPOT')}
    for m in metrics.values():m['spread_relative']=(m['max']-m['min'])/m['median']
    counters={k:sum(x[k] for x in rs) for k in ('actual_H2D_bytes','actual_peer_bytes','actual_wire_bytes','actual_collective_calls','actual_p2p_batches','actual_p2p_ops','actual_zero_remote_rounds','active_peer_degree_sum')}
-   counters['mean_active_peer_degree']=counters['active_peer_degree_sum']/(4*24672) if transport=='coslot-active' else None
+   counters['mean_active_peer_degree']=counters['active_peer_degree_sum']/(4*6240) if transport=='coslot-active' else None
    counters['max_active_peer_degree']=max(x['max_active_peer_degree'] for x in rs)
    summaries.append(dict(policy=policy,transport=transport,metrics=metrics,counters=counters,samples=samples))
  comparisons=[]
@@ -107,7 +108,7 @@ def summarize(env):
  write(PACKET/(env+'_results.json'),dict(status='PASS',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,stable=stable,
   stability_gate='(max-min)/median <=5% for E2E and TPOT, all six conditions; no extra repeats',
   summaries=summaries,comparisons=comparisons,raw_receipts=raw))
- lines=[f'# {env} c60/s0 transport stack results','',
+ lines=[f'# {env} c60/s0 decode64 TPOT and E2E','',
   'Three measurements per condition. Raw medians and full ranges are in the JSON.',
   'Stable timing does not imply a statistically established BR/CA difference.','',
   '| Policy | Transport | TPOT median (s) | E2E median (s) | TPOT spread |',
@@ -127,16 +128,16 @@ def main():
    status=path/'status.json';receipt=path/'rank0.json'
    if not status.exists() or not receipt.exists() or (path/'schedule_validation.json').exists():continue
    a=json.loads(status.read_text());b=json.loads(receipt.read_text());spec=b.get('cell_spec',{})
-   if a.get('status')=='PASS' and abs(b.get('cache_ratio',spec.get('cache_ratio',-1))-CACHE_RATIO)<1e-9 and b.get('substitution',spec.get('substitution')) is SUBSTITUTION:
+   if b.get('decode_steps',256)==DECODE_STEPS and a.get('status')=='PASS' and abs(b.get('cache_ratio',spec.get('cache_ratio',-1))-CACHE_RATIO)<1e-9 and b.get('substitution',spec.get('substitution')) is SUBSTITUTION:
     validate(path)
   stop_idle_load()
   stop=launcher.ROOT/'STOP'
   if stop.exists():stop.rename(ROOT/'superseded_previous_STOP')
   for policy in ('BR','CA'):
-   plan=launcher.discover_validated_plan('R',policy,CACHE_RATIO,SUBSTITUTION)
+   plan=launcher.discover_validated_plan('R',policy,CACHE_RATIO,SUBSTITUTION,DECODE_STEPS)
    if plan is None:
     repeat=0
-    while (launcher.ROOT/f'R_{policy}_env1_PLAN_{CACHE_TAG}_{SUB_TAG}_{repeat}').exists():repeat+=1
+    while (launcher.ROOT/f'R_{policy}_env1_PLAN_{CACHE_TAG}_{SUB_TAG}_h64_{repeat}').exists():repeat+=1
     plan=phase(policy,'PLAN','env1','current','pageable',repeat)
     validate(plan)
     write(PACKET/(policy+'_c60_s0_plan_validation.json'),json.loads((plan/'schedule_validation.json').read_text()))

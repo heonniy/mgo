@@ -6,8 +6,8 @@ ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004')
 PACKET=P/'experiments/transport_stack_remeasure_20261004'
 def write(x):(PACKET/'queue.json').write_text(json.dumps(x,indent=2)+'\n')
 def main():
- state=dict(status='RUNNING',owner_followup_commit='70780ff219594355c09843b9b15a6d38764edf05',order=['c60_s0'],active=None)
- for arm,script in [('c60_s0','run_transport_stack_packet.py')]:
+ state=dict(status='RUNNING',owner_followup_commit='70780ff219594355c09843b9b15a6d38764edf05',order=['c60_s0_h64'],active=None)
+ for arm,script in [('c60_s0_h64','run_transport_stack_packet.py')]:
   state['active']=arm;write(state)
   with (ROOT/(arm+'_driver.log')).open('w') as log:
    proc=subprocess.Popen([sys.executable,'-u',str(P/'scripts'/script)],stdout=log,stderr=subprocess.STDOUT)

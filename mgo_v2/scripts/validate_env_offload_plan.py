@@ -13,7 +13,7 @@ def validate(path):
   with gzip.open(source,'rb') as f:payload=f.read()
   assert sha(payload)==receipt['action_hash'],'serialized action payload changed'
   events=pickle.loads(payload);del payload
-  assert len(events)==12336
+  assert len(events)==(receipt.get('decode_steps',256)+1)*48
   keys=np.full(receipt['cache_capacity'],-1,np.int32);route=hashlib.sha256();fetches=0;replicas=0
   for i,e in enumerate(events):
    assert e['layer']==i%48
@@ -28,13 +28,14 @@ def validate(path):
    assert len(e['send_idx'])==sum(e['send_counts']) and len(e['return_order'])==sum(e['return_counts'])
   assert sha(keys.tobytes())==receipt['state_hash'];tokens=np.load(path/f'rank{r}_tokens.npy');assert sha(tokens.tobytes())==receipt['token_hash']
   out.append(dict(rank=r,status='PASS',route_hash=route.hexdigest(),action_hash=receipt['action_hash'],schedule_file_sha256=sha(source.read_bytes()),token_hash=receipt['token_hash'],state_hash=receipt['state_hash'],fetches=fetches,replica_fetches=replicas,physical_H2D_bytes=fetches*9437184,cache_slots=len(keys)));plans.append(events)
- for i in range(12336):
+ assert len({len(x) for x in plans})==1
+ for i in range(len(plans[0])):
   for src in range(world):
    for dst in range(world):
     assert plans[src][i]['send_counts'][dst]==plans[dst][i]['recv_counts'][src]
     assert plans[src][i]['return_counts'][dst]==plans[dst][i]['return_recv_counts'][src]
- result=dict(status='PASS',events=12336,ranks=out)
+ result=dict(status='PASS',events=len(plans[0]),ranks=out)
  (path/'schedule_validation.json').write_text(json.dumps(result,indent=2)+'\n')
- print(json.dumps(dict(status='PASS',path=str(path),world=world,events=12336)),flush=True);return result
+ print(json.dumps(dict(status='PASS',path=str(path),world=world,events=len(plans[0]))),flush=True);return result
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('path',type=Path);validate(p.parse_args().path)
