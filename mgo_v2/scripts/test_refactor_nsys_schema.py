@@ -1,0 +1,45 @@
+"""Synthetic schema test; does not replace a physical Nsight capture gate."""
+import hashlib,json,sqlite3,tempfile
+from pathlib import Path
+from analyze_refactor_nsys import analyze
+
+def main():
+ with tempfile.TemporaryDirectory() as tmp:
+  root=Path(tmp);path=root/'trace.sqlite';db=sqlite3.connect(path)
+  for sql in [
+   'CREATE TABLE StringIds(id INTEGER,value TEXT)',
+   'CREATE TABLE NVTX_EVENTS(start INTEGER,end INTEGER,globalTid INTEGER,text TEXT,textId INTEGER)',
+   'CREATE TABLE CUPTI_ACTIVITY_KIND_RUNTIME(start INTEGER,end INTEGER,globalTid INTEGER,correlationId INTEGER)',
+   'CREATE TABLE CUPTI_ACTIVITY_KIND_DRIVER(start INTEGER,end INTEGER,globalTid INTEGER,correlationId INTEGER)',
+   'CREATE TABLE CUPTI_ACTIVITY_KIND_KERNEL(start INTEGER,end INTEGER,globalPid INTEGER,correlationId INTEGER,demangledName INTEGER)',
+   'CREATE TABLE ENUM_CUDA_MEMCPY_OPER(id INTEGER,label TEXT)',
+   'CREATE TABLE CUPTI_ACTIVITY_KIND_MEMCPY(start INTEGER,end INTEGER,copyKind INTEGER,bytes INTEGER)']:db.execute(sql)
+  db.executemany('INSERT INTO StringIds VALUES (?,?)',[(1,'ncclDevKernel'),(2,'triton_expert')])
+  db.execute("INSERT INTO ENUM_CUDA_MEMCPY_OPER VALUES (1,'HtoD')")
+  pid=1<<24;tid=pid+1
+  phases=[('moe.metadata',1,9,3,7,1),('moe.forward_a2a',10,25,12,25,1),('moe.expert_compute',26,60,30,55,2),('moe.return_a2a',61,90,65,80,1)]
+  for event in range(384):
+   base=1000+event*100
+   db.execute('INSERT INTO NVTX_EVENTS VALUES (?,?,?,?,NULL)',(base,base+99,tid,f'decode.event.{event+48}'))
+   for phase,(name,a,b,c,d,kernel) in enumerate(phases):
+    corr=event*4+phase
+    db.execute('INSERT INTO NVTX_EVENTS VALUES (?,?,?,?,NULL)',(base+a,base+b,tid,name))
+    # Exercise direct-driver attribution for the compute launch.
+    api='DRIVER' if kernel==2 else 'RUNTIME'
+    db.execute(f'INSERT INTO CUPTI_ACTIVITY_KIND_{api} VALUES (?,?,?,?)',(base+a,base+a+1,tid,corr))
+    db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_KERNEL VALUES (?,?,?,?,?)',(base+c,base+d,pid,corr,kernel))
+  db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_MEMCPY VALUES (1010,1040,1,9437184)');db.commit();db.close()
+  trace=root/'copy.json';trace.write_text(json.dumps([dict(source_event=48,bytes=9437184,kind='demand',readiness_at_use=None)]))
+  receipt=dict(status='PASS',decode_expert_copies=1,decode_expert_bytes=9437184,copy_trace_path=str(trace),copy_trace_sha256=hashlib.sha256(trace.read_bytes()).hexdigest())
+  out=analyze(path,receipt)
+  assert out['decode_events']==384 and out['kernel_counts']['moe.expert_compute']==384
+  assert out['H2D']['total_union_ms']==30/1e6
+  assert out['H2D']['overlap_comm_expert_ms']==23/1e6
+  assert len(out['interval_decomposition']['per_event'])==384
+  receipt['decode_expert_copies']=2
+  try:analyze(path,receipt)
+  except AssertionError as exc:assert 'copy count mismatch' in str(exc)
+  else:raise AssertionError('missing DMA event must fail reconciliation')
+ print('PASS schema fixture: runtime/driver correlation, DMA overlap, per-event conservation, missing-copy rejection')
+
+if __name__=='__main__':main()
