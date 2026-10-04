@@ -1,0 +1,77 @@
+{
+  "status": "QUEUED_AFTER_TOLERANCE_001",
+  "provenance_old_policy": {
+    "commit": "a0be82e9000d7d7634db04c9558d64f8f896ee6d",
+    "file": "mgo_v2/mgo_v2/admission.py",
+    "functions": [
+      "_incremental_cost",
+      "HungarianAdmission.place"
+    ]
+  },
+  "dataset": "ShareGPT",
+  "trace_source": "existing exact pool; first 64 decode steps",
+  "candidate_pool": 2048,
+  "local_batch": 32,
+  "horizon": 64,
+  "cache_percent": 30,
+  "eviction": "Gate",
+  "gate_window": 128,
+  "substitution": false,
+  "policies": [
+    "BR",
+    "Current-CA",
+    "OldCA-fanout"
+  ],
+  "ranks": [
+    4,
+    8
+  ],
+  "search": {
+    "reuse_existing_candidate_space": true,
+    "expand_search": false,
+    "preferred_fetch_h2d_relative_tolerance": 0.001,
+    "fallback_fetch_h2d_relative_tolerance": 0.0025,
+    "primary": "maximize BR->OldCA Fanout_total reduction",
+    "secondary": [
+      "maximize per-event critical-rank communication reduction",
+      "maximize aggregate peer-byte reduction",
+      "minimize H2D mismatch"
+    ]
+  },
+  "physical": {
+    "environment": "Env2",
+    "runtime": "A3_current_3A2A_only",
+    "order": [
+      "R4",
+      "R8"
+    ],
+    "gpu_sets": {
+      "R4": [
+        0,
+        1,
+        4,
+        6
+      ],
+      "R8": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "frozen_route": true,
+    "initial_runs_per_policy": 1,
+    "positive_gain_confirmation_threshold": 0.01,
+    "max_additional_confirmation_pairs": 1,
+    "full_horizon_warmup_per_measure": false,
+    "short_readiness_warmup_decode_steps": [
+      8,
+      16
+    ]
+  },
+  "automatic_followup": false
+}

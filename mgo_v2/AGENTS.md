@@ -1,3 +1,18 @@
+**OWNER QUEUED FOLLOW-UP (2026-10-04): OLD-CA token->rank fan-out isolation.**
+Do not interrupt the active `fetch_matched_b32_a2a_20261004/tolerance_001`
+study. After it fully exits and commits, run
+`experiments/old_ca_fanout_followup_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Reuse ShareGPT B32/decode64/cache30/Gate W128/substitution-OFF frozen traces.
+Compare BR, Current-CA, and an `OldCA-fanout` policy porting the exact
+a0be82e `_incremental_cost` balanced-Hungarian objective: minimize incremental
+token->remote-rank destinations created by incoming experts relative to
+pre-owned destinations. No same/path affinity in this first isolation. Prefer
+a common <=0.1% BR-relative fetch/H2D-matched workload; bounded fallback <=0.25%
+without padding or fake fetches. Env2 only, A3 only, R4(0,1,4,6) then R8(0..7),
+single-shot BR/Current-CA/OldCA first; if a CA variant gains >=1% TPOT/decode
+wall, allow exactly one additional BR+that-policy confirmation pair. Commit
+results and stop; no automatic A2/affinity/decode256 expansion.
+
 **OWNER FETCH TOLERANCE AMENDMENT:** Resume the B32/decode64 frozen-route pivot with abs(CA-BR)/BR <=0.001 for both total fetches and H2D. Reuse completed CPU receipts, select Peer-best and Critical-best independently, deduplicate identical winners, then Env2 R4(0,1,4,6) -> R8(0..7), A3/A2 single-shot; exactly one confirmation pair only when any initial CA gain >=1%. No new trace capture or expanded search. See `experiments/fetch_matched_b32_a2a_20261004/tolerance_001/EXECUTION.md`.
 
 **OWNER IMMEDIATE REPLACEMENT:** The owner cancelled all remaining old R4 physical experiments and their queue. Execute commit81dfb0c `fetch_matched_b32_a2a_20261004` now after stopping/reaping those processes. Reuse only the first64 decode steps of the existing exact256 trace; no new trace capture. This overrides the older wait-for-R4 wording below.
