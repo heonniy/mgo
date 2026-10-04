@@ -1,0 +1,69 @@
+{
+  "status": "PLAN_ONLY",
+  "branch": "refactoring",
+  "scope": "decode-only next-layer prefetch runtime refactoring",
+  "model": "Qwen3-30B-A3B",
+  "ranks": 8,
+  "local_batches": [
+    128,
+    256
+  ],
+  "cache_percent": 60,
+  "substitution": false,
+  "replication": false,
+  "decode_tokens": 256,
+  "prefill": {
+    "prefetch": false,
+    "predictor": false,
+    "mandatory_miss_fetch": "balanced floor/ceil across ranks",
+    "placement_policies": [
+      "BR",
+      "CA",
+      "LA"
+    ]
+  },
+  "decode": {
+    "predictor": "EdgeMoE-style offline layer-to-layer transition calibration; batch aggregated",
+    "prefetch_slots_per_rank": [
+      0,
+      1,
+      2,
+      4,
+      8
+    ],
+    "prefetch_placement": [
+      "BR",
+      "CA",
+      "LA"
+    ],
+    "prefetch_quota": "balanced per-rank count",
+    "promotion": "physical slot role swap; no expert-weight D2D copy",
+    "demand_h2d_priority": "urgent over background prefetch",
+    "execution": "ready-first, per-slot wait, no global H2D barrier",
+    "communication": "1 metadata collective + 1 fused forward A2A + 1 return A2A"
+  },
+  "trigger_positions": {
+    "T0": "prefetch prediction/placement before forward A2A",
+    "T1": "urgent H2D -> async forward A2A -> predictor/prefetch placement (preferred)",
+    "T2": "prefetch prediction/placement after forward A2A"
+  },
+  "required_metrics": [
+    "TPOT",
+    "H2D_total",
+    "H2D_exposed",
+    "H2D_hidden_ratio",
+    "forward_A2A",
+    "expert_compute",
+    "return_A2A",
+    "metadata",
+    "current_controller",
+    "prefetch_controller_total",
+    "prefetch_controller_exposed",
+    "prefetch_ready_at_use",
+    "prefetch_inflight_at_use",
+    "wasted_prefetch_bytes",
+    "promotion_count",
+    "promotion_induced_reload"
+  ],
+  "automatic_long_gpu_run": false
+}
