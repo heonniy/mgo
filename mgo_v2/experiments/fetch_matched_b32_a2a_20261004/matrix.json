@@ -19,7 +19,7 @@
     ],
     "dp_seed_range": [
       0,
-      511
+      63
     ],
     "br_seeds": [
       7,
@@ -31,19 +31,27 @@
       181,
       251
     ],
-    "prescreen_topk_per_rank": 128,
     "hard_constraints": [
       "BR_total_fetches == CA_total_fetches",
       "BR_H2D_bytes == CA_H2D_bytes",
       "quota_max_minus_min <= 1"
     ],
-    "selection": [
-      "CA_max_rank_comm <= BR_max_rank_comm",
-      "maximize max-rank send+recv reduction",
-      "maximize absolute aggregate peer reduction",
-      "maximize relative aggregate peer reduction",
-      "prefer exact reload equality"
-    ]
+    "selection": {
+      "peer_best": [
+        "maximize absolute aggregate peer-byte reduction",
+        "maximize relative aggregate peer-byte reduction",
+        "maximize per-event critical-rank reduction",
+        "prefer exact reload equality"
+      ],
+      "critical_best": [
+        "maximize absolute per-event Critical_total reduction",
+        "maximize relative per-event Critical_total reduction",
+        "maximize aggregate peer-byte reduction",
+        "prefer exact reload equality"
+      ],
+      "deduplicate_if_same_winner": true
+    },
+    "prescreen_topk_per_objective": 64
   },
   "physical": {
     "environment": "Env2",
@@ -74,9 +82,26 @@
       "BR",
       "CA"
     ],
-    "initial_repeats": 2,
-    "third_repeat_if_relative_diff_gt": 0.02,
-    "unstable_if_relative_diff_gt": 0.05
+    "initial_repeats": 1,
+    "order": [
+      "R4",
+      "R8"
+    ],
+    "workloads_per_rank": [
+      "Peer-best",
+      "Critical-best"
+    ],
+    "full_256_warmup_per_measure": false,
+    "short_readiness_warmup_decode_steps": [
+      8,
+      16
+    ],
+    "selective_confirmation": {
+      "positive_ca_gain_threshold": 0.01,
+      "action": "one additional BR+CA confirmation pair",
+      "max_additional_confirmations": 1,
+      "no_further_repeat": true
+    }
   },
   "a2a_counts": {
     "layer_events_all_forwards": 12336,

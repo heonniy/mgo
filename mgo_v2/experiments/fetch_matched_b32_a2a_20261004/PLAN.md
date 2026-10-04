@@ -14,7 +14,7 @@ Status: owner-authorized, queued after current physical R4 work completes.
 - substitution: **OFF**
 - policies: BR and CA
 - rank counts: R=4 and R=8
-- one selected stress cell per rank count
+- two independently selected stress cells per rank count: **Peer-best** and **Critical-best** (deduplicate if identical)
 
 Global request counts:
 - R4: 128 requests
@@ -28,14 +28,21 @@ fails validation.
 Search independently for R4/B32/cache30 and R8/B32/cache30.
 
 Search variables:
-- sample_seed: 0..511
-- dp_seed: 0..511
+- sample_seed: 0..511 (**512 samples**)
+- dp_seed: 0..63 (**64 DP partitions per sample**)
 - BR seed: [7,19,42,73,99,131,181,251]
 
 The DP split must contain exactly B=32 requests per rank.
 
-Use a routing-only prescreen to retain the best 128 sample/DP candidates per R,
-then run exact Gate-cache replay for every retained candidate and BR seed.
+Per R, run 512 x 64 = **32,768 routing-only prescreen candidates**. Maintain
+two independent rankings:
+- Peer ranking: top 64 by aggregate peer-byte reduction.
+- Critical ranking: top 64 by per-event critical-rank communication reduction.
+
+Deduplicate the two top-64 lists, so at most 128 sample/DP candidates per R
+enter exact Gate-cache replay. For each retained candidate, test the eight BR
+seeds and deterministic CA. This is at most 1,152 exact replays per R, 2,304
+across R4+R8.
 
 ### Hard validity conditions
 
@@ -54,24 +61,38 @@ must imply exact H2D-byte equality; validate both explicitly.
 Record first-fetch and reload counts separately. Prefer candidates with exact
 reload equality, but total fetch/H2D equality is the hard owner requirement.
 
-### Communication score
+### Two independent communication objectives
 
 For every eligible pair compute both:
-- aggregate peer bytes;
-- per-rank send+receive bytes and the maximum critical-rank communication load.
 
-Selection order for each R:
-1. require CA not to increase max-rank communication;
-2. maximize reduction in max-rank communication;
-3. tie-break by absolute aggregate peer-byte reduction;
-4. tie-break by relative aggregate peer reduction;
-5. tie-break by exact reload equality.
+1. **Aggregate peer bytes**
+   ```
+   Peer = sum over all remote activation/return traffic
+   ```
 
-This keeps the selected stress example aligned with collective critical-path
-latency rather than aggregate bytes alone.
+2. **Per-event critical-rank communication**
+   For every dispatch/return collective event i:
+   ```
+   Critical_i = max_r(send_bytes[i,r] + recv_bytes[i,r])
+   Critical_total = sum_i Critical_i
+   ```
+   This intentionally does not collapse the whole run into one max-rank total;
+   the bottleneck rank may change across layers/steps.
 
-Report the chosen sample_seed, dp_seed and BR seed plus the top-10 eligible
-alternatives. Also report how many searched pairs satisfy exact fetch matching.
+Select two winners independently for each R:
+
+- **Peer-best**: among exact fetch/H2D-matched candidates, maximize absolute
+  BR->CA aggregate peer-byte reduction; tie-break by relative peer reduction,
+  then critical reduction, then exact reload equality.
+- **Critical-best**: among exact fetch/H2D-matched candidates, maximize absolute
+  BR->CA `Critical_total` reduction; tie-break by relative critical reduction,
+  then aggregate peer reduction, then exact reload equality.
+
+Do not force the two objectives to choose the same workload. If the exact same
+(sample_seed, dp_seed, BR_seed) wins both, deduplicate it in physical timing.
+
+Report both winners, their cross-metrics, the top-10 eligible alternatives for
+each objective, and how many searched pairs satisfy exact fetch matching.
 
 ## 3. Common physical workload requirement
 
@@ -156,36 +177,61 @@ Before any A2 timing:
 
 If this gate fails, stop A2 timing.
 
-## 6. Physical timing scope
+## 6. Fast physical pivot screen
 
 Primary environment: **Env 2 only** (P2P disabled, validated SHM).
 
-Reason: this packet tests whether larger messages plus one fewer collective
-expose the placement benefit under the project's expensive-communication
-condition. The earlier R8/B8 packet already provides Env1/Env2 context.
+Run **R4 first, then R8** so the owner can pivot early.
 
 Physical GPU sets:
+- R4: GPUs 0,1,4,6
 - R8: GPUs 0,1,2,3,4,5,6,7
-- R4: GPUs 0,1,4,6 (the predeclared representative quartet from the prior
-  pair-matrix discussion)
 
 Do not search or change the GPU subset after timing begins.
 
-Matrix:
-- R8-best: BR/A3, CA/A3, BR/A2, CA/A2
-- R4-best: BR/A3, CA/A3, BR/A2, CA/A2
+For each R, time both selected workloads:
+- Peer-best
+- Critical-best
 
-Start with two clean MEASURE repeats per combination.
+If both objectives selected the exact same workload/BR seed, run it once.
 
-Repeat rule:
-```
-relative_diff = abs(T1-T2) / mean(T1,T2)
-```
-- <=2% for both E2E/decode-wall and TPOT: stop at 2;
-- >2% and <=5%: add exactly one third repeat;
-- >5%: mark unstable and stop that comparison.
+For every unique workload, the single-shot screening matrix is:
+- BR/A3 once
+- CA/A3 once
+- BR/A2 once
+- CA/A2 once
 
-No single-sample primary result.
+Thus there are at most four unique workload sets and **16 initial timed runs**
+(8 for R4 + 8 for R8). The minimum is 8 if Peer-best and Critical-best coincide
+for both R values.
+
+### Warmup policy
+
+Do **not** run a full 256-step warmup before every MEASURE.
+
+- Populate/validate compiler artifacts once per (R, runtime A3/A2) outside the
+  scientific timer.
+- Before the first timed use of each (R, runtime), allow only a short untimed
+  8-16 decode-step readiness warmup.
+- Subsequent BR/CA measurements reuse the validated compile artifacts and do
+  not repeat a full schedule warmup.
+- Keep `error_on_recompile=True` during MEASURE. If a timed run recompiles,
+  invalidate that run rather than silently including compilation.
+
+### Selective confirmation rule
+
+This is an exploratory pivot screen, not the final paper timing protocol.
+
+After the first BR/CA samples for a fixed (R, workload, runtime):
+- if positive CA gain is **<1%** in both E2E/decode-wall and TPOT: no repeat;
+- if positive CA gain is **>=1%** in any primary timing metric: run **exactly
+  one additional confirmation pair** — BR once and CA once;
+- do not add a second confirmation repeat, even if the two observations differ.
+
+Therefore an interesting pair has two observations per policy total; an
+uninteresting pair remains single-shot. Report raw values, not confidence
+intervals. Final publication-quality repetition can be done later only for
+surviving cells.
 
 ## 7. Timing hygiene
 
@@ -227,7 +273,8 @@ Mechanism counters next to timing:
 - total fetches and H2D bytes: BR == CA by construction;
 - first fetches / reloads;
 - aggregate peer bytes;
-- max per-rank send+recv bytes;
+- **per-event critical-rank send+recv bytes and Critical_total**;
+- max per-rank whole-run send+recv bytes (diagnostic only);
 - per-rank send and recv distributions;
 - peer fan-out;
 - activation A2A bytes;
