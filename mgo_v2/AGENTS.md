@@ -1,3 +1,5 @@
+**OWNER IMMEDIATE REPLACEMENT:** The owner cancelled all remaining old R4 physical experiments and their queue. Execute commit81dfb0c `fetch_matched_b32_a2a_20261004` now after stopping/reaping those processes. Reuse only the first64 decode steps of the existing exact256 trace; no new trace capture. This overrides the older wait-for-R4 wording below.
+
 **OWNER QUEUED FOLLOW-UP (2026-10-04): FAST fetch-matched B32 + 2-A2A pivot screen.**
 Do not interrupt the active `ca_stress_physical_validation_20261004` R4 work.
 After it fully exits and commits, run
