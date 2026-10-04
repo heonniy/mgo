@@ -27,19 +27,26 @@ def main(a):
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda');references={};results=[]
  for case in cases:
-  label=case['label'];horizon=case['horizon'];a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.streaming=case.get('overlap',True);a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
+  label=case['label'];horizon=case['horizon'];a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision=case.get('partial_precision');a.streaming=case.get('overlap',True);a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
   proof=json.loads((a.inputs/f'{a.policy}_P{a.arena_budget}_proof.json').read_text());assert proof['horizon']==horizon
   baseline=case.get('baseline',False);rt=(PrefixRuntime if baseline else DecodeOffloadRuntime)(a,model,backing,experts)
   if not baseline:rt.stage_frozen_inputs(horizon)
   if rank==0:write(a.output/'phase.json',dict(stage='WARMUP_VALIDATION',case=label,case_spec=case))
-  warm,tokens=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
+  nonfinite=torch.zeros((),device='cuda',dtype=torch.bool)
+  def check_finite(module,inputs,output):nonfinite.logical_or_(~torch.isfinite(output.logits).all())
+  hook=model.register_forward_hook(check_finite)
+  try:warm,tokens=generate(model,rt,ids,mask,teacher,horizon)
+  finally:hook.remove()
+  assert not nonfinite.item(),'nonfinite warmup logits'
+  validate(rt,warm,proof,rank)
   if baseline:
-   references[horizon]=warm['argmax_hash']
+   references[horizon]=dict(hash=warm['argmax_hash'],tokens=tokens.copy())
    if horizon==256:
     old=Path('/home/hwlee/mgo-results/la_physical_validation_20261004')/f'B{batch}_BR_env1'/f'validation_rank{rank}.json'
     assert warm['argmax_hash']==json.loads(old.read_text())['argmax_hash']
-  else:assert warm['argmax_hash']==references[horizon],('reference output mismatch',label,rank)
-  write(a.output/f'{label}_validation_rank{rank}.json',dict(status='PASS',rank=rank,case=case,argmax_hash=warm['argmax_hash'],state_hash=warm['state_hash'],peak_gpu_bytes=torch.cuda.max_memory_allocated(),frozen_input_bytes=getattr(rt,'frozen_input_bytes',0),scheduler_metrics=(rt.h2d.metrics if not baseline else None)))
+  elif not a.partial_precision:assert warm['argmax_hash']==references[horizon]['hash'],('reference output mismatch',label,rank)
+  numeric=dict(legacy_argmax_agreement=float(np.mean(tokens==references[horizon]['tokens'])),legacy_argmax_hash=references[horizon]['hash'],actual_argmax_hash=warm['argmax_hash'],partial_precision=a.partial_precision)
+  write(a.output/f'{label}_validation_rank{rank}.json',dict(status='PASS',rank=rank,case=case,numerical_comparison=numeric,finite_logits=True,argmax_hash=warm['argmax_hash'],state_hash=warm['state_hash'],peak_gpu_bytes=torch.cuda.max_memory_allocated(),frozen_input_bytes=getattr(rt,'frozen_input_bytes',0),scheduler_metrics=(rt.h2d.metrics if not baseline else None)))
   if case.get('measure',True):
    samples=[]
    for repeat in (1,2,3):
@@ -56,11 +63,11 @@ def main(a):
     with torch._dynamo.config.patch(error_on_recompile=True):row,actual=generate(model,rt,ids,mask,teacher,horizon)
     assert before==dict(counters['stats']) and np.array_equal(tokens,actual)
     validate(rt,row,proof,rank)
-    row.update(status='PASS',rank=rank,case=case,repeat=repeat,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
+    row.update(status='PASS',rank=rank,case=case,repeat=repeat,numerical_comparison=numeric,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
     write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
     samples.append({k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']})
     if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=label,repeat=repeat,samples=samples))
-   result=dict(status='PASS',case=case,samples=samples,gate=decide(samples[:2]),unstable=final_unstable(samples));results.append(result)
+   result=dict(status='PASS',case=case,numerical_comparison=numeric,samples=samples,gate=decide(samples[:2]),unstable=final_unstable(samples));results.append(result)
    if rank==0:write(a.output/f'{label}_result.json',result)
   if hasattr(rt,'close'):rt.close()
   for block in model.model.layers:block.mlp.forward=lambda *args:None
