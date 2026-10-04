@@ -1,7 +1,112 @@
 {
-  "status": "PASS",
-  "stage": "M12_PARTIAL_B256",
-  "started_unix": 1791136214.5753167,
-  "pid": 153661,
-  "finished_unix": 1791136566.5953395
+  "status": "FAIL",
+  "stage": "M13_COALESCED_SCREEN",
+  "label": "M13_COALESCED_SCREEN_B128_H64",
+  "group": {
+    "batch": 128,
+    "horizon": 64,
+    "cases": [
+      {
+        "label": "REFERENCE",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T1",
+        "horizon": 64,
+        "baseline": true,
+        "measure": false
+      },
+      {
+        "label": "P1_T1",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P1_T0",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P1_T2",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P2_T2",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P2_T1",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P2_T0",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P4_T0",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P4_T2",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      },
+      {
+        "label": "P4_T1",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "fp32"
+      }
+    ]
+  },
+  "started_unix": 1791136624.3055327,
+  "source_sha": "f6d48ba114a3f727920eeca3f0f2ae9cca9ad7b8",
+  "monitor": "boundaries only; file polling during MEASURE",
+  "pid": 157983,
+  "completed": [
+    "P1_T1_r1",
+    "P1_T1_r2"
+  ],
+  "error": "RuntimeError('owner STOP')",
+  "exit_code": 1,
+  "finished_unix": 1791137144.2121308
 }
