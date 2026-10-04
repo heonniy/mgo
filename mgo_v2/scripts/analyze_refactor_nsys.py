@@ -129,6 +129,23 @@ def analyze(path,receipt):
  for key,value in exclusive.items():
   assert abs(sum(row['exclusive_ms'][key] for row in per_event)-value)<1e-6
  split_report={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in split.items()}
+ # One all-gather per decode metadata record. Distinguish host packet
+ # preparation, the collective API call, and blocking readback plus CPU unpack.
+ # The final category is intentionally not presented as pure communication.
+ if 'moe.metadata_collective_submit' in cpu:
+  partitioned=0
+  for (tid,name),(starts,parents) in list(ranges.items()):
+   if name!='moe.metadata':continue
+   child_pair=ranges.get((tid,'moe.metadata_collective_submit'))
+   assert child_pair is not None
+   child_starts,children=child_pair
+   for a,b in parents:
+    if not contained(tid,'decode.event',a,b):continue
+    i=bisect.bisect_left(child_starts,a);j=bisect.bisect_left(child_starts,b)
+    assert j-i==1 and children[i][1]<=b,'expected one nested decode metadata collective'
+    c,d=children[i];cpu['moe.metadata_pack_host'].append((a,c))
+    cpu['moe.metadata_readback_wait_and_unpack'].append((d,b));partitioned+=1
+  assert partitioned==384
  for name,ints in cpu.items():
   ints=intersection(ints,window);full=duration(ints);overlap=duration(intersection(ints,cover));a2a_overlap=duration(intersection(ints,comm));cpu_report[name]=dict(total_ms=full/1e6,overlap_comm_expert_ms=overlap/1e6,outside_comm_expert_ms=(full-overlap)/1e6,overlap_payload_A2A_ms=a2a_overlap/1e6,outside_payload_A2A_ms=(full-a2a_overlap)/1e6)
  if 'moe.prefetch_predictor' in cpu_report:

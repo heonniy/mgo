@@ -70,12 +70,22 @@ def main(a):
  def profiled_stage(*args,**kwargs):
   with nvtx_phase('moe.host_staging'):return original_stage(*args,**kwargs)
  h2d_module.copy_expert_to_stage=profiled_stage
+ import mgo_v2.decode_runtime as runtime_module
+ diagnostic_hooks=[]
+ for module,name,phase in [(dist,'all_gather_into_tensor','moe.metadata_collective_submit'),
+                           (runtime_module,'plan_layout','moe.packet_layout_cpu'),
+                           (runtime_module,'device_layout','moe.packet_layout_upload')]:
+  original=getattr(module,name);diagnostic_hooks.append((module,name,original))
+  def profiled_call(*args,_original=original,_phase=phase,**kwargs):
+   with nvtx_phase(_phase):return _original(*args,**kwargs)
+  setattr(module,name,profiled_call)
  before=dict(counters['stats']);torch.cuda.profiler.start()
  try:
   with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
   torch.cuda.synchronize();rt.h2d.synchronize()
  finally:
   torch.cuda.profiler.stop();h2d_module.copy_expert_to_stage=original_stage
+  for module,name,original in diagnostic_hooks:setattr(module,name,original)
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
  write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))

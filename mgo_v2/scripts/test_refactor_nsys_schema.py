@@ -24,6 +24,8 @@ def main():
    for phase,(name,a,b,c,d,kernel) in enumerate(phases):
     corr=event*4+phase
     db.execute('INSERT INTO NVTX_EVENTS VALUES (?,?,?,?,NULL)',(base+a,base+b,tid,name))
+    if name=='moe.metadata':
+     db.execute('INSERT INTO NVTX_EVENTS VALUES (?,?,?,?,NULL)',(base+a,base+a+1,tid,'moe.metadata_collective_submit'))
     # Exercise direct-driver attribution for the compute launch.
     api='DRIVER' if kernel==2 else 'RUNTIME'
     db.execute(f'INSERT INTO CUPTI_ACTIVITY_KIND_{api} VALUES (?,?,?,?)',(base+a,base+a+1,tid,corr))
@@ -36,6 +38,9 @@ def main():
   assert out['H2D']['total_union_ms']==30/1e6
   assert out['H2D']['overlap_comm_expert_ms']==23/1e6
   assert len(out['interval_decomposition']['per_event'])==384
+  cpu=out['cpu_nvtx']
+  metadata_parts=sum(cpu[name]['total_ms'] for name in ('moe.metadata_pack_host','moe.metadata_collective_submit','moe.metadata_readback_wait_and_unpack'))
+  assert abs(metadata_parts-cpu['moe.metadata']['total_ms'])<1e-12
   receipt['decode_expert_copies']=2
   try:analyze(path,receipt)
   except AssertionError as exc:assert 'copy count mismatch' in str(exc)
