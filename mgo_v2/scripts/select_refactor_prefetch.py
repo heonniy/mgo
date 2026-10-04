@@ -14,7 +14,7 @@ def select(stage,horizon):
  for label in common:
   rows=[bybatch[b][label] for b in [128,256]]
   if any(r['unstable'] for r in rows):rejected.append(dict(label=label,reason='unstable',rows=rows));continue
-  tpots={str(b):statistics.median(x['TPOT'] for x in bybatch[b][label]['samples']) for b in [128,256]}
+  tpots={str(b):bybatch[b][label].get('estimate',{}).get('TPOT',statistics.median(x['TPOT'] for x in bybatch[b][label]['samples'])) for b in [128,256]}
   eligible.append(dict(label=label,P=rows[0]['case']['P'],trigger=rows[0]['case']['trigger'],TPOT=tpots,rows=rows))
  assert eligible,'No stable shared candidate; concrete stability diagnosis is required'
  best={str(b):min(r['TPOT'][str(b)] for r in eligible) for b in [128,256]}

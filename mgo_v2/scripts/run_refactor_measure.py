@@ -5,6 +5,14 @@ import run_timing_stability as h
 from batch_comm_common import stop_idle_load,start_idle_load
 P=Path(__file__).resolve().parents[1];ROOT=Path('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004');PACKET=P/'experiments/decode_prefetch_runtime_refactoring_20261004';h.ROOT=ROOT
 
+def boundary_diagnostics():
+ row=dict(load_average=os.getloadavg())
+ try:
+  text=subprocess.check_output(['nvidia-smi','--query-gpu=index,clocks.sm,clocks.mem,power.draw,utilization.gpu','--format=csv,noheader,nounits'],text=True,timeout=10)
+  row['gpu_clock_power_utilization_csv']=text.strip().splitlines()
+ except (subprocess.SubprocessError,OSError) as exc:row['diagnostic_error']=repr(exc)
+ return row
+
 def publish(message,paths):
  subprocess.run(['git','add',*[str(p) for p in paths]],cwd=P.parent,check=True)
  if subprocess.run(['git','diff','--cached','--quiet'],cwd=P.parent).returncode:
@@ -35,7 +43,7 @@ def run(stage,group):
      boundary=json.loads((out/'boundary.json').read_text()) if (out/'boundary.json').exists() else None
      if boundary and boundary['key'] not in released:
       key=boundary['key'];assert len(list(out.glob(f'{key}_ready_rank*.json')))==8
-      sample=h.sample(proc.pid);h.safe(sample);state.setdefault('boundaries',[]).append(dict(key=key,sample=sample));h.write(out/'status.json',state)
+      sample=h.sample(proc.pid);h.safe(sample);state.setdefault('boundaries',[]).append(dict(key=key,sample=sample,diagnostics=boundary_diagnostics()));h.write(out/'status.json',state)
       h.write(PACKET/'status.json',dict(status='RUNNING',stage=stage,label=label,active=boundary,started_unix=state['started_unix'],pid=proc.pid))
       (out/f'{key}_GO').touch();released.add(key);active=key
      elif time.monotonic()-last_scan>30:

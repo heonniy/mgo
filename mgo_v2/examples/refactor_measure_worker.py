@@ -1,6 +1,8 @@
 """Full-model frozen-route timing, live cache strategy, external clean boundaries."""
 from refactor_baseline_worker import *
 from mgo_v2.decode_runtime import DecodeOffloadRuntime
+from adaptive_timing import single_decision
+import resource
 
 def validate(rt,row,proof,rank):
  rt.h2d.synchronize()
@@ -49,8 +51,8 @@ def main(a):
   write(a.output/f'{label}_validation_rank{rank}.json',dict(status='PASS',rank=rank,case=case,numerical_comparison=numeric,finite_logits=True,argmax_hash=warm['argmax_hash'],state_hash=warm['state_hash'],peak_gpu_bytes=torch.cuda.max_memory_allocated(),frozen_input_bytes=getattr(rt,'frozen_input_bytes',0),scheduler_metrics=(rt.h2d.metrics if not baseline else None)))
   if case.get('measure',True):
    samples=[]
-   for repeat in (1,2,3):
-    if repeat==3 and decide(samples)['target_repeats']!=3:break
+   for repeat in range(1,8):
+    if len(samples)>=2 and repeat>single_decision(samples)['target_repeats']:break
     a.phase='MEASURE';rt.reset();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
     from torch._dynamo.utils import counters
     before=dict(counters['stats']);key=f'{label}_r{repeat}'
@@ -60,14 +62,18 @@ def main(a):
     while not (a.output/f'{key}_GO').exists():
      if time.monotonic()>deadline:raise TimeoutError('boundary release')
      time.sleep(.2)
+    usage_before=resource.getrusage(resource.RUSAGE_SELF)
     with torch._dynamo.config.patch(error_on_recompile=True):row,actual=generate(model,rt,ids,mask,teacher,horizon)
+    usage_after=resource.getrusage(resource.RUSAGE_SELF)
+    process_delta={k:getattr(usage_after,k)-getattr(usage_before,k) for k in ['ru_utime','ru_stime','ru_nvcsw','ru_nivcsw']}
     assert before==dict(counters['stats']) and np.array_equal(tokens,actual)
     validate(rt,row,proof,rank)
-    row.update(status='PASS',rank=rank,case=case,repeat=repeat,numerical_comparison=numeric,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
+    row.update(status='PASS',rank=rank,case=case,repeat=repeat,numerical_comparison=numeric,process_usage_delta=process_delta,affinity=cpus,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
     write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
     samples.append({k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']})
     if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=label,repeat=repeat,samples=samples))
-   result=dict(status='PASS',case=case,numerical_comparison=numeric,samples=samples,gate=decide(samples[:2]),unstable=final_unstable(samples));results.append(result)
+   decision=single_decision(samples);assert decision['complete']
+   result=dict(status='PASS',case=case,numerical_comparison=numeric,samples=samples,gate=decision,estimate=decision['estimate'],initial_gate=decide(samples[:2]),unstable=decision['unstable']);results.append(result)
    if rank==0:write(a.output/f'{label}_result.json',result)
   if hasattr(rt,'close'):rt.close()
   for block in model.model.layers:block.mlp.forward=lambda *args:None
