@@ -792,6 +792,25 @@ REPLICA_CONFIGS=[
     for h,g,b in itertools.product((1.0,1.5,2.0),(0.02,0.05),(0.02,0.05))
 ]
 
+def robust_phase_gain(base,cand):
+    gains=[]
+    for env in ("env1","env2"):
+        for mode in ("overlap","serial"):
+            key=f"phase_{mode}_archived_expert_ms"
+            a=base["phase_by_env"][env][key];b=cand["phase_by_env"][env][key]
+            gains.append((a-b)/a if a else 0.0)
+    return float(min(gains))
+
+def phase_gain_detail(base,cand):
+    out={}
+    for env in ("env1","env2"):
+        out[env]={}
+        for mode in ("overlap","serial"):
+            key=f"phase_{mode}_archived_expert_ms"
+            a=base["phase_by_env"][env][key];b=cand["phase_by_env"][env][key]
+            out[env][mode]=(a-b)/a if a else 0.0
+    return out
+
 def policy_eval(winners,cal):
     rows=[]
     for (batch,fam),win in sorted(winners.items()):
@@ -825,9 +844,11 @@ def policy_eval(winners,cal):
             by_phase=min(short,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"])
             safe=[x for x in short if x["decode"]["H2D_bytes"]<=base64["H2D_bytes"]*1.02]
             by_safe=min(safe,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"]) if safe else by_phase
+            robust_pool=safe or short
+            by_robust=max(robust_pool,key=lambda x:robust_phase_gain(base64,x["decode"]))
             selected=[]
             seen=set()
-            for x,label in ((by_compute,"compute"),(by_phase,"phase"),(by_safe,"h2d-safe")):
+            for x,label in ((by_compute,"compute"),(by_phase,"env1-overlap"),(by_safe,"h2d-safe"),(by_robust,"robust-env1-env2")):
                 key=tuple(sorted(x["config"].items()))
                 if key not in seen:
                     selected.append((x["config"],[label]));seen.add(key)
@@ -875,71 +896,125 @@ def best_rows(rows):
                 b=base[pname]["decode"]
                 safe=[x for x in reps if x["decode"]["H2D_bytes"]<=b["H2D_bytes"]*1.02]
                 pool=safe or reps
-                chosen.append(min(pool,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"]))
+                chosen.append(max(pool,key=lambda x:robust_phase_gain(b,x["decode"])))
             out[(batch,fam)]=chosen
     return out
 
+def comparison(base,cand):
+    b=base["decode"];d=cand["decode"]
+    rows_gain=(b["critical_rows_sum"]-d["critical_rows_sum"])/b["critical_rows_sum"]
+    h2d_growth=(d["H2D_bytes"]-b["H2D_bytes"])/b["H2D_bytes"] if b["H2D_bytes"] else 0.0
+    peer_gain=(b["peer_bytes"]-d["peer_bytes"])/b["peer_bytes"] if b["peer_bytes"] else 0.0
+    detail=phase_gain_detail(b,d)
+    robust=min(detail[e][m] for e in detail for m in detail[e])
+    return dict(rows_gain=rows_gain,h2d_growth=h2d_growth,peer_gain=peer_gain,
+                phase_gain=detail,robust_phase_gain=robust)
+
+def grade_go(comp):
+    r=comp["robust_phase_gain"];rows=comp["rows_gain"];h2d=comp["h2d_growth"]
+    if h2d<=.02 and r>=.08 and rows>=.08:return "STRONG_GO"
+    if h2d<=.02 and r>=.05 and rows>=.05:return "GO"
+    if h2d<=.05 and r>=.02:return "MARGINAL"
+    return "NO_GO"
+
 def write_summary(winners,top5,rows,cal):
     selected=best_rows(rows)
-    table=[]
-    selected_full={}
+    table=[];selected_full={};decisions={}
     for key,items in selected.items():
         batch,fam=key
         selected_full[f"B{batch}_{fam}"]=items
+        by={x["policy"]:x for x in items}
         for x in items:
-            d=x["decode"]
-            table.append(dict(batch=batch,stress=fam,dataset=x["dataset"],policy=x["policy"],
-                              scope=x["scope"],config=json.dumps(x["config"],sort_keys=True) if x["config"] else "",
-                              critical_rows=d["critical_rows_sum"],H2D_bytes=d["H2D_bytes"],
-                              D2D_bytes=d["D2D_bytes"],peer_bytes=d["peer_bytes"],
-                              exact_hit=d["exact_global_hit_rate"],
-                              phase_fast_expert_ms=d["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"],
-                              phase_cons_expert_ms=d["phase_conservative_expert_ms"],
-                              replica_creations=d["replica_creations"]))
+            d=x["decode"];p=d["phase_by_env"]
+            table.append(dict(
+                batch=batch,stress=fam,dataset=x["dataset"],policy=x["policy"],
+                scope=x["scope"],config=json.dumps(x["config"],sort_keys=True) if x["config"] else "",
+                critical_rows=d["critical_rows_sum"],H2D_bytes=d["H2D_bytes"],
+                D2D_bytes=d["D2D_bytes"],peer_bytes=d["peer_bytes"],
+                exact_hit=d["exact_global_hit_rate"],
+                env1_overlap_ms=p["env1"]["phase_overlap_archived_expert_ms"],
+                env1_serial_ms=p["env1"]["phase_serial_archived_expert_ms"],
+                env2_overlap_ms=p["env2"]["phase_overlap_archived_expert_ms"],
+                env2_serial_ms=p["env2"]["phase_serial_archived_expert_ms"],
+                replica_creations=d["replica_creations"]))
+
+        comps={
+            "CA_over_BR":comparison(by["BR"],by["CA"]),
+            "LA_over_BR":comparison(by["BR"],by["LA"]),
+            "BR_REP_over_BR":comparison(by["BR"],by["BR+REP"]),
+            "CA_REP_over_CA":comparison(by["CA"],by["CA+REP"]),
+            "LA_REP_over_LA":comparison(by["LA"],by["LA+REP"]),
+        }
+        candidates=[by[k] for k in ("CA","LA","BR+REP","CA+REP","LA+REP")]
+        safe=[x for x in candidates if comparison(by["BR"],x)["h2d_growth"]<=.02]
+        pool=safe or candidates
+        best=max(pool,key=lambda x:comparison(by["BR"],x)["robust_phase_gain"])
+        best_comp=comparison(by["BR"],best)
+        decisions[f"B{batch}_{fam}"]=dict(
+            comparisons=comps,best_policy_vs_BR=best["policy"],
+            best=best_comp,grade=grade_go(best_comp))
+
     with (PACKET/"comparison.csv").open("w",newline="") as f:
         w=csv.DictWriter(f,fieldnames=list(table[0]));w.writeheader();w.writerows(table)
 
-    gain_ratio=[]
+    scaling={}
     for fam in ("COMM","LOAD"):
-        byb={}
-        for batch in (128,256):
-            items={x["policy"]:x for x in selected[(batch,fam)]}
-            def gain(a,b,metric):
-                av=items[a]["decode"][metric];bv=items[b]["decode"][metric]
-                return (av-bv)/av if av else 0.0
-            byb[batch]=dict(
-                CA_over_BR_rows=gain("BR","CA","critical_rows_sum"),
-                LA_over_BR_rows=gain("BR","LA","critical_rows_sum"),
-                BR_REP_over_BR_rows=gain("BR","BR+REP","critical_rows_sum"),
-                CA_REP_over_CA_rows=gain("CA","CA+REP","critical_rows_sum"),
-                LA_REP_over_LA_rows=gain("LA","LA+REP","critical_rows_sum"),
-                CA_over_BR_phase=gain("BR","CA","phase_env1_overlap_ms"),
-                LA_over_BR_phase=gain("BR","LA","phase_env1_overlap_ms"),
-                BR_REP_over_BR_phase=gain("BR","BR+REP","phase_env1_overlap_ms"),
-                CA_REP_over_CA_phase=gain("CA","CA+REP","phase_env1_overlap_ms"),
-                LA_REP_over_LA_phase=gain("LA","LA+REP","phase_env1_overlap_ms"),
-            )
-        row=dict(stress=fam,B128=byb[128],B256=byb[256],growth={})
-        for k in byb[128]:
-            a=byb[128][k];b=byb[256][k]
-            row["growth"][k]=None if abs(a)<1e-12 else b/a
-        gain_ratio.append(row)
+        a=decisions[f"B128_{fam}"]["best"]["robust_phase_gain"]
+        b=decisions[f"B256_{fam}"]["best"]["robust_phase_gain"]
+        ratio=None if abs(a)<1e-12 else b/a
+        support=(b-a>=.02) or (ratio is not None and ratio>=1.20)
+        scaling[fam]=dict(B128_robust_gain=a,B256_robust_gain=b,gain_ratio=ratio,
+                          absolute_gain_delta=b-a,supports_batch_scaling_hypothesis=support)
+
+    grades=[decisions[k]["grade"] for k in decisions]
+    order={"NO_GO":0,"MARGINAL":1,"GO":2,"STRONG_GO":3}
+    overall=max(grades,key=lambda x:order[x])
+    # Require at least one high-batch case to carry the overall GO label.
+    b256_grades=[decisions[f"B256_{fam}"]["grade"] for fam in ("COMM","LOAD")]
+    if max(order[g] for g in b256_grades)<2 and order[overall]>=2:overall="MARGINAL"
 
     all_phase=[x for x in rows if x["scope"]=="all-phase"]
+    prefill={}
+    for batch in (128,256):
+        for fam in ("COMM","LOAD"):
+            items={x["policy"]:x for x in selected[(batch,fam)]}
+            br=items["BR"]["prefill"]
+            vals={}
+            for x in all_phase:
+                if x["batch"]!=batch or x["stress"]!=fam:continue
+                if x["policy"] not in ("BR+REP","CA+REP","LA+REP"):continue
+                p=x["prefill"];vals[x["policy"]]=dict(
+                    critical_rows_gain=(br["critical_rows_sum"]-p["critical_rows_sum"])/br["critical_rows_sum"],
+                    H2D_growth=(p["H2D_bytes"]-br["H2D_bytes"])/br["H2D_bytes"] if br["H2D_bytes"] else 0.0,
+                    env1_overlap_gain=(br["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"]-
+                                       p["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"])/
+                                      br["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"])
+            prefill[f"B{batch}_{fam}"]=vals
+
     win_json={f"B{b}_{fam}":v for (b,fam),v in winners.items()}
     top_json={f"B{b}_{fam}":v for (b,fam),v in top5.items()}
     result=dict(status="PASS",calibration=cal,winners=win_json,top5=top_json,
                 selected=table,selected_full=selected_full,
-                batch_headroom_growth=gain_ratio,
-                all_phase_replica_checks=all_phase)
+                go_decisions=decisions,batch_scaling=scaling,overall_go=overall,
+                all_phase_replica_checks=all_phase,prefill_summary=prefill)
     write(PACKET/"RESULT.json",result)
+    write(PACKET/"GO_DECISION.json",dict(
+        status="PASS",criteria=dict(
+            STRONG_GO="robust phase >=8%, critical rows >=8%, H2D growth <=2%",
+            GO="robust phase >=5%, critical rows >=5%, H2D growth <=2%",
+            MARGINAL="robust phase >=2% with H2D growth <=5%, or only partial-environment benefit",
+            NO_GO="otherwise"),
+        decisions=decisions,batch_scaling=scaling,overall=overall,
+        note="robust phase gain=min(Env1 overlap, Env1 serial, Env2 overlap, Env2 serial); decode only"))
     write(PACKET/"prefill_decode_comparison.json",
           dict(selected=selected_full,all_phase_replica_checks=all_phase,
-               note="Prefill timings are MoE-phase model only; attention/dense prefill kernels excluded."))
+               prefill_summary=prefill,
+               note="Prefill phase model covers MoE only; attention/dense prefill kernels excluded."))
 
     lines=[
         "# R8 B128/B256 phase-aware policy CPU result","",
-        "Stress workloads are intentionally optimized upper/headroom cases, not dataset averages.","",
+        f"**Overall engineering gate: {overall}**","",
+        "Stress workloads are optimized headroom cases, not dataset averages.","",
         "## Stress winners","",
         "| Batch | Stress | Dataset | sample / DP / placement | BR peer GiB | BR critical rows |",
         "|---:|---|---|---|---:|---:|",
@@ -948,18 +1023,21 @@ def write_summary(winners,top5,rows,cal):
         d=v["decode"];lines.append(
             f"| {b} | {fam} | {v['dataset']} | {v['sample_seed']} / {v['dp_seed']} / {v['placement_seed']} | {d['peer_bytes']/2**30:.2f} | {d['critical_rows_sum']} |")
     lines += ["","## Selected policy comparison","",
-              "| B | Stress | Policy | Critical rows | H2D TiB | D2D GiB | Peer GiB | phase fast/expert ms |",
-              "|---:|---|---|---:|---:|---:|---:|---:|"]
+              "| B | Stress | Policy | Critical rows | H2D TiB | D2D GiB | Peer GiB | E1 ovlp | E1 serial | E2 ovlp | E2 serial |",
+              "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for r in table:
-        lines.append(f"| {r['batch']} | {r['stress']} | {r['policy']} | {r['critical_rows']} | {r['H2D_bytes']/2**40:.3f} | {r['D2D_bytes']/2**30:.3f} | {r['peer_bytes']/2**30:.3f} | {r['phase_fast_expert_ms']:.1f} |")
-    lines += ["","## Batch-headroom growth",""]
-    for row in gain_ratio:
-        lines.append(f"- {row['stress']}: B128={json.dumps(row['B128'],sort_keys=True)}")
-        lines.append(f"  B256={json.dumps(row['B256'],sort_keys=True)}")
-        lines.append(f"  B256/B128 gain ratios={json.dumps(row['growth'],sort_keys=True)}")
+        lines.append(f"| {r['batch']} | {r['stress']} | {r['policy']} | {r['critical_rows']} | {r['H2D_bytes']/2**40:.3f} | {r['D2D_bytes']/2**30:.3f} | {r['peer_bytes']/2**30:.3f} | {r['env1_overlap_ms']:.1f} | {r['env1_serial_ms']:.1f} | {r['env2_overlap_ms']:.1f} | {r['env2_serial_ms']:.1f} |")
+    lines += ["","## GO decisions",""]
+    for key,d in decisions.items():
+        b=d["best"];lines.append(
+            f"- {key}: **{d['grade']}**, best={d['best_policy_vs_BR']}, robust phase gain={b['robust_phase_gain']:.2%}, critical-row gain={b['rows_gain']:.2%}, H2D growth={b['h2d_growth']:.2%}.")
+    lines += ["","## Batch scaling",""]
+    for fam,s in scaling.items():
+        lines.append(
+            f"- {fam}: B128 {s['B128_robust_gain']:.2%} -> B256 {s['B256_robust_gain']:.2%}; delta {s['absolute_gain_delta']:.2%}; ratio {s['gain_ratio']}; supports={s['supports_batch_scaling_hypothesis']}.")
     lines += ["",
-              "CPU/calibrated model only. `phase fast/expert` uses archived fast-P2P microcost, median H2D, D2D=0.05 ms sensitivity point, and the archived enclosing expert-kernel row slope.",
-              "See RESULT.json and prefill_decode_comparison.json for prefill/decode separation, serial-vs-overlap D2D transfer models, p90 H2D and D2D sensitivity."]
+              "GO uses decode only and requires robustness across Env1/Env2 and both D2D-overlap and serial counterfactual phase models.",
+              "Prefill is reported separately as MoE-only headroom; no TTFT claim is made without physical full-model timing."]
     (PACKET/"RESULTS.md").write_text("\n".join(lines)+"\n")
 
 def validate_b128_compatibility(cal):
