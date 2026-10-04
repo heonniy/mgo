@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "completed": 248,
+  "max_limit": 176,
+  "final_concurrency": 176,
+  "history": [
+    {
+      "concurrency": 8,
+      "jobs": 8,
+      "seconds": 17.92433366831392,
+      "normalized_work_per_second": 114.25808277717964,
+      "completed": 8
+    },
+    {
+      "concurrency": 16,
+      "jobs": 16,
+      "seconds": 3.404230917803943,
+      "normalized_work_per_second": 1203.2086244731936,
+      "completed": 24
+    },
+    {
+      "concurrency": 32,
+      "jobs": 32,
+      "seconds": 3.5689033130183816,
+      "normalized_work_per_second": 2295.383001864418,
+      "completed": 56
+    },
+    {
+      "concurrency": 64,
+      "jobs": 64,
+      "seconds": 3.741486574523151,
+      "normalized_work_per_second": 4379.008095756197,
+      "completed": 120
+    },
+    {
+      "concurrency": 128,
+      "jobs": 128,
+      "seconds": 4.782046167179942,
+      "normalized_work_per_second": 10278.445310155968,
+      "completed": 248
+    }
+  ],
+  "peak_sum_RSS_bytes_double_counts_shared_pages": 541720047616,
+  "guards": "8-GiB private-data and 96-GiB address-space limit per worker; host available >=256 GiB; single-thread BLAS/Numba; disjoint worker vCPUs",
+  "throughput_note": "normalized by 128+R*B to account approximately for route volume; includes useful first-wave work, not extra repetitions"
+}

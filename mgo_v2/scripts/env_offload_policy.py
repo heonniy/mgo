@@ -2,6 +2,7 @@
 import numpy as np
 from numba import njit
 from br_carep_cpu import balanced_assignment,choose_slot,place,ROW_BYTES,EXPERT_BYTES
+from old_ca_fanout_policy import fanout_assignment
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
@@ -54,7 +55,12 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
                 position=lengths[t];lengths[t]+=1;effective[t,position]=target;demand[target,r]+=1;active[target]=True
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
-    misses=np.flatnonzero(active&(~resident));assignment=balanced_assignment(demand,misses,world,policy==0)
+    misses=np.flatnonzero(active&(~resident))
+    if policy==3:
+        assert not substitution
+        assignment=fanout_assignment(effective,lengths,org,primary,layer,experts,misses,world)
+    else:
+        assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min();assert row[44]-row[45]<=1
     for i in range(len(misses)):
