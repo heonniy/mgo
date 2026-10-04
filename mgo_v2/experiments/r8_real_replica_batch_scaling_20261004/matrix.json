@@ -1,0 +1,59 @@
+{
+  "status": "OWNER_AUTHORIZED",
+  "ranks": 8,
+  "cache_percent": 60,
+  "eviction": "Gate W128",
+  "substitution": false,
+  "decode_tokens": 256,
+  "batches": [
+    128,
+    256
+  ],
+  "b128_frozen": {
+    "dataset": "MATH",
+    "sample_seed": 97,
+    "dp_seed": 200,
+    "placement_seed": 172
+  },
+  "b256": {
+    "datasets": [
+      "MATH",
+      "ShareGPT"
+    ],
+    "uses_all_2048_requests": true,
+    "dp_seeds": [
+      0,
+      255
+    ],
+    "placement_seeds": [
+      0,
+      255
+    ],
+    "stage_a_placement_topk": 8,
+    "stage_a_dp_topk_per_placement": 2
+  },
+  "replica_grid": {
+    "hotness_multiplier": [
+      1,
+      1.5,
+      2,
+      3
+    ],
+    "min_event_gain_fraction": [
+      0.02,
+      0.05
+    ],
+    "duplicate_budget_fraction_of_cache": [
+      0.01,
+      0.02,
+      0.05
+    ],
+    "max_copies_per_expert": 2,
+    "max_new_replicas_per_event": 1
+  },
+  "reporting": {
+    "h2d_safe_threshold": 0.02,
+    "physical_timing": false,
+    "weighted_objective": false
+  }
+}
