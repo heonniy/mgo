@@ -1,37 +1,37 @@
 {
   "status": "PASS",
-  "stage": "M14_SMOKE_V1_OPT_NOPF_BARRIER",
-  "label": "M14_SMOKE_V1_OPT_NOPF_BARRIER_B128_H8",
+  "stage": "M14_SMOKE_V2_OPT_PF_BARRIER",
+  "label": "M14_SMOKE_V2_OPT_PF_BARRIER_B128_H8",
   "group": {
     "batch": 128,
     "horizon": 8,
     "paired": true,
-    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "runtime_arm": "V2_OPT_PF_BARRIER",
     "cases": [
       {
         "label": "BR",
         "policy": "BR",
-        "P": 0,
+        "P": 2,
         "trigger": "T2",
         "horizon": 8,
         "overlap": false,
         "partial_precision": "bf16",
-        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+        "runtime_arm": "V2_OPT_PF_BARRIER"
       },
       {
         "label": "LA",
         "policy": "LA",
-        "P": 0,
+        "P": 2,
         "trigger": "T2",
         "horizon": 8,
         "overlap": false,
         "partial_precision": "bf16",
-        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+        "runtime_arm": "V2_OPT_PF_BARRIER"
       }
     ]
   },
-  "started_unix": 1791156542.3183258,
-  "source_sha": "d6528ecc3fe5e30d3887ea2f82d764a5957c356b",
+  "started_unix": 1791156820.4056246,
+  "source_sha": "b7ef9050bde101767abaa4f2cd2c81964de892be",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
@@ -110,13 +110,19 @@
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 372293,
+  "pid": 378008,
   "completed": [
     "BR_r1",
     "LA_r1",
     "LA_r2",
-    "BR_r2"
+    "BR_r2",
+    "BR_r3",
+    "LA_r3",
+    "LA_r4",
+    "BR_r4",
+    "BR_r5",
+    "LA_r5"
   ],
   "exit_code": 0,
-  "finished_unix": 1791156793.023093
+  "finished_unix": 1791157248.3477678
 }
