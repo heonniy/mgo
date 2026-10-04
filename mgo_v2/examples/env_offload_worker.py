@@ -5,6 +5,7 @@ os.environ['TOKENIZERS_PARALLELISM']='false'
 from mgo_v2.bootstrap import pin_rank_before_cuda_import
 BOOT=pin_rank_before_cuda_import()
 import argparse,ctypes,gzip,hashlib,json,pickle,struct,time,types
+from contextlib import contextmanager
 from pathlib import Path
 import numpy as np
 import torch
@@ -40,6 +41,12 @@ def check_cpu_residency(backing):
  if rc:raise OSError(ctypes.get_errno(),'mincore expert pool')
  assert np.all(flags&1),'CPU expert pool contains nonresident pages'
  return count
+
+@contextmanager
+def nvtx_phase(name):
+ torch.cuda.nvtx.range_push(name)
+ try:yield
+ finally:torch.cuda.nvtx.range_pop()
 
 def expert_kernel(x,gate,up,down):return F.linear(F.silu(F.linear(x,gate))*F.linear(x,up),down)
 
@@ -84,13 +91,17 @@ def device_layout(e):return pack_layouts([e])[0]
 class Runtime:
  def __init__(self,args,model,experts,cap):
   self.args=args;self.rank=dist.get_rank();self.world=dist.get_world_size();self.experts=experts;self.cap=cap;self.events=[];self.metrics=[];self.index=0
+  self.execution_order=getattr(args,'execution_order','streaming');self.schedule_mode=getattr(args,'schedule_mode','frozen')
+  if self.execution_order=='fetch-barrier' and args.phase!='PLAN' and self.schedule_mode!='live':
+   raise ValueError('fetch-barrier physical validation requires --schedule-mode live')
   self.cache=torch.empty((cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(cap,-1,np.int32);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
   self.h2d=PinnedH2DCache(self.cache,args.h2d_stages) if args.h2d_mode=='pinned' else None
   self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0;self.actual_wire_bytes=0;self.actual_collective_calls=0;self.actual_p2p_batches=0;self.actual_p2p_ops=0;self.actual_zero_remote_rounds=0;self.active_peer_degree_sum=0;self.max_active_peer_degree=0
-  if args.phase=='PLAN' or (args.phase=='COUNTERS' and args.comm_mode=='current'):
-   meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];sim=np.load(meta['similarity_path'])
-   self.policy=Policy(args.capacities,sim,args.substitution,['BR','CA','CA-rep'].index(args.policy))
-   self.future=None
+  self.live_schedule=args.phase=='PLAN' or self.schedule_mode=='live' or (args.phase=='COUNTERS' and args.comm_mode=='current')
+  self.similarity=None;self.policy_kind=['BR','CA','CA-rep'].index(args.policy);self.future=None
+  if self.live_schedule:
+   meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];self.similarity=np.load(meta['similarity_path'])
+   self.policy=Policy(args.capacities,self.similarity,args.substitution,self.policy_kind)
    if args.policy=='CA-rep':
     path=SOURCE/'packed'/args.dataset/f'R{self.world}_B{args.batch}'
     self.future=suffix_demand(*(np.load(path/(k+'.npy'),mmap_mode='r') for k in ['selected','offsets','decode_origins']),48,128,self.world,256)
@@ -101,11 +112,14 @@ class Runtime:
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
    if args.comm_mode in ('coslot','coslot-active'):self.events=[add_coslot_layout(e,self.world) for e in self.events]
    self.events=pack_layouts(self.events)
-   if args.phase=='COUNTERS' and args.comm_mode in ('coslot','coslot-active'):self.metrics=np.load(args.plan/f'rank{self.rank}_metrics.npy').tolist()
+   if args.phase=='COUNTERS' and args.comm_mode in ('coslot','coslot-active') and self.schedule_mode=='frozen':self.metrics=np.load(args.plan/f'rank{self.rank}_metrics.npy').tolist()
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
   for l,block in enumerate(model.model.layers):
    block.mlp.forward=types.MethodType(self.forward_for(l),block.mlp)
- def reset(self):self.index=0;self.keys.fill(-1);self.mismatch.zero_()
+ def reset(self):
+  self.index=0;self.keys.fill(-1);self.mismatch.zero_()
+  if self.live_schedule:
+   self.history=GateHistory(48,128,128);self.policy=Policy(self.args.capacities,self.similarity,self.args.substitution,self.policy_kind);self.metrics=[]
  def forward_for(self,layer):
   rt=self
   def forward(module,hidden_states):
@@ -146,26 +160,29 @@ class Runtime:
   recv_eids=torch.empty(recv_k,dtype=eids.dtype,device='cuda');recv_eids.view(torch.uint8).view(recv_k,ee).copy_(recv_buf[:,hb:hb+ee])
   recv_weights=torch.empty(recv_k,dtype=send_weights.dtype,device='cuda');recv_weights.view(torch.uint8).view(recv_k,ew).copy_(recv_buf[:,hb+ee:])
   return recv_hidden,recv_eids,recv_weights
- def execute(self,layer,hidden,selected,weights,probs):
-  if self.args.phase=='PLAN' or (self.args.phase=='COUNTERS' and self.args.comm_mode=='current'):
-   g=gather_global_routes(layer,selected,weights,probs);r=g.routes;self.history.update(layer,r.full_router_probs)
+ def plan_event(self,layer,selected,weights,probs):
+  if not self.live_schedule:return self.events[self.index]
+  with nvtx_phase('moe.metadata_exchange'):
+   g=gather_global_routes(layer,selected,weights,probs);r=g.routes
+  with nvtx_phase('moe.rank_decision'):
+   self.history.update(layer,r.full_router_probs)
    scores=np.array([self.history.score(layer,e) for e in range(128)],np.float32)
    future=self.future[self.index//48,layer] if self.future is not None else np.zeros((128,self.world),np.int32)
    targets,effective,masses,lengths,destinations,fetches,row=self.policy.apply(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,scores,future)
-   e=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
-   e.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,slot,victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
-   e['groups']=[(expert,rows,cols,int(np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0])) for expert,rows,cols in e['groups']]
-   if self.args.comm_mode in ('coslot','coslot-active'):e=add_coslot_layout(e,self.world)
-   if self.args.phase=='PLAN':self.events.append(e)
-   else:
-    frozen=self.events[self.index]
-    assert e['fetches']==frozen['fetches'] and e['send_counts']==frozen['send_counts'] and e['return_counts']==frozen['return_counts']
-    assert np.array_equal(e['targets'],frozen['targets'].cpu().numpy())
-   self.metrics.append(row);e=device_layout(e) if self.args.phase=='PLAN' else self.events[self.index]
-  else:e=self.events[self.index]
-  assert e['layer']==layer
-  self.mismatch.logical_or_((selected!=e['selected']).any())
-  # CoSLoT-style pinned mode: bounded pinned stage -> dedicated H2D stream.
+   live=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
+   live.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,slot,victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
+   live['groups']=[(expert,rows,cols,int(np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0])) for expert,rows,cols in live['groups']]
+   if self.args.comm_mode in ('coslot','coslot-active'):live=add_coslot_layout(live,self.world)
+   self.metrics.append(row)
+  if self.args.phase=='PLAN':
+   self.events.append(live);return device_layout(live)
+  frozen=self.events[self.index]
+  assert live['fetches']==frozen['fetches']
+  assert live['send_counts']==frozen['send_counts'] and live['recv_counts']==frozen['recv_counts']
+  assert live['return_counts']==frozen['return_counts'] and live['return_recv_counts']==frozen['return_recv_counts']
+  assert np.array_equal(live['targets'],frozen['targets'].cpu().numpy())
+  return frozen
+ def apply_fetches(self,e):
   fetch_slots=[slot for _,slot,_,_ in e['fetches']];assert len(fetch_slots)==len(set(fetch_slots)),'slot fetched twice before compute'
   for key,slot,victim,rep in e['fetches']:
    assert self.keys[slot]==victim
@@ -176,36 +193,83 @@ class Runtime:
      n=t.numel();self.cache[slot,pos:pos+n].copy_(t.reshape(-1),non_blocking=True);pos+=n
    assert pos*2==EB;self.keys[slot]=key
    if self.args.phase=='COUNTERS':self.actual_h2d_bytes+=pos*2
-  dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
+ def fetch_barrier(self):
+  # Strong experimental barrier: every rank finishes every local expert H2D
+  # before any rank begins expert compute.  This intentionally disables H2D /
+  # expert-compute overlap so GPU-side scheduling headroom is observable.
+  if self.h2d:self.h2d.synchronize()
+  else:torch.cuda.synchronize()
+  dist.barrier();torch.cuda.synchronize()
+ def dispatch(self,hidden,dense,e):
   if self.args.comm_mode in ('coslot','coslot-active'):
-   received,recv_eids,rw=self.exchange_coslot_routes(hidden,dense,e);parts=[]
+   received,recv_eids,rw=self.exchange_coslot_routes(hidden,dense,e)
+   return ('coslot',received,recv_eids,rw)
+  send_w=dense[e['send_idx'][:,None],e['send_eids'].clamp_min(0)]*(e['send_eids']>=0)
+  received=self.exchange(hidden[e['send_idx']],e['send_counts'],e['recv_counts'],activation_row_bytes=2048*hidden.element_size())
+  rw=self.exchange(send_w,e['send_counts'],e['recv_counts'])
+  return ('current',received,None,rw)
+ def compute(self,packet,e,layer):
+  mode,received,recv_eids,rw=packet;parts=[]
+  if mode=='coslot':
    for expert,rows,slot in e['coslot_groups']:
     assert self.keys[slot]==layer*128+expert
     if self.args.phase!='MEASURE':self.mismatch.logical_or_((recv_eids[rows]!=expert).any())
-    if self.h2d:self.h2d.wait_for_slot(slot)
+    if self.h2d and self.execution_order=='streaming':self.h2d.wait_for_slot(slot)
     w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
     part=self.kernel(received[rows],gate,up,down)
     if self.h2d:self.h2d.record_slot_use(slot)
     parts.append(part*rw[rows,None])
-   values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
-   returned=self.exchange(values[e['coslot_return_order']],e['coslot_return_counts'],e['coslot_return_recv_counts'],activation_row_bytes=2048*values.element_size(),active=self.args.comm_mode=='coslot-active')
-   output=torch.zeros_like(hidden)
-   for idx,pos in e['coslot_combine']:output.index_add_(0,idx,returned[pos])
   else:
-   send_w=dense[e['send_idx'][:,None],e['send_eids'].clamp_min(0)]*(e['send_eids']>=0)
-   received=self.exchange(hidden[e['send_idx']],e['send_counts'],e['recv_counts'],activation_row_bytes=2048*hidden.element_size())
-   rw=self.exchange(send_w,e['send_counts'],e['recv_counts']);parts=[]
    for expert,rows,cols,slot in e['groups']:
     assert self.keys[slot]==layer*128+expert
-    if self.h2d:self.h2d.wait_for_slot(slot)
+    if self.h2d and self.execution_order=='streaming':self.h2d.wait_for_slot(slot)
     w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
     part=self.kernel(received[rows],gate,up,down)
     if self.h2d:self.h2d.record_slot_use(slot)
     parts.append(part*rw[rows,cols,None])
-   values=torch.cat(parts) if parts else hidden.new_empty((0,2048))
-   returned=self.exchange(values[e['return_order']],e['return_counts'],e['return_recv_counts'],activation_row_bytes=2048*values.element_size())
+  return torch.cat(parts) if parts else received.new_empty((0,2048))
+ def combine(self,hidden,values,e,mode):
+  if mode=='coslot':
+   returned=self.exchange(values[e['coslot_return_order']],e['coslot_return_counts'],e['coslot_return_recv_counts'],activation_row_bytes=2048*values.element_size(),active=self.args.comm_mode=='coslot-active')
    output=torch.zeros_like(hidden)
-   for idx,pos in e['combine']:output.index_add_(0,idx,returned[pos])
+   for idx,pos in e['coslot_combine']:output.index_add_(0,idx,returned[pos])
+   return output
+  returned=self.exchange(values[e['return_order']],e['return_counts'],e['return_recv_counts'],activation_row_bytes=2048*values.element_size())
+  output=torch.zeros_like(hidden)
+  for idx,pos in e['combine']:output.index_add_(0,idx,returned[pos])
+  return output
+ def execute(self,layer,hidden,selected,weights,probs):
+  e=self.plan_event(layer,selected,weights,probs);assert e['layer']==layer
+  self.mismatch.logical_or_((selected!=e['selected']).any())
+  dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
+  if self.execution_order=='fetch-barrier':
+   # Required physical-validation order:
+   # metadata exchange -> rank decision -> dispatch -> all miss H2D -> global
+   # fetch barrier -> expert compute -> return/combine.
+   with nvtx_phase('moe.dispatch'):
+    packet=self.dispatch(hidden,dense,e)
+   # NCCL dispatch is enqueued on the default stream; make it globally complete
+   # before even CPU staging/H2D begins so there is no dispatch/fetch overlap.
+   torch.cuda.synchronize()
+   with nvtx_phase('moe.h2d_fetch'):
+    self.apply_fetches(e)
+   with nvtx_phase('moe.h2d_global_barrier'):
+    self.fetch_barrier()
+   with nvtx_phase('moe.expert_compute'):
+    values=self.compute(packet,e,layer)
+   with nvtx_phase('moe.combine'):
+    output=self.combine(hidden,values,e,packet[0])
+  else:
+   # Historical streaming baseline: enqueue fetches first and let dispatch /
+   # expert execution overlap through the dedicated H2D stream when possible.
+   with nvtx_phase('moe.h2d_fetch'):
+    self.apply_fetches(e)
+   with nvtx_phase('moe.dispatch'):
+    packet=self.dispatch(hidden,dense,e)
+   with nvtx_phase('moe.expert_compute'):
+    values=self.compute(packet,e,layer)
+   with nvtx_phase('moe.combine'):
+    output=self.combine(hidden,values,e,packet[0])
   self.index+=1;return output
 
 def generate(model,rt,initial_ids,initial_mask):
@@ -267,7 +331,7 @@ def main(a):
   else:
    from torch._dynamo.utils import counters
    before=dict(counters['stats']);rt.reset();torch.manual_seed(42)
-   if a.comm_mode!='current' or a.h2d_mode=='pinned':
+   if a.comm_mode!='current' or a.h2d_mode=='pinned' or a.execution_order=='fetch-barrier' or a.schedule_mode=='live':
     write(a.output/f'ready_rank{rank}.json',dict(rank=rank,status='READY'));dist.barrier();deadline=time.monotonic()+600
     while not (a.output/'GO').exists():
      if time.monotonic()>deadline:raise TimeoutError('measurement boundary timeout')
@@ -276,10 +340,10 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',decode_steps=a.decode_steps,phase=a.phase,cell=a.cell,cache_ratio=a.cache_ratio,substitution=a.substitution,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',decode_steps=a.decode_steps,phase=a.phase,cell=a.cell,cache_ratio=a.cache_ratio,substitution=a.substitution,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,execution_order=a.execution_order,schedule_mode=a.schedule_mode,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation=f'device equality for all {(a.decode_steps+1)*48} events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
  write(a.output/f'rank{rank}.json',receipt);dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution-mode',choices=['matrix','on','off'],default='matrix');p.add_argument('--decode-steps',type=int,choices=[64,256],default=256);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution-mode',choices=['matrix','on','off'],default='matrix');p.add_argument('--decode-steps',type=int,choices=[64,256],default=256);p.add_argument('--execution-order',choices=['streaming','fetch-barrier'],default='streaming');p.add_argument('--schedule-mode',choices=['frozen','live'],default='frozen');p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
