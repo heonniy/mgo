@@ -40,8 +40,10 @@ def timed_wall(fn,rank,active=True):
  samples=[]
  for i in range(40):
   torch.cuda.synchronize();dist.barrier()
-  t=time.perf_counter();fn();torch.cuda.synchronize();dist.barrier()
+  t=time.perf_counter();fn();torch.cuda.synchronize()
   elapsed=(time.perf_counter()-t)*1e3
+  # Keep the next iteration aligned, but never include this barrier in latency.
+  dist.barrier()
   if active and i>=10:samples.append(elapsed)
  return stats(samples)
 
