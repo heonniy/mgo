@@ -23,11 +23,19 @@ def main(a):
  warm,expected=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
  rt.reset();a.phase='MEASURE';rt.capture=True;torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
  from torch._dynamo.utils import counters
+ # Attribute pageable-to-pinned staging on its actual worker thread. This
+ # monkeypatch exists only in this dedicated diagnostic process, never timing.
+ import mgo_v2.pinned_h2d as h2d_module
+ original_stage=h2d_module.copy_expert_to_stage
+ def profiled_stage(*args,**kwargs):
+  with nvtx_phase('moe.host_staging'):return original_stage(*args,**kwargs)
+ h2d_module.copy_expert_to_stage=profiled_stage
  before=dict(counters['stats']);torch.cuda.profiler.start()
  try:
   with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
   torch.cuda.synchronize();rt.h2d.synchronize()
- finally:torch.cuda.profiler.stop()
+ finally:
+  torch.cuda.profiler.stop();h2d_module.copy_expert_to_stage=original_stage
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()

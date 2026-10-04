@@ -1,0 +1,1576 @@
+{
+  "status": "DIAGNOSTIC_SNAPSHOT",
+  "case": "P1_T1",
+  "completed_repeats": 5,
+  "timing_gate": {
+    "status": "EXTEND_JITTER",
+    "target_repeats": 7,
+    "complete": false,
+    "unstable": false,
+    "summary": {
+      "E2E_wall": {
+        "n": 5,
+        "mean": 93.23169333562255,
+        "median": 91.30450361128896,
+        "min": 88.16042887419462,
+        "max": 98.75878701917827,
+        "range_relative": 0.11340041305362021,
+        "mean_CI95": [
+          87.66178723226683,
+          98.80159943897827
+        ],
+        "relative_CI_half_width": 0.05974262511037683,
+        "early_late_drift": 0.059891566782757914
+      },
+      "TPOT": {
+        "n": 5,
+        "mean": 1.2412069580078124,
+        "median": 1.2268480224609375,
+        "min": 1.171470703125,
+        "max": 1.33437646484375,
+        "range_relative": 0.1300205086735613,
+        "mean_CI95": [
+          1.1641303342717175,
+          1.3182835817439074
+        ],
+        "relative_CI_half_width": 0.062098124119289444,
+        "early_late_drift": 0.07349481877087594
+      }
+    },
+    "estimate": {
+      "E2E_wall": 93.23169333562255,
+      "TPOT": 1.2412069580078124
+    },
+    "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+  },
+  "copy_bytes_identical": true,
+  "per_rank_logical_work_identical": true,
+  "per_rank_scheduler_identical": true,
+  "samples": [
+    {
+      "repeat": 1,
+      "E2E_wall": 91.30450361128896,
+      "TPOT": 1.2268480224609375,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 166.80602400000004,
+          "ru_stime": 2.6409609999999972,
+          "ru_nvcsw": 269849,
+          "ru_nivcsw": 444
+        },
+        {
+          "ru_utime": 165.758129,
+          "ru_stime": 2.224055,
+          "ru_nvcsw": 266385,
+          "ru_nivcsw": 95
+        },
+        {
+          "ru_utime": 158.76233800000003,
+          "ru_stime": 2.587851999999998,
+          "ru_nvcsw": 203974,
+          "ru_nivcsw": 98
+        },
+        {
+          "ru_utime": 160.117367,
+          "ru_stime": 2.089943000000005,
+          "ru_nvcsw": 252391,
+          "ru_nivcsw": 93
+        },
+        {
+          "ru_utime": 163.98906299999996,
+          "ru_stime": 3.7908240000000006,
+          "ru_nvcsw": 253938,
+          "ru_nivcsw": 102
+        },
+        {
+          "ru_utime": 161.468543,
+          "ru_stime": 2.1063040000000015,
+          "ru_nvcsw": 248857,
+          "ru_nivcsw": 98
+        },
+        {
+          "ru_utime": 160.838719,
+          "ru_stime": 3.1102689999999953,
+          "ru_nvcsw": 239981,
+          "ru_nivcsw": 95
+        },
+        {
+          "ru_utime": 160.505704,
+          "ru_stime": 3.4822150000000036,
+          "ru_nvcsw": 234377,
+          "ru_nivcsw": 99
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "E2E_wall": 98.75878701917827,
+      "TPOT": 1.33437646484375,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 184.674019,
+          "ru_stime": 3.024169999999998,
+          "ru_nvcsw": 290027,
+          "ru_nivcsw": 248
+        },
+        {
+          "ru_utime": 173.86460999999997,
+          "ru_stime": 1.1782389999999978,
+          "ru_nvcsw": 191871,
+          "ru_nivcsw": 70
+        },
+        {
+          "ru_utime": 172.95334400000002,
+          "ru_stime": 3.7187759999999983,
+          "ru_nvcsw": 257432,
+          "ru_nivcsw": 75
+        },
+        {
+          "ru_utime": 168.41689600000007,
+          "ru_stime": 1.6082019999999986,
+          "ru_nvcsw": 200504,
+          "ru_nivcsw": 64
+        },
+        {
+          "ru_utime": 178.63499300000007,
+          "ru_stime": 2.919664999999995,
+          "ru_nvcsw": 237150,
+          "ru_nivcsw": 70
+        },
+        {
+          "ru_utime": 163.35261900000006,
+          "ru_stime": 1.845447,
+          "ru_nvcsw": 190879,
+          "ru_nivcsw": 67
+        },
+        {
+          "ru_utime": 167.150916,
+          "ru_stime": 3.0330820000000003,
+          "ru_nvcsw": 242603,
+          "ru_nivcsw": 77
+        },
+        {
+          "ru_utime": 168.13338400000004,
+          "ru_stime": 2.460358999999997,
+          "ru_nvcsw": 198055,
+          "ru_nivcsw": 72
+        }
+      ]
+    },
+    {
+      "repeat": 3,
+      "E2E_wall": 97.08410626929253,
+      "TPOT": 1.2651505126953124,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 170.55901900000003,
+          "ru_stime": 1.5653179999999978,
+          "ru_nvcsw": 220616,
+          "ru_nivcsw": 468
+        },
+        {
+          "ru_utime": 163.839022,
+          "ru_stime": 1.6637999999999948,
+          "ru_nvcsw": 210224,
+          "ru_nivcsw": 76
+        },
+        {
+          "ru_utime": 170.39001299999995,
+          "ru_stime": 2.439805,
+          "ru_nvcsw": 190869,
+          "ru_nivcsw": 79
+        },
+        {
+          "ru_utime": 164.35887400000001,
+          "ru_stime": 1.3342479999999952,
+          "ru_nvcsw": 201453,
+          "ru_nivcsw": 73
+        },
+        {
+          "ru_utime": 172.22535100000005,
+          "ru_stime": 2.662048999999996,
+          "ru_nvcsw": 202557,
+          "ru_nivcsw": 83
+        },
+        {
+          "ru_utime": 165.11589200000003,
+          "ru_stime": 2.450206999999999,
+          "ru_nvcsw": 208407,
+          "ru_nivcsw": 83
+        },
+        {
+          "ru_utime": 169.197996,
+          "ru_stime": 3.0913129999999995,
+          "ru_nvcsw": 244440,
+          "ru_nivcsw": 90
+        },
+        {
+          "ru_utime": 164.261847,
+          "ru_stime": 3.508504000000002,
+          "ru_nvcsw": 249768,
+          "ru_nivcsw": 76
+        }
+      ]
+    },
+    {
+      "repeat": 4,
+      "E2E_wall": 88.16042887419462,
+      "TPOT": 1.171470703125,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 163.993153,
+          "ru_stime": 1.4671170000000018,
+          "ru_nvcsw": 223974,
+          "ru_nivcsw": 473
+        },
+        {
+          "ru_utime": 161.44422399999996,
+          "ru_stime": 1.1787919999999943,
+          "ru_nvcsw": 188658,
+          "ru_nivcsw": 73
+        },
+        {
+          "ru_utime": 162.26163399999996,
+          "ru_stime": 3.3267039999999994,
+          "ru_nvcsw": 257008,
+          "ru_nivcsw": 70
+        },
+        {
+          "ru_utime": 160.49188300000003,
+          "ru_stime": 2.767172000000002,
+          "ru_nvcsw": 254472,
+          "ru_nivcsw": 69
+        },
+        {
+          "ru_utime": 160.421114,
+          "ru_stime": 2.415758000000004,
+          "ru_nvcsw": 170344,
+          "ru_nivcsw": 72
+        },
+        {
+          "ru_utime": 156.26534400000003,
+          "ru_stime": 3.284486000000001,
+          "ru_nvcsw": 265057,
+          "ru_nivcsw": 67
+        },
+        {
+          "ru_utime": 155.01527299999998,
+          "ru_stime": 3.1517940000000024,
+          "ru_nvcsw": 256570,
+          "ru_nivcsw": 64
+        },
+        {
+          "ru_utime": 154.813089,
+          "ru_stime": 3.426209,
+          "ru_nvcsw": 251013,
+          "ru_nivcsw": 68
+        }
+      ]
+    },
+    {
+      "repeat": 5,
+      "E2E_wall": 90.85064090415835,
+      "TPOT": 1.2081890869140626,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 168.5063970000001,
+          "ru_stime": 2.5327679999999972,
+          "ru_nvcsw": 269725,
+          "ru_nivcsw": 365
+        },
+        {
+          "ru_utime": 163.94770099999994,
+          "ru_stime": 2.0166010000000014,
+          "ru_nvcsw": 208107,
+          "ru_nivcsw": 82
+        },
+        {
+          "ru_utime": 163.93365299999994,
+          "ru_stime": 3.006926,
+          "ru_nvcsw": 223904,
+          "ru_nivcsw": 75
+        },
+        {
+          "ru_utime": 163.6931249999999,
+          "ru_stime": 1.2149199999999993,
+          "ru_nvcsw": 177622,
+          "ru_nivcsw": 72
+        },
+        {
+          "ru_utime": 162.75946299999998,
+          "ru_stime": 2.315950000000001,
+          "ru_nvcsw": 172831,
+          "ru_nivcsw": 78
+        },
+        {
+          "ru_utime": 159.041246,
+          "ru_stime": 3.1677249999999972,
+          "ru_nvcsw": 260629,
+          "ru_nivcsw": 99
+        },
+        {
+          "ru_utime": 158.06954299999995,
+          "ru_stime": 3.1141310000000004,
+          "ru_nvcsw": 255261,
+          "ru_nivcsw": 71
+        },
+        {
+          "ru_utime": 156.99242500000003,
+          "ru_stime": 2.585150999999996,
+          "ru_nvcsw": 204384,
+          "ru_nivcsw": 73
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "key": "P1_T1_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 35
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19923,
+            "free_mib": 61167,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498627698688,
+        "unix": 1791137365.6471145,
+        "rss_bytes": 954236829696,
+        "foreign_pids": [],
+        "collection_seconds": 0.47839363664388657
+      },
+      "diagnostics": {
+        "load_average": [
+          11.9912109375,
+          11.60498046875,
+          10.796875
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.97, 0",
+          "1, 1980, 2619, 122.96, 0",
+          "2, 1980, 2619, 119.49, 0",
+          "3, 1980, 2619, 124.05, 0",
+          "4, 1980, 2619, 124.36, 0",
+          "5, 1980, 2619, 118.70, 0",
+          "6, 1980, 2619, 122.54, 0",
+          "7, 1980, 2619, 121.46, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19923,
+            "free_mib": 61167,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498487459840,
+        "unix": 1791137461.8739476,
+        "rss_bytes": 954351394816,
+        "foreign_pids": [],
+        "collection_seconds": 0.44687092769891024
+      },
+      "diagnostics": {
+        "load_average": [
+          12.94140625,
+          12.08203125,
+          11.04345703125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.35, 0",
+          "1, 1980, 2619, 123.89, 0",
+          "2, 1980, 2619, 120.98, 0",
+          "3, 1980, 2619, 125.45, 0",
+          "4, 1980, 2619, 124.82, 0",
+          "5, 1980, 2619, 119.71, 0",
+          "6, 1980, 2619, 122.99, 0",
+          "7, 1980, 2619, 121.39, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r3",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19925,
+            "free_mib": 61165,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498427588608,
+        "unix": 1791137566.4384408,
+        "rss_bytes": 954310983680,
+        "foreign_pids": [],
+        "collection_seconds": 0.45197352208197117
+      },
+      "diagnostics": {
+        "load_average": [
+          11.861328125,
+          12.17236328125,
+          11.19677734375
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.39, 0",
+          "1, 1980, 2619, 123.93, 0",
+          "2, 1980, 2619, 120.95, 0",
+          "3, 1980, 2619, 124.85, 0",
+          "4, 1980, 2619, 124.91, 0",
+          "5, 1980, 2619, 119.67, 0",
+          "6, 1980, 2619, 123.13, 0",
+          "7, 1980, 2619, 122.21, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r4",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19925,
+            "free_mib": 61165,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498257039360,
+        "unix": 1791137669.1514711,
+        "rss_bytes": 954411229184,
+        "foreign_pids": [],
+        "collection_seconds": 0.5635591857135296
+      },
+      "diagnostics": {
+        "load_average": [
+          13.9248046875,
+          12.900390625,
+          11.564453125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.56, 0",
+          "1, 1980, 2619, 124.07, 0",
+          "2, 1980, 2619, 121.01, 0",
+          "3, 1980, 2619, 125.68, 0",
+          "4, 1980, 2619, 125.08, 0",
+          "5, 1980, 2619, 119.79, 0",
+          "6, 1980, 2619, 122.52, 0",
+          "7, 1980, 2619, 121.49, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r5",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19925,
+            "free_mib": 61165,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498322866176,
+        "unix": 1791137763.6226587,
+        "rss_bytes": 954322010112,
+        "foreign_pids": [],
+        "collection_seconds": 0.512416047975421
+      },
+      "diagnostics": {
+        "load_average": [
+          13.4345703125,
+          13.14501953125,
+          11.78125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.58, 0",
+          "1, 1980, 2619, 123.83, 0",
+          "2, 1980, 2619, 121.00, 0",
+          "3, 1980, 2619, 125.04, 0",
+          "4, 1980, 2619, 125.52, 0",
+          "5, 1980, 2619, 119.66, 0",
+          "6, 1980, 2619, 122.48, 0",
+          "7, 1980, 2619, 122.21, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r6",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19925,
+            "free_mib": 61165,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498227085312,
+        "unix": 1791137859.8838682,
+        "rss_bytes": 954420518912,
+        "foreign_pids": [],
+        "collection_seconds": 0.44470609445124865
+      },
+      "diagnostics": {
+        "load_average": [
+          14.60693359375,
+          13.890625,
+          12.203125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.64, 0",
+          "1, 1980, 2619, 123.93, 0",
+          "2, 1980, 2619, 121.08, 0",
+          "3, 1980, 2619, 125.12, 0",
+          "4, 1980, 2619, 125.12, 0",
+          "5, 1980, 2619, 119.81, 0",
+          "6, 1980, 2619, 121.96, 0",
+          "7, 1980, 2619, 122.36, 0"
+        ]
+      }
+    }
+  ],
+  "causal_conclusion": "Not established: identical logical/copy work excludes workload-count changes, but does not distinguish CPU scheduling, staging latency, NCCL waits, thermal or clock variation during the measured interval. Boundary snapshots are not continuous telemetry. No samples excluded."
+}
