@@ -1,0 +1,141 @@
+{
+  "status": "PASS",
+  "label": "CA_env1_COMPILE_0",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/ca_stress_physical_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/CA_env1_COMPILE_0",
+    "--policy",
+    "CA",
+    "--environment",
+    "env1",
+    "--phase",
+    "COMPILE",
+    "--plan",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/CA_env1_PLAN_0"
+  ],
+  "started_unix": 1791072952.5225961,
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      }
+    ],
+    "host_available_bytes": 1982718857216,
+    "unix": 1791072952.3583834,
+    "foreign_pids": [],
+    "collection_seconds": 0.31759342458099127
+  },
+  "monitor": "untimed safety polling",
+  "pid": 3476968,
+  "last_safety": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 7017,
+        "free_mib": 74073,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 1,
+        "used_mib": 7019,
+        "free_mib": 74071,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 2,
+        "used_mib": 6751,
+        "free_mib": 74339,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 3,
+        "used_mib": 6863,
+        "free_mib": 74227,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 4,
+        "used_mib": 6733,
+        "free_mib": 74357,
+        "temperature_c": 42
+      },
+      {
+        "gpu": 5,
+        "used_mib": 6809,
+        "free_mib": 74281,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 6,
+        "used_mib": 6747,
+        "free_mib": 74343,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 7,
+        "used_mib": 7105,
+        "free_mib": 73985,
+        "temperature_c": 35
+      }
+    ],
+    "host_available_bytes": 1707918909440,
+    "unix": 1791073345.2398865,
+    "rss_bytes": 556351488,
+    "foreign_pids": [],
+    "collection_seconds": 0.45641141943633556
+  },
+  "exit_code": 0,
+  "finished_unix": 1791073352.7613719
+}
