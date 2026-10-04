@@ -101,7 +101,7 @@ class Runtime:
    with gzip.open(args.plan/f'rank{self.rank}.pkl.gz','rb') as f:self.events=pickle.load(f)
    if args.comm_mode in ('coslot','coslot-active'):self.events=[add_coslot_layout(e,self.world) for e in self.events]
    self.events=pack_layouts(self.events)
-   if args.phase=='COUNTERS' and args.comm_mode=='coslot':self.metrics=np.load(args.plan/f'rank{self.rank}_metrics.npy').tolist()
+   if args.phase=='COUNTERS' and args.comm_mode in ('coslot','coslot-active'):self.metrics=np.load(args.plan/f'rank{self.rank}_metrics.npy').tolist()
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True)
   for l,block in enumerate(model.model.layers):
    block.mlp.forward=types.MethodType(self.forward_for(l),block.mlp)
