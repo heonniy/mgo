@@ -1,3 +1,16 @@
+**OWNER QUEUED FOLLOW-UP (2026-10-04): fetch-matched B32 + 2-A2A physical isolation.**
+Do not interrupt the active `ca_stress_physical_validation_20261004` R4 work.
+After it fully exits and commits, run
+`experiments/fetch_matched_b32_a2a_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
+Use ShareGPT local-B32/cache30/Gate W128/substitution-OFF/decode256. Search one
+R8 and one R4 sample/DP/BR-seed winner under exact BR==CA total-fetch and H2D
+constraints, with critical-rank send+recv reduction as the primary communication
+score. Then physically replay a common frozen route/token workload in Env2,
+comparing the current 3-A2A runtime against a 2-A2A variant that removes the
+routing-weight collective and applies frozen weights on the source after expert
+return. R8 uses GPUs0-7; R4 uses GPUs0,1,4,6. Start with two repeats and add only
+one third repeat under the 2%-5% noise rule. Commit results and stop.
+
 **OWNER TIMING REPETITION AMENDMENT:** Active/queued physical R8 and both R4 GPU-set studies use two clean MEASURE repeats per cell/environment/policy. Gate E2E and TPOT with abs(T1-T2)/mean(T1,T2): both <=2% stop at two; maximum >2% and <=5% adds exactly one third; either >5% stops at two and is unstable. Never use one sample as primary evidence or add further repeats. This overrides earlier three-plus-two repetition text. See `experiments/ca_stress_physical_validation_20261004/REPETITION_AMENDMENT.md`.
 
 **OWNER EXTENSION (2026-10-04): add R4-best physical stress cell after current R8 run.**

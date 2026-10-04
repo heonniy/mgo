@@ -1,0 +1,88 @@
+{
+  "status": "QUEUED_AFTER_CURRENT_PHYSICAL_PACKET",
+  "dataset": "ShareGPT",
+  "candidate_pool": 2048,
+  "horizon": 256,
+  "local_batch": 32,
+  "cache_percent": 30,
+  "eviction": "Gate",
+  "gate_window": 128,
+  "substitution": false,
+  "ranks": [
+    4,
+    8
+  ],
+  "search": {
+    "sample_seed_range": [
+      0,
+      511
+    ],
+    "dp_seed_range": [
+      0,
+      511
+    ],
+    "br_seeds": [
+      7,
+      19,
+      42,
+      73,
+      99,
+      131,
+      181,
+      251
+    ],
+    "prescreen_topk_per_rank": 128,
+    "hard_constraints": [
+      "BR_total_fetches == CA_total_fetches",
+      "BR_H2D_bytes == CA_H2D_bytes",
+      "quota_max_minus_min <= 1"
+    ],
+    "selection": [
+      "CA_max_rank_comm <= BR_max_rank_comm",
+      "maximize max-rank send+recv reduction",
+      "maximize absolute aggregate peer reduction",
+      "maximize relative aggregate peer reduction",
+      "prefer exact reload equality"
+    ]
+  },
+  "physical": {
+    "environment": "Env2",
+    "gpu_sets": {
+      "R8": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "R4": [
+        0,
+        1,
+        4,
+        6
+      ]
+    },
+    "route_mode": "common_frozen_teacher_forced",
+    "variants": [
+      "A3_current_3A2A",
+      "A2_no_weight_A2A"
+    ],
+    "policies": [
+      "BR",
+      "CA"
+    ],
+    "initial_repeats": 2,
+    "third_repeat_if_relative_diff_gt": 0.02,
+    "unstable_if_relative_diff_gt": 0.05
+  },
+  "a2a_counts": {
+    "layer_events_all_forwards": 12336,
+    "A3_calls_per_rank": 37008,
+    "A2_calls_per_rank": 24672,
+    "calls_removed_per_rank": 12336
+  },
+  "automatic_followup": false
+}
