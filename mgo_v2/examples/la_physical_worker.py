@@ -33,8 +33,10 @@ class LiveRuntime(Runtime):
    if rt.valid is not None:flat=flat.index_select(0,rt.valid);probs=probs[rt.valid]
    # Fixed exact trace avoids policy-dependent route drift; router cost remains.
    lo=int(rt.arrays['offsets'][rt.index]);start,end=rt.ranges[0 if rt.index<48 else 1]
-   selected=torch.tensor(rt.arrays['selected'][lo+start:lo+end],device='cuda',dtype=torch.int64)
-   weights=torch.tensor(rt.arrays['weights'][lo+start:lo+end],device='cuda',dtype=torch.bfloat16)
+   if hasattr(rt,'route_tensors'):selected,weights=rt.route_tensors[rt.index]
+   else:
+    selected=torch.tensor(rt.arrays['selected'][lo+start:lo+end],device='cuda',dtype=torch.int64)
+    weights=torch.tensor(rt.arrays['weights'][lo+start:lo+end],device='cuda',dtype=torch.bfloat16)
    result=rt.execute(layer,flat,selected,weights,probs)
    if rt.valid is not None:result=torch.zeros((shape[0]*shape[1],shape[2]),dtype=flat.dtype,device='cuda').index_copy_(0,rt.valid,result)
    return result.view(shape),logits

@@ -24,6 +24,18 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache)
   self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//8)
+ def stage_frozen_inputs(self,horizon):
+  # Benchmark input delivery is common across strategies and outside timing.
+  # Only the current event is exposed to the runtime; prediction never reads
+  # future routes even though the frozen input storage is device-resident.
+  ids=[];weights=[];sizes=[]
+  for event in range((horizon+1)*48):
+   lo=int(self.arrays['offsets'][event]);start,end=self.ranges[0 if event<48 else 1]
+   ids.append(self.arrays['selected'][lo+start:lo+end]);weights.append(self.arrays['weights'][lo+start:lo+end]);sizes.append(end-start)
+  all_ids=torch.tensor(np.concatenate(ids),device='cuda',dtype=torch.int64)
+  all_weights=torch.tensor(np.concatenate(weights),device='cuda',dtype=torch.bfloat16)
+  self.route_tensors=list(zip(all_ids.split(sizes),all_weights.split(sizes)))
+  self.frozen_input_bytes=all_ids.numel()*all_ids.element_size()+all_weights.numel()*all_weights.element_size()
  def reset(self):
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):
    self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache)
