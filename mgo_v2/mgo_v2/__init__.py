@@ -10,6 +10,7 @@ from .admission import (
     SwapRefinedAdmission,
 )
 from .controller import GlobalExpertController
+from .selected_runtime import create_selected_runtime, selected_options
 
 __all__ = [
     "RuntimeConfig",
@@ -24,4 +25,6 @@ __all__ = [
     "HungarianAdmission",
     "SwapRefinedAdmission",
     "GlobalExpertController",
+    "create_selected_runtime",
+    "selected_options",
 ]
