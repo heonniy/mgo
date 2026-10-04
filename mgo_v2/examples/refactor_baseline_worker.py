@@ -63,7 +63,9 @@ def main(a):
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda');rows=[]
  for name in (['BR'] if a.instrument else ['BR','CA','LA']):
-  a.policy=name;rt=(CompactBoundaryRuntime if a.compact else ArenaBoundaryRuntime if a.arena_budget else PrefixRuntime)(a,model,backing,experts);expected=None
+  a.policy=name
+  from mgo_v2.decode_runtime import DecodeOffloadRuntime
+  rt=(DecodeOffloadRuntime if a.split_controller else CompactBoundaryRuntime if a.compact else ArenaBoundaryRuntime if a.arena_budget else PrefixRuntime)(a,model,backing,experts);expected=None
   if a.compact:
    import la_physical_worker as live
    original_collect=live.gather_global_routes;live.gather_global_routes=rt.collect
@@ -84,11 +86,11 @@ def main(a):
    assert rt.actual_h2d_bytes==rt.proof['H2D_bytes'][rank] and not rt.mismatch.item()
    if expected is not None:assert np.array_equal(expected,tokens)
    expected=tokens
-   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
+   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),controller_times=getattr(rt,'controller_times',[]),debug_plan_checks=getattr(rt,'debug_plan_checks',0),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
   if a.compact:live.gather_global_routes=original_collect
   # Detach closures before reclaiming the arena for the next policy.
   for block in model.model.layers:block.mlp.forward=lambda *args: None
   del rt;gc.collect();torch.cuda.empty_cache()
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,horizon=8,rows=rows,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated()));dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');p.add_argument('--split-controller',action='store_true');p.add_argument('--debug-plan',action='store_true');main(p.parse_args())
