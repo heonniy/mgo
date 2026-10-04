@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    6
+  ],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/env_offload_preflight.py",
+    "--output",
+    "/home/hwlee/mgo-results/old_ca_fanout_followup_20261004/R4_preflight"
+  ],
+  "started_unix": 1791094230.8055809,
+  "timed_boundaries": [],
+  "pid": 3707249,
+  "transports": [
+    "SHM/direct/direct"
+  ],
+  "exit_code": 0,
+  "finished_unix": 1791094241.7216976
+}
