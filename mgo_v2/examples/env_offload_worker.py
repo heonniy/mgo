@@ -235,9 +235,12 @@ def main(a):
   for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'));rank=dist.get_rank()
- cell=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][a.cell];a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=cell['substitution']
+ cell=dict(json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][a.cell])
+ if a.cache_ratio is not None:
+  assert 0.0<a.cache_ratio<=1.0;cell['cache_ratio']=float(a.cache_ratio)
+ a.cache_ratio=float(cell['cache_ratio']);a.dataset=cell['dataset'];a.batch=cell['local_batch'];a.substitution=cell['substitution']
  world=cell['ranks'];assert dist.get_world_size()==world
- total=int(48*128*cell['cache_ratio']);a.capacities=[total//world+(r<total%world) for r in range(world)]
+ total=int(48*128*a.cache_ratio);a.capacities=[total//world+(r<total%world) for r in range(world)]
  records=json.loads((SOURCE/(a.dataset+'_requests.json')).read_text())['requests'][:world*a.batch];records=records[rank::world]
  model,backing,experts=load_model();print(json.dumps(dict(event='MODEL_LOADED',phase=a.phase,rank=rank)),flush=True);rt=Runtime(a,model,experts,a.capacities[rank]);rt.cpu_backing=backing
  length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
@@ -270,10 +273,10 @@ def main(a):
    assert all(receipt[k]==expected[k] for k in ['token_hash','state_hash'])
    assert dict(counters['stats'])==before,'compile occurred in MEASURE'
    receipt.update(no_compile_in_measure=True,compiler_stats=before)
- receipt.update(status='PASS',phase=a.phase,cell=a.cell,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ receipt.update(status='PASS',phase=a.phase,cell=a.cell,cache_ratio=a.cache_ratio,policy=a.policy,environment=a.environment,comm_mode=a.comm_mode,h2d_mode=a.h2d_mode,h2d_stages=a.h2d_stages,pinned_stage_bytes=(rt.h2d.pinned_bytes if rt.h2d else 0),rank=rank,boot=BOOT,cell_spec=cell,matrix_sha256=hashlib.sha256((ROOT/'frozen_matrix.json').read_bytes()).hexdigest(),tensor_layout_sha256=hashlib.sha256((PKG/'scripts/env_offload_tensors.py').read_bytes()).hexdigest(),cache_capacity=a.capacities[rank],max_resident_copies=int(np.count_nonzero(rt.keys>=0)),cpu_expert_pool_bytes=backing.numel(),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
  if a.phase!='MEASURE':
   for k in ['E2E_wall','decode_wall','TPOT']:receipt.pop(k,None)
  if a.phase!='PLAN':receipt.update(route_hash=rt.plan_proof['route_hash'],route_validation='device equality for all 12336 events; digest from validated PLAN',action_hash=rt.plan_proof['action_hash'],schedule_file_sha256=rt.plan_proof['schedule_file_sha256'])
  write(a.output/f'rank{rank}.json',receipt);dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',choices=['P','R','E'],required=True);p.add_argument('--policy',choices=['BR','CA','CA-rep'],required=True);p.add_argument('--phase',choices=['PLAN','COMPILE','MEASURE','COUNTERS'],required=True);p.add_argument('--environment',choices=['env1','env2'],required=True);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',type=Path);main(p.parse_args())
