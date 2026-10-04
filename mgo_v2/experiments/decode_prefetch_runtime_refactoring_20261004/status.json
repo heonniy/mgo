@@ -1,20 +1,11 @@
 {
-  "status": "FAIL",
-  "stage": "M13_COALESCED_SCREEN",
-  "label": "M13_COALESCED_SCREEN_B128_H64",
+  "status": "PASS",
+  "stage": "M13_BF16_SCREEN",
+  "label": "M13_BF16_SCREEN_B128_H64",
   "group": {
     "batch": 128,
     "horizon": 64,
     "cases": [
-      {
-        "label": "REFERENCE",
-        "policy": "BR",
-        "P": 0,
-        "trigger": "T1",
-        "horizon": 64,
-        "baseline": true,
-        "measure": false
-      },
       {
         "label": "P1_T1",
         "policy": "BR",
@@ -22,7 +13,7 @@
         "trigger": "T1",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P1_T0",
@@ -31,7 +22,7 @@
         "trigger": "T0",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P1_T2",
@@ -40,7 +31,7 @@
         "trigger": "T2",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P2_T2",
@@ -49,7 +40,7 @@
         "trigger": "T2",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P2_T1",
@@ -58,7 +49,7 @@
         "trigger": "T1",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P2_T0",
@@ -67,7 +58,7 @@
         "trigger": "T0",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P4_T0",
@@ -76,7 +67,7 @@
         "trigger": "T0",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P4_T2",
@@ -85,7 +76,7 @@
         "trigger": "T2",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       },
       {
         "label": "P4_T1",
@@ -94,19 +85,59 @@
         "trigger": "T1",
         "horizon": 64,
         "overlap": true,
-        "partial_precision": "fp32"
+        "partial_precision": "bf16"
       }
     ]
   },
-  "started_unix": 1791136624.3055327,
-  "source_sha": "f6d48ba114a3f727920eeca3f0f2ae9cca9ad7b8",
+  "started_unix": 1791137197.3371553,
+  "source_sha": "fb012a2501e5d3273bb38872a0e141d7691c64ee",
   "monitor": "boundaries only; file polling during MEASURE",
-  "pid": 157983,
+  "pid": 164553,
   "completed": [
     "P1_T1_r1",
-    "P1_T1_r2"
+    "P1_T1_r2",
+    "P1_T1_r3",
+    "P1_T1_r4",
+    "P1_T1_r5",
+    "P1_T1_r6",
+    "P1_T1_r7",
+    "P1_T0_r1",
+    "P1_T0_r2",
+    "P1_T2_r1",
+    "P1_T2_r2",
+    "P2_T2_r1",
+    "P2_T2_r2",
+    "P2_T2_r3",
+    "P2_T2_r4",
+    "P2_T2_r5",
+    "P2_T2_r6",
+    "P2_T2_r7",
+    "P2_T1_r1",
+    "P2_T1_r2",
+    "P2_T1_r3",
+    "P2_T1_r4",
+    "P2_T1_r5",
+    "P2_T1_r6",
+    "P2_T1_r7",
+    "P2_T0_r1",
+    "P2_T0_r2",
+    "P2_T0_r3",
+    "P2_T0_r4",
+    "P2_T0_r5",
+    "P2_T0_r6",
+    "P2_T0_r7",
+    "P4_T0_r1",
+    "P4_T0_r2",
+    "P4_T2_r1",
+    "P4_T2_r2",
+    "P4_T1_r1",
+    "P4_T1_r2",
+    "P4_T1_r3",
+    "P4_T1_r4",
+    "P4_T1_r5",
+    "P4_T1_r6",
+    "P4_T1_r7"
   ],
-  "error": "RuntimeError('owner STOP')",
-  "exit_code": 1,
-  "finished_unix": 1791137144.2121308
+  "exit_code": 0,
+  "finished_unix": 1791142316.5441167
 }
