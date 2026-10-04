@@ -1,3 +1,11 @@
+**OWNER AMENDMENT (2026-10-04): calibration before GO.**
+For the active R8 B128/B256 packet, first run the four-GPU Env1/Env2 model-free
+microbenchmark (activation G2G, 9-MiB D2D, H2D, overlap and strict serial
+H2D->D2D), then run the CPU policy replay using that calibration. Prefer
+`scripts/run_replica_calibrated_cpu_packet.py --gpus <four free GPU ids>`.
+The final decision is `GO_DECISION.json`; do not launch full-model GPU timing
+automatically.
+
 **OWNER PRIORITY (2026-10-04): R8 B128/B256 phase-aware CPU policy replay.**
 Read `experiments/r8_real_replica_batch_scaling_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json,PHYSICAL_EXECUTION_ORDER.md}`.
 Run the CPU-only packet before any new full-model GPU timing. Reuse the exact
