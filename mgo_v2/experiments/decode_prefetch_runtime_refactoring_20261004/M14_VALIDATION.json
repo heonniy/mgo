@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "gate_scope": "M14 functional and common-stack equivalence only",
+  "common_stack_equivalence": "PASS",
+  "precision": "bf16",
+  "horizon": 8,
+  "arms": [
+    {
+      "arm": "V1_OPT_NOPF_BARRIER",
+      "functional_validation": "PASS",
+      "warmup_rank_receipts": 16,
+      "measure_rank_receipts": 32,
+      "pairs": 2,
+      "timing_gate": "STABLE_PAIRED_GAIN",
+      "timing_unstable": false,
+      "result_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V1_OPT_NOPF_BARRIER_B128_H8/result.json",
+      "result_sha256": "9f99e14e68a6f3f1dccdc70f070aa95e335681de827ad755cc587fa3a6a4bb0d",
+      "state_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V1_OPT_NOPF_BARRIER_B128_H8/status.json",
+      "state_sha256": "ca20cf859b67b317fcf61a55d1791fb9a99f290282b68ba9cda4f6de842841a2"
+    },
+    {
+      "arm": "V2_OPT_PF_BARRIER",
+      "functional_validation": "PASS",
+      "warmup_rank_receipts": 16,
+      "measure_rank_receipts": 80,
+      "pairs": 5,
+      "timing_gate": "STABLE_PAIRED_GAIN",
+      "timing_unstable": false,
+      "result_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V2_OPT_PF_BARRIER_B128_H8/result.json",
+      "result_sha256": "f55e8b3a1e96844293b5ef015f329e4d437465b244258abc5f444ffbb7216777",
+      "state_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V2_OPT_PF_BARRIER_B128_H8/status.json",
+      "state_sha256": "40655b30bb0da873faa56073d3ea0e79f3a5622fd2e4ede5a138423124a20c9d"
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "functional_validation": "PASS",
+      "warmup_rank_receipts": 16,
+      "measure_rank_receipts": 112,
+      "pairs": 7,
+      "timing_gate": "UNRESOLVED_JITTER",
+      "timing_unstable": true,
+      "result_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V3_OPT_PF_OVERLAP_B128_H8/result.json",
+      "result_sha256": "e73c6d1a6cce833dc095ced1cd102d19d31123427103da12de8006756a985af1",
+      "state_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M14_SMOKE_V3_OPT_PF_OVERLAP_B128_H8/status.json",
+      "state_sha256": "c1a59c10504d2a44e1fa0503c0c0e2f250907a0e6268a89bce2d564497d148bc"
+    }
+  ],
+  "primary_performance_claim": false,
+  "next_stage": "M15 full256 BR/LA pairs for all three arms and both batches",
+  "interpretation": "V3 short smoke retains unresolved timing jitter. No timing sample is discarded and no short-smoke gain is used to choose the winner. M15 requires its own stable paired timing evidence."
+}
