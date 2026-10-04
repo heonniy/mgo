@@ -1,173 +1,302 @@
 {
-  "status": "PARTIAL_SCREEN",
-  "completed_cells": 8,
+  "status": "B256_SCREEN_COMPLETE",
+  "completed_cells": 9,
   "planned_cells": 9,
   "results": [
     {
       "status": "PASS",
       "case": {
-        "label": "P1_T0",
+        "label": "P4_T1",
         "policy": "BR",
-        "P": 1,
-        "trigger": "T0",
+        "P": 4,
+        "trigger": "T1",
         "horizon": 64,
         "overlap": true,
         "partial_precision": "bf16"
       },
       "numerical_comparison": {
-        "actual_argmax_hash": "328076a3e385817828e9fa7c74f4673a1c3de44027e07014364f03439662d83e",
+        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
         "partial_precision": "bf16",
         "legacy_comparison": "not collected: owner BF16-only amendment"
       },
       "samples": [
         {
-          "E2E_wall": 115.73995899222791,
-          "TPOT": 1.442366943359375
+          "E2E_wall": 118.16535669285804,
+          "TPOT": 1.4289166259765624
         },
         {
-          "E2E_wall": 115.10512944404036,
-          "TPOT": 1.428236572265625
+          "E2E_wall": 120.28783391974866,
+          "TPOT": 1.51185400390625
+        },
+        {
+          "E2E_wall": 125.70060872286558,
+          "TPOT": 1.5935101318359375
         }
       ],
       "gate": {
-        "status": "STABLE",
-        "target_repeats": 2,
+        "status": "UNRESOLVED_JITTER_FUTILITY",
+        "target_repeats": 3,
         "complete": true,
-        "unstable": false,
+        "unstable": true,
         "summary": {
           "E2E_wall": {
-            "n": 2,
-            "mean": 115.42254421813414,
-            "median": 115.42254421813414,
-            "min": 115.10512944404036,
-            "max": 115.73995899222791,
-            "range_relative": 0.005500048127407464,
+            "n": 3,
+            "mean": 121.38459977849077,
+            "median": 120.28783391974866,
+            "min": 118.16535669285804,
+            "max": 125.70060872286558,
+            "range_relative": 0.061798308076012436,
             "mean_CI95": [
-              111.38940711214045,
-              119.45568132412782
+              111.73246126559306,
+              131.03673829138847
             ],
-            "relative_CI_half_width": 0.03494236878344634,
-            "early_late_drift": 0.0
+            "relative_CI_half_width": 0.07951699416986543,
+            "early_late_drift": 0.031109019178942883
           },
           "TPOT": {
-            "n": 2,
-            "mean": 1.4353017578125,
-            "median": 1.4353017578125,
-            "min": 1.428236572265625,
-            "max": 1.442366943359375,
-            "range_relative": 0.009844878275134158,
+            "n": 3,
+            "mean": 1.5114269205729167,
+            "median": 1.51185400390625,
+            "min": 1.4289166259765624,
+            "max": 1.5935101318359375,
+            "range_relative": 0.10891480194444851,
             "mean_CI95": [
-              1.3455300637532512,
-              1.5250734518717488
+              1.3069883884116174,
+              1.715865452734216
             ],
-            "relative_CI_half_width": 0.06254551948439553,
-            "early_late_drift": 0.0
+            "relative_CI_half_width": 0.13526193650421778,
+            "early_late_drift": 0.054445860782053185
           }
         },
         "estimate": {
-          "E2E_wall": 115.42254421813414,
-          "TPOT": 1.4353017578125
+          "E2E_wall": 120.28783391974866,
+          "TPOT": 1.51185400390625
         },
-        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
+        "optimistic_future_relative_CI_halfwidth": {
+          "5": {
+            "E2E_wall": 0.02810050041515442,
+            "TPOT": 0.047787841066303946
+          },
+          "7": {
+            "E2E_wall": 0.01708866828495648,
+            "TPOT": 0.029057850760485403
+          }
+        }
       },
       "estimate": {
-        "E2E_wall": 115.42254421813414,
-        "TPOT": 1.4353017578125
+        "E2E_wall": 120.28783391974866,
+        "TPOT": 1.51185400390625
       },
       "initial_gate": {
-        "status": "STABLE_TWO",
+        "status": "UNSTABLE",
         "target_repeats": 2,
         "relative_difference": {
-          "E2E_wall": 0.005500048127407464,
-          "TPOT": 0.009844878275134158
+          "E2E_wall": 0.017802045101076632,
+          "TPOT": 0.05640520011109645
         },
         "estimator": "mean_and_median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
-      "unstable": false
+      "unstable": true
     },
     {
       "status": "PASS",
       "case": {
-        "label": "P1_T2",
+        "label": "P4_T2",
         "policy": "BR",
-        "P": 1,
+        "P": 4,
         "trigger": "T2",
         "horizon": 64,
         "overlap": true,
         "partial_precision": "bf16"
       },
       "numerical_comparison": {
-        "actual_argmax_hash": "328076a3e385817828e9fa7c74f4673a1c3de44027e07014364f03439662d83e",
+        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
         "partial_precision": "bf16",
         "legacy_comparison": "not collected: owner BF16-only amendment"
       },
       "samples": [
         {
-          "E2E_wall": 116.0399180362001,
-          "TPOT": 1.446031005859375
+          "E2E_wall": 121.7603662610054,
+          "TPOT": 1.5316260986328125
         },
         {
-          "E2E_wall": 115.69436217751354,
-          "TPOT": 1.4377354736328125
+          "E2E_wall": 115.34515342954546,
+          "TPOT": 1.4294442138671875
+        },
+        {
+          "E2E_wall": 113.829769927077,
+          "TPOT": 1.4112156982421875
         }
       ],
       "gate": {
-        "status": "STABLE",
-        "target_repeats": 2,
+        "status": "UNRESOLVED_JITTER_FUTILITY",
+        "target_repeats": 3,
         "complete": true,
-        "unstable": false,
+        "unstable": true,
         "summary": {
           "E2E_wall": {
-            "n": 2,
-            "mean": 115.86714010685682,
-            "median": 115.86714010685682,
-            "min": 115.69436217751354,
-            "max": 116.0399180362001,
-            "range_relative": 0.0029823456276549362,
+            "n": 3,
+            "mean": 116.97842987254262,
+            "median": 115.34515342954546,
+            "min": 113.829769927077,
+            "max": 121.7603662610054,
+            "range_relative": 0.06732536821997545,
             "mean_CI95": [
-              113.67178836268981,
-              118.06249185102384
+              106.52015596635862,
+              127.43670377872662
             ],
-            "relative_CI_half_width": 0.018947147069845488,
-            "early_late_drift": 0.0
+            "relative_CI_half_width": 0.0894034388868027,
+            "early_late_drift": 0.034016422743795294
           },
           "TPOT": {
-            "n": 2,
-            "mean": 1.441883239746094,
-            "median": 1.441883239746094,
-            "min": 1.4377354736328125,
-            "max": 1.446031005859375,
-            "range_relative": 0.005753262121295847,
+            "n": 3,
+            "mean": 1.4574286702473958,
+            "median": 1.4294442138671875,
+            "min": 1.4112156982421875,
+            "max": 1.5316260986328125,
+            "range_relative": 0.08183273767450812,
             "mean_CI95": [
-              1.38918087431204,
-              1.4945856051801478
+              1.2962080661590514,
+              1.6186492743357401
             ],
-            "relative_CI_half_width": 0.03655106320768,
-            "early_late_drift": 0.0
+            "relative_CI_half_width": 0.11061989336395966,
+            "early_late_drift": 0.04150844514620012
           }
         },
         "estimate": {
-          "E2E_wall": 115.86714010685682,
-          "TPOT": 1.441883239746094
+          "E2E_wall": 115.34515342954546,
+          "TPOT": 1.4294442138671875
         },
-        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
+        "optimistic_future_relative_CI_halfwidth": {
+          "5": {
+            "E2E_wall": 0.031593130189574076,
+            "TPOT": 0.03908695723583666
+          },
+          "7": {
+            "E2E_wall": 0.019212333277413868,
+            "TPOT": 0.02376852708556072
+          }
+        }
       },
       "estimate": {
-        "E2E_wall": 115.86714010685682,
-        "TPOT": 1.441883239746094
+        "E2E_wall": 115.34515342954546,
+        "TPOT": 1.4294442138671875
       },
       "initial_gate": {
-        "status": "STABLE_TWO",
+        "status": "UNSTABLE",
         "target_repeats": 2,
         "relative_difference": {
-          "E2E_wall": 0.0029823456276549362,
-          "TPOT": 0.005753262121295847
+          "E2E_wall": 0.05411272449357153,
+          "TPOT": 0.06901685808288287
         },
         "estimator": "mean_and_median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
-      "unstable": false
+      "unstable": true
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P4_T0",
+        "policy": "BR",
+        "P": 4,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 121.17176911327988,
+          "TPOT": 1.5070455322265626
+        },
+        {
+          "E2E_wall": 114.0749152675271,
+          "TPOT": 1.4141448974609374
+        },
+        {
+          "E2E_wall": 115.15025573037565,
+          "TPOT": 1.424639892578125
+        },
+        {
+          "E2E_wall": 118.96962204948068,
+          "TPOT": 1.4987117919921875
+        }
+      ],
+      "gate": {
+        "status": "UNRESOLVED_JITTER_FUTILITY",
+        "target_repeats": 4,
+        "complete": true,
+        "unstable": true,
+        "summary": {
+          "E2E_wall": {
+            "n": 4,
+            "mean": 117.34164054016583,
+            "median": 117.05993888992816,
+            "min": 114.0749152675271,
+            "max": 121.17176911327988,
+            "range_relative": 0.060335420789733224,
+            "mean_CI95": [
+              112.08065876031709,
+              122.60262232001456
+            ],
+            "relative_CI_half_width": 0.04483473859433483,
+            "early_late_drift": 0.004801392735620372
+          },
+          "TPOT": {
+            "n": 4,
+            "mean": 1.4611355285644532,
+            "median": 1.4616758422851563,
+            "min": 1.4141448974609374,
+            "max": 1.5070455322265626,
+            "range_relative": 0.06360464132806527,
+            "mean_CI95": [
+              1.383944776434443,
+              1.5383262806944633
+            ],
+            "relative_CI_half_width": 0.05282928970035309,
+            "early_late_drift": 0.0007395805661286322
+          }
+        },
+        "estimate": {
+          "E2E_wall": 117.34164054016583,
+          "TPOT": 1.4611355285644532
+        },
+        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
+        "optimistic_future_relative_CI_halfwidth": {
+          "5": {
+            "E2E_wall": 0.030296496956035583,
+            "TPOT": 0.035697886371103556
+          },
+          "7": {
+            "E2E_wall": 0.01842393758375915,
+            "TPOT": 0.021708062668920215
+          }
+        }
+      },
+      "estimate": {
+        "E2E_wall": 117.34164054016583,
+        "TPOT": 1.4611355285644532
+      },
+      "initial_gate": {
+        "status": "UNSTABLE",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.060335420789733224,
+          "TPOT": 0.06360464132806527
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": true
     },
     {
       "status": "PASS",
@@ -465,298 +594,256 @@
     {
       "status": "PASS",
       "case": {
-        "label": "P4_T0",
+        "label": "P1_T2",
         "policy": "BR",
-        "P": 4,
-        "trigger": "T0",
-        "horizon": 64,
-        "overlap": true,
-        "partial_precision": "bf16"
-      },
-      "numerical_comparison": {
-        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
-        "partial_precision": "bf16",
-        "legacy_comparison": "not collected: owner BF16-only amendment"
-      },
-      "samples": [
-        {
-          "E2E_wall": 121.17176911327988,
-          "TPOT": 1.5070455322265626
-        },
-        {
-          "E2E_wall": 114.0749152675271,
-          "TPOT": 1.4141448974609374
-        },
-        {
-          "E2E_wall": 115.15025573037565,
-          "TPOT": 1.424639892578125
-        },
-        {
-          "E2E_wall": 118.96962204948068,
-          "TPOT": 1.4987117919921875
-        }
-      ],
-      "gate": {
-        "status": "UNRESOLVED_JITTER_FUTILITY",
-        "target_repeats": 4,
-        "complete": true,
-        "unstable": true,
-        "summary": {
-          "E2E_wall": {
-            "n": 4,
-            "mean": 117.34164054016583,
-            "median": 117.05993888992816,
-            "min": 114.0749152675271,
-            "max": 121.17176911327988,
-            "range_relative": 0.060335420789733224,
-            "mean_CI95": [
-              112.08065876031709,
-              122.60262232001456
-            ],
-            "relative_CI_half_width": 0.04483473859433483,
-            "early_late_drift": 0.004801392735620372
-          },
-          "TPOT": {
-            "n": 4,
-            "mean": 1.4611355285644532,
-            "median": 1.4616758422851563,
-            "min": 1.4141448974609374,
-            "max": 1.5070455322265626,
-            "range_relative": 0.06360464132806527,
-            "mean_CI95": [
-              1.383944776434443,
-              1.5383262806944633
-            ],
-            "relative_CI_half_width": 0.05282928970035309,
-            "early_late_drift": 0.0007395805661286322
-          }
-        },
-        "estimate": {
-          "E2E_wall": 117.34164054016583,
-          "TPOT": 1.4611355285644532
-        },
-        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
-        "optimistic_future_relative_CI_halfwidth": {
-          "5": {
-            "E2E_wall": 0.030296496956035583,
-            "TPOT": 0.035697886371103556
-          },
-          "7": {
-            "E2E_wall": 0.01842393758375915,
-            "TPOT": 0.021708062668920215
-          }
-        }
-      },
-      "estimate": {
-        "E2E_wall": 117.34164054016583,
-        "TPOT": 1.4611355285644532
-      },
-      "initial_gate": {
-        "status": "UNSTABLE",
-        "target_repeats": 2,
-        "relative_difference": {
-          "E2E_wall": 0.060335420789733224,
-          "TPOT": 0.06360464132806527
-        },
-        "estimator": "mean_and_median",
-        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
-      },
-      "unstable": true
-    },
-    {
-      "status": "PASS",
-      "case": {
-        "label": "P4_T1",
-        "policy": "BR",
-        "P": 4,
-        "trigger": "T1",
-        "horizon": 64,
-        "overlap": true,
-        "partial_precision": "bf16"
-      },
-      "numerical_comparison": {
-        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
-        "partial_precision": "bf16",
-        "legacy_comparison": "not collected: owner BF16-only amendment"
-      },
-      "samples": [
-        {
-          "E2E_wall": 118.16535669285804,
-          "TPOT": 1.4289166259765624
-        },
-        {
-          "E2E_wall": 120.28783391974866,
-          "TPOT": 1.51185400390625
-        },
-        {
-          "E2E_wall": 125.70060872286558,
-          "TPOT": 1.5935101318359375
-        }
-      ],
-      "gate": {
-        "status": "UNRESOLVED_JITTER_FUTILITY",
-        "target_repeats": 3,
-        "complete": true,
-        "unstable": true,
-        "summary": {
-          "E2E_wall": {
-            "n": 3,
-            "mean": 121.38459977849077,
-            "median": 120.28783391974866,
-            "min": 118.16535669285804,
-            "max": 125.70060872286558,
-            "range_relative": 0.061798308076012436,
-            "mean_CI95": [
-              111.73246126559306,
-              131.03673829138847
-            ],
-            "relative_CI_half_width": 0.07951699416986543,
-            "early_late_drift": 0.031109019178942883
-          },
-          "TPOT": {
-            "n": 3,
-            "mean": 1.5114269205729167,
-            "median": 1.51185400390625,
-            "min": 1.4289166259765624,
-            "max": 1.5935101318359375,
-            "range_relative": 0.10891480194444851,
-            "mean_CI95": [
-              1.3069883884116174,
-              1.715865452734216
-            ],
-            "relative_CI_half_width": 0.13526193650421778,
-            "early_late_drift": 0.054445860782053185
-          }
-        },
-        "estimate": {
-          "E2E_wall": 120.28783391974866,
-          "TPOT": 1.51185400390625
-        },
-        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
-        "optimistic_future_relative_CI_halfwidth": {
-          "5": {
-            "E2E_wall": 0.02810050041515442,
-            "TPOT": 0.047787841066303946
-          },
-          "7": {
-            "E2E_wall": 0.01708866828495648,
-            "TPOT": 0.029057850760485403
-          }
-        }
-      },
-      "estimate": {
-        "E2E_wall": 120.28783391974866,
-        "TPOT": 1.51185400390625
-      },
-      "initial_gate": {
-        "status": "UNSTABLE",
-        "target_repeats": 2,
-        "relative_difference": {
-          "E2E_wall": 0.017802045101076632,
-          "TPOT": 0.05640520011109645
-        },
-        "estimator": "mean_and_median",
-        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
-      },
-      "unstable": true
-    },
-    {
-      "status": "PASS",
-      "case": {
-        "label": "P4_T2",
-        "policy": "BR",
-        "P": 4,
+        "P": 1,
         "trigger": "T2",
         "horizon": 64,
         "overlap": true,
         "partial_precision": "bf16"
       },
       "numerical_comparison": {
-        "actual_argmax_hash": "694124a7f8a40318d0f5c48e81a1a64784a529288c40ddab36e01de37de64421",
+        "actual_argmax_hash": "328076a3e385817828e9fa7c74f4673a1c3de44027e07014364f03439662d83e",
         "partial_precision": "bf16",
         "legacy_comparison": "not collected: owner BF16-only amendment"
       },
       "samples": [
         {
-          "E2E_wall": 121.7603662610054,
-          "TPOT": 1.5316260986328125
+          "E2E_wall": 116.0399180362001,
+          "TPOT": 1.446031005859375
         },
         {
-          "E2E_wall": 115.34515342954546,
-          "TPOT": 1.4294442138671875
-        },
-        {
-          "E2E_wall": 113.829769927077,
-          "TPOT": 1.4112156982421875
+          "E2E_wall": 115.69436217751354,
+          "TPOT": 1.4377354736328125
         }
       ],
       "gate": {
-        "status": "UNRESOLVED_JITTER_FUTILITY",
-        "target_repeats": 3,
+        "status": "STABLE",
+        "target_repeats": 2,
         "complete": true,
-        "unstable": true,
+        "unstable": false,
         "summary": {
           "E2E_wall": {
-            "n": 3,
-            "mean": 116.97842987254262,
-            "median": 115.34515342954546,
-            "min": 113.829769927077,
-            "max": 121.7603662610054,
-            "range_relative": 0.06732536821997545,
+            "n": 2,
+            "mean": 115.86714010685682,
+            "median": 115.86714010685682,
+            "min": 115.69436217751354,
+            "max": 116.0399180362001,
+            "range_relative": 0.0029823456276549362,
             "mean_CI95": [
-              106.52015596635862,
-              127.43670377872662
+              113.67178836268981,
+              118.06249185102384
             ],
-            "relative_CI_half_width": 0.0894034388868027,
-            "early_late_drift": 0.034016422743795294
+            "relative_CI_half_width": 0.018947147069845488,
+            "early_late_drift": 0.0
           },
           "TPOT": {
-            "n": 3,
-            "mean": 1.4574286702473958,
-            "median": 1.4294442138671875,
-            "min": 1.4112156982421875,
-            "max": 1.5316260986328125,
-            "range_relative": 0.08183273767450812,
+            "n": 2,
+            "mean": 1.441883239746094,
+            "median": 1.441883239746094,
+            "min": 1.4377354736328125,
+            "max": 1.446031005859375,
+            "range_relative": 0.005753262121295847,
             "mean_CI95": [
-              1.2962080661590514,
-              1.6186492743357401
+              1.38918087431204,
+              1.4945856051801478
             ],
-            "relative_CI_half_width": 0.11061989336395966,
-            "early_late_drift": 0.04150844514620012
+            "relative_CI_half_width": 0.03655106320768,
+            "early_late_drift": 0.0
           }
         },
         "estimate": {
-          "E2E_wall": 115.34515342954546,
-          "TPOT": 1.4294442138671875
+          "E2E_wall": 115.86714010685682,
+          "TPOT": 1.441883239746094
         },
-        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
-        "optimistic_future_relative_CI_halfwidth": {
-          "5": {
-            "E2E_wall": 0.031593130189574076,
-            "TPOT": 0.03908695723583666
-          },
-          "7": {
-            "E2E_wall": 0.019212333277413868,
-            "TPOT": 0.02376852708556072
-          }
-        }
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
       },
       "estimate": {
-        "E2E_wall": 115.34515342954546,
-        "TPOT": 1.4294442138671875
+        "E2E_wall": 115.86714010685682,
+        "TPOT": 1.441883239746094
       },
       "initial_gate": {
-        "status": "UNSTABLE",
+        "status": "STABLE_TWO",
         "target_repeats": 2,
         "relative_difference": {
-          "E2E_wall": 0.05411272449357153,
-          "TPOT": 0.06901685808288287
+          "E2E_wall": 0.0029823456276549362,
+          "TPOT": 0.005753262121295847
         },
         "estimator": "mean_and_median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
-      "unstable": true
+      "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P1_T0",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T0",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "328076a3e385817828e9fa7c74f4673a1c3de44027e07014364f03439662d83e",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 115.73995899222791,
+          "TPOT": 1.442366943359375
+        },
+        {
+          "E2E_wall": 115.10512944404036,
+          "TPOT": 1.428236572265625
+        }
+      ],
+      "gate": {
+        "status": "STABLE",
+        "target_repeats": 2,
+        "complete": true,
+        "unstable": false,
+        "summary": {
+          "E2E_wall": {
+            "n": 2,
+            "mean": 115.42254421813414,
+            "median": 115.42254421813414,
+            "min": 115.10512944404036,
+            "max": 115.73995899222791,
+            "range_relative": 0.005500048127407464,
+            "mean_CI95": [
+              111.38940711214045,
+              119.45568132412782
+            ],
+            "relative_CI_half_width": 0.03494236878344634,
+            "early_late_drift": 0.0
+          },
+          "TPOT": {
+            "n": 2,
+            "mean": 1.4353017578125,
+            "median": 1.4353017578125,
+            "min": 1.428236572265625,
+            "max": 1.442366943359375,
+            "range_relative": 0.009844878275134158,
+            "mean_CI95": [
+              1.3455300637532512,
+              1.5250734518717488
+            ],
+            "relative_CI_half_width": 0.06254551948439553,
+            "early_late_drift": 0.0
+          }
+        },
+        "estimate": {
+          "E2E_wall": 115.42254421813414,
+          "TPOT": 1.4353017578125
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 115.42254421813414,
+        "TPOT": 1.4353017578125
+      },
+      "initial_gate": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.005500048127407464,
+          "TPOT": 0.009844878275134158
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P1_T1",
+        "policy": "BR",
+        "P": 1,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "328076a3e385817828e9fa7c74f4673a1c3de44027e07014364f03439662d83e",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 116.37900210637599,
+          "TPOT": 1.45041455078125
+        },
+        {
+          "E2E_wall": 111.88764545414597,
+          "TPOT": 1.3868382568359374
+        },
+        {
+          "E2E_wall": 113.4855333790183,
+          "TPOT": 1.40201904296875
+        }
+      ],
+      "gate": {
+        "status": "STABLE",
+        "target_repeats": 3,
+        "complete": true,
+        "unstable": false,
+        "summary": {
+          "E2E_wall": {
+            "n": 3,
+            "mean": 113.91739364651342,
+            "median": 113.4855333790183,
+            "min": 111.88764545414597,
+            "max": 116.37900210637599,
+            "range_relative": 0.03935184312056976,
+            "mean_CI95": [
+              108.26198333461207,
+              119.57280395841477
+            ],
+            "relative_CI_half_width": 0.04964483588388736,
+            "early_late_drift": 0.012756678576305693
+          },
+          "TPOT": {
+            "n": 3,
+            "mean": 1.4130906168619792,
+            "median": 1.40201904296875,
+            "min": 1.3868382568359374,
+            "max": 1.45041455078125,
+            "range_relative": 0.04481538886815373,
+            "mean_CI95": [
+              1.3306104698748007,
+              1.4955707638491578
+            ],
+            "relative_CI_half_width": 0.05836861840491191,
+            "early_late_drift": 0.017203896435890105
+          }
+        },
+        "estimate": {
+          "E2E_wall": 113.4855333790183,
+          "TPOT": 1.40201904296875
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 113.4855333790183,
+        "TPOT": 1.40201904296875
+      },
+      "initial_gate": {
+        "status": "THIRD_REQUIRED",
+        "target_repeats": 3,
+        "relative_difference": {
+          "E2E_wall": 0.03935184312056976,
+          "TPOT": 0.04481538886815373
+        },
+        "estimator": "median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false
     }
   ],
-  "interpretation": "Only completed cells. Legacy T2 rows are archived timing observations and ineligible until replaced by the separately measured T2 completion repair. P1_T0 is stable in both batches; final selection awaits the completed corrected screen."
+  "interpretation": "Legacy T2 records measure stream-wait semantics and are ineligible for PLAN T2 selection; replace only through the separate T2 completion repair."
 }
