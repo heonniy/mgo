@@ -19,6 +19,7 @@ def main():
  if args.stage=='M5':cmd+=['--arena-budget','2']
  if args.stage=='M6':cmd+=['--arena-budget','2','--compact']
  if args.stage.startswith('M9'):cmd+=['--arena-budget','2','--split-controller','--debug-plan','--physical-prefetch']
+ if args.stage.startswith('M10'):cmd+=['--arena-budget','2','--split-controller','--debug-plan','--physical-prefetch','--streaming']
  if args.stage=='M7':cmd+=['--arena-budget','2','--split-controller','--debug-plan']
  with (out/'run.log').open('w') as log:
   proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(PACKET/'status.json',state)

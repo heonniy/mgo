@@ -13,6 +13,7 @@ from .controller import DecodePrefetchController
 from .predictor import TransitionPredictor
 from .compact_metadata import CompactMetadata
 from .pinned_h2d import PriorityH2DScheduler
+from .ready_compute import expert_order
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
@@ -28,7 +29,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   super().reset()
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena
-  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0
+  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0)
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
@@ -77,6 +78,15 @@ class DecodeOffloadRuntime(LiveRuntime):
   for key,slot,victim,rep in e['fetches']:
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
+ def compute(self,packet,e,layer):
+  if not getattr(self.args,'streaming',False) or self.index<48:return super().compute(packet,e,layer)
+  mode,received,_,rw=packet;assert mode=='current'
+  groups=e['groups'];parts=[None]*len(groups)
+  for i in expert_order(groups,self.h2d,getattr(self.args,'ready_first',False),self.ready_metrics):
+   expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
+   w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+   self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
+  return torch.cat(parts) if parts else received.new_empty((0,2048))
  def close(self):
   if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
  def execute(self,*args):
@@ -89,9 +99,10 @@ class DecodeOffloadRuntime(LiveRuntime):
    # Complete forward only, without draining speculative copies on another stream.
    forward_done=torch.cuda.Event();forward_done.record();forward_done.synchronize()
    with nvtx_phase('moe.h2d_fetch'):self.apply_fetches(e)
-   with nvtx_phase('moe.h2d_global_barrier'):
-    self.h2d.wait_slots([slot for _,_,_,slot in e['groups']],host=True)
-    dist.barrier();torch.cuda.current_stream().synchronize()
+   if not getattr(self.args,'streaming',False) or self.index<48:
+    with nvtx_phase('moe.h2d_global_barrier'):
+     self.h2d.wait_slots([slot for _,_,_,slot in e['groups']],host=True)
+     dist.barrier();torch.cuda.current_stream().synchronize()
    self.prefetch_next()
    with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
    with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])
