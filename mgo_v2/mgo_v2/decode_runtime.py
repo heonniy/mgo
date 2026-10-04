@@ -15,6 +15,7 @@ from .compact_metadata import CompactMetadata
 from .pinned_h2d import PriorityH2DScheduler
 from .ready_compute import expert_order
 from .fused_transport import FusedTokenRankTransport
+from .coalesced_return import combine_rank_partials
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
@@ -138,7 +139,10 @@ class DecodeOffloadRuntime(LiveRuntime):
    if not fused:self.prefetch_next()
    with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
    if fused:
-    with nvtx_phase('moe.return_a2a'):result=self.transport.combine(hidden,values,e)
+    with nvtx_phase('moe.return_a2a'):
+     precision=getattr(self.args,'partial_precision',None)
+     if precision:result=combine_rank_partials(self.transport,hidden,values,e,{'bf16':torch.bfloat16,'fp32':torch.float32,'fp64':torch.float64}[precision])
+     else:result=self.transport.combine(hidden,values,e)
     assert self.transport.calls-before==2
    else:
     with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])

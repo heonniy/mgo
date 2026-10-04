@@ -24,6 +24,9 @@ def main():
  if args.stage.startswith('M9'):cmd+=['--arena-budget','2','--split-controller','--debug-plan','--physical-prefetch']
  if args.stage.startswith('M10'):cmd+=['--arena-budget','2','--split-controller','--debug-plan','--physical-prefetch','--streaming']
  if args.stage.startswith('M12'):cmd+=['--arena-budget','2','--split-controller','--debug-plan','--physical-prefetch','--streaming','--fused']
+ if args.stage.startswith('M12_PARTIAL'):
+  batch=256 if 'B256' in args.stage else 128
+  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/refactor_partial_model_check.py'),'--inputs',str(ROOT/f'inputs_B{batch}_H8'),'--output',str(out)]
  if args.stage=='M7':cmd+=['--arena-budget','2','--split-controller','--debug-plan']
  with (out/'run.log').open('w') as log:
   proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(PACKET/'status.json',state)
