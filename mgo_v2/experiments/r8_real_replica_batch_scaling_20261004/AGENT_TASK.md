@@ -15,3 +15,11 @@
 9. Mark the best <=2% H2D-growth policy separately and provide the Pareto
    frontier. Do not combine H2D and compute into an arbitrary lambda score.
 10. Commit results and stop. No physical GPU timing automatically follows.
+
+## Physical validation order
+
+Before any later GPU timing, read `PHYSICAL_EXECUTION_ORDER.md`. Use the new
+`--execution-order fetch-barrier --schedule-mode live` mode so the measured
+MoE layer order is metadata exchange -> rank decision -> dispatch -> all miss
+H2D -> global fetch barrier -> expert compute -> combine. Keep the historical
+streaming/frozen path only as a comparison baseline.
