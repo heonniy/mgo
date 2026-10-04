@@ -3,12 +3,15 @@ import argparse,json,os,signal,subprocess,time,hashlib
 from pathlib import Path
 from run_rank_oracle_study import process_tree
 P=Path(__file__).resolve().parents[1];ROOT=Path('/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003');PACKET=P/'experiments/env_e2e_tpot_offload_20261003'
-def discover_validated_plan(cell,policy):
- candidates=[]
- for path in ROOT.glob(f'{cell}_{policy}_*_PLAN_*'):
-  try:status=json.loads((path/'status.json').read_text());validation=json.loads((path/'schedule_validation.json').read_text())
+def discover_validated_plan(cell,policy,cache_ratio=None,substitution=None):
+ spec=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][cell]
+ wanted=float(spec['cache_ratio'] if cache_ratio is None else cache_ratio);wanted_sub=bool(spec['substitution'] if substitution is None else substitution);candidates=[]
+ for path in ROOT.glob(f'{cell}_{policy}_*PLAN*'):
+  try:
+   status=json.loads((path/'status.json').read_text());validation=json.loads((path/'schedule_validation.json').read_text());rank0=json.loads((path/'rank0.json').read_text())
   except FileNotFoundError:continue
-  if status.get('status')=='PASS' and validation.get('status')=='PASS':candidates.append(path)
+  actual=float(rank0.get('cache_ratio',rank0.get('cell_spec',{}).get('cache_ratio',-1)));actual_sub=bool(rank0.get('substitution',rank0.get('cell_spec',{}).get('substitution',False)))
+  if status.get('status')=='PASS' and validation.get('status')=='PASS' and abs(actual-wanted)<1e-9 and actual_sub==wanted_sub:candidates.append(path)
  if not candidates:return None
  candidates.sort(key=lambda p:p.stat().st_mtime,reverse=True);return candidates[0]
 def write(p,x):
@@ -16,10 +19,12 @@ def write(p,x):
 def snapshot():
  rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.used,memory.free,temperature.gpu','--format=csv,noheader,nounits'],text=True)
  return dict(gpus=[dict(zip(['gpu','used_mib','free_mib','temperature_c'],map(int,r.split(',')))) for r in rows.splitlines()],host_available_bytes=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:')))
-def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pageable',plan_path=None,h2d_stages=2):
+def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pageable',plan_path=None,h2d_stages=2,cache_ratio=None,substitution=None):
  if phase=='PLAN' and comm_mode!='current':raise ValueError('reference PLAN only uses current transport')
- spec=json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][cell];world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
- tags=[]
+ spec=dict(json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][cell]);world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
+ cache_ratio=float(spec['cache_ratio'] if cache_ratio is None else cache_ratio);assert 0.0<cache_ratio<=1.0
+ substitution=bool(spec['substitution'] if substitution is None else substitution)
+ cache_tag=f'c{int(round(cache_ratio*100)):02d}';sub_tag='s1' if substitution else 's0';tags=[cache_tag,sub_tag]
  if comm_mode!='current':tags.append(comm_mode)
  if h2d_mode!='pageable':tags.append(h2d_mode)
  suffix='' if not tags else '_'+('_'.join(tags));label=f'{cell}_{policy}_{environment}_{phase}{suffix}_{repeat}';out=ROOT/label;out.mkdir(exist_ok=False);state=dict(status='RUNNING',cell=cell,policy=policy,phase=phase,environment=environment,repeat=repeat,started_unix=time.time(),samples=[])
@@ -33,15 +38,16 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
   if k.startswith('NCCL_'):del env[k]
  env['NCCL_CUMEM_ENABLE']='0'
  if environment=='env2':env.update(NCCL_P2P_DISABLE='1',NCCL_IB_DISABLE='1')
- cache=ROOT/'compile_cache'/f'{cell}_{policy}_{environment}_{comm_mode}_{h2d_mode}';cache.mkdir(parents=True,exist_ok=True)
+ cache=ROOT/'compile_cache'/f'{cell}_{policy}_{environment}_{cache_tag}_{sub_tag}_{comm_mode}_{h2d_mode}';cache.mkdir(parents=True,exist_ok=True)
  env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
- cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples/env_offload_worker.py'),'--cell',cell,'--policy',policy,'--phase',phase,'--environment',environment,'--comm-mode',comm_mode,'--h2d-mode',h2d_mode,'--h2d-stages',str(h2d_stages),'--output',str(out)]
+ cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples/env_offload_worker.py'),'--cell',cell,'--policy',policy,'--phase',phase,'--environment',environment,'--comm-mode',comm_mode,'--h2d-mode',h2d_mode,'--h2d-stages',str(h2d_stages),'--cache-ratio',str(cache_ratio),'--substitution-mode',('on' if substitution else 'off'),'--output',str(out)]
  if phase!='PLAN':
-  plan_path=Path(plan_path) if plan_path is not None else discover_validated_plan(cell,policy)
+  plan_path=Path(plan_path) if plan_path is not None else discover_validated_plan(cell,policy,cache_ratio,substitution)
   if plan_path is None:raise FileNotFoundError(f'no validated PLAN for {cell}/{policy}; use ensure_plan()')
   assert json.loads((plan_path/'schedule_validation.json').read_text())['status']=='PASS'
+  rank0=json.loads((plan_path/'rank0.json').read_text());plan_ratio=float(rank0.get('cache_ratio',rank0['cell_spec']['cache_ratio']));plan_sub=bool(rank0.get('substitution',rank0['cell_spec']['substitution']));assert abs(plan_ratio-cache_ratio)<1e-9,(plan_ratio,cache_ratio);assert plan_sub==substitution,(plan_sub,substitution)
   cmd+=['--plan',str(plan_path)]
- state.update(comm_mode=comm_mode,h2d_mode=h2d_mode,h2d_stages=h2d_stages,plan_path=(str(plan_path) if phase!='PLAN' else None),command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),layout_sha256=hashlib.sha256((P/'scripts/env_offload_layout.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
+ state.update(cache_ratio=cache_ratio,cache_tag=cache_tag,substitution=substitution,sub_tag=sub_tag,comm_mode=comm_mode,h2d_mode=h2d_mode,h2d_stages=h2d_stages,plan_path=(str(plan_path) if phase!='PLAN' else None),command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),layout_sha256=hashlib.sha256((P/'scripts/env_offload_layout.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
  (out/'worker_source.py').write_bytes((P/'examples/env_offload_worker.py').read_bytes());(out/'policy_source.py').write_bytes((P/'scripts/env_offload_policy.py').read_bytes());(out/'layout_source.py').write_bytes((P/'scripts/env_offload_layout.py').read_bytes())
  reason=None
  with (out/'run.log').open('w') as f:
@@ -86,4 +92,4 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
  if state['status']!='PASS':raise RuntimeError(str(out/'run.log'))
  return out
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--policy',required=True);p.add_argument('--phase',required=True);p.add_argument('--environment',default='env1');p.add_argument('--repeat',type=int,default=0);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--plan',type=Path);a=p.parse_args();run(a.cell,a.policy,a.phase,a.environment,a.repeat,a.comm_mode,a.h2d_mode,a.plan,a.h2d_stages)
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--policy',required=True);p.add_argument('--phase',required=True);p.add_argument('--environment',default='env1');p.add_argument('--repeat',type=int,default=0);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution',choices=['matrix','on','off'],default='matrix');p.add_argument('--plan',type=Path);a=p.parse_args();sub=None if a.substitution=='matrix' else a.substitution=='on';run(a.cell,a.policy,a.phase,a.environment,a.repeat,a.comm_mode,a.h2d_mode,a.plan,a.h2d_stages,a.cache_ratio,sub)
