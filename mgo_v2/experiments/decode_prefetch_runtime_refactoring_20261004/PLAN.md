@@ -536,7 +536,189 @@ but add a decision-equivalent or bounded greedy fast path only after profiling.
 
 Do not silently replace CA semantics to gain controller speed.
 
-## 16. Final success conditions
+## 16. Three-arm final runtime selection
+
+The final implementation is **not pre-decided**. Build and physically compare
+three runtime variants that differ only in prefetch / H2D exposure policy.
+
+All other implementation details MUST be identical across the three arms:
+- same compact one-shot metadata exchange;
+- same replicated deterministic controller;
+- same BR and LA placement implementation;
+- same cache ratio C;
+- same expert kernel and compilation mode;
+- same fused token->rank packet format;
+- exactly one forward payload A2A + one return payload A2A;
+- same NCCL settings / communicator optimizations;
+- same CPU affinity / NUMA binding;
+- same frozen requests, routes, weights and teacher tokens;
+- same prefill behavior;
+- same timing boundaries and repeat rule.
+
+This is required so the measured LA gain changes only because H2D exposure
+changes, not because one arm has a better communicator or controller.
+
+### V1 — OPT-NOPF-BARRIER
+
+Purpose: optimized version of the current physical LA experiment.
+
+Decode order:
+
+```
+metadata
+-> current controller
+-> fused forward A2A
+-> residual demand H2D
+-> global fetch barrier
+-> expert compute
+-> return A2A
+-> combine
+```
+
+Properties:
+- prefetch OFF;
+- P=0;
+- global fetch barrier ON;
+- current-demand H2D remains fully exposed before compute;
+- all metadata/NCCL/controller refactoring is ON.
+
+This is the clean reference for the already observed physical LA mechanism.
+The historical `b18d9d7` result is not the final V1 number because it did not
+yet include all common refactoring optimizations.
+
+### V2 — OPT-PF-BARRIER
+
+Purpose: isolate the effect of next-layer prefetch while preserving the fetch
+barrier.
+
+Decode behavior:
+- EdgeMoE-style batch next-layer predictor ON;
+- C+P MAIN/PREFETCH arena ON;
+- useful prefetch promotion ON;
+- selected P/trigger fixed identically for BR and LA;
+- residual current misses still pass through the global fetch barrier before
+  expert compute.
+
+Conceptually:
+
+```
+previous/current useful work
+   || next-layer prefetch H2D
+next layer:
+metadata
+-> current controller + promotion
+-> fused forward A2A
+-> residual demand H2D
+-> global fetch barrier
+-> expert compute
+-> return A2A
+-> combine
+```
+
+This arm answers whether reducing the amount of demand H2D alone makes LA's
+compute-balancing gain more visible.
+
+### V3 — OPT-PF-OVERLAP
+
+Purpose: full optimized runtime.
+
+Properties:
+- same predictor, P, promotion and prefetch placement semantics as V2;
+- global fetch barrier OFF;
+- residual demand H2D submitted as early as possible after current-controller
+  hit/miss/owner decision;
+- demand H2D overlaps forward communication and ready expert compute;
+- background prefetch remains lower priority than current demand;
+- expert execution is ready-first with only per-slot waits.
+
+Decode order:
+
+```
+metadata
+-> current controller
+-> urgent demand H2D submit --------------------------+
+-> fused forward A2A async                            |
+      || predictor / prefetch controller              |
+      || next-layer background H2D                    |
+forward receive ready                                 |
+-> ready-first expert compute <-----------------------+
+      || remaining demand H2D
+-> return A2A
+-> combine
+```
+
+This arm answers whether pushing exposed H2D below the communication / expert
+compute critical path increases LA's realized TPOT benefit.
+
+### Selection metric
+
+For each variant v and local batch B:
+
+```
+G_LA(v,B) = (TPOT_BR(v,B) - TPOT_LA(v,B)) / TPOT_BR(v,B)
+```
+
+Only stable BR and LA measurements are eligible.
+
+Primary final-runtime score:
+
+```
+G_robust(v) = min(G_LA(v,B128), G_LA(v,B256))
+```
+
+Choose the eligible variant with the largest `G_robust`.
+
+Tie-breaks, in order:
+1. larger mean LA gain across B128/B256;
+2. lower absolute LA TPOT averaged across B128/B256;
+3. lower exposed H2D;
+4. lower extra HBM / wasted prefetch bytes.
+
+The robust minimum prevents choosing a runtime that only makes LA look strong
+on one batch size.
+
+### Anti-gaming constraint
+
+A variant may not win merely because BR became artificially slower.
+
+Therefore report for every arm:
+- absolute BR TPOT;
+- absolute LA TPOT;
+- LA gain;
+- exposed H2D;
+- communication time;
+- expert-compute time;
+- controller time.
+
+If a candidate has larger relative LA gain but materially worse LA TPOT than a
+strictly dominated arm, flag it as `GAIN_ONLY_DOMINATED` and do not adopt it.
+
+A simple dominance rule is sufficient:
+variant A dominates B if A has
+- no worse stable LA gain (within measurement tolerance), and
+- lower absolute LA TPOT.
+
+### Prefetch tuning fairness
+
+P and trigger timing are tuned **before** the final BR-vs-LA comparison using a
+policy-neutral protocol:
+- first use BR-only physical sweeps to select a small P/trigger knee;
+- freeze that P/trigger;
+- then run BR and LA using exactly the same frozen prefetch configuration.
+
+Do not tune P separately for LA.
+
+### Final adoption
+
+After the three-arm physical comparison:
+- write `FINAL_RUNTIME_SELECTION.json`;
+- record all stable repeats and phase exposure;
+- set the winning variant as the default optimized runtime;
+- keep the other two as explicit ablation/diagnostic modes;
+- do not delete fetch-barrier mode because V1/V2 remain useful mechanism
+  controls.
+
+## 17. Final success conditions
 
 Correctness:
 - exact token/output parity;
