@@ -1,5 +1,12 @@
 # BR-only physical tuning protocol
 
+Owner updates: `OWNER_PARTIAL_RETURN_AMENDMENT.md` enables true rank-partial
+return with reported numerical differences; use FP32 for the common main stack.
+`OWNER_JITTER_AMENDMENT.md` supersedes the original repetition cap below with
+bounded five/seven-sample jitter resolution. B256 reverses the B128 setting order
+to reduce monotonic order bias. Keep BF16 V3 as a separate final candidate using
+the same BR-frozen P/trigger.
+
 The final comparison remains the frozen MATH LOAD workloads at decode256.
 To avoid spending the overnight run on weak settings, screen the 18 BR-only
 (B128/B256, P1/P2/P4, T0/T1/T2) combinations on the exact first64 decode prefix.
