@@ -53,7 +53,7 @@ class ProfileRuntime(DecodeOffloadRuntime):
   for t in self.h2d.trace:
    if t.profile_meta['source_event']<48:continue
    row=dict(t.profile_meta)
-   row.update(kind='demand' if row['origin']=='demand' else 'useful_prefetch' if row['use_event'] is not None else 'wasted_prefetch',bytes=9437184,event_dma_ms=t.begin.elapsed_time(t.done))
+   row.update(kind='demand' if row['origin']=='demand' else 'useful_prefetch' if row['use_event'] is not None else 'wasted_prefetch',bytes=9437184,event_dma_ms=t.begin.elapsed_time(t.done),readiness_observation='Logical promotion in current-layer controller, before forward payload launch; not the later expert kernel start.')
    rows.append(row)
   assert len(rows)==self.h2d.metrics['copies']-self.profile_prefill_metrics['copies']
   return rows

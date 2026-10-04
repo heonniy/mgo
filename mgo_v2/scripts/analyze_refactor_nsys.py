@@ -135,6 +135,7 @@ def analyze(path,receipt):
   assert abs(sum(row['exclusive_ms'][key] for row in per_event)-value)<1e-6
  split_report={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in split.items()}
  split_report['readiness_at_use']={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in readiness_intervals.items()}
+ split_report['readiness_scope']='Observed at logical promotion in the current-layer controller, before forward payload launch. Classified DMA duration covers the whole copy, not remaining wait time after promotion or expert-kernel start. Queued copies canceled before submission are absent from DMA classes.'
  # One all-gather per decode metadata record. Distinguish host packet
  # preparation, the collective API call, and blocking readback plus CPU unpack.
  # The final category is intentionally not presented as pure communication.
