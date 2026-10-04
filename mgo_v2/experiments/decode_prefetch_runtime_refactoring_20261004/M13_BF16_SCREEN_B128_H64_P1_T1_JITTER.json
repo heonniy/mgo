@@ -1,45 +1,45 @@
 {
   "status": "DIAGNOSTIC_SNAPSHOT",
   "case": "P1_T1",
-  "completed_repeats": 5,
+  "completed_repeats": 7,
   "timing_gate": {
-    "status": "EXTEND_JITTER",
+    "status": "UNRESOLVED_JITTER",
     "target_repeats": 7,
-    "complete": false,
-    "unstable": false,
+    "complete": true,
+    "unstable": true,
     "summary": {
       "E2E_wall": {
-        "n": 5,
-        "mean": 93.23169333562255,
-        "median": 91.30450361128896,
+        "n": 7,
+        "mean": 92.24831464168217,
+        "median": 91.00982465222478,
         "min": 88.16042887419462,
         "max": 98.75878701917827,
         "range_relative": 0.11340041305362021,
         "mean_CI95": [
-          87.66178723226683,
-          98.80159943897827
+          88.46527869782713,
+          96.03135058553721
         ],
-        "relative_CI_half_width": 0.05974262511037683,
-        "early_late_drift": 0.059891566782757914
+        "relative_CI_half_width": 0.041009268934065535,
+        "early_late_drift": 0.05672258945423055
       },
       "TPOT": {
-        "n": 5,
-        "mean": 1.2412069580078124,
-        "median": 1.2268480224609375,
+        "n": 7,
+        "mean": 1.2281333879743304,
+        "median": 1.2153109130859374,
         "min": 1.171470703125,
         "max": 1.33437646484375,
         "range_relative": 0.1300205086735613,
         "mean_CI95": [
-          1.1641303342717175,
-          1.3182835817439074
+          1.1758252342383344,
+          1.2804415417103263
         ],
-        "relative_CI_half_width": 0.062098124119289444,
-        "early_late_drift": 0.07349481877087594
+        "relative_CI_half_width": 0.04259159000820957,
+        "early_late_drift": 0.06878890016082959
       }
     },
     "estimate": {
-      "E2E_wall": 93.23169333562255,
-      "TPOT": 1.2412069580078124
+      "E2E_wall": 92.24831464168217,
+      "TPOT": 1.2281333879743304
     },
     "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
   },
@@ -1106,6 +1106,430 @@
           "ru_nivcsw": 73
         }
       ]
+    },
+    {
+      "repeat": 6,
+      "E2E_wall": 91.00982465222478,
+      "TPOT": 1.2153109130859374,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 165.16469099999995,
+          "ru_stime": 0.9474620000000016,
+          "ru_nvcsw": 199040,
+          "ru_nivcsw": 316
+        },
+        {
+          "ru_utime": 166.08396900000002,
+          "ru_stime": 2.0715569999999985,
+          "ru_nvcsw": 260490,
+          "ru_nivcsw": 74
+        },
+        {
+          "ru_utime": 165.57045199999993,
+          "ru_stime": 3.2801630000000017,
+          "ru_nvcsw": 255730,
+          "ru_nivcsw": 74
+        },
+        {
+          "ru_utime": 162.32387199999994,
+          "ru_stime": 2.269273999999996,
+          "ru_nvcsw": 253621,
+          "ru_nivcsw": 57
+        },
+        {
+          "ru_utime": 164.10403100000008,
+          "ru_stime": 2.161678000000002,
+          "ru_nvcsw": 169717,
+          "ru_nivcsw": 75
+        },
+        {
+          "ru_utime": 159.2317710000001,
+          "ru_stime": 3.4152479999999983,
+          "ru_nvcsw": 264106,
+          "ru_nivcsw": 76
+        },
+        {
+          "ru_utime": 158.58206800000005,
+          "ru_stime": 3.0436520000000016,
+          "ru_nvcsw": 252140,
+          "ru_nivcsw": 68
+        },
+        {
+          "ru_utime": 163.09178299999985,
+          "ru_stime": 3.2432930000000013,
+          "ru_nvcsw": 244572,
+          "ru_nivcsw": 64
+        }
+      ]
+    },
+    {
+      "repeat": 7,
+      "E2E_wall": 88.56991116143763,
+      "TPOT": 1.1755880126953124,
+      "copy_bytes": 1183026511872,
+      "rank_scheduler": [
+        {
+          "copies": 17027,
+          "bytes": 160686931968,
+          "background_copies": 3008,
+          "urgent_copies": 14019,
+          "canceled": 0,
+          "escalated": 2551,
+          "restaged": 0
+        },
+        {
+          "copies": 16650,
+          "bytes": 157129113600,
+          "background_copies": 3008,
+          "urgent_copies": 13642,
+          "canceled": 0,
+          "escalated": 2540,
+          "restaged": 0
+        },
+        {
+          "copies": 16283,
+          "bytes": 153665667072,
+          "background_copies": 3008,
+          "urgent_copies": 13275,
+          "canceled": 0,
+          "escalated": 2558,
+          "restaged": 0
+        },
+        {
+          "copies": 15870,
+          "bytes": 149768110080,
+          "background_copies": 3008,
+          "urgent_copies": 12862,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 15452,
+          "bytes": 145823367168,
+          "background_copies": 3008,
+          "urgent_copies": 12444,
+          "canceled": 0,
+          "escalated": 2548,
+          "restaged": 0
+        },
+        {
+          "copies": 15076,
+          "bytes": 142274985984,
+          "background_copies": 3008,
+          "urgent_copies": 12068,
+          "canceled": 0,
+          "escalated": 2560,
+          "restaged": 0
+        },
+        {
+          "copies": 14692,
+          "bytes": 138651107328,
+          "background_copies": 3008,
+          "urgent_copies": 11684,
+          "canceled": 0,
+          "escalated": 2552,
+          "restaged": 0
+        },
+        {
+          "copies": 14308,
+          "bytes": 135027228672,
+          "background_copies": 3008,
+          "urgent_copies": 11300,
+          "canceled": 0,
+          "escalated": 2543,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20404,
+          "wasted": 3660,
+          "promotions": 20404,
+          "promotion_evictions": 20404,
+          "promotion_victim_reloads": 16345,
+          "mandatory": 101294,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 166.3811599999999,
+          "ru_stime": 2.311748999999999,
+          "ru_nvcsw": 268121,
+          "ru_nivcsw": 114
+        },
+        {
+          "ru_utime": 164.13703299999997,
+          "ru_stime": 2.7044950000000014,
+          "ru_nvcsw": 254018,
+          "ru_nivcsw": 72
+        },
+        {
+          "ru_utime": 163.82451500000002,
+          "ru_stime": 3.631851999999995,
+          "ru_nvcsw": 255848,
+          "ru_nivcsw": 67
+        },
+        {
+          "ru_utime": 163.28666700000008,
+          "ru_stime": 1.5190290000000033,
+          "ru_nvcsw": 174594,
+          "ru_nivcsw": 63
+        },
+        {
+          "ru_utime": 161.927412,
+          "ru_stime": 3.1699279999999987,
+          "ru_nvcsw": 239179,
+          "ru_nivcsw": 63
+        },
+        {
+          "ru_utime": 156.96019699999988,
+          "ru_stime": 2.4935469999999995,
+          "ru_nvcsw": 260570,
+          "ru_nivcsw": 77
+        },
+        {
+          "ru_utime": 155.54493000000002,
+          "ru_stime": 3.124162999999996,
+          "ru_nvcsw": 253854,
+          "ru_nivcsw": 67
+        },
+        {
+          "ru_utime": 154.16451299999994,
+          "ru_stime": 2.441975999999997,
+          "ru_nvcsw": 197551,
+          "ru_nivcsw": 68
+        }
+      ]
     }
   ],
   "boundaries": [
@@ -1568,6 +1992,83 @@
           "5, 1980, 2619, 119.81, 0",
           "6, 1980, 2619, 121.96, 0",
           "7, 1980, 2619, 122.36, 0"
+        ]
+      }
+    },
+    {
+      "key": "P1_T1_r7",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 21199,
+            "free_mib": 59891,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 18567,
+            "free_mib": 62523,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 2,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 3,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18659,
+            "free_mib": 62431,
+            "temperature_c": 44
+          },
+          {
+            "gpu": 5,
+            "used_mib": 23291,
+            "free_mib": 57799,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 6,
+            "used_mib": 19273,
+            "free_mib": 61817,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 7,
+            "used_mib": 19925,
+            "free_mib": 61165,
+            "temperature_c": 36
+          }
+        ],
+        "host_available_bytes": 1498238853120,
+        "unix": 1791137956.0874772,
+        "rss_bytes": 954420215808,
+        "foreign_pids": [],
+        "collection_seconds": 0.430041934363544
+      },
+      "diagnostics": {
+        "load_average": [
+          15.34814453125,
+          14.21875,
+          12.47509765625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.65, 0",
+          "1, 1980, 2619, 124.80, 0",
+          "2, 1980, 2619, 121.03, 0",
+          "3, 1980, 2619, 125.11, 0",
+          "4, 1980, 2619, 125.55, 0",
+          "5, 1980, 2619, 119.69, 0",
+          "6, 1980, 2619, 121.82, 0",
+          "7, 1980, 2619, 122.23, 0"
         ]
       }
     }
