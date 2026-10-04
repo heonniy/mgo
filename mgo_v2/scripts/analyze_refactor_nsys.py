@@ -21,14 +21,37 @@ def intersection(left,right):
   else:j+=1
  return out
 
+def exclusive_partition(window,h2d,comm,compute):
+ """Disjoint actual-time bins, including activity outside the three classes."""
+ names=('idle_or_unattributed','H2D_only','COMM_only','H2D_COMM',
+        'COMPUTE_only','H2D_COMPUTE','COMM_COMPUTE','H2D_COMM_COMPUTE')
+ totals={name:0 for name in names}
+ # Union each class first: concurrent kernels of one class count only once.
+ events=defaultdict(lambda:[0,0,0])
+ for k,intervals in enumerate((h2d,comm,compute)):
+  for a,b in intersection(intervals,window):
+   events[a][k]+=1;events[b][k]-=1
+ for a,b in union(window):
+  events[a];events[b]
+ active=[0,0,0];previous=None
+ for t,delta in sorted(events.items()):
+  if previous is not None:
+   inside=duration(intersection([(previous,t)],window))
+   mask=sum(1<<k for k,v in enumerate(active) if v)
+   totals[names[mask]]+=inside
+  active=[v+d for v,d in zip(active,delta)];previous=t
+ assert sum(totals.values())==duration(window)
+ return {name:value/1e6 for name,value in totals.items()}
+
 def analyze(path,receipt):
  db=sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
  strings={r['id']:r['value'] for r in db.execute('SELECT id,value FROM StringIds')}
- ranges=defaultdict(list);decode=[];cpu=defaultdict(list)
+ ranges=defaultdict(list);decode=[];decode_ids=[];cpu=defaultdict(list)
  for r in db.execute('SELECT start,end,globalTid,text,textId FROM NVTX_EVENTS WHERE end IS NOT NULL AND end>start'):
   name=strings.get(r['textId'],r['text'])
   if not name:continue
   if name.startswith('decode.event.'):
+   decode_ids.append((int(name.rsplit('.',1)[1]),r['start'],r['end']))
    decode.append((r['start'],r['end']));name='decode.event'
   ranges[(r['globalTid'],name)].append((r['start'],r['end']))
   if name.startswith('moe.'):cpu[name].append((r['start'],r['end']))
@@ -93,9 +116,22 @@ def analyze(path,receipt):
  window=[(window[0][0],max([window[0][1]]+[b for a,b in h2d+other_h2d+decode_kernels]))]
  comm=kernels['moe.forward_a2a.nccl']+kernels['moe.return_a2a.nccl'];expert=kernels['moe.expert_compute'];cover=comm+expert
  total=duration(h2d);hidden=duration(intersection(h2d,cover));cpu_report={}
+ decomposition_comm=comm+kernels['moe.metadata.nccl']
+ exclusive=exclusive_partition(window,h2d,decomposition_comm,expert)
+ # Adjacent host event-start boundaries partition the complete decode window;
+ # GPU work is assigned by actual timestamp, not the launch's layer label.
+ # A copy spanning a boundary is split, never counted twice.
+ ordered=sorted(decode_ids,key=lambda x:x[1]);per_event=[]
+ for i,(event,start,end) in enumerate(ordered):
+  stop=ordered[i+1][1] if i+1<len(ordered) else window[0][1]
+  per_event.append(dict(event=event,layer=event%48,step=event//48-1,
+                        window_ns=[start,stop],exclusive_ms=exclusive_partition([(start,stop)],h2d,decomposition_comm,expert)))
+ for key,value in exclusive.items():
+  assert abs(sum(row['exclusive_ms'][key] for row in per_event)-value)<1e-6
  split_report={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in split.items()}
  for name,ints in cpu.items():
-  ints=intersection(ints,window);full=duration(ints);overlap=duration(intersection(ints,cover));cpu_report[name]=dict(total_ms=full/1e6,overlap_comm_expert_ms=overlap/1e6,outside_comm_expert_ms=(full-overlap)/1e6)
- return dict(status='PASS',source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),kernel_names={k:dict(v) for k,v in kernel_names.items()},prefetch_readiness_at_use=dict(readiness),H2D_split=split_report,H2D_by_source_event_ms={str(k):duration(v)/1e6 for k,v in byevent.items()},unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),other_H2D=dict(count=other_count,bytes=other_bytes,total_union_ms=duration(other_h2d)/1e6),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Expert DMA uses the 9-MiB copy size and exactly reconciles the scheduler decode-copy count; smaller control/input copies are reported separately. Capture includes trailing decode work after CPU launch spans. NCCL kernel names separate collective work from local pack/combine kernels. Copy classes map the single H2D stream in submission order to checked ticket provenance. GPU phases use actual correlated CUDA runtime/driver launches; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
+  ints=intersection(ints,window);full=duration(ints);overlap=duration(intersection(ints,cover));a2a_overlap=duration(intersection(ints,comm));cpu_report[name]=dict(total_ms=full/1e6,overlap_comm_expert_ms=overlap/1e6,outside_comm_expert_ms=(full-overlap)/1e6,overlap_payload_A2A_ms=a2a_overlap/1e6,outside_payload_A2A_ms=(full-a2a_overlap)/1e6)
+ decomposition=dict(aggregate_exclusive_ms=exclusive,per_event=per_event,window_definition='Adjacent host decode-event start timestamps, through final captured decode work. Actual GPU intervals are split at boundaries; these are time windows, not causal layer ownership. COMM includes metadata and both payload NCCL collectives. Local pack/combine kernels and non-MoE work remain unattributed. Idle_or_unattributed is not necessarily GPU idle.')
+ return dict(status='PASS',interval_decomposition=decomposition,source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),kernel_names={k:dict(v) for k,v in kernel_names.items()},prefetch_readiness_at_use=dict(readiness),H2D_split=split_report,H2D_by_source_event_ms={str(k):duration(v)/1e6 for k,v in byevent.items()},unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),other_H2D=dict(count=other_count,bytes=other_bytes,total_union_ms=duration(other_h2d)/1e6),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Expert DMA uses the 9-MiB copy size and exactly reconciles the scheduler decode-copy count; smaller control/input copies are reported separately. Capture includes trailing decode work after CPU launch spans. NCCL kernel names separate collective work from local pack/combine kernels. Copy classes map the single H2D stream in submission order to checked ticket provenance. GPU phases use actual correlated CUDA runtime/driver launches; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('sqlite',type=Path);p.add_argument('--output',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.sqlite,json.loads(a.receipt.read_text())),indent=2)+'\n')
