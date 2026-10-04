@@ -441,29 +441,12 @@ def scope_slice(name,horizon):
     raise KeyError(name)
 
 def load_calibration():
-    hot=json.loads((PKG/"experiments/hot_expert_replication_threshold_20261003/break_even_microcost.json").read_text())
-    pair={}
-    for row in hot["rows"]:
-        if row.get("kind")=="pair-pooled" and row.get("mode")=="T0":
-            pair[int(row["case"])]=float(row["median_ms"])
-    h2d_path=PKG/"experiments/timing_stability_numa_20261004/S2B_H2D.json"
-    h2d_medians=[];h2d_p90=[]
-    if h2d_path.exists() and h2d_path.stat().st_size:
-        try:
-            obj=json.loads(h2d_path.read_text())
-            rows=obj if isinstance(obj,list) else obj.get("rows",obj.get("records",[]))
-            for row in rows:
-                if (row.get("kind")=="H2D" and int(row.get("payload_bytes",0))==EXPERT_BYTES
-                    and int(row.get("concurrency",0))==8):
-                    h2d_medians.append(float(row["median_ms"]))
-                    h2d_p90.append(float(row["p90_ms"]))
-        except Exception:
-            pass
-    if not h2d_medians:
-        tr=list(csv.DictReader((PKG/"experiments/fetch_comm_pareto_p2p_20261002/transport_calibration.csv").open()))
-        row=next(r for r in tr if r["mode"]=="T0" and r["case"]=="h2d")
-        h2d_medians=[float(row["h2d_median_ms"])]
-        h2d_p90=[float(row["h2d_p90_ms"])]
+    micro_path=PACKET/"microbench_calibration.json"
+    if not micro_path.exists():
+        raise FileNotFoundError(
+            f"{micro_path} is required. Run scripts/run_replica_phase_microbench.py first.")
+    micro=json.loads(micro_path.read_text())
+    assert micro.get("status")=="PASS" and set(micro["environments"])=={"env1","env2"}
 
     phase=json.loads((PKG/"experiments/rank_demand_oracle_20261002/gpu_phase_summary.json").read_text())
     loads=json.loads((PKG/"experiments/rank_demand_oracle_20261002/rank_load_summary.json").read_text())
@@ -472,37 +455,98 @@ def load_calibration():
     gemm_slope=float(phase["P0"]["max_rank_gemm_gpu_union_ms"])/denom
     expert_slope=float(phase["P0"]["max_rank_expert_gpu_union_ms"])/denom
 
-    tr=list(csv.DictReader((PKG/"experiments/fetch_comm_pareto_p2p_20261002/transport_calibration.csv").open()))
-    peer=next(r for r in tr if r["mode"]=="T0" and r["case"]=="concurrent")
-    conservative_bw=float(peer["peer_effective_GBps"])*1e9
+    envs={}
+    for name,e in micro["environments"].items():
+        act={int(k):float(v["oneway_median_ms"]) for k,v in e["activation"].items()}
+        act_p90={int(k):float(v["oneway_p90_ms"]) for k,v in e["activation"].items()}
+        compute={int(k):float(v["median_ms"]) for k,v in e["expert_compute"].items()}
+        compute_p90={int(k):float(v["p90_ms"]) for k,v in e["expert_compute"].items()}
+        envs[name]=dict(
+            h2d_median_ms=float(e["H2D_9MiB"]["median_ms"]),
+            h2d_p90_ms=float(e["H2D_9MiB"]["p90_ms"]),
+            d2d_median_ms=float(e["D2D_9MiB_onepair"]["median_ms"]),
+            d2d_p90_ms=float(e["D2D_9MiB_onepair"]["p90_ms"]),
+            d2d_twopair_median_ms=float(e["D2D_9MiB_twopair"]["median_ms"]),
+            resident_overlap_measured_ms=float(e["resident_D2D_overlap_H2D"]["median_ms"]),
+            miss_overlap_measured_ms=float(e["miss_overlap"]["median_ms"]),
+            miss_serial_measured_ms=float(e["miss_serial"]["median_ms"]),
+            miss_overlap_saving_vs_serial=float(e["miss_overlap_saving_vs_serial"]),
+            activation_oneway_ms=act,
+            activation_oneway_p90_ms=act_p90,
+            expert_compute_ms=compute,
+            expert_compute_p90_ms=compute_p90,
+        )
     return dict(
-        h2d_median_ms=float(statistics.median(h2d_medians)),
-        h2d_p90_ms=float(statistics.median(h2d_p90)),
-        p2p_pair_ms=pair,
-        gemm_ms_per_row=gemm_slope,
-        expert_ms_per_row=expert_slope,
-        conservative_peer_bytes_per_s=conservative_bw,
-        d2d_sensitivity_ms=[0.02,0.05,0.10,0.20],
-        source_files=[
-            "hot_expert_replication_threshold_20261003/break_even_microcost.json",
-            "timing_stability_numa_20261004/S2B_H2D.json",
-            "rank_demand_oracle_20261002/gpu_phase_summary.json",
-            "rank_demand_oracle_20261002/rank_load_summary.json",
-            "fetch_comm_pareto_p2p_20261002/transport_calibration.csv",
-        ],
+        status="PASS",
+        envs=envs,
+        archived_gemm_ms_per_row=gemm_slope,
+        archived_expert_ms_per_row=expert_slope,
+        microbench_path=str(micro_path),
+        microbench_sha256=sha(micro_path),
+        note="4-GPU Env1/Env2 microbench calibrates pair/H2D/D2D costs; archived R4 profile slopes retained as second compute model.",
     )
 
-def pair_cost_ms(n,table):
-    if n<=0: return 0.0
+def interp_ms(n,table):
+    if n<=0:return 0.0
     xs=sorted(table)
-    if n<=xs[0]: return table[xs[0]]
+    if n<=xs[0]:return float(table[xs[0]])
     for a,b in zip(xs[:-1],xs[1:]):
         if a<=n<=b:
             f=(n-a)/(b-a)
-            return table[a]*(1-f)+table[b]*f
+            return float(table[a])*(1-f)+float(table[b])*f
     a,b=xs[-2],xs[-1]
-    slope=max(0.0,(table[b]-table[a])/(b-a))
-    return table[b]+slope*(n-b)
+    slope=max(0.0,(float(table[b])-float(table[a]))/(b-a))
+    return float(table[b])+slope*(n-b)
+
+def phase_model(result,sl,cal):
+    r=as_result_dict(result)
+    idx=np.arange(len(r["max_rows"]))[sl]
+    critical=int(r["max_rows"][sl].sum())
+    out={}
+    for env_name,e in cal["envs"].items():
+        comm_med=0.0;comm_p90=0.0;compute_curve=0.0;compute_curve_p90=0.0
+        overlap_med=0.0;serial_med=0.0;overlap_p90=0.0;serial_p90=0.0
+        for ev in idx:
+            d=int(r["max_dispatch_pair_rows"][ev]);ret=int(r["max_return_pair_rows"][ev])
+            comm_med += interp_ms(d,e["activation_oneway_ms"])+interp_ms(ret,e["activation_oneway_ms"])
+            comm_p90 += interp_ms(d,e["activation_oneway_p90_ms"])+interp_ms(ret,e["activation_oneway_p90_ms"])
+            rows=int(r["max_rows"][ev])
+            compute_curve += interp_ms(rows,e["expert_compute_ms"])
+            compute_curve_p90 += interp_ms(rows,e["expert_compute_p90_ms"])
+            max_fetch=int(r["h2d_counts"][ev].max())
+            base=max_fetch*e["h2d_median_ms"];base90=max_fetch*e["h2d_p90_ms"]
+            if r["replica_created"][ev]:
+                dep=e["h2d_median_ms"] if r["replica_source_miss"][ev] else 0.0
+                dep90=e["h2d_p90_ms"] if r["replica_source_miss"][ev] else 0.0
+                overlap_med += max(base,dep+e["d2d_median_ms"])
+                overlap_p90 += max(base90,dep90+e["d2d_p90_ms"])
+                serial_med += base+e["d2d_median_ms"]
+                serial_p90 += base90+e["d2d_p90_ms"]
+            else:
+                overlap_med += base;serial_med += base
+                overlap_p90 += base90;serial_p90 += base90
+        archived_expert=critical*cal["archived_expert_ms_per_row"]
+        archived_gemm=critical*cal["archived_gemm_ms_per_row"]
+        out[env_name]=dict(
+            comm_median_ms=float(comm_med),comm_p90_ms=float(comm_p90),
+            transfer_overlap_median_ms=float(overlap_med),
+            transfer_serial_median_ms=float(serial_med),
+            transfer_overlap_p90_ms=float(overlap_p90),
+            transfer_serial_p90_ms=float(serial_p90),
+            compute_curve_median_ms=float(compute_curve),
+            compute_curve_p90_ms=float(compute_curve_p90),
+            compute_archived_expert_ms=float(archived_expert),
+            compute_archived_gemm_ms=float(archived_gemm),
+            phase_overlap_archived_expert_ms=float(comm_med+overlap_med+archived_expert),
+            phase_serial_archived_expert_ms=float(comm_med+serial_med+archived_expert),
+            phase_overlap_curve_ms=float(comm_med+overlap_med+compute_curve),
+            phase_serial_curve_ms=float(comm_med+serial_med+compute_curve),
+            phase_overlap_p90_curve_ms=float(comm_p90+overlap_p90+compute_curve_p90),
+            microbench_miss_overlap_ms=e["miss_overlap_measured_ms"],
+            microbench_miss_serial_ms=e["miss_serial_measured_ms"],
+            microbench_overlap_saving_vs_serial=e["miss_overlap_saving_vs_serial"],
+        )
+    return out
 
 def summarize(result,scope,horizon,cal):
     r=as_result_dict(result);sl=scope_slice(scope,horizon)
@@ -537,41 +581,7 @@ def summarize(result,scope,horizon,cal):
         evictions=int(r["evictions"][sl].sum()),
         active_peer_pairs_sum=int(r["active_peer_pairs"][sl].sum()),
     )
-
-    fast_comm=0.0;cons_comm=0.0
-    alpha=pair_cost_ms(1,cal["p2p_pair_ms"])/2
-    bw=cal["conservative_peer_bytes_per_s"]
-    idx=np.arange(len(r["max_rows"]))[sl]
-    for ev in idx:
-        d=int(r["max_dispatch_pair_rows"][ev]);ret=int(r["max_return_pair_rows"][ev])
-        fast_comm += pair_cost_ms(d,cal["p2p_pair_ms"])/2 + pair_cost_ms(ret,cal["p2p_pair_ms"])/2
-        cons_comm += (alpha + d*ROW_BYTES/bw*1e3 if d else 0.0)
-        cons_comm += (alpha + ret*ROW_BYTES/bw*1e3 if ret else 0.0)
-    out["comm_fast_ms"]=float(fast_comm)
-    out["comm_conservative_ms"]=float(cons_comm)
-    out["compute_gemm_ms"]=float(out["critical_rows_sum"]*cal["gemm_ms_per_row"])
-    out["compute_expert_ms"]=float(out["critical_rows_sum"]*cal["expert_ms_per_row"])
-
-    transfer={}
-    for hname,hms in (("median",cal["h2d_median_ms"]),("p90",cal["h2d_p90_ms"])):
-        for d2d in cal["d2d_sensitivity_ms"]:
-            overlap=0.0;serial=0.0
-            for ev in idx:
-                max_fetch=int(r["h2d_counts"][ev].max())
-                base=max_fetch*hms
-                if r["replica_created"][ev]:
-                    dep=hms if r["replica_source_miss"][ev] else 0.0
-                    overlap += max(base,dep+d2d)
-                    serial += base+d2d
-                else:
-                    overlap += base;serial += base
-            transfer[f"{hname}_d2d{d2d:.2f}_overlap_ms"]=float(overlap)
-            transfer[f"{hname}_d2d{d2d:.2f}_serial_ms"]=float(serial)
-    out["transfer_models"]=transfer
-    t=transfer["median_d2d0.05_overlap_ms"]
-    out["phase_fast_gemm_ms"]=float(fast_comm+t+out["compute_gemm_ms"])
-    out["phase_fast_expert_ms"]=float(fast_comm+t+out["compute_expert_ms"])
-    out["phase_conservative_expert_ms"]=float(cons_comm+t+out["compute_expert_ms"])
+    out["phase_by_env"]=phase_model(result,sl,cal)
     return out
 
 def state_hash(result):
@@ -812,9 +822,9 @@ def policy_eval(winners,cal):
                 dec=summarize(res,"decode",64,cal)
                 short.append(dict(config=cfg,decode=dec))
             by_compute=min(short,key=lambda x:x["decode"]["critical_rows_sum"])
-            by_phase=min(short,key=lambda x:x["decode"]["phase_fast_expert_ms"])
+            by_phase=min(short,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"])
             safe=[x for x in short if x["decode"]["H2D_bytes"]<=base64["H2D_bytes"]*1.02]
-            by_safe=min(safe,key=lambda x:x["decode"]["phase_fast_expert_ms"]) if safe else by_phase
+            by_safe=min(safe,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"]) if safe else by_phase
             selected=[]
             seen=set()
             for x,label in ((by_compute,"compute"),(by_phase,"phase"),(by_safe,"h2d-safe")):
@@ -837,7 +847,7 @@ def policy_eval(winners,cal):
                           moe_total=summarize(res,"moe_total",HORIZON,cal),
                           state_sha256=state_hash(res))
                 rows.append(item);full.append(item)
-            best=min(full,key=lambda x:x["decode"]["phase_fast_expert_ms"])
+            best=min(full,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"])
             res=replay_arrays(arrays,batch,seed,p,True,**best["config"],
                               horizon=HORIZON,replica_all_phase=True)
             rows.append(dict(batch=batch,stress=fam,dataset=win["dataset"],
@@ -865,7 +875,7 @@ def best_rows(rows):
                 b=base[pname]["decode"]
                 safe=[x for x in reps if x["decode"]["H2D_bytes"]<=b["H2D_bytes"]*1.02]
                 pool=safe or reps
-                chosen.append(min(pool,key=lambda x:x["decode"]["phase_fast_expert_ms"]))
+                chosen.append(min(pool,key=lambda x:x["decode"]["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"]))
             out[(batch,fam)]=chosen
     return out
 
@@ -883,7 +893,7 @@ def write_summary(winners,top5,rows,cal):
                               critical_rows=d["critical_rows_sum"],H2D_bytes=d["H2D_bytes"],
                               D2D_bytes=d["D2D_bytes"],peer_bytes=d["peer_bytes"],
                               exact_hit=d["exact_global_hit_rate"],
-                              phase_fast_expert_ms=d["phase_fast_expert_ms"],
+                              phase_fast_expert_ms=d["phase_by_env"]["env1"]["phase_overlap_archived_expert_ms"],
                               phase_cons_expert_ms=d["phase_conservative_expert_ms"],
                               replica_creations=d["replica_creations"]))
     with (PACKET/"comparison.csv").open("w",newline="") as f:
@@ -903,11 +913,11 @@ def write_summary(winners,top5,rows,cal):
                 BR_REP_over_BR_rows=gain("BR","BR+REP","critical_rows_sum"),
                 CA_REP_over_CA_rows=gain("CA","CA+REP","critical_rows_sum"),
                 LA_REP_over_LA_rows=gain("LA","LA+REP","critical_rows_sum"),
-                CA_over_BR_phase=gain("BR","CA","phase_fast_expert_ms"),
-                LA_over_BR_phase=gain("BR","LA","phase_fast_expert_ms"),
-                BR_REP_over_BR_phase=gain("BR","BR+REP","phase_fast_expert_ms"),
-                CA_REP_over_CA_phase=gain("CA","CA+REP","phase_fast_expert_ms"),
-                LA_REP_over_LA_phase=gain("LA","LA+REP","phase_fast_expert_ms"),
+                CA_over_BR_phase=gain("BR","CA","phase_env1_overlap_ms"),
+                LA_over_BR_phase=gain("BR","LA","phase_env1_overlap_ms"),
+                BR_REP_over_BR_phase=gain("BR","BR+REP","phase_env1_overlap_ms"),
+                CA_REP_over_CA_phase=gain("CA","CA+REP","phase_env1_overlap_ms"),
+                LA_REP_over_LA_phase=gain("LA","LA+REP","phase_env1_overlap_ms"),
             )
         row=dict(stress=fam,B128=byb[128],B256=byb[256],growth={})
         for k in byb[128]:
