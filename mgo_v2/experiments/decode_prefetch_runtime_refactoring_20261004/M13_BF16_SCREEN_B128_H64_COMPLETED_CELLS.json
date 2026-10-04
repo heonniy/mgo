@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL_SCREEN",
-  "snapshot_unix": 1791138702.693062,
+  "snapshot_unix": 1791139463.487182,
   "batch": 128,
   "horizon": 64,
   "precision": "bf16",
@@ -273,6 +273,109 @@
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
       "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P2_T2",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "fc023e7b54ef764de9387050c9fb0445fcb22cb2f53070dd48cbe4da075c4dae",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 99.93123807571828,
+          "TPOT": 1.363354736328125
+        },
+        {
+          "E2E_wall": 99.74993267841637,
+          "TPOT": 1.3289417724609376
+        },
+        {
+          "E2E_wall": 86.78660066705197,
+          "TPOT": 1.161305419921875
+        },
+        {
+          "E2E_wall": 88.37565693166107,
+          "TPOT": 1.1845889892578125
+        },
+        {
+          "E2E_wall": 88.59228284936398,
+          "TPOT": 1.1852972412109375
+        },
+        {
+          "E2E_wall": 90.43982845917344,
+          "TPOT": 1.2175303955078125
+        },
+        {
+          "E2E_wall": 85.97275005280972,
+          "TPOT": 1.1488916015625
+        }
+      ],
+      "gate": {
+        "status": "UNRESOLVED_JITTER",
+        "target_repeats": 7,
+        "complete": true,
+        "unstable": true,
+        "summary": {
+          "E2E_wall": {
+            "n": 7,
+            "mean": 91.40689853059926,
+            "median": 88.59228284936398,
+            "min": 85.97275005280972,
+            "max": 99.93123807571828,
+            "range_relative": 0.1501687851178117,
+            "mean_CI95": [
+              85.91991233851346,
+              96.89388472268507
+            ],
+            "relative_CI_half_width": 0.06002814098597815,
+            "early_late_drift": 0.1237382556214037
+          },
+          "TPOT": {
+            "n": 7,
+            "mean": 1.2271300223214285,
+            "median": 1.1852972412109375,
+            "min": 1.1488916015625,
+            "max": 1.363354736328125,
+            "range_relative": 0.1707341605247966,
+            "mean_CI95": [
+              1.1488099038758834,
+              1.3054501407669736
+            ],
+            "relative_CI_half_width": 0.06382381411986218,
+            "early_late_drift": 0.12883678399630213
+          }
+        },
+        "estimate": {
+          "E2E_wall": 91.40689853059926,
+          "TPOT": 1.2271300223214285
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 91.40689853059926,
+        "TPOT": 1.2271300223214285
+      },
+      "initial_gate": {
+        "status": "THIRD_REQUIRED",
+        "target_repeats": 3,
+        "relative_difference": {
+          "E2E_wall": 0.0018159488610486139,
+          "TPOT": 0.025564022205463336
+        },
+        "estimator": "median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": true
     }
   ],
   "selection": "No shared setting chosen until B256 screen and full256 BR confirmation."
