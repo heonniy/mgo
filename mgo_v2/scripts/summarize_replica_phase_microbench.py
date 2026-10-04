@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Summarize Env1/Env2 four-GPU replica microbench into CPU-model calibration."""
-import argparse,json,statistics
+import argparse,json,statistics,hashlib
 from pathlib import Path
+
+def sha(path):
+ h=hashlib.sha256()
+ with path.open('rb') as f:
+  for b in iter(lambda:f.read(8*2**20),b''):h.update(b)
+ return h.hexdigest()
 
 def stat(rows,kind,rows_value=None):
  vals=[]
@@ -40,6 +46,7 @@ def env(root,name):
                        p90_ms=p90(ranks,'expert_compute',n))
  return dict(
   environment=name,
+  raw_receipts=[dict(path=str(path/f'rank{i}.json'),sha256=sha(path/f'rank{i}.json')) for i in range(4)],
   transport_env=status.get('transport_env',{}),
   H2D_9MiB=dict(median_ms=stat(ranks,'h2d_4rank'),p90_ms=p90(ranks,'h2d_4rank')),
   D2D_9MiB_onepair=dict(median_ms=stat(ranks,'d2d_expert_onepair'),p90_ms=p90(ranks,'d2d_expert_onepair')),
