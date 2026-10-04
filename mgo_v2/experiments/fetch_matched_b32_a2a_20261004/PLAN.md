@@ -7,7 +7,7 @@ Status: owner-authorized, queued after current physical R4 work completes.
 
 - dataset: ShareGPT V3 cleaned
 - existing 2,048-request exact-model candidate pool
-- decode horizon: 256
+- decode horizon: **64** (use the first 64-step prefix of the existing exact 256-step traces)
 - local batch: **32**
 - cache ratio: **30% global**
 - eviction: Gate, W=128
@@ -46,8 +46,7 @@ across R4+R8.
 
 ### Hard validity conditions
 
-A candidate BR/CA pair is eligible only if, over the full frozen 256-step
-trace:
+A candidate BR/CA pair is eligible only if, over the full frozen **64-step prefix**:
 
 ```
 total_fetches_BR == total_fetches_CA
@@ -105,7 +104,7 @@ Therefore the physical comparison in this packet uses a **common frozen-route,
 teacher-forced decode replay** for each selected R cell:
 
 - identical request IDs and rank membership for BR and CA;
-- identical 256 generated-token sequence from the selected exact trace;
+- identical 64 generated-token sequence from the selected exact-trace prefix;
 - identical per-layer top-k expert IDs and routing weights;
 - the model still executes real dense layers, real expert kernels, real CPU->GPU
   expert H2D, real bounded GPU cache, and real NCCL communication;
@@ -154,14 +153,18 @@ source's frozen routing weight immediately before `index_add_`.
 
 Do not transmit a routing-weight tensor in A2.
 
-Expected collective count:
-- all 257 forwards: A3 = 3 * 12,336 = 37,008 A2A calls/rank;
-- all 257 forwards: A2 = 2 * 12,336 = 24,672 A2A calls/rank;
-- reduction = 12,336 calls/rank (33.3%).
+Expected collective count for the 64-step horizon:
+- 1 prefill + 64 decode = 65 forwards;
+- layer events = 65 * 48 = 3,120;
+- A3 = 3 * 3,120 = 9,360 A2A calls/rank;
+- A2 = 2 * 3,120 = 6,240 A2A calls/rank;
+- reduction = 3,120 calls/rank (33.3%).
 
-For decode-only 256 steps:
-- A3 = 36,864 calls/rank;
-- A2 = 24,576 calls/rank.
+For decode-only 64 steps:
+- layer events = 64 * 48 = 3,072;
+- A3 = 9,216 calls/rank;
+- A2 = 6,144 calls/rank;
+- reduction = 3,072 calls/rank.
 
 ## 5. A2 correctness gate
 
@@ -173,7 +176,7 @@ Before any A2 timing:
 - compare weighted expert contributions from A3 and A2 on an untimed prefix;
 - require exact equality if achievable; otherwise report max-abs/max-rel BF16
   difference and require identical final teacher-forced token/logit-argmax hash
-  over a full untimed 256-step pass.
+  over a full untimed **64-step** pass.
 
 If this gate fails, stop A2 timing.
 
@@ -207,7 +210,7 @@ for both R values.
 
 ### Warmup policy
 
-Do **not** run a full 256-step warmup before every MEASURE.
+Do **not** run a full 64-step schedule warmup before every MEASURE.
 
 - Populate/validate compiler artifacts once per (R, runtime A3/A2) outside the
   scientific timer.
@@ -308,5 +311,5 @@ Commit:
 - A2 correctness validation;
 - physical timing/counters.
 
-Then stop for owner review. No Env1 rerun, other batch/cache ratio, substitution,
+Then stop for owner review. No decode256 extension, Env1 rerun, other batch/cache ratio, substitution,
 replication or extra GPU-set sweep follows automatically.

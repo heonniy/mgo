@@ -5,7 +5,7 @@ R4 work. Start this packet only after all of those scientific processes exit
 and their results are committed.
 
 1. Read README.md and PLAN.md.
-2. Reuse the completed 2,048-request ShareGPT exact-route pool.
+2. Reuse the completed 2,048-request ShareGPT exact-route pool, taking only the first 64 decode steps of each existing 256-step trace; do not recapture.
 3. For R4/B32/cache30 and R8/B32/cache30, prescreen 512 sample seeds x 64 DP
    seeds and retain top-64 for each of two independent objectives:
    aggregate peer-byte reduction and per-event critical-rank reduction.
@@ -26,7 +26,7 @@ and their results are committed.
    - R4 GPUs 0,1,4,6.
    - R8 GPUs 0..7.
 10. Fast screen: for every unique Peer-best/Critical-best workload, run
-    BR/A3, CA/A3, BR/A2, CA/A2 **once each**. No full 256-step warmup per
+    BR/A3, CA/A3, BR/A2, CA/A2 **once each**. No full 64-step schedule warmup per
     MEASURE; use only the one-time compile validation plus short 8-16-step
     readiness warmup per (R,A3/A2).
 11. Selective confirmation: if a fixed BR-vs-CA pair shows >=1% positive CA

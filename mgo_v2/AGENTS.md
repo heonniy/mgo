@@ -2,17 +2,18 @@
 Do not interrupt the active `ca_stress_physical_validation_20261004` R4 work.
 After it fully exits and commits, run
 `experiments/fetch_matched_b32_a2a_20261004/{README.md,PLAN.md,AGENT_TASK.md,matrix.json}`.
-Use ShareGPT local-B32/cache30/Gate W128/substitution-OFF/decode256. Search two
-independent fetch/H2D-matched winners per R: Peer-best (aggregate peer-byte
-reduction) and Critical-best (sum of per-event max-rank send+recv reduction);
-deduplicate identical winners. Physical replay uses common frozen routes/tokens
-in Env2, R4 first on GPUs0,1,4,6 then R8 on GPUs0-7, comparing current A3
-(3 A2A) against A2 (routing-weight A2A removed). Fast screen is **one timed run
-per BR/CA/A3/A2 condition**, with no full 256-step warmup per MEASURE; only
-one-time compile validation and short 8-16-step readiness warmup per
-(R,runtime). If a BR-vs-CA pair shows >=1% positive CA gain, run **one additional
-confirmation pair only** (BR once + CA once), then stop repeating. Commit and
-stop; no automatic extension.
+Use ShareGPT local-B32/cache30/Gate W128/substitution-OFF/**decode64**, reusing
+the first 64-step prefix of the existing exact decode256 traces (no recapture).
+Search two independent fetch/H2D-matched winners per R: Peer-best (aggregate
+peer-byte reduction) and Critical-best (sum of per-event max-rank send+recv
+reduction); deduplicate identical winners. Physical replay uses common frozen
+routes/tokens in Env2, R4 first on GPUs0,1,4,6 then R8 on GPUs0-7, comparing
+current A3 (3 A2A) against A2 (routing-weight A2A removed). Fast screen is
+**one timed run per BR/CA/A3/A2 condition**, with no full-horizon warmup per
+MEASURE; only one-time compile validation and short 8-16-step readiness warmup
+per (R,runtime). If a BR-vs-CA pair shows >=1% positive CA gain, run **one
+additional confirmation pair only** (BR once + CA once), then stop repeating.
+Commit and stop; no decode256 extension or other automatic follow-up.
 
 **OWNER TIMING REPETITION AMENDMENT:** Active/queued physical R8 and both R4 GPU-set studies use two clean MEASURE repeats per cell/environment/policy. Gate E2E and TPOT with abs(T1-T2)/mean(T1,T2): both <=2% stop at two; maximum >2% and <=5% adds exactly one third; either >5% stops at two and is unstable. Never use one sample as primary evidence or add further repeats. This overrides earlier three-plus-two repetition text. See `experiments/ca_stress_physical_validation_20261004/REPETITION_AMENDMENT.md`.
 

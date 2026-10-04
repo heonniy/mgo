@@ -2,7 +2,7 @@
   "status": "QUEUED_AFTER_CURRENT_PHYSICAL_PACKET",
   "dataset": "ShareGPT",
   "candidate_pool": 2048,
-  "horizon": 256,
+  "horizon": 64,
   "local_batch": 32,
   "cache_percent": 30,
   "eviction": "Gate",
@@ -91,7 +91,6 @@
       "Peer-best",
       "Critical-best"
     ],
-    "full_256_warmup_per_measure": false,
     "short_readiness_warmup_decode_steps": [
       8,
       16
@@ -101,13 +100,20 @@
       "action": "one additional BR+CA confirmation pair",
       "max_additional_confirmations": 1,
       "no_further_repeat": true
-    }
+    },
+    "full_horizon_warmup_per_measure": false
   },
   "a2a_counts": {
-    "layer_events_all_forwards": 12336,
-    "A3_calls_per_rank": 37008,
-    "A2_calls_per_rank": 24672,
-    "calls_removed_per_rank": 12336
+    "forwards_total": 65,
+    "layers_per_forward": 48,
+    "layer_events_all_forwards": 3120,
+    "A3_calls_per_rank": 9360,
+    "A2_calls_per_rank": 6240,
+    "calls_removed_per_rank": 3120,
+    "decode_only_layer_events": 3072,
+    "decode_only_A3_calls_per_rank": 9216,
+    "decode_only_A2_calls_per_rank": 6144
   },
-  "automatic_followup": false
+  "automatic_followup": false,
+  "trace_source": "first_64_decode_steps_of_existing_256_step_exact_trace"
 }
