@@ -13,7 +13,7 @@ def sha(path):
 def capture(inputs,env):
  paths=list((P/'mgo_v2').glob('*.py'))
  paths += [P/'examples'/name for name in ('env_offload_worker.py','fetch_relaxed_worker.py','la_physical_worker.py','refactor_baseline_worker.py','refactor_measure_worker.py','refactor_paired_worker.py')]
- paths += [P/'scripts'/name for name in ('env_offload_policy.py','env_offload_layout.py','env_offload_tensors.py','br_carep_cpu.py','la_placement.py','old_ca_fanout_policy.py','adaptive_timing.py')]
+ paths += [P/'scripts'/name for name in ('env_offload_policy.py','env_offload_layout.py','env_offload_tensors.py','br_carep_cpu.py','la_placement.py','old_ca_fanout_policy.py','adaptive_timing.py','refactor_thread_usage.py')]
  code={str(p.relative_to(P)):sha(p) for p in sorted(paths)}
  inputs_hashes={name:sha(inputs/name) for name in INPUTS}
  settings={k:v for k,v in env.items() if k.startswith(('NCCL_','MGO_V2_','MOE_EP_')) or k in ('CUDA_VISIBLE_DEVICES','OMP_NUM_THREADS','MKL_NUM_THREADS','OPENBLAS_NUM_THREADS','TORCHINDUCTOR_COMPILE_THREADS','CUBLAS_WORKSPACE_CONFIG')}

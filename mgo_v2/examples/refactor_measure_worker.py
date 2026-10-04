@@ -3,6 +3,7 @@ from refactor_baseline_worker import *
 from mgo_v2.decode_runtime import DecodeOffloadRuntime
 from adaptive_timing import tuning_decision
 import resource
+import refactor_thread_usage
 
 def validate(rt,row,proof,rank):
  rt.h2d.synchronize()
@@ -63,13 +64,15 @@ def main(a):
     while not (a.output/f'{key}_GO').exists():
      if time.monotonic()>deadline:raise TimeoutError('boundary release')
      time.sleep(.2)
+    thread_before=refactor_thread_usage.snapshot(rt.h2d.thread.native_id)
     usage_before=resource.getrusage(resource.RUSAGE_SELF)
     with torch._dynamo.config.patch(error_on_recompile=True):row,actual=generate(model,rt,ids,mask,teacher,horizon)
     usage_after=resource.getrusage(resource.RUSAGE_SELF)
     process_delta={k:getattr(usage_after,k)-getattr(usage_before,k) for k in ['ru_utime','ru_stime','ru_nvcsw','ru_nivcsw']}
+    thread_delta=refactor_thread_usage.delta(thread_before,refactor_thread_usage.snapshot(rt.h2d.thread.native_id))
     assert before==dict(counters['stats']) and np.array_equal(tokens,actual)
     validate(rt,row,proof,rank)
-    row.update(status='PASS',rank=rank,case=case,repeat=repeat,numerical_comparison=numeric,process_usage_delta=process_delta,affinity=cpus,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
+    row.update(status='PASS',rank=rank,case=case,repeat=repeat,numerical_comparison=numeric,process_usage_delta=process_delta,thread_usage_delta=thread_delta,affinity=cpus,no_compile_in_measure=True,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),peak_gpu_bytes=torch.cuda.max_memory_allocated())
     write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
     samples.append({k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']})
     if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=label,repeat=repeat,samples=samples))

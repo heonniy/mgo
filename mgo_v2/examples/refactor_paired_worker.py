@@ -45,11 +45,13 @@ def main(a):
    while not (a.output/f'{key}_GO').exists():
     if time.monotonic()>deadline:raise TimeoutError('paired boundary release')
     time.sleep(.2)
+   thread_before=refactor_thread_usage.snapshot(rt.h2d.thread.native_id)
    usage_before=resource.getrusage(resource.RUSAGE_SELF)
    with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
    usage_after=resource.getrusage(resource.RUSAGE_SELF);process_delta={k:getattr(usage_after,k)-getattr(usage_before,k) for k in ['ru_utime','ru_stime','ru_nvcsw','ru_nivcsw']}
+   thread_delta=refactor_thread_usage.delta(thread_before,refactor_thread_usage.snapshot(rt.h2d.thread.native_id))
    assert before==dict(counters['stats']) and np.array_equal(tokens,warm_tokens[policy]);validate(rt,row,proofs[policy],rank)
-   row.update(status='PASS',rank=rank,case=case,repeat=repeat,paired_order=order,numerical_comparison=numeric[policy],no_compile_in_measure=True,process_usage_delta=process_delta,affinity=cpus,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),physical_arena_count=1,peak_gpu_bytes=torch.cuda.max_memory_allocated())
+   row.update(status='PASS',rank=rank,case=case,repeat=repeat,paired_order=order,numerical_comparison=numeric[policy],no_compile_in_measure=True,process_usage_delta=process_delta,thread_usage_delta=thread_delta,affinity=cpus,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),physical_arena_count=1,peak_gpu_bytes=torch.cuda.max_memory_allocated())
    write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
    pair[policy]={k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']}
   pairs.append(pair)

@@ -48,3 +48,12 @@ changed. Separate untimed profiles are used to investigate a suspected cause.
 The earlier exact-return P1/T1 pair remains recorded as unstable under its
 original rule. Its queue was intentionally replaced by the owner-authorized
 coalesced-return study; do not silently reclassify its two samples as conclusive.
+
+Fresh measurement workers also take two own-thread CPU counter snapshots,
+before and after generation, outside its E2E/TPOT timers. Main-thread and
+expert-staging-thread CPU time can distinguish controller/launch activity from
+staging activity; aggregate process CPU counters remain available as well.
+This is not continuous sampling. The current host has kernel scheduler wait
+statistics disabled, so queue-wait values are explicitly null and no system
+setting is changed. Snapshot scope includes generation entry/exit overhead;
+do not interpret it as a precise decomposition of TPOT.
