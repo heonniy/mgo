@@ -31,12 +31,15 @@ def main():
     db.execute(f'INSERT INTO CUPTI_ACTIVITY_KIND_{api} VALUES (?,?,?,?)',(base+a,base+a+1,tid,corr))
     db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_KERNEL VALUES (?,?,?,?,?)',(base+c,base+d,pid,corr,kernel))
   db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_MEMCPY VALUES (1010,1040,1,9437184)');db.commit();db.close()
-  trace=root/'copy.json';trace.write_text(json.dumps([dict(source_event=48,bytes=9437184,kind='demand',readiness_at_use=None)]))
+  trace=root/'copy.json';trace.write_text(json.dumps([dict(source_event=48,bytes=9437184,kind='useful_prefetch',readiness_at_use='inflight')]))
   receipt=dict(status='PASS',decode_expert_copies=1,decode_expert_bytes=9437184,copy_trace_path=str(trace),copy_trace_sha256=hashlib.sha256(trace.read_bytes()).hexdigest())
   out=analyze(path,receipt)
   assert out['decode_events']==384 and out['kernel_counts']['moe.expert_compute']==384
   assert out['H2D']['total_union_ms']==30/1e6
   assert out['H2D']['overlap_comm_expert_ms']==23/1e6
+  inflight=out['H2D_split']['readiness_at_use']['inflight']
+  assert inflight['count']==1 and inflight['bytes']==9437184
+  assert inflight['total_union_ms']==30/1e6 and inflight['overlap_comm_expert_ms']==23/1e6
   assert len(out['interval_decomposition']['per_event'])==384
   cpu=out['cpu_nvtx']
   metadata_parts=sum(cpu[name]['total_ms'] for name in ('moe.metadata_pack_host','moe.metadata_collective_submit','moe.metadata_readback_wait_and_unpack'))

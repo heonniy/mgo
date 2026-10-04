@@ -2,6 +2,17 @@
 from refactor_measure_worker import *
 
 class ProfileRuntime(DecodeOffloadRuntime):
+ def plan_event(self,*args):
+  event=super().plan_event(*args)
+  if getattr(self,'capture',False) and self.index>=48:
+   sent=list(map(int,event['send_counts']));received=list(map(int,event['recv_counts']))
+   self.profile_communication.append(dict(event=self.index,send_token_rows=sent,recv_token_rows=received,
+    active_remote_send_peers=sum(n>0 for r,n in enumerate(sent) if r!=self.rank),
+    active_remote_recv_peers=sum(n>0 for r,n in enumerate(received) if r!=self.rank),
+    forward_wire_bytes=(sum(sent)-sent[self.rank])*(2048*2+24),
+    return_wire_bytes=(sum(received)-received[self.rank])*2048*2))
+  return event
+
  def execute(self,*args):
   if not getattr(self,'capture',False):return super().execute(*args)
   with nvtx_phase(f'{"decode" if self.index>=48 else "prefill"}.event.{self.index}'):
@@ -10,7 +21,7 @@ class ProfileRuntime(DecodeOffloadRuntime):
   return result
 
  def arm_profile(self):
-  scheduler=self.h2d;scheduler.profile=True;self.profile_tickets=[]
+  scheduler=self.h2d;scheduler.profile=True;self.profile_tickets=[];self.profile_communication=[]
   original_predict=self.predictor.predict_next
   def predict(*args,**kwargs):
    with nvtx_phase('moe.prefetch_predictor'):return original_predict(*args,**kwargs)
@@ -88,6 +99,10 @@ def main(a):
   for module,name,original in diagnostic_hooks:setattr(module,name,original)
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
+ assert len(rt.profile_communication)==384 and rt.transport.calls==768
+ assert sum(r['forward_wire_bytes'] for r in rt.profile_communication)==rt.transport.forward_bytes
+ assert sum(r['return_wire_bytes'] for r in rt.profile_communication)==rt.transport.return_bytes
+ write(a.output/f'communication_rank{rank}.json',dict(status='PASS',rank=rank,events=rt.profile_communication,metadata_calls=rt.metadata.calls,payload_calls=rt.transport.calls,forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes,scope='Decode BF16 token/rank payload bytes excluding self, protocol overhead and metadata. Per-event peer counts come from the executed layout.'))
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':

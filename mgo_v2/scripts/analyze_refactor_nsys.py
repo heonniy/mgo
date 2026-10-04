@@ -105,11 +105,12 @@ def analyze(path,receipt):
  trace_path=Path(receipt['copy_trace_path']);trace_raw=trace_path.read_bytes()
  assert hashlib.sha256(trace_raw).hexdigest()==receipt['copy_trace_sha256']
  trace=json.loads(trace_raw);assert len(trace)==len(h2d)
- split=defaultdict(list);byevent=defaultdict(list);readiness=defaultdict(int)
+ split=defaultdict(list);byevent=defaultdict(list);readiness=defaultdict(int);readiness_intervals=defaultdict(list)
  for interval,row in zip(h2d,trace):
   assert row['bytes']==9437184
   split[row['kind']].append(interval);byevent[row['source_event']].append(interval)
-  if row['readiness_at_use'] is not None:readiness[row['readiness_at_use']]+=1
+  if row['readiness_at_use'] is not None:
+   readiness[row['readiness_at_use']]+=1;readiness_intervals[row['readiness_at_use']].append(interval)
 
  # The capture ends only after generation and scheduler synchronization. Keep
  # trailing decode DMA/kernel work instead of clipping to CPU launch spans.
@@ -129,6 +130,7 @@ def analyze(path,receipt):
  for key,value in exclusive.items():
   assert abs(sum(row['exclusive_ms'][key] for row in per_event)-value)<1e-6
  split_report={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in split.items()}
+ split_report['readiness_at_use']={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in readiness_intervals.items()}
  # One all-gather per decode metadata record. Distinguish host packet
  # preparation, the collective API call, and blocking readback plus CPU unpack.
  # The final category is intentionally not presented as pure communication.
