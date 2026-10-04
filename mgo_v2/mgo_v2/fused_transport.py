@@ -11,11 +11,13 @@ import torch.distributed as dist
 @dataclass
 class ForwardPacket:
  raw: torch.Tensor
+ send: torch.Tensor
  work: object
  hidden_size: int
  dtype: torch.dtype
  def finish(self):
   if self.work is not None:self.work.wait();self.work=None
+  self.send=None
   n=self.raw.shape[0];hb=self.hidden_size*2
   hidden=self.raw[:,:hb].contiguous().view(self.dtype).view(n,self.hidden_size)
   weights=self.raw[:,hb:hb+16].contiguous().view(self.dtype).view(n,8)
@@ -40,7 +42,7 @@ class FusedTokenRankTransport:
   payload[:,hb+16:]=ids.to(torch.uint8)
   raw,work=self.exchange(payload,e['send_counts'],e['recv_counts'],async_op)
   self.forward_bytes+=(sum(e['send_counts'])-e['send_counts'][self.rank])*(hb+24)
-  return ForwardPacket(raw,work,h,hidden.dtype)
+  return ForwardPacket(raw,payload,work,h,hidden.dtype)
  def combine(self,hidden,parts,e):
   if self.return_mode=='exact':
    values=torch.cat(parts) if parts else hidden.new_empty((0,hidden.shape[-1]))

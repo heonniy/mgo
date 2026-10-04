@@ -70,7 +70,7 @@ def main(a):
    import la_physical_worker as live
    original_collect=live.gather_global_routes;live.gather_global_routes=rt.collect
   for repeat in range(2):
-   if a.streaming:a.ready_first=bool(repeat)
+   if a.streaming:a.ready_first=True if a.fused else bool(repeat)
    rt.reset()
    if a.instrument and repeat==1:
     from mgo_v2.phase_timing import PhaseRecorder
@@ -98,7 +98,7 @@ def main(a):
    assert not rt.mismatch.item()
    if expected is not None:assert np.array_equal(expected,tokens)
    expected=tokens
-   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),controller_times=getattr(rt,'controller_times',[]),debug_plan_checks=getattr(rt,'debug_plan_checks',0),scheduler_metrics=(rt.h2d.metrics if a.physical_prefetch else None),controller_counters=(rt.controller.counters if a.physical_prefetch else None),ready_first=getattr(a,'ready_first',False),ready_metrics=getattr(rt,'ready_metrics',None),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
+   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),controller_times=getattr(rt,'controller_times',[]),debug_plan_checks=getattr(rt,'debug_plan_checks',0),scheduler_metrics=(rt.h2d.metrics if a.physical_prefetch else None),controller_counters=(rt.controller.counters if a.physical_prefetch else None),ready_first=getattr(a,'ready_first',False),fused_payload_calls=(rt.transport.calls if a.fused else 0),ready_metrics=getattr(rt,'ready_metrics',None),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
   if a.compact:live.gather_global_routes=original_collect
   if hasattr(rt,'close'):rt.close()
   # Detach closures before reclaiming the arena for the next policy.
@@ -106,4 +106,4 @@ def main(a):
   del rt;gc.collect();torch.cuda.empty_cache()
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,horizon=8,rows=rows,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated()));dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');p.add_argument('--split-controller',action='store_true');p.add_argument('--debug-plan',action='store_true');p.add_argument('--physical-prefetch',action='store_true');p.add_argument('--streaming',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');p.add_argument('--split-controller',action='store_true');p.add_argument('--debug-plan',action='store_true');p.add_argument('--physical-prefetch',action='store_true');p.add_argument('--streaming',action='store_true');p.add_argument('--fused',action='store_true');main(p.parse_args())

@@ -14,6 +14,7 @@ from .predictor import TransitionPredictor
 from .compact_metadata import CompactMetadata
 from .pinned_h2d import PriorityH2DScheduler
 from .ready_compute import expert_order
+from .fused_transport import FusedTokenRankTransport
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
@@ -30,6 +31,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena
   self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0)
+  self.transport=FusedTokenRankTransport('exact')
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
@@ -39,7 +41,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
    out,promotions,discards=self.controller.plan_current(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,self.arrays['gates'][self.index])
-   if self.index>=48:self.controller_times.append((time.perf_counter()-start)*1000)
+   if self.index>=48 and self.args.phase!='MEASURE':self.controller_times.append((time.perf_counter()-start)*1000)
    targets,effective,masses,lengths,destinations,fetches,row=out
    if getattr(self.args,'physical_prefetch',False):
     for promotion in promotions:
@@ -79,13 +81,15 @@ class DecodeOffloadRuntime(LiveRuntime):
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
  def compute(self,packet,e,layer):
-  if not getattr(self.args,'streaming',False) or self.index<48:return super().compute(packet,e,layer)
+  if self.index<48 or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
   groups=e['groups'];parts=[None]*len(groups)
   for i in expert_order(groups,self.h2d,getattr(self.args,'ready_first',False),self.ready_metrics):
    expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
+   if getattr(self.args,'fused',False) and self.args.phase!='MEASURE':self.mismatch.logical_or_((packet[2][rows,cols]!=expert).any())
    w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
    self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
+  if getattr(self.args,'fused',False) and self.index>=48:return parts
   return torch.cat(parts) if parts else received.new_empty((0,2048))
  def close(self):
   if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
@@ -95,17 +99,36 @@ class DecodeOffloadRuntime(LiveRuntime):
    layer,hidden,selected,weights,probs=args
    e=self.plan_event(layer,selected,weights,probs)
    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
-   with nvtx_phase('moe.dispatch'):packet=self.dispatch(hidden,dense,e)
-   # Complete forward only, without draining speculative copies on another stream.
-   forward_done=torch.cuda.Event();forward_done.record();forward_done.synchronize()
-   with nvtx_phase('moe.h2d_fetch'):self.apply_fetches(e)
-   if not getattr(self.args,'streaming',False) or self.index<48:
+   fused=getattr(self.args,'fused',False) and self.index>=48
+   overlap=getattr(self.args,'streaming',False) and self.index>=48
+   if fused:
+    before=self.transport.calls;trigger=getattr(self.args,'trigger','T1')
+    if overlap:
+     with nvtx_phase('moe.demand_h2d'):self.apply_fetches(e)
+    if trigger=='T0':self.prefetch_next()
+    with nvtx_phase('moe.forward_a2a'):pending=self.transport.forward(hidden,dense,e,async_op=True)
+    if trigger=='T1':self.prefetch_next()
+    with nvtx_phase('moe.forward_complete'):
+     received,rw,recv_ids=pending.finish();packet=('current',received,recv_ids,rw)
+    if not overlap:
+     done=torch.cuda.Event();done.record();done.synchronize()
+     with nvtx_phase('moe.demand_h2d'):self.apply_fetches(e)
+    if trigger=='T2':self.prefetch_next()
+   else:
+    with nvtx_phase('moe.dispatch'):packet=self.dispatch(hidden,dense,e)
+    done=torch.cuda.Event();done.record();done.synchronize()
+    with nvtx_phase('moe.demand_h2d'):self.apply_fetches(e)
+   if not overlap:
     with nvtx_phase('moe.h2d_global_barrier'):
      self.h2d.wait_slots([slot for _,_,_,slot in e['groups']],host=True)
      dist.barrier();torch.cuda.current_stream().synchronize()
-   self.prefetch_next()
+   if not fused:self.prefetch_next()
    with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
-   with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])
+   if fused:
+    with nvtx_phase('moe.return_a2a'):result=self.transport.combine(hidden,values,e)
+    assert self.transport.calls-before==2
+   else:
+    with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])
    self.index+=1
    if self.args.phase!='MEASURE':
     self.arena.assert_consistent()
