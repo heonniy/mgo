@@ -88,7 +88,7 @@ def main(a):
   for module,name,original in diagnostic_hooks:setattr(module,name,original)
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
- write(a.output/f'rank{rank}.json',dict(status='PASS',purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
+ write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--case',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())
