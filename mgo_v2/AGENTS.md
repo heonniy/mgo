@@ -1,3 +1,15 @@
+**OWNER PRIORITY (2026-10-04): R8/B128/cache60 replication stress upper bound.**
+Read `experiments/r8_b128_c60_replication_stress_20261004/{README.md,PLAN.md,AGENT_TASK.md,EXECUTION.md,matrix.json}`.
+After any active physical timing process exits, run the CPU-only stress search.
+Reuse the completed 2048-request MATH/ShareGPT exact pools; no new GPU capture.
+Freeze R8, local B128, cache60, Gate W128, substitution OFF, decode256. Search
+sample seed, rank-assignment seed and BR random placement seed for an
+intentionally bad one-copy stress case using BR-only structural metrics, then
+compare deterministic CA and temporary one-replica compute-balance oracles.
+The replica oracle is an upper bound and ignores slot/creation cost. A >=10%
+critical-rank-row reduction is only a go/no-go for a later real replica policy.
+Commit results and stop; do not automatically launch physical timing.
+
 **OWNER DECODE AMENDMENT: c60/s0 decode64; report TPOT and E2E only.**
 Stop the decode256 attempt. Run only the c60/substitution-OFF packet with
 64 decode steps. PLAN identity and output paths include horizon; never reuse
