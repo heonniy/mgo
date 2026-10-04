@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Run replica phase microbench in Env1 and Env2 on four selected GPUs."""
-import argparse,json,os,shlex,subprocess,time
+import argparse,json,os,shlex,subprocess,time,signal
 from pathlib import Path
 
 P=Path(__file__).resolve().parents[1]
@@ -21,7 +21,17 @@ def run_env(name,gpus,root):
  if name=='env2':env.update(NCCL_P2P_DISABLE='1',NCCL_IB_DISABLE='1')
  cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',
       str(P/'examples/replica_phase_microbench.py'),'--output',str(out),'--environment',name]
- with (out/'run.log').open('w') as f:subprocess.run(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
+ with (out/'run.log').open('w') as f:
+  proc=subprocess.Popen(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)
+  (out/'process.json').write_text(json.dumps(dict(pid=proc.pid,command=cmd)))
+  try:
+   proc.wait(timeout=900)
+   if proc.returncode:raise RuntimeError(f'{name} microbench exited {proc.returncode}')
+  finally:
+   if proc.poll() is None:
+    os.killpg(proc.pid,signal.SIGTERM)
+    try:proc.wait(timeout=15)
+    except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  return out
 
 def main():

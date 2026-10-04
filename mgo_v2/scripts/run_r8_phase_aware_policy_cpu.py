@@ -19,7 +19,8 @@ def publish(message):
  subprocess.run(['git','add',str(PACKET)],cwd=P.parent,check=True)
  if subprocess.run(['git','diff','--cached','--quiet'],cwd=P.parent).returncode:
   subprocess.run(['git','commit','-m',message],cwd=P.parent,check=True)
-  subprocess.run(['git','push','origin','HEAD:'+BRANCH],cwd=P.parent,check=True)
+  result=subprocess.run(['git','push','origin','HEAD:'+BRANCH],cwd=P.parent)
+  if result.returncode:write(ROOT/'publication_pending.json',dict(status='LOCAL_COMMIT_SAVED_PUSH_PENDING',unix=time.time()))
 
 def main():
  ROOT.mkdir(parents=True,exist_ok=True)
