@@ -196,13 +196,29 @@ Per-rank H2D queues are serial, ranks execute concurrently. Because mandatory
 miss counts are balanced, H2D phase lower-bound is driven by the largest rank
 queue.
 
-### D2D calibration
-Until a 9-MiB H100 D2D copy microbenchmark is available, do **not** hide this
-uncertainty in one guessed number. Report D2D sensitivity at:
-`{0.02, 0.05, 0.10, 0.20} ms / expert copy`.
+### Env1/Env2 microbenchmark calibration
 
-A separate model-free GPU microbenchmark is supplied to replace this grid when
-four GPUs are available.
+The CPU result is **not finalizable** until the four-GPU model-free calibration
+has completed in both transport environments:
+
+- Env1: normal NCCL peer path (NVLink/NVSwitch when available);
+- Env2: `NCCL_P2P_DISABLE=1`, `NCCL_IB_DISABLE=1`, matching the existing
+  SHM transport-control environment.
+
+Measure:
+- concurrent 9-MiB H2D;
+- activation G2G one-way and round-trip for 1..2048 rows;
+- 9-MiB expert D2D for one pair and two concurrent pairs;
+- resident-source D2D overlapping H2D;
+- miss-source H2D(Ehot) -> D2D(Ehot) overlapping H2D(next);
+- exact serial counterfactual H2D(Ehot) -> H2D(next) -> D2D(Ehot);
+- expert compute at 64..2048 rows.
+
+The resulting `microbench_calibration.json` is a required input to the CPU
+phase model. Raw per-rank result hashes must be retained.
+
+Env2 is a transport stress/control, not a claim that it represents a distinct
+physical PCIe-only server.
 
 ### Expert-compute calibration
 Use two existing physical-profile slopes as descriptive bounds:
@@ -269,7 +285,29 @@ Additionally report B256/B128 gain-ratio for:
 
 This directly answers whether the optimization headroom grows with batch.
 
-## 11. Stop
+## 11. Engineering GO gate
 
-CPU replay and microbenchmark-calibrated modeling only.
+The GO decision is predeclared on decode only. For a candidate policy, define
+`robust phase gain` as the minimum modeled improvement across:
+
+- Env1 + H2D/D2D overlap;
+- Env1 + serial H2D->D2D;
+- Env2 + overlap;
+- Env2 + serial.
+
+Grades:
+- **STRONG_GO**: robust phase gain >=8%, critical-row gain >=8%, H2D growth <=2%;
+- **GO**: robust phase gain >=5%, critical-row gain >=5%, H2D growth <=2%;
+- **MARGINAL**: robust phase gain >=2% with H2D growth <=5%, or benefit only in
+  part of the environments;
+- **NO_GO**: otherwise.
+
+Batch scaling supports the hypothesis when B256 improves absolute robust gain
+by >=2 percentage points over B128 or the gain ratio is >=1.20x.
+
+This is an engineering follow-up gate, not a statistical significance rule.
+
+## 12. Stop
+
+Run Env1/Env2 microbench first, then CPU replay and GO classification.
 Commit results and stop. Do not automatically launch full-model GPU timing.
