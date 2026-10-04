@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL_SCREEN",
-  "snapshot_unix": 1791139463.487182,
+  "snapshot_unix": 1791140239.1671,
   "batch": 128,
   "horizon": 64,
   "precision": "bf16",
@@ -273,6 +273,109 @@
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
       },
       "unstable": false
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P2_T1",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T1",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "fc023e7b54ef764de9387050c9fb0445fcb22cb2f53070dd48cbe4da075c4dae",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 88.96383562963456,
+          "TPOT": 1.1920628662109376
+        },
+        {
+          "E2E_wall": 97.02775317523628,
+          "TPOT": 1.32016552734375
+        },
+        {
+          "E2E_wall": 83.90768138691783,
+          "TPOT": 1.113388916015625
+        },
+        {
+          "E2E_wall": 92.92461012024432,
+          "TPOT": 1.2577283935546875
+        },
+        {
+          "E2E_wall": 89.27495393715799,
+          "TPOT": 1.200691650390625
+        },
+        {
+          "E2E_wall": 94.80110115557909,
+          "TPOT": 1.284054931640625
+        },
+        {
+          "E2E_wall": 90.27409736718982,
+          "TPOT": 1.2162308349609374
+        }
+      ],
+      "gate": {
+        "status": "UNRESOLVED_JITTER",
+        "target_repeats": 7,
+        "complete": true,
+        "unstable": true,
+        "summary": {
+          "E2E_wall": {
+            "n": 7,
+            "mean": 91.0248618245657,
+            "median": 90.27409736718982,
+            "min": 83.90768138691783,
+            "max": 97.02775317523628,
+            "range_relative": 0.14502490150774205,
+            "mean_CI95": [
+              87.02137911557044,
+              95.02834453356097
+            ],
+            "relative_CI_half_width": 0.04398229921745185,
+            "early_late_drift": 0.004939220180289468
+          },
+          "TPOT": {
+            "n": 7,
+            "mean": 1.2263318743024554,
+            "median": 1.2162308349609374,
+            "min": 1.113388916015625,
+            "max": 1.32016552734375,
+            "range_relative": 0.16993793740047372,
+            "mean_CI95": [
+              1.1633649144962712,
+              1.2892988341086395
+            ],
+            "relative_CI_half_width": 0.051345774439729125,
+            "early_late_drift": 0.004765124475080999
+          }
+        },
+        "estimate": {
+          "E2E_wall": 91.0248618245657,
+          "TPOT": 1.2263318743024554
+        },
+        "rule": "2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion."
+      },
+      "estimate": {
+        "E2E_wall": 91.0248618245657,
+        "TPOT": 1.2263318743024554
+      },
+      "initial_gate": {
+        "status": "UNSTABLE",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.08671271209002698,
+          "TPOT": 0.10198329217317144
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": true
     },
     {
       "status": "PASS",
