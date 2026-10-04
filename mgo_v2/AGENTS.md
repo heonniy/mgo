@@ -1,3 +1,6 @@
+**OWNER OVERRIDE (2026-10-04): transport follow-up is c60, substitution OFF.**
+For `experiments/transport_stack_remeasure_20261004`, ignore the older cache30/sub-ON wording below. Run R=MATH/R4/local-B64/Gate/decode256 on GPUs 0,1,4,5 with cache=60% and substitution OFF. Use CoSLoT-style pinned H2D for all timed cells and compare current/coslot/coslot-active for BR/CA. PLAN identity is keyed by c60+s0; create and validate missing c60/s0 reference PLANs outside timing rather than requesting a path from the owner. Execute `scripts/run_transport_stack_packet.py`. Env1 first, Env2 only if all six Env1 conditions meet <=5% E2E and TPOT spread. Commit each checkpoint and stop after the packet.
+
 **OWNER RESTART (2026-10-04): transport stack at ac6d6bc.**
 Follow `experiments/transport_stack_remeasure_20261004/{README.md,PLAN.md,EXECUTION.md}`.
 The missing-PLAN block is superseded: create current/pageable R/BR and R/CA
