@@ -230,7 +230,7 @@ def generate(model,rt,initial_ids,initial_mask):
  return dict(token_hash=array_hash(result),state_hash=array_hash(rt.keys),E2E_wall=finish-start,decode_wall=finish-decode_start,TPOT=begin.elapsed_time(end)/1000/256),result
 
 def main(a):
- if a.comm_mode in ('coslot','coslot-active'):
+ if a.comm_mode in ('coslot','coslot-active') or a.h2d_mode=='pinned':
   rank=int(os.environ['RANK']);cpus=list(range(24*rank,24*(rank+1)))
   for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
