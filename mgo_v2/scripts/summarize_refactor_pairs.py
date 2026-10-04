@@ -1,0 +1,58 @@
+"""Recompute paired evidence; reject missing arms, noise and gain-only domination."""
+import argparse,hashlib,json,math,statistics
+from pathlib import Path
+from adaptive_timing import paired_decision
+from prepare_refactor_arms import ARMS
+ROOT=Path('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004')
+PACKET=Path(__file__).resolve().parents[1]/'experiments/decode_prefetch_runtime_refactoring_20261004'
+
+def evaluate(records):
+ rows=[]
+ for arm in ARMS:
+  batches={}
+  for batch in (128,256):
+   d=records[arm][batch];assert d['status']=='PASS' and d['baseline']=='BR' and d['candidate']=='LA'
+   assert d['physical_arena_count']==1
+   cases=d['cases'];assert [c['policy'] for c in cases]==['BR','LA']
+   assert all(c['runtime_arm']==arm and c['horizon']==256 and c['partial_precision']=='bf16' for c in cases)
+   for k in ('P','trigger','horizon','overlap','partial_precision'):assert cases[0][k]==cases[1][k]
+   assert cases[0]['overlap']==(arm==ARMS[2]);assert (cases[0]['P']==0)==(arm==ARMS[0])
+   gate=paired_decision(d['pairs']);assert gate['complete'],'incomplete adaptive repetitions'
+   batches[str(batch)]=dict(gate=gate,samples=d['pairs'],LA_TPOT=statistics.mean(p['LA']['TPOT'] for p in d['pairs']),BR_TPOT=statistics.mean(p['BR']['TPOT'] for p in d['pairs']))
+  rows.append(dict(arm=arm,batches=batches,stable=all(not b['gate']['unstable'] for b in batches.values()),positive_supported=all(b['gate']['gain']['TPOT']['positive_supported'] for b in batches.values()),score=min(b['gate']['gain']['TPOT']['estimate'] for b in batches.values()),mean_gain=statistics.mean(b['gate']['gain']['TPOT']['estimate'] for b in batches.values())))
+ # Prefetch and trigger choices cannot change after seeing LA timings.
+ tuning={(records[a][b]['cases'][0]['P'],records[a][b]['cases'][0]['trigger']) for a in ARMS[1:] for b in (128,256)}
+ assert len(tuning)==1,'V2/V3 or batch-specific retuning'
+ for row in rows:
+  row['dominated_by']=[]
+  for other in rows:
+   if other is row or not other['stable']:continue
+   ratios=[other['batches'][b]['LA_TPOT']/row['batches'][b]['LA_TPOT'] for b in ('128','256')]
+   if max(ratios)<=1 and min(ratios)<.98:row['dominated_by'].append(other['arm'])
+  row['eligible']=row['stable'] and row['positive_supported'] and not row['dominated_by']
+ eligible=[r for r in rows if r['eligible']]
+ ranked=sorted(eligible,key=lambda r:(-r['score'],-r['mean_gain'],sum(b['LA_TPOT'] for b in r['batches'].values())))
+ return dict(status='TIMING_CANDIDATE' if ranked else 'NO_VALIDATED_GAIN',winner=ranked[0]['arm'] if ranked else None,rows=rows,selection_scope='BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA',gain_estimator='1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained')
+
+def main(a):
+ records={};sources={}
+ for arm in ARMS:
+  records[arm]={}
+  for batch in (128,256):
+   path=ROOT/f'{a.stage_prefix}_{arm}_B{batch}_H256/result.json';raw=path.read_bytes();records[arm][batch]=json.loads(raw);sources[str(path)]=hashlib.sha256(raw).hexdigest()
+ out=evaluate(records);out['source_hashes']=sources
+ (PACKET/'THREE_ARM_RESULTS.json').write_text(json.dumps(out,indent=2)+'\n')
+ lines=['# BF16 three-arm paired timing','',f'Status: {out["status"]}. Timing candidate: {out["winner"]}.','',out['selection_scope'], '', '| Arm | Batch | BR TPOT (s) | LA TPOT (s) | Paired LA gain | 95% interval | Repeats | Eligible |','|---|---:|---:|---:|---:|---|---:|---|']
+ for r in out['rows']:
+  for batch,b in r['batches'].items():
+   g=b['gate']['gain']['TPOT'];lo,hi=g['CI95']
+   lines.append(f'| {r["arm"]} | {batch} | {b["BR_TPOT"]:.6f} | {b["LA_TPOT"]:.6f} | {g["estimate"]:.2%} | [{lo:.2%}, {hi:.2%}] | {len(b["samples"])} | {r["eligible"]} |')
+ lines+=['', '| Arm | Batch | BR E2E (s) | LA E2E (s) | Paired E2E gain | 95% interval |', '|---|---:|---:|---:|---:|---|']
+ for r in out['rows']:
+  for batch,b in r['batches'].items():
+   g=b['gate']['gain']['E2E_wall'];lo,hi=g['CI95'];br=statistics.mean(p['BR']['E2E_wall'] for p in b['samples']);la=statistics.mean(p['LA']['E2E_wall'] for p in b['samples'])
+   lines.append(f'| {r["arm"]} | {batch} | {br:.6f} | {la:.6f} | {g["estimate"]:.2%} | [{lo:.2%}, {hi:.2%}] |')
+ lines+=['', 'BR/LA absolute times are arithmetic means. Relative gains use paired log ratios and therefore need not equal the ratio of the displayed absolute means. JSON retains E2E, all raw pairs, full ranges, stability decisions, and exclusions.']
+ (PACKET/'THREE_ARM_RESULTS.md').write_text('\n'.join(lines)+'\n')
+if __name__=='__main__':
+ p=argparse.ArgumentParser();p.add_argument('--stage-prefix',default='M15');main(p.parse_args())
