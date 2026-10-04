@@ -321,60 +321,145 @@ Full short-horizon token/cache parity and no NCCL/H2D deadlock in repeated runs.
 ## M13 — Prefetch trigger and budget physical sweep
 
 ### Matrix
+Use BR only for tuning:
 - trigger T0/T1/T2;
 - P near CPU knee;
-- B128/B256;
-- BR initially.
+- B128/B256.
 
-After selecting trigger/P:
-- BR / CA / LA comparison.
+All communication/controller/NCCL optimizations must already be enabled.
 
 ### Primary selection
-Minimize median TPOT subject to:
-- zero correctness failures;
+Choose a small stable P/trigger knee with:
+- low BR TPOT;
 - bounded extra HBM;
 - no urgent-H2D regression;
 - acceptable wasted-prefetch bytes.
 
-### Exit gate
-Freeze one P and trigger per batch or one shared setting if results support it.
+Prefer one shared P/trigger across B128/B256 if close to optimal. If a
+batch-specific setting is materially better, freeze both before LA runs.
+
+### Fairness gate
+After this milestone, P and trigger are immutable for the three-arm BR-vs-LA
+selection. Do not retune them on LA.
 
 ---
 
-## M14 — Full phase-exposure study
+## M14 — Build the three final runtime arms
 
-### Work
-Collect unprofiled repetitions for speed claims.
-Collect separate Nsight runs for attribution.
+Implement all three from one code path with explicit mode flags.
+
+### V1: OPT-NOPF-BARRIER
+- prefetch OFF;
+- P=0;
+- global fetch barrier ON;
+- optimized metadata/controller/2-round A2A ON.
+
+### V2: OPT-PF-BARRIER
+- frozen predictor/P/trigger;
+- promotion ON;
+- global fetch barrier ON for residual misses;
+- all common optimizations ON.
+
+### V3: OPT-PF-OVERLAP
+- same predictor/P/trigger/promotion as V2;
+- global barrier OFF;
+- urgent demand H2D early-start;
+- ready-first per-slot compute overlap;
+- all common optimizations ON.
+
+### Hard equivalence gate
+Across V1/V2/V3, assert identical:
+- model route/weight inputs;
+- BR/LA placement implementation;
+- metadata encoding;
+- fused communicator;
+- NCCL environment;
+- expert kernel;
+- prefill path;
+- measurement boundaries.
+
+Only prefetch and H2D/barrier semantics may differ.
+
+---
+
+## M15 — Three-arm BR-vs-LA physical selection
+
+For each V1/V2/V3:
+- B128 BR;
+- B128 LA;
+- B256 BR;
+- B256 LA.
+
+Use the existing physical repeat stability rule. No unstable pair is eligible.
+
+### Metrics
+
+For each batch:
+
+```
+G_LA = (TPOT_BR - TPOT_LA) / TPOT_BR
+```
+
+Primary variant score:
+
+```
+G_robust = min(G_LA_B128, G_LA_B256)
+```
+
+### Selection
+Choose the stable variant with largest `G_robust`.
+
+Tie-breaks:
+1. larger mean LA gain;
+2. lower absolute LA TPOT;
+3. lower exposed H2D;
+4. lower extra HBM / wasted prefetch.
+
+Reject a gain-only winner if its absolute LA TPOT is materially dominated by
+another arm.
+
+### Output
+- `THREE_ARM_RESULTS.json`;
+- `THREE_ARM_RESULTS.md`;
+- `FINAL_RUNTIME_SELECTION.json`.
+
+The selected arm becomes the production/default optimized runtime.
+The other two remain selectable ablation modes.
+
+---
+
+## M16 — Full phase-exposure study on all three arms
+
+Collect unprofiled repetitions for speed claims and separate Nsight runs for
+attribution.
 
 ### Report
-- TPOT;
+- BR TPOT;
+- LA TPOT;
+- LA gain;
 - H2D total/exposed/hidden;
 - H2D hidden ratio;
+- metadata;
+- current controller;
+- prefetch controller total/exposed;
 - forward A2A;
 - expert compute;
 - return A2A;
-- current controller;
-- prefetch controller total/exposed;
 - prefetch useful/wasted bytes;
 - promotion reload cost.
 
 ### Exit gate
-`RESULTS.md` explains where every material TPOT improvement comes from.
+Explain why the winning arm has the largest realized LA gain:
+- less H2D masking;
+- different compute exposure;
+- or lower controller/comm overhead.
 
 ---
 
-## M15 — Final BR/CA/LA evaluation
+## M17 — Final CA/LA characterization
 
-Use the exact same:
-- predictor;
-- P;
-- trigger;
-- C cache capacity;
-- H2D scheduler;
-- communicator.
-
-Only placement objective differs.
+After the winner is frozen, run CA only as a secondary characterization using
+the exact same runtime configuration.
 
 Primary questions:
 1. after H2D exposure is reduced, how much communication headroom remains?
@@ -382,4 +467,5 @@ Primary questions:
 3. does CA or LA dominate at B128/B256?
 4. is a joint objective justified by the measured tradeoff?
 
-Do not design the joint method before these answers exist.
+Do not change the selected runtime after seeing CA unless a correctness issue is
+found.
