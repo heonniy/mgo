@@ -1,18 +1,24 @@
-"""Owner-authorized transport matrix with checkpoints and conditional Env2."""
-import json,os,signal,subprocess,time,statistics,hashlib
+"""Owner-authorized c60/s0 transport matrix with checkpoints and conditional Env2."""
+import hashlib,json,os,signal,statistics,subprocess,time
 from pathlib import Path
 import run_env_offload_cell as launcher
 from validate_env_offload_plan import validate
 from batch_comm_common import stop_idle_load
 import run_timing_stability as harness
+
 P=launcher.P
 ROOT=Path('/home/hwlee/mgo-results/transport_stack_remeasure_20261004')
 PACKET=P/'experiments/transport_stack_remeasure_20261004'
 BRANCH='codex/coslot-comm-remeasure-20261004'
+CACHE_RATIO=0.60
+SUBSTITUTION=False
+CACHE_TAG='c60'
+SUB_TAG='s0'
 launcher.PACKET=PACKET
 harness.ROOT=ROOT
 write=launcher.write
-state=dict(status='RUNNING',owner_commit='ac6d6bc90e88e9c9cd3a8791805124e0e57623e7',cell='R',physical_gpus=[0,1,4,5],stage='STARTING',started_unix=time.time(),plans={},completed=[])
+state=dict(status='RUNNING',cell='R',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,
+ physical_gpus=[0,1,4,5],stage='STARTING',started_unix=time.time(),plans={},completed=[])
 
 def publish(message):
  subprocess.run(['git','add',str(PACKET)],cwd=P.parent,check=True)
@@ -22,13 +28,23 @@ def publish(message):
 
 def checkpoint():write(PACKET/'status.json',state)
 
+def run_cpu_validation():
+ cmd=['python','-m','pytest','-q',
+  'scripts/test_coslot_layout.py','scripts/test_pinned_h2d.py',
+  'scripts/test_active_peer.py','scripts/test_cache_substitution_plan.py']
+ proc=subprocess.run(cmd,cwd=P,text=True,capture_output=True)
+ receipt=dict(status='PASS' if proc.returncode==0 else 'FAIL',command=cmd,
+  stdout=proc.stdout,stderr=proc.stderr,cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION)
+ write(PACKET/'CPU_validation.json',receipt)
+ if proc.returncode:raise RuntimeError('CPU validation failed')
+ publish('test: validate c60 s0 transport packet')
+
 def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
  state.update(stage=name,environment=env,policy=policy,transport=transport,repeat=repeat);checkpoint()
  try:
-  out=launcher.run('R',policy,name,env,repeat,transport,h2d,plan,2)
+  out=launcher.run('R',policy,name,env,repeat,transport,h2d,plan,2,CACHE_RATIO,SUBSTITUTION)
  except BaseException:
-  # Also clean up if the lower-level launcher throws at a boundary assertion.
-  for path in launcher.ROOT.glob(f'R_{policy}_{env}_{name}*/status.json'):
+  for path in launcher.ROOT.glob(f'R_{policy}_{env}_{name}_{CACHE_TAG}_{SUB_TAG}*/status.json'):
    receipt=json.loads(path.read_text());pid=receipt.get('pid');cmd=Path('/proc')/str(pid)/'cmdline'
    if receipt['status']=='RUNNING' and pid and cmd.exists() and b'env_offload_worker.py' in cmd.read_bytes() and os.getpgid(pid)==pid:
     os.killpg(pid,signal.SIGTERM)
@@ -37,28 +53,41 @@ def phase(policy,name,env,transport='current',h2d='pinned',repeat=0,plan=None):
      time.sleep(1)
     if cmd.exists():os.killpg(pid,signal.SIGKILL)
   raise
- state['completed'].append(str(out));checkpoint();publish(f'results: transport stack {env} {policy} {transport} {name} {repeat}')
+ state['completed'].append(str(out));checkpoint();publish(f'results: c60 s0 {env} {policy} {transport} {name} {repeat}')
  return out
+
+def result_dir(policy,env,phase_name,transport,repeat):
+ tags=[CACHE_TAG,SUB_TAG]
+ if transport!='current':tags.append(transport)
+ tags.append('pinned')
+ return launcher.ROOT/f"R_{policy}_{env}_{phase_name}_{'_'.join(tags)}_{repeat}"
 
 def summarize(env):
  summaries=[];raw=[]
  for policy in ('BR','CA'):
   plan=Path(state['plans'][policy]);proof=json.loads((plan/'schedule_validation.json').read_text())
   for transport in ('current','coslot','coslot-active'):
-   tag='pinned' if transport=='current' else transport+'_pinned';samples=[]
+   samples=[]
    for rep in range(3):
-    out=launcher.ROOT/f'R_{policy}_{env}_MEASURE_{tag}_{rep}';rs=[json.loads((out/f'rank{r}.json').read_text()) for r in range(4)]
+    out=result_dir(policy,env,'MEASURE',transport,rep)
+    rs=[json.loads((out/f'rank{r}.json').read_text()) for r in range(4)]
     assert all(x['status']=='PASS' and x['no_compile_in_measure'] for x in rs)
-    for r,x in enumerate(rs):
-     for k in ('token_hash','state_hash','action_hash','schedule_file_sha256'):assert x[k]==proof['ranks'][r][k]
+    assert all(abs(x['cache_ratio']-CACHE_RATIO)<1e-9 and x['substitution'] is SUBSTITUTION for x in rs)
+    for rank,x in enumerate(rs):
+     for key in ('token_hash','state_hash','action_hash','schedule_file_sha256'):
+      assert x[key]==proof['ranks'][rank][key]
     samples.append({k:max(x[k] for x in rs) for k in ('E2E_wall','decode_wall','TPOT')})
-   out=launcher.ROOT/f'R_{policy}_{env}_COUNTERS_{tag}_0';rs=[json.loads((out/f'rank{r}.json').read_text()) for r in range(4)]
-   for r,x in enumerate(rs):
-    assert x['status']=='PASS' and x['actual_H2D_bytes']==proof['ranks'][r]['physical_H2D_bytes']
+   out=result_dir(policy,env,'COUNTERS',transport,0)
+   rs=[json.loads((out/f'rank{r}.json').read_text()) for r in range(4)]
+   for rank,x in enumerate(rs):
+    assert x['status']=='PASS' and x['actual_H2D_bytes']==proof['ranks'][rank]['physical_H2D_bytes']
+    assert abs(x['cache_ratio']-CACHE_RATIO)<1e-9 and x['substitution'] is SUBSTITUTION
     assert x['actual_collective_calls']==(37008 if transport=='current' else 24672 if transport=='coslot' else 0)
-    for k in ('token_hash','state_hash','action_hash','schedule_file_sha256'):assert x[k]==proof['ranks'][r][k]
+    for key in ('token_hash','state_hash','action_hash','schedule_file_sha256'):
+     assert x[key]==proof['ranks'][rank][key]
     assert x['pinned_stage_bytes']==2*9437184
-    if transport=='coslot-active':assert x['actual_p2p_batches']+x['actual_zero_remote_rounds']==24672
+    if transport=='coslot-active':
+     assert x['actual_p2p_batches']+x['actual_zero_remote_rounds']==24672
    metrics={k:dict(median=statistics.median(x[k] for x in samples),min=min(x[k] for x in samples),max=max(x[k] for x in samples)) for k in ('E2E_wall','decode_wall','TPOT')}
    for m in metrics.values():m['spread_relative']=(m['max']-m['min'])/m['median']
    counters={k:sum(x[k] for x in rs) for k in ('actual_H2D_bytes','actual_peer_bytes','actual_wire_bytes','actual_collective_calls','actual_p2p_batches','actual_p2p_ops','actual_zero_remote_rounds','active_peer_degree_sum')}
@@ -67,33 +96,44 @@ def summarize(env):
    summaries.append(dict(policy=policy,transport=transport,metrics=metrics,counters=counters,samples=samples))
  comparisons=[]
  for transport in ('current','coslot','coslot-active'):
-  br,ca=[next(x for x in summaries if x['transport']==transport and x['policy']==p) for p in ('BR','CA')]
-  comparisons.append(dict(transport=transport,**{k+'_CA_gain':1-ca['metrics'][k]['median']/br['metrics'][k]['median'] for k in ('E2E_wall','TPOT')},noise_overlap={k:abs(br['metrics'][k]['median']-ca['metrics'][k]['median'])<max(x['metrics'][k]['max']-x['metrics'][k]['min'] for x in (br,ca)) for k in ('E2E_wall','TPOT')}))
+  br,ca=[next(x for x in summaries if x['transport']==transport and x['policy']==policy) for policy in ('BR','CA')]
+  comparisons.append(dict(transport=transport,
+   **{k+'_CA_gain':1-ca['metrics'][k]['median']/br['metrics'][k]['median'] for k in ('E2E_wall','TPOT')},
+   noise_overlap={k:abs(br['metrics'][k]['median']-ca['metrics'][k]['median'])<max(x['metrics'][k]['max']-x['metrics'][k]['min'] for x in (br,ca)) for k in ('E2E_wall','TPOT')}))
  stable=all(x['metrics'][k]['spread_relative']<=.05 for x in summaries for k in ('E2E_wall','TPOT'))
- for d in state['completed']:
-  path=Path(d)
+ for directory in state['completed']:
+  path=Path(directory)
   if env in path.name:
    raw.extend(dict(path=str(p),sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in path.glob('rank*.json'))
- write(PACKET/(env+'_results.json'),dict(status='PASS',stable=stable,stability_gate='(max-min)/median <=5% for E2E and TPOT, all six conditions; no extra repeats',summaries=summaries,comparisons=comparisons,raw_receipts=raw))
- lines=[f'# {env} transport stack results','','Three measurements per condition. Raw medians and full ranges are in the JSON.','Stable timing does not imply a statistically established BR/CA difference.','','| Policy | Transport | TPOT median (s) | E2E median (s) | TPOT spread |','|---|---|---:|---:|---:|']
+ write(PACKET/(env+'_results.json'),dict(status='PASS',cache_ratio=CACHE_RATIO,substitution=SUBSTITUTION,stable=stable,
+  stability_gate='(max-min)/median <=5% for E2E and TPOT, all six conditions; no extra repeats',
+  summaries=summaries,comparisons=comparisons,raw_receipts=raw))
+ lines=[f'# {env} c60/s0 transport stack results','',
+  'Three measurements per condition. Raw medians and full ranges are in the JSON.',
+  'Stable timing does not imply a statistically established BR/CA difference.','',
+  '| Policy | Transport | TPOT median (s) | E2E median (s) | TPOT spread |',
+  '|---|---|---:|---:|---:|']
  for x in summaries:lines.append(f"| {x['policy']} | {x['transport']} | {x['metrics']['TPOT']['median']:.6f} | {x['metrics']['E2E_wall']['median']:.3f} | {x['metrics']['TPOT']['spread_relative']:.2%} |")
  lines+=['',f'Stability gate: {stable}. Env2 is conditional on all Env1 conditions passing.']
- (PACKET/(env+'_RESULTS.md')).write_text('\n'.join(lines)+'\n');publish('results: summarize transport stack '+env);return stable
+ (PACKET/(env+'_RESULTS.md')).write_text('\n'.join(lines)+'\n')
+ publish('results: summarize c60 s0 transport stack '+env);return stable
 
 def main():
  ROOT.mkdir(exist_ok=True);checkpoint()
  try:
-  assert json.loads((PACKET/'CPU_validation.json').read_text())['status']=='PASS'
+  run_cpu_validation()
   stop_idle_load()
   stop=launcher.ROOT/'STOP'
   if stop.exists():stop.rename(ROOT/'superseded_previous_STOP')
   for policy in ('BR','CA'):
-   plan=launcher.discover_validated_plan('R',policy)
+   plan=launcher.discover_validated_plan('R',policy,CACHE_RATIO,SUBSTITUTION)
    if plan is None:
     repeat=0
-    while (launcher.ROOT/f'R_{policy}_env1_PLAN_{repeat}').exists():repeat+=1
+    while (launcher.ROOT/f'R_{policy}_env1_PLAN_{CACHE_TAG}_{SUB_TAG}_{repeat}').exists():repeat+=1
     plan=phase(policy,'PLAN','env1','current','pageable',repeat)
-    validate(plan);write(PACKET/(policy+'_plan_validation.json'),json.loads((plan/'schedule_validation.json').read_text()));publish('results: freeze reference R '+policy+' PLAN')
+    validate(plan)
+    write(PACKET/(policy+'_c60_s0_plan_validation.json'),json.loads((plan/'schedule_validation.json').read_text()))
+    publish('results: freeze c60 s0 reference R '+policy+' PLAN')
    state['plans'][policy]=str(plan);checkpoint()
   for env in ('env1','env2'):
    for policy in ('BR','CA'):
@@ -103,7 +143,9 @@ def main():
      phase(policy,'COUNTERS',env,transport,plan=plan)
    if not summarize(env):state.update(status='UNSTABLE_STOP',stage='FINISHED');break
   else:state.update(status='COMPLETE',stage='FINISHED')
- except BaseException as exc:state.update(status='FAILED_OR_STOPPED',error=repr(exc));raise
+ except BaseException as exc:
+  state.update(status='FAILED_OR_STOPPED',error=repr(exc));raise
  finally:
-  state['finished_unix']=time.time();checkpoint();state['resident_models']=harness.restore();checkpoint();publish('results: transport stack checkpoint and GPU handoff')
+  state['finished_unix']=time.time();checkpoint();state['resident_models']=harness.restore();checkpoint();publish('results: c60 s0 transport checkpoint and GPU handoff')
+
 if __name__=='__main__':main()
