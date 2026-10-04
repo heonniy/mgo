@@ -51,3 +51,15 @@ PYTHONPATH="/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:$
 ```
 
 No full-model GPU timing is automatically launched.
+
+## Prefill interpretation
+
+Prefill is retained as a characterization axis rather than the primary TPOT
+claim. Decode replica hotness thresholds scale with local batch. For prefill,
+the same multiplier is applied to the current event's per-rank token volume so
+the much larger prefill token count does not trivially trigger replicas.
+
+Report both `decode-only` replication and `all-phase` replication. The latter
+captures whether a prefill-created replica helps enough to justify its slot and
+its effect on the initial decode cache state. Full TTFT still requires physical
+attention/dense timing and is not inferred from this CPU MoE model.
