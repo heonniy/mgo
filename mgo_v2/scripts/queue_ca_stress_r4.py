@@ -13,20 +13,20 @@ def process_identity(pid):
 
 def comparison():
  rows=[]
- for name,path in [('R8_best',PACKET),('R4_0123',PACKET/'R4_0123'),('R4_0146',PACKET/'R4_0146')]:
+ for name,path in [('R8_best',PACKET),('R4_0146',PACKET/'R4_0146'),('R4_0123',PACKET/'R4_0123')]:
   for r in csv.DictReader((path/'comparisons.csv').open()):rows.append(dict(configuration=name,**r))
  with (PACKET/'R4_R8_comparison.csv').open('w') as f:
   w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
  lines=['# Two fixed R4 GPU sets and the R8 stress reference','','All are optimized communication-stress workloads, not dataset averages.','R4 uses sample205/DP4/BR73, 32 requests; R8 uses sample81/DP86/BR42,','64 requests. The R4/R8 contrast changes workload as well as rank count and','cannot isolate a rank-count effect. The two R4 sets preserve request/rank','membership, seed, CPU affinity and all other settings.','','| Configuration | Env | E2E gain BR→CA | TPOT gain | Physical peer reduction |','|---|---|---:|---:|---:|']
  for r in rows:lines.append(f"| {r['configuration']} | {r['environment']} | {float(r['E2E_wall_gain']):.2%} | {float(r['TPOT_gain']):.2%} | {float(r['peer_reduction']):.2%} |")
- for name,path in [('R8_best',PACKET),('R4_0123',PACKET/'R4_0123'),('R4_0146',PACKET/'R4_0146')]:
+ for name,path in [('R8_best',PACKET),('R4_0146',PACKET/'R4_0146'),('R4_0123',PACKET/'R4_0123')]:
   v=json.loads((path/'validation.json').read_text());lines+=['',f"{name}: timing_stable={v['timing_stable']}, timed_generations={v['timed_generations']}."]
  lines+=['','See each configuration RESULTS.md, timing_summary.csv and counter_summary.csv','for full ranges, stability and CPU/physical differences. No further sweep.']
  (PACKET/'R4_RESULTS.md').write_text('\n'.join(lines)+'\n')
 
 def main():
  origin=json.loads((ROOT/'process.json').read_text());pid=origin['pid'];identity=process_identity(pid)
- state=dict(status='WAITING_FOR_R8',R8_pid=pid,R8_process_identity=identity,owner_commit='a121c85dc6820a36b03854a9c51e2109f89aca0c',physical_gpu_sets=[[0,1,2,3],[0,1,4,6]],started_unix=time.time())
+ state=dict(status='WAITING_FOR_R8',R8_pid=pid,R8_process_identity=identity,owner_commit='a121c85dc6820a36b03854a9c51e2109f89aca0c',physical_gpu_sets=[[0,1,4,6],[0,1,2,3]],started_unix=time.time())
  write(ROOT/'R4_queue_status.json',state)
  while identity is not None and process_identity(pid)==identity:
   if (ROOT/'STOP_R4_QUEUE').exists():state['status']='OWNER_STOPPED';write(ROOT/'R4_queue_status.json',state);return
@@ -37,7 +37,7 @@ def main():
  subprocess.run(['git','diff','--exit-code','HEAD','--',str(PACKET/'status.json')],cwd=P.parent,check=True)
  child=None
  try:
-  for variant in ['0123','0146']:
+  for variant in ['0146','0123']:
    if (ROOT/'STOP_R4_QUEUE').exists():raise RuntimeError('Owner stopped R4 queue')
    state.update(status='RUNNING_R4',variant=variant);write(ROOT/'R4_queue_status.json',state)
    env=dict(os.environ,MGO_R4_GPU_SET=variant,MGO_R4_CHAIN='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1',NUMBA_NUM_THREADS='1',PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{P}:{P}/scripts')

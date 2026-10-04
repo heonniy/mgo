@@ -7,8 +7,8 @@ The owner's message following a121c85 authorizes the same frozen R4 study twice:
 | R4_0123 | GPU0 | GPU1 | GPU2 | GPU3 |
 | R4_0146 | GPU0 | GPU1 | GPU4 | GPU6 |
 
-This expands only the physical GPU-set axis of R4_AMENDMENT.md. Run R4_0123,
-then R4_0146, after the existing R8 study fully exits and commits. Do not modify
+This expands only the physical GPU-set axis of R4_AMENDMENT.md. Run R4_0146,
+then R4_0123, after the existing R8 study fully exits and commits. Do not modify
 or interrupt the running R8 driver, workers or matrix. A failed R8 execution
 requires attention; do not treat an infrastructure failure as completion.
 
