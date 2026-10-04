@@ -97,7 +97,7 @@ class Runtime:
   self.cache=torch.empty((cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(cap,-1,np.int32);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
   self.h2d=PinnedH2DCache(self.cache,args.h2d_stages) if args.h2d_mode=='pinned' else None
   self.history=GateHistory(48,128,128);self.valid=None;self.actual_h2d_bytes=0;self.actual_peer_bytes=0;self.actual_wire_bytes=0;self.actual_collective_calls=0;self.actual_p2p_batches=0;self.actual_p2p_ops=0;self.actual_zero_remote_rounds=0;self.active_peer_degree_sum=0;self.max_active_peer_degree=0
-  self.live_schedule=args.phase=='PLAN' or self.schedule_mode=='live' or (args.phase=='COUNTERS' and args.comm_mode=='current')
+  self.live_schedule=args.phase=='PLAN' or self.schedule_mode=='live' or (args.phase=='COUNTERS' and args.comm_mode=='current');self.current_global_fetch_count=0
   self.similarity=None;self.policy_kind=['BR','CA','CA-rep'].index(args.policy);self.future=None
   if self.live_schedule:
    meta=json.loads((PKG/'experiments/br_ca_carep_cpu_headroom_20261003/similarity_audit.json').read_text());assert hashlib.sha256(Path(meta['similarity_path']).read_bytes()).hexdigest()==meta['similarity_sha256'];self.similarity=np.load(meta['similarity_path'])
@@ -169,6 +169,7 @@ class Runtime:
    scores=np.array([self.history.score(layer,e) for e in range(128)],np.float32)
    future=self.future[self.index//48,layer] if self.future is not None else np.zeros((128,self.world),np.int32)
    targets,effective,masses,lengths,destinations,fetches,row=self.policy.apply(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,scores,future)
+   self.current_global_fetch_count=len(fetches)
    live=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
    live.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,slot,victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
    live['groups']=[(expert,rows,cols,int(np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0])) for expert,rows,cols in live['groups']]
@@ -248,13 +249,17 @@ class Runtime:
    # fetch barrier -> expert compute -> return/combine.
    with nvtx_phase('moe.dispatch'):
     packet=self.dispatch(hidden,dense,e)
-   # NCCL dispatch is enqueued on the default stream; make it globally complete
-   # before even CPU staging/H2D begins so there is no dispatch/fetch overlap.
-   torch.cuda.synchronize()
-   with nvtx_phase('moe.h2d_fetch'):
-    self.apply_fetches(e)
-   with nvtx_phase('moe.h2d_global_barrier'):
-    self.fetch_barrier()
+   if self.current_global_fetch_count:
+    # NCCL dispatch is enqueued on the default stream; make it complete before
+    # even CPU staging/H2D begins so there is no dispatch/fetch overlap.
+    torch.cuda.synchronize()
+    with nvtx_phase('moe.h2d_fetch'):
+     self.apply_fetches(e)
+    with nvtx_phase('moe.h2d_global_barrier'):
+     self.fetch_barrier()
+   else:
+    # No rank has a miss fetch in this globally planned event.
+    assert not e['fetches']
    with nvtx_phase('moe.expert_compute'):
     values=self.compute(packet,e,layer)
    with nvtx_phase('moe.combine'):
@@ -295,7 +300,7 @@ def generate(model,rt,initial_ids,initial_mask):
  return dict(token_hash=array_hash(result),state_hash=array_hash(rt.keys),E2E_wall=finish-start,decode_wall=finish-decode_start,TPOT=begin.elapsed_time(end)/1000/horizon),result
 
 def main(a):
- if a.comm_mode in ('coslot','coslot-active') or a.h2d_mode=='pinned':
+ if a.comm_mode in ('coslot','coslot-active') or a.h2d_mode=='pinned' or a.execution_order=='fetch-barrier' or a.schedule_mode=='live':
   rank=int(os.environ['RANK']);cpus=list(range(24*rank,24*(rank+1)))
   for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
