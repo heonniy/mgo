@@ -19,7 +19,7 @@ def write(p,x):
 def snapshot():
  rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.used,memory.free,temperature.gpu','--format=csv,noheader,nounits'],text=True)
  return dict(gpus=[dict(zip(['gpu','used_mib','free_mib','temperature_c'],map(int,r.split(',')))) for r in rows.splitlines()],host_available_bytes=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:')))
-def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pageable',plan_path=None,h2d_stages=2,cache_ratio=None,substitution=None,decode_steps=256):
+def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pageable',plan_path=None,h2d_stages=2,cache_ratio=None,substitution=None,decode_steps=256,execution_order='streaming',schedule_mode='frozen'):
  if phase=='PLAN' and comm_mode!='current':raise ValueError('reference PLAN only uses current transport')
  spec=dict(json.loads((ROOT/'frozen_matrix.json').read_text())['cells'][cell]);world=spec['ranks'];gpus=list(range(8)) if world==8 else [0,1,4,5]
  cache_ratio=float(spec['cache_ratio'] if cache_ratio is None else cache_ratio);assert 0.0<cache_ratio<=1.0
@@ -28,6 +28,8 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
  if decode_steps!=256:tags.append(f'h{decode_steps}')
  if comm_mode!='current':tags.append(comm_mode)
  if h2d_mode!='pageable':tags.append(h2d_mode)
+ if execution_order!='streaming':tags.append(execution_order)
+ if schedule_mode!='frozen':tags.append(schedule_mode)
  suffix='' if not tags else '_'+('_'.join(tags));label=f'{cell}_{policy}_{environment}_{phase}{suffix}_{repeat}';out=ROOT/label;out.mkdir(exist_ok=False);state=dict(status='RUNNING',cell=cell,policy=policy,phase=phase,environment=environment,repeat=repeat,started_unix=time.time(),samples=[])
  initial=snapshot();cooldown=time.monotonic()
  while any(g['temperature_c']>=65 for g in initial['gpus']) and time.monotonic()-cooldown<180:
@@ -39,9 +41,9 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
   if k.startswith('NCCL_'):del env[k]
  env['NCCL_CUMEM_ENABLE']='0'
  if environment=='env2':env.update(NCCL_P2P_DISABLE='1',NCCL_IB_DISABLE='1')
- cache=ROOT/'compile_cache'/f'{cell}_{policy}_{environment}_{cache_tag}_{sub_tag}_{comm_mode}_{h2d_mode}_h{decode_steps}';cache.mkdir(parents=True,exist_ok=True)
+ cache=ROOT/'compile_cache'/f'{cell}_{policy}_{environment}_{cache_tag}_{sub_tag}_{comm_mode}_{h2d_mode}_{execution_order}_{schedule_mode}_h{decode_steps}';cache.mkdir(parents=True,exist_ok=True)
  env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
- cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples/env_offload_worker.py'),'--cell',cell,'--policy',policy,'--phase',phase,'--environment',environment,'--comm-mode',comm_mode,'--h2d-mode',h2d_mode,'--decode-steps',str(decode_steps),'--h2d-stages',str(h2d_stages),'--cache-ratio',str(cache_ratio),'--substitution-mode',('on' if substitution else 'off'),'--output',str(out)]
+ cmd=['/home/hwlee/sub-moe/phase01/.venv/bin/python','-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/'examples/env_offload_worker.py'),'--cell',cell,'--policy',policy,'--phase',phase,'--environment',environment,'--comm-mode',comm_mode,'--h2d-mode',h2d_mode,'--decode-steps',str(decode_steps),'--h2d-stages',str(h2d_stages),'--cache-ratio',str(cache_ratio),'--substitution-mode',('on' if substitution else 'off'),'--execution-order',execution_order,'--schedule-mode',schedule_mode,'--output',str(out)]
  if phase!='PLAN':
   plan_path=Path(plan_path) if plan_path is not None else discover_validated_plan(cell,policy,cache_ratio,substitution,decode_steps)
   if plan_path is None:raise FileNotFoundError(f'no validated PLAN for {cell}/{policy}; use ensure_plan()')
@@ -49,14 +51,14 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
   rank0=json.loads((plan_path/'rank0.json').read_text());assert rank0.get('decode_steps',256)==decode_steps
   plan_ratio=float(rank0.get('cache_ratio',rank0['cell_spec']['cache_ratio']));plan_sub=bool(rank0.get('substitution',rank0['cell_spec']['substitution']));assert abs(plan_ratio-cache_ratio)<1e-9,(plan_ratio,cache_ratio);assert plan_sub==substitution,(plan_sub,substitution)
   cmd+=['--plan',str(plan_path)]
- state.update(decode_steps=decode_steps,cache_ratio=cache_ratio,cache_tag=cache_tag,substitution=substitution,sub_tag=sub_tag,comm_mode=comm_mode,h2d_mode=h2d_mode,h2d_stages=h2d_stages,plan_path=(str(plan_path) if phase!='PLAN' else None),command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),layout_sha256=hashlib.sha256((P/'scripts/env_offload_layout.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
+ state.update(decode_steps=decode_steps,cache_ratio=cache_ratio,cache_tag=cache_tag,substitution=substitution,sub_tag=sub_tag,comm_mode=comm_mode,h2d_mode=h2d_mode,h2d_stages=h2d_stages,execution_order=execution_order,schedule_mode=schedule_mode,plan_path=(str(plan_path) if phase!='PLAN' else None),command=cmd,source_sha256=hashlib.sha256((P/'examples/env_offload_worker.py').read_bytes()).hexdigest(),policy_sha256=hashlib.sha256((P/'scripts/env_offload_policy.py').read_bytes()).hexdigest(),layout_sha256=hashlib.sha256((P/'scripts/env_offload_layout.py').read_bytes()).hexdigest(),transport_env={k:v for k,v in env.items() if k.startswith('NCCL_')},compile_cache=str(cache),initial=initial)
  (out/'worker_source.py').write_bytes((P/'examples/env_offload_worker.py').read_bytes());(out/'policy_source.py').write_bytes((P/'scripts/env_offload_policy.py').read_bytes());(out/'layout_source.py').write_bytes((P/'scripts/env_offload_layout.py').read_bytes())
  reason=None
  with (out/'run.log').open('w') as f:
   proc=subprocess.Popen(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(out/'status.json',state)
   timed=False
   while proc.poll() is None:
-   if phase=='MEASURE' and (comm_mode!='current' or h2d_mode=='pinned') and len(list(out.glob('ready_rank*.json')))==world:
+   if phase=='MEASURE' and (comm_mode!='current' or h2d_mode=='pinned' or execution_order=='fetch-barrier' or schedule_mode=='live') and len(list(out.glob('ready_rank*.json')))==world:
     boundary=snapshot();assert boundary['host_available_bytes']>=256*2**30 and all(g['free_mib']>8192 and g['temperature_c']<85 for g in boundary['gpus'])
     state['before_measure']=boundary;state['GO_unix']=time.time();write(out/'status.json',state);(out/'GO').touch();timed=True
     while proc.poll() is None:
@@ -94,4 +96,4 @@ def run(cell,policy,phase,environment,repeat=0,comm_mode='current',h2d_mode='pag
  if state['status']!='PASS':raise RuntimeError(str(out/'run.log'))
  return out
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--policy',required=True);p.add_argument('--phase',required=True);p.add_argument('--environment',default='env1');p.add_argument('--repeat',type=int,default=0);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution',choices=['matrix','on','off'],default='matrix');p.add_argument('--plan',type=Path);a=p.parse_args();sub=None if a.substitution=='matrix' else a.substitution=='on';run(a.cell,a.policy,a.phase,a.environment,a.repeat,a.comm_mode,a.h2d_mode,a.plan,a.h2d_stages,a.cache_ratio,sub)
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--policy',required=True);p.add_argument('--phase',required=True);p.add_argument('--environment',default='env1');p.add_argument('--repeat',type=int,default=0);p.add_argument('--comm-mode',choices=['current','coslot','coslot-active'],default='current');p.add_argument('--h2d-mode',choices=['pageable','pinned'],default='pageable');p.add_argument('--h2d-stages',type=int,default=2);p.add_argument('--cache-ratio',type=float);p.add_argument('--substitution',choices=['matrix','on','off'],default='matrix');p.add_argument('--execution-order',choices=['streaming','fetch-barrier'],default='streaming');p.add_argument('--schedule-mode',choices=['frozen','live'],default='frozen');p.add_argument('--decode-steps',type=int,choices=[64,256],default=256);p.add_argument('--plan',type=Path);a=p.parse_args();sub=None if a.substitution=='matrix' else a.substitution=='on';run(a.cell,a.policy,a.phase,a.environment,a.repeat,a.comm_mode,a.h2d_mode,a.plan,a.h2d_stages,a.cache_ratio,sub,a.decode_steps,a.execution_order,a.schedule_mode)
