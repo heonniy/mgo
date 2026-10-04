@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "full_model_parity": "M6_gpu_gate.json",
+  "native_gate_parity": "M6_NATIVE_gpu_gate.json",
+  "performance": [
+    {
+      "batch": 128,
+      "max_rank_median_ms": {
+        "compact": 0.3697737120091915,
+        "legacy": 1.0559274815022945
+      },
+      "record_bytes": 1560
+    },
+    {
+      "batch": 256,
+      "max_rank_median_ms": {
+        "compact": 0.4207189194858074,
+        "legacy": 1.1774897575378418
+      },
+      "record_bytes": 2584
+    }
+  ],
+  "method": "alternating order with identical synchronized boundaries; max of rank medians, 50 samples after 10 warmups",
+  "discarded_timing_method": "In-model compact-then-legacy wall times include preceding compute only in first path, so are not a fair metadata latency comparison.",
+  "Gate_semantics": "Preserve last W128 global-rank-order router rows, not whole-batch average. B>=128 enables rank-tail aggregation exactly.",
+  "validation_only_extra_collectives": "Legacy side-by-side gathers exist only for correctness validation; compact production call issues one all_gather_into_tensor."
+}

@@ -29,6 +29,28 @@ class ArenaBoundaryRuntime(PrefixRuntime):
    self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
   return result
 
+class CompactBoundaryRuntime(ArenaBoundaryRuntime):
+ def __init__(self,a,model,backing,experts):
+  super().__init__(a,model,backing,experts)
+  from mgo_v2.compact_metadata import CompactMetadata
+  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//8)
+  self.metadata_records=[]
+ def reset(self):
+  super().reset()
+  self.metadata_records=[]
+  if hasattr(self,'metadata'):self.metadata.calls=0
+ def collect(self,layer,selected,weights,probs):
+  from mgo_v2.runtime import gather_global_routes as legacy
+  if self.index<48:return legacy(layer,selected,weights,probs)
+  start=time.perf_counter();g=self.metadata.collect(self.index,selected,probs,self.arrays['gates'][self.index]);elapsed=time.perf_counter()-start
+  start=time.perf_counter();reference=legacy(layer,selected,weights,probs);old_elapsed=time.perf_counter()-start
+  assert np.array_equal(g.routes.selected_experts,reference.routes.selected_experts)
+  assert np.array_equal(g.routes.origin_ranks,reference.routes.origin_ranks)
+  assert g.counts==reference.counts
+  assert np.array_equal(g.gate_scores,self.arrays['gates'][self.index])
+  self.metadata_records.append(dict(compact_ms=elapsed*1000,legacy_ms=old_elapsed*1000))
+  return g
+
 def main(a):
  rank=int(os.environ['RANK']);a.output.mkdir(parents=True,exist_ok=True)
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(rank)]
@@ -41,7 +63,10 @@ def main(a):
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda');rows=[]
  for name in (['BR'] if a.instrument else ['BR','CA','LA']):
-  a.policy=name;rt=(ArenaBoundaryRuntime if a.arena_budget else PrefixRuntime)(a,model,backing,experts);expected=None
+  a.policy=name;rt=(CompactBoundaryRuntime if a.compact else ArenaBoundaryRuntime if a.arena_budget else PrefixRuntime)(a,model,backing,experts);expected=None
+  if a.compact:
+   import la_physical_worker as live
+   original_collect=live.gather_global_routes;live.gather_global_routes=rt.collect
   for repeat in range(2):
    rt.reset()
    if a.instrument and repeat==1:
@@ -59,10 +84,11 @@ def main(a):
    assert rt.actual_h2d_bytes==rt.proof['H2D_bytes'][rank] and not rt.mismatch.item()
    if expected is not None:assert np.array_equal(expected,tokens)
    expected=tokens
-   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None)))
+   rows.append(dict(policy=name,repeat=repeat,argmax_hash=row['argmax_hash'],state_hash=row['state_hash'],H2D_bytes=rt.actual_h2d_bytes,prefill_boundary=getattr(rt,'prefill_boundary',None),metadata_records=getattr(rt,'metadata_records',[]),metadata_calls=(rt.metadata.calls if a.compact else None),metadata_record_bytes=(rt.metadata.record_bytes if a.compact else None)))
+  if a.compact:live.gather_global_routes=original_collect
   # Detach closures before reclaiming the arena for the next policy.
   for block in model.model.layers:block.mlp.forward=lambda *args: None
   del rt;gc.collect();torch.cuda.empty_cache()
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,horizon=8,rows=rows,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated()));dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');p.add_argument('--arena-budget',type=int,default=0);p.add_argument('--compact',action='store_true');main(p.parse_args())

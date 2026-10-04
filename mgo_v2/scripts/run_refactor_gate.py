@@ -12,8 +12,11 @@ def main():
  while any(g['temperature_c']>=65 for g in h.snapshot()['gpus']) and time.monotonic()<deadline:time.sleep(5)
  h.safe(h.sample(),True);env=h.env_for('env1');cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/refactor_baseline_worker.py'),'--inputs',str(ROOT/'baseline_B128'),'--output',str(out)]
+ if args.stage in ('M6_NATIVE','M6_PERF'):cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'examples/compact_metadata_check.py'),'--output',str(out)]
+ if args.stage=='M6_PERF':cmd+=['--benchmark']
  if args.stage=='M1':cmd+=['--instrument']
  if args.stage=='M5':cmd+=['--arena-budget','2']
+ if args.stage=='M6':cmd+=['--arena-budget','2','--compact']
  with (out/'run.log').open('w') as log:
   proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(PACKET/'status.json',state)
   try:
