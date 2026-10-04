@@ -1,0 +1,130 @@
+{
+  "status": "IMPLEMENTING",
+  "branch": "refactoring",
+  "scope": "decode-only next-layer prefetch runtime refactoring",
+  "model": "Qwen3-30B-A3B",
+  "ranks": 8,
+  "local_batches": [
+    128,
+    256
+  ],
+  "cache_percent": 60,
+  "substitution": false,
+  "replication": false,
+  "decode_tokens": 256,
+  "prefill": {
+    "prefetch": false,
+    "predictor": false,
+    "mandatory_miss_fetch": "balanced floor/ceil across ranks",
+    "placement_policies": [
+      "BR",
+      "CA",
+      "LA"
+    ]
+  },
+  "decode": {
+    "predictor": "EdgeMoE-style offline layer-to-layer transition calibration; batch aggregated",
+    "prefetch_slots_per_rank": [
+      0,
+      1,
+      2,
+      4,
+      8
+    ],
+    "prefetch_placement": [
+      "BR",
+      "CA",
+      "LA"
+    ],
+    "prefetch_quota": "balanced per-rank count",
+    "promotion": "physical slot role swap; no expert-weight D2D copy",
+    "demand_h2d_priority": "urgent over background prefetch",
+    "execution": "ready-first, per-slot wait, no global H2D barrier",
+    "communication": "1 metadata collective + 1 fused forward A2A + 1 return A2A"
+  },
+  "trigger_positions": {
+    "T0": "prefetch prediction/placement before forward A2A",
+    "T1": "urgent H2D -> async forward A2A -> predictor/prefetch placement (preferred)",
+    "T2": "prefetch prediction/placement after forward A2A"
+  },
+  "required_metrics": [
+    "TPOT",
+    "H2D_total",
+    "H2D_exposed",
+    "H2D_hidden_ratio",
+    "forward_A2A",
+    "expert_compute",
+    "return_A2A",
+    "metadata",
+    "current_controller",
+    "prefetch_controller_total",
+    "prefetch_controller_exposed",
+    "prefetch_ready_at_use",
+    "prefetch_inflight_at_use",
+    "wasted_prefetch_bytes",
+    "promotion_count",
+    "promotion_induced_reload"
+  ],
+  "automatic_long_gpu_run": true,
+  "final_runtime_selection": {
+    "objective": "maximize stable realized LA TPOT gain while avoiding gain-only dominated runtimes",
+    "common_stack": [
+      "one compact metadata collective",
+      "replicated deterministic controller",
+      "same BR/LA placement",
+      "same cache ratio C",
+      "same expert kernel",
+      "same fused token-to-rank packet format",
+      "one forward payload A2A",
+      "one return payload A2A",
+      "same NCCL/NUMA settings",
+      "same prefill path",
+      "same timing boundaries"
+    ],
+    "variants": {
+      "V1_OPT_NOPF_BARRIER": {
+        "prefetch": false,
+        "prefetch_slots_per_rank": 0,
+        "fetch_barrier": true,
+        "demand_h2d": "after forward A2A, fully completes before compute"
+      },
+      "V2_OPT_PF_BARRIER": {
+        "prefetch": true,
+        "prefetch_slots_per_rank": "frozen from BR-only tuning",
+        "fetch_barrier": true,
+        "demand_h2d": "residual demand fetch completes at global barrier before compute"
+      },
+      "V3_OPT_PF_OVERLAP": {
+        "prefetch": true,
+        "prefetch_slots_per_rank": "same frozen P as V2",
+        "fetch_barrier": false,
+        "demand_h2d": "urgent early-start after current controller; overlap with forward A2A and ready-first compute"
+      }
+    },
+    "primary_metric": "G_LA(v,B)=(TPOT_BR-TPOT_LA)/TPOT_BR",
+    "robust_score": "min(G_LA(v,B128), G_LA(v,B256))",
+    "stability_required": true,
+    "tie_breaks": [
+      "larger mean LA gain across B128/B256",
+      "lower absolute LA TPOT",
+      "lower exposed H2D",
+      "lower extra HBM/wasted prefetch"
+    ],
+    "anti_gaming": "reject GAIN_ONLY_DOMINATED variant if larger relative gain is caused by worse BR while absolute LA TPOT is materially dominated",
+    "outputs": [
+      "THREE_ARM_RESULTS.json",
+      "THREE_ARM_RESULTS.md",
+      "FINAL_RUNTIME_SELECTION.json"
+    ]
+  },
+  "owner_override": "2026-10-05 chat authorizes autonomous implementation, failure repair and overnight physical selection; review-only checkpoints superseded, validation gates retained",
+  "baseline_commit": "628158d",
+  "plan_commit": "1bc6bb053437e36576ec5081d07c28939c5ef06e",
+  "environment": "env1",
+  "eval_cases": [
+    "B128_LOAD",
+    "B256_LOAD"
+  ],
+  "calibration_dataset": "ShareGPT",
+  "evaluation_dataset": "MATH"
+}
