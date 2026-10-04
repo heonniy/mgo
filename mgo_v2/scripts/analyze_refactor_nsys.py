@@ -169,6 +169,14 @@ def analyze(path,receipt):
  decomposition['causal_event_kernel_union_ms']=causal
  decomposition['causal_event_kernel_distributions']=distributions
  decomposition['causal_scope']='Actual GPU intervals attributed to their CPU launch event. Unlike adjacent-time-window bins, causal event durations can overlap and must not be summed into decode wall time. NCCL durations include residency/wait time.'
+ preview_window=[(ordered[0][1],ordered[3][1])]
+ preview_classes={**kernels, 'expert_H2D_DMA':h2d}
+ for phase in ('moe.current_controller','moe.prefetch_controller','moe.metadata'):
+  preview_classes['CPU '+phase]=cpu[phase]
+ decomposition['timeline_preview']=dict(window_ns=preview_window[0],
+  intervals_ns={phase:intersection(intervals,preview_window) for phase,intervals in preview_classes.items()},
+  event_boundaries_ns=[dict(event=e,start_ns=s) for e,s,end in ordered[:4]],
+  scope='First three adjacent decode-layer time windows. GPU lanes use actual CUDA intervals; CPU lanes use NVTX wall intervals. Not primary timing or a critical-path proof.')
  return dict(status='PASS',interval_decomposition=decomposition,source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),kernel_names={k:dict(v) for k,v in kernel_names.items()},prefetch_readiness_at_use=dict(readiness),H2D_split=split_report,H2D_by_source_event_ms={str(k):duration(v)/1e6 for k,v in byevent.items()},unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),other_H2D=dict(count=other_count,bytes=other_bytes,total_union_ms=duration(other_h2d)/1e6),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Expert DMA uses the 9-MiB copy size and exactly reconciles the scheduler decode-copy count; smaller control/input copies are reported separately. Capture includes trailing decode work after CPU launch spans. NCCL kernel names separate collective work from local pack/combine kernels. Copy classes map the single H2D stream in submission order to checked ticket provenance. GPU phases use actual correlated CUDA runtime/driver launches; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('sqlite',type=Path);p.add_argument('--output',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.sqlite,json.loads(a.receipt.read_text())),indent=2)+'\n')

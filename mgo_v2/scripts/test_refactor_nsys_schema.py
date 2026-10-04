@@ -45,6 +45,10 @@ def main():
   assert len(causal)==384 and causal['48']['moe.forward_a2a.nccl']==13/1e6
   forward=out['interval_decomposition']['causal_event_kernel_distributions']['moe.forward_a2a.nccl']
   assert forward['median_ms']==13/1e6 and abs(forward['p90_ms']-13/1e6)<1e-15
+  preview=out['interval_decomposition']['timeline_preview']
+  assert preview['window_ns']==(1000,1300)
+  assert preview['intervals_ns']['expert_H2D_DMA']==[(1010,1040)]
+  assert len(preview['intervals_ns']['moe.expert_compute'])==3
   cpu=out['cpu_nvtx']
   metadata_parts=sum(cpu[name]['total_ms'] for name in ('moe.metadata_pack_host','moe.metadata_collective_submit','moe.metadata_readback_wait_and_unpack'))
   assert abs(metadata_parts-cpu['moe.metadata']['total_ms'])<1e-12
