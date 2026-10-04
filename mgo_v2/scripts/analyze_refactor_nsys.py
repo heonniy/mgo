@@ -1,5 +1,5 @@
 """Actual CUDA interval unions from Nsight SQLite; no CPU-span-as-kernel proxy."""
-import argparse,bisect,hashlib,json,sqlite3
+import argparse,bisect,hashlib,json,sqlite3,statistics
 from collections import defaultdict
 from pathlib import Path
 
@@ -46,11 +46,12 @@ def exclusive_partition(window,h2d,comm,compute):
 def analyze(path,receipt):
  db=sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
  strings={r['id']:r['value'] for r in db.execute('SELECT id,value FROM StringIds')}
- ranges=defaultdict(list);decode=[];decode_ids=[];cpu=defaultdict(list)
+ ranges=defaultdict(list);decode=[];decode_ids=[];cpu=defaultdict(list);event_ids={}
  for r in db.execute('SELECT start,end,globalTid,text,textId FROM NVTX_EVENTS WHERE end IS NOT NULL AND end>start'):
   name=strings.get(r['textId'],r['text'])
   if not name:continue
   if name.startswith('decode.event.'):
+   event_ids[(r['globalTid'],r['start'])]=int(name.rsplit('.',1)[1])
    decode_ids.append((int(name.rsplit('.',1)[1]),r['start'],r['end']))
    decode.append((r['start'],r['end']));name='decode.event'
   ranges[(r['globalTid'],name)].append((r['start'],r['end']))
@@ -71,18 +72,21 @@ def analyze(path,receipt):
    key=(r['globalTid'] & 0xFFFFFFFFFF000000,r['correlationId'])
    runtime.setdefault(key,(r['start'],r['end'],r['globalTid']))
  phases=('moe.metadata','moe.forward_a2a','moe.expert_compute','moe.return_a2a')
- kernels=defaultdict(list);counts=defaultdict(int);kernel_names=defaultdict(lambda:defaultdict(int));unassigned=0;decode_kernels=[]
+ kernels=defaultdict(list);counts=defaultdict(int);kernel_names=defaultdict(lambda:defaultdict(int));unassigned=0;decode_kernels=[];event_kernels=defaultdict(lambda:defaultdict(list))
  for r in db.execute('SELECT start,end,globalPid,correlationId,demangledName FROM CUPTI_ACTIVITY_KIND_KERNEL'):
   api=runtime.get((r['globalPid'],r['correlationId']))
   if api is None:continue
   start,end,tid=api
   if not contained(tid,'decode.event',start,end):continue
+  event_starts,event_spans=ranges[(tid,'decode.event')]
+  event=event_ids[(tid,event_starts[bisect.bisect_right(event_starts,start)-1])]
   interval=(r['start'],r['end']);decode_kernels.append(interval);matched=False
   for name in phases:
    if contained(tid,name,start,end):
     kernel_name=strings.get(r['demangledName'],'<unknown>');phase=name
     if name in ('moe.metadata','moe.forward_a2a','moe.return_a2a'):phase += '.nccl' if 'nccl' in kernel_name.lower() else '.local_gpu'
     kernels[phase].append(interval);counts[phase]+=1;kernel_names[phase][kernel_name]+=1;matched=True
+    event_kernels[event][phase].append(interval)
   if not matched:unassigned+=1
  assert counts['moe.expert_compute']>0,'missing expert kernel attribution'
  assert counts['moe.metadata.nccl']>0,'missing metadata collective attribution'
@@ -156,6 +160,15 @@ def analyze(path,receipt):
   assert duration(intersection(parent,child))==duration(child),'predictor must be nested in prefetch controller'
   cpu_report['moe.prefetch_placement_and_bookkeeping']={key:max(0,value-cpu_report['moe.prefetch_predictor'][key]) for key,value in cpu_report['moe.prefetch_controller'].items()}
  decomposition=dict(aggregate_exclusive_ms=exclusive,per_event=per_event,window_definition='Adjacent host decode-event start timestamps, through final captured decode work. Actual GPU intervals are split at boundaries; these are time windows, not causal layer ownership. COMM includes metadata and both payload NCCL collectives. Local pack/combine kernels and non-MoE work remain unattributed. Idle_or_unattributed is not necessarily GPU idle.')
+ causal={str(event):{phase:duration(intervals)/1e6 for phase,intervals in phases.items()} for event,phases in event_kernels.items()}
+ assert len(causal)==384
+ distributions={}
+ for phase in kernels:
+  values=[phases.get(phase,0.) for phases in causal.values()]
+  distributions[phase]=dict(median_ms=statistics.median(values),p90_ms=statistics.quantiles(values,n=10,method='inclusive')[8],max_ms=max(values),events=len(values))
+ decomposition['causal_event_kernel_union_ms']=causal
+ decomposition['causal_event_kernel_distributions']=distributions
+ decomposition['causal_scope']='Actual GPU intervals attributed to their CPU launch event. Unlike adjacent-time-window bins, causal event durations can overlap and must not be summed into decode wall time. NCCL durations include residency/wait time.'
  return dict(status='PASS',interval_decomposition=decomposition,source=str(path),decode_events=len(decode),window_ns=window,kernel_counts=dict(counts),kernel_names={k:dict(v) for k,v in kernel_names.items()},prefetch_readiness_at_use=dict(readiness),H2D_split=split_report,H2D_by_source_event_ms={str(k):duration(v)/1e6 for k,v in byevent.items()},unassigned_decode_kernel_count=unassigned,kernel_union_ms={k:duration(v)/1e6 for k,v in kernels.items()},all_decode_kernel_union_ms=duration(decode_kernels)/1e6,H2D=dict(count=h2d_count,bytes=h2d_bytes,total_union_ms=total/1e6,overlap_comm_expert_ms=hidden/1e6,outside_comm_expert_ms=(total-hidden)/1e6,hidden_ratio=hidden/total),other_H2D=dict(count=other_count,bytes=other_bytes,total_union_ms=duration(other_h2d)/1e6),cpu_nvtx=cpu_report,interpretation='Overlap is interval intersection, not a causal speedup or critical-path proof. NCCL kernel residency includes wait/spin time. Expert DMA uses the 9-MiB copy size and exactly reconciles the scheduler decode-copy count; smaller control/input copies are reported separately. Capture includes trailing decode work after CPU launch spans. NCCL kernel names separate collective work from local pack/combine kernels. Copy classes map the single H2D stream in submission order to checked ticket provenance. GPU phases use actual correlated CUDA runtime/driver launches; CPU NVTX spans are reported separately. Never use these instrumented times as primary E2E/TPOT.')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('sqlite',type=Path);p.add_argument('--output',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.sqlite,json.loads(a.receipt.read_text())),indent=2)+'\n')

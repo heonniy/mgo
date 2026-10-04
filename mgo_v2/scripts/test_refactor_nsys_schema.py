@@ -41,6 +41,10 @@ def main():
   assert inflight['count']==1 and inflight['bytes']==9437184
   assert inflight['total_union_ms']==30/1e6 and inflight['overlap_comm_expert_ms']==23/1e6
   assert len(out['interval_decomposition']['per_event'])==384
+  causal=out['interval_decomposition']['causal_event_kernel_union_ms']
+  assert len(causal)==384 and causal['48']['moe.forward_a2a.nccl']==13/1e6
+  forward=out['interval_decomposition']['causal_event_kernel_distributions']['moe.forward_a2a.nccl']
+  assert forward['median_ms']==13/1e6 and abs(forward['p90_ms']-13/1e6)<1e-15
   cpu=out['cpu_nvtx']
   metadata_parts=sum(cpu[name]['total_ms'] for name in ('moe.metadata_pack_host','moe.metadata_collective_submit','moe.metadata_readback_wait_and_unpack'))
   assert abs(metadata_parts-cpu['moe.metadata']['total_ms'])<1e-12
