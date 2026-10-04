@@ -1,0 +1,201 @@
+{
+  "status": "FAIL",
+  "label": "BR_env1_MEASURE_1",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo/mgo_v2/examples/ca_stress_r4_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/R4_0146/BR_env1_MEASURE_1",
+    "--policy",
+    "BR",
+    "--environment",
+    "env1",
+    "--phase",
+    "MEASURE",
+    "--plan",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/R4_0146/BR_env1_PLAN_0"
+  ],
+  "started_unix": 1791085268.4573555,
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      }
+    ],
+    "host_available_bytes": 1980096335872,
+    "unix": 1791085268.2935886,
+    "foreign_pids": [],
+    "collection_seconds": 0.31666287407279015
+  },
+  "monitor": "BOUNDARY",
+  "pid": 3599836,
+  "last_safety": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 10907,
+        "free_mib": 70183,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 1,
+        "used_mib": 11259,
+        "free_mib": 69831,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 10929,
+        "free_mib": 70161,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 6,
+        "used_mib": 10909,
+        "free_mib": 70181,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      }
+    ],
+    "host_available_bytes": 1736792584192,
+    "unix": 1791085761.0803971,
+    "rss_bytes": 478315991040,
+    "foreign_pids": [],
+    "collection_seconds": 0.44923221599310637
+  },
+  "before_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 10907,
+        "free_mib": 70183,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 1,
+        "used_mib": 11259,
+        "free_mib": 69831,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 30
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 10929,
+        "free_mib": 70161,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 6,
+        "used_mib": 10909,
+        "free_mib": 70181,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 31
+      }
+    ],
+    "host_available_bytes": 1736790831104,
+    "unix": 1791085761.528429,
+    "rss_bytes": 478315991040,
+    "pss_bytes": 300602145792,
+    "foreign_pids": [],
+    "collection_seconds": 6.59374135825783
+  },
+  "GO_unix": 1791085767.9553022,
+  "error": "AssertionError('/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/R4_0146/BR_env1_MEASURE_1/run.log')",
+  "exit_code": 1,
+  "finished_unix": 1791085837.4531198
+}
