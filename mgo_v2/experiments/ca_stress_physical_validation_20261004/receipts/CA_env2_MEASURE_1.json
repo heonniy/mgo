@@ -1,0 +1,200 @@
+{
+  "status": "PASS",
+  "label": "CA_env2_MEASURE_1",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo/mgo_v2/examples/ca_stress_physical_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/CA_env2_MEASURE_1",
+    "--policy",
+    "CA",
+    "--environment",
+    "env2",
+    "--phase",
+    "MEASURE",
+    "--plan",
+    "/home/hwlee/mgo-results/ca_stress_physical_validation_20261004/CA_env1_PLAN_0"
+  ],
+  "started_unix": 1791075650.1027536,
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 39
+      },
+      {
+        "gpu": 1,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 33
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 4,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 34
+      }
+    ],
+    "host_available_bytes": 1982747852800,
+    "unix": 1791075649.945201,
+    "foreign_pids": [],
+    "collection_seconds": 0.3111704969778657
+  },
+  "monitor": "BOUNDARY",
+  "pid": 3500184,
+  "last_safety": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 7279,
+        "free_mib": 73811,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 7281,
+        "free_mib": 73809,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 7013,
+        "free_mib": 74077,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 3,
+        "used_mib": 7125,
+        "free_mib": 73965,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 4,
+        "used_mib": 6995,
+        "free_mib": 74095,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 7071,
+        "free_mib": 74019,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 7009,
+        "free_mib": 74081,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 7367,
+        "free_mib": 73723,
+        "temperature_c": 34
+      }
+    ],
+    "host_available_bytes": 1549833945088,
+    "unix": 1791076039.0184028,
+    "rss_bytes": 902615425024,
+    "foreign_pids": [],
+    "collection_seconds": 0.4365975260734558
+  },
+  "before_measure": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 7279,
+        "free_mib": 73811,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 1,
+        "used_mib": 7281,
+        "free_mib": 73809,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 2,
+        "used_mib": 7013,
+        "free_mib": 74077,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 3,
+        "used_mib": 7125,
+        "free_mib": 73965,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 4,
+        "used_mib": 6995,
+        "free_mib": 74095,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 5,
+        "used_mib": 7071,
+        "free_mib": 74019,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 6,
+        "used_mib": 7009,
+        "free_mib": 74081,
+        "temperature_c": 37
+      },
+      {
+        "gpu": 7,
+        "used_mib": 7367,
+        "free_mib": 73723,
+        "temperature_c": 34
+      }
+    ],
+    "host_available_bytes": 1549839233024,
+    "unix": 1791076039.4285138,
+    "rss_bytes": 902615425024,
+    "pss_bytes": 489125115904,
+    "foreign_pids": [],
+    "collection_seconds": 11.453242838382721
+  },
+  "GO_unix": 1791076050.741692,
+  "exit_code": 0,
+  "finished_unix": 1791076385.9702182
+}
