@@ -47,3 +47,8 @@ all candidates are nonpositive or their intervals include zero. Ranking is not
 a positive-improvement claim: report that claim only when the paired gain
 confidence interval is above zero in both batches. Do not silently add a
 positive-sign eligibility constraint absent from the original selection plan.
+
+`BR_TUNING_FUTILITY.md` permits early rejection after at least three BR-only
+tuning samples when a mathematical lower bound proves that neither five nor
+seven samples can meet the unchanged confidence-width gate. This applies to
+fresh workers after the current B128 group, and never to paired gain timing.

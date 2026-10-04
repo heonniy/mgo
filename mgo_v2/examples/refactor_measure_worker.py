@@ -1,7 +1,7 @@
 """Full-model frozen-route timing, live cache strategy, external clean boundaries."""
 from refactor_baseline_worker import *
 from mgo_v2.decode_runtime import DecodeOffloadRuntime
-from adaptive_timing import single_decision
+from adaptive_timing import tuning_decision
 import resource
 
 def validate(rt,row,proof,rank):
@@ -53,7 +53,7 @@ def main(a):
   if case.get('measure',True):
    samples=[]
    for repeat in range(1,8):
-    if len(samples)>=2 and repeat>single_decision(samples)['target_repeats']:break
+    if len(samples)>=2 and repeat>tuning_decision(samples)['target_repeats']:break
     a.phase='MEASURE';rt.reset();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
     from torch._dynamo.utils import counters
     before=dict(counters['stats']);key=f'{label}_r{repeat}'
@@ -73,7 +73,7 @@ def main(a):
     write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
     samples.append({k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']})
     if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=label,repeat=repeat,samples=samples))
-   decision=single_decision(samples);assert decision['complete']
+   decision=tuning_decision(samples);assert decision['complete']
    result=dict(status='PASS',case=case,numerical_comparison=numeric,samples=samples,gate=decision,estimate=decision['estimate'],initial_gate=decide(samples[:2]),unstable=decision['unstable']);results.append(result)
    if rank==0:write(a.output/f'{label}_result.json',result)
   if hasattr(rt,'close'):rt.close()

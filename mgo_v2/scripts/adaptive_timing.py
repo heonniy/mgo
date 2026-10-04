@@ -36,3 +36,25 @@ def paired_decision(pairs,baseline="BR",candidate="LA"):
   resolved=all(g['CI_half_width']<=.02 and g['early_late_drift']<=.02 for g in gain.values());target=5 if resolved and n==5 else 7
  complete=n>=target;unstable=complete and n>=5 and not all(g['CI_half_width']<=.02 and g['early_late_drift']<=.02 for g in gain.values())
  return dict(baseline=baseline,candidate=candidate,status='UNRESOLVED_JITTER' if unstable else 'STABLE_PAIRED_GAIN' if complete else 'EXTEND',complete=complete,unstable=unstable,target_repeats=target,gain=gain,absolute=single,rule='Alternate BR/LA order. Noisy comparisons use 5 or at most 7 complete pairs. Require paired gain CI95 half-width <=2 percentage points and early/late paired-gain drift <=2 points. All observations retained; positive claim requires CI lower bound >0.')
+
+def optimistic_relative_ci(values,final_n):
+ """Smallest possible relative t-CI halfwidth with arbitrary positive future times.
+
+ For r remaining samples, the optimum sets every future value to Q/S, where
+ S=sum(observed), Q=sum(observed**2). This even grants unrealistically perfect
+ future repeats; exceeding the threshold here proves futility within the cap.
+ """
+ assert 2<=len(values)<=final_n<=7 and all(math.isfinite(x) and x>0 for x in values)
+ m=len(values);s=sum(values);q=sum(x*x for x in values);remaining=final_n-m
+ return T95[final_n-1]*math.sqrt(max(0.,m*q-s*s)/((final_n-1)*(s*s+remaining*q)))
+
+def tuning_decision(rows):
+ """BR-only tuning: retain >=3 samples, prune only mathematically futile extensions."""
+ d=single_decision(rows);n=len(rows)
+ if n<3 or d['complete'] or d['target_repeats']<5:return d
+ finals=[k for k in (5,7) if k>=n]
+ bounds={str(final):{key:optimistic_relative_ci([r[key] for r in rows],final) for key in KEYS} for final in finals}
+ # At every permitted endpoint, at least one required metric cannot meet 2%.
+ if all(any(value>.02+1e-12 for value in bymetric.values()) for bymetric in bounds.values()):
+  d.update(status='UNRESOLVED_JITTER_FUTILITY',complete=True,unstable=True,target_repeats=n,optimistic_future_relative_CI_halfwidth=bounds,rule='BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.')
+ return d
