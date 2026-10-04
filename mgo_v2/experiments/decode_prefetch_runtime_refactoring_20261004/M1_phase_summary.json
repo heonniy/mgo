@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "events": 3072,
+  "instrumentation_on_off_token_state_H2D_parity": true,
+  "scope": "sum over eight ranks and 384 decode-layer events per rank; profiled short run, not speed evidence",
+  "total_span_ms": 87978.6201171875,
+  "unattributed_ms": 5916.12109375,
+  "unattributed_fraction": 0.0672449861781161,
+  "H2D_DMA_ms": 2623.20703125,
+  "CPU_phase_ms": {
+    "moe.metadata_exchange": 11245.24194188416,
+    "moe.rank_decision": 6784.610980190337,
+    "moe.dispatch": 1109.0317787602544,
+    "moe.h2d_fetch": 14706.641726195812,
+    "moe.h2d_global_barrier": 7387.703729793429,
+    "moe.expert_compute": 12887.929235585034,
+    "moe.combine": 24707.351280376315,
+    "moe.layer": 87912.06498350948
+  },
+  "max_reconciliation_error_ms": 0.0,
+  "allowed_reconciliation_error_ms": 0.05,
+  "allowed_unattributed_fraction": 0.1,
+  "raw": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/M1",
+  "unit_test": "scripts/test_phase_timing.py",
+  "limitation": "GPU phase boundaries include enqueue/idle gaps. Actual H2D stream events are measured. Kernel-only attribution deferred to M16 Nsight."
+}

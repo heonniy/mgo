@@ -1,6 +1,11 @@
 """Short full-model baseline gate for BR/CA/LA; never reports speed claims."""
 from la_physical_worker import *
 class PrefixRuntime(LiveRuntime):
+ def execute(self,*args):
+  recorder=getattr(self,"recorder",None)
+  if recorder is None:return super().execute(*args)
+  recorder.event=self.index
+  with recorder.span("moe.layer"):return super().execute(*args)
  def reset(self):
   self.policy_kind={'BR':0,'CA':1,'LA':4}[self.args.policy]
   super().reset()
@@ -16,10 +21,21 @@ def main(a):
  model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda')
  teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda');rows=[]
- for name in ['BR','CA','LA']:
+ for name in (['BR'] if a.instrument else ['BR','CA','LA']):
   a.policy=name;rt=PrefixRuntime(a,model,backing,experts);expected=None
   for repeat in range(2):
-   rt.reset();row,tokens=generate(model,rt,ids,mask,teacher,8)
+   rt.reset()
+   if a.instrument and repeat==1:
+    from mgo_v2.phase_timing import PhaseRecorder
+    import env_offload_worker as base
+    import la_physical_worker as live
+    recorder=PhaseRecorder();rt.recorder=recorder;rt.h2d.trace=recorder
+    old_base,old_live=base.nvtx_phase,live.nvtx_phase;base.nvtx_phase=recorder.span;live.nvtx_phase=recorder.span
+   row,tokens=generate(model,rt,ids,mask,teacher,8)
+   if a.instrument and repeat==1:
+    base.nvtx_phase,live.nvtx_phase=old_base,old_live
+    write(a.output/f'phases_rank{rank}.json',recorder.receipt())
+    rt.recorder=None;rt.h2d.trace=None
    assert row['state_hash']==rt.proof['rank_state_hashes'][rank]
    assert rt.actual_h2d_bytes==rt.proof['H2D_bytes'][rank] and not rt.mismatch.item()
    if expected is not None:assert np.array_equal(expected,tokens)
@@ -30,4 +46,4 @@ def main(a):
   del rt;gc.collect();torch.cuda.empty_cache()
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,horizon=8,rows=rows,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated()));dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--instrument',action='store_true');main(p.parse_args())

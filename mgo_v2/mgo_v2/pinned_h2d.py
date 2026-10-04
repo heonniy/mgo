@@ -27,6 +27,7 @@ class PinnedH2DCache:
     def __init__(self,cache:torch.Tensor,stage_count:int=2):
         if not cache.is_cuda:raise ValueError("cache must be CUDA")
         if stage_count<2:raise ValueError("stage_count must be >=2")
+        self.trace=None
         self.cache=cache;self.stage_count=int(stage_count)
         self.h2d_stream=torch.cuda.Stream(device=cache.device)
         self.stages=[torch.empty(cache.shape[1],dtype=cache.dtype,device="cpu",pin_memory=True) for _ in range(self.stage_count)]
@@ -43,7 +44,9 @@ class PinnedH2DCache:
         stage=self.stages[sid];copy_expert_to_stage(stage,tensors)
         with torch.cuda.stream(self.h2d_stream):
             if self.compute_valid[slot]:self.h2d_stream.wait_event(self.compute_done[slot])
+            token=self.trace.copy_start(self.h2d_stream,slot) if self.trace else None
             self.cache[slot].copy_(stage,non_blocking=True)
+            if self.trace:self.trace.copy_end(token,self.h2d_stream)
             self.fetch_done[slot].record(self.h2d_stream);self.stage_done[sid].record(self.h2d_stream)
         self.stage_busy[sid]=True;self.fetch_valid[slot]=True
     def wait_for_slot(self,slot:int):
