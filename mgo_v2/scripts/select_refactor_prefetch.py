@@ -28,7 +28,7 @@ def select(stage,horizon):
  if horizon==64:
   finalists=ordered[:2];result['finalists']=finalists;groups=[]
   for batch in [128,256]:
-   cases=[dict(label='REFERENCE',policy='BR',P=0,trigger='T1',horizon=256,baseline=True,measure=False)]
+   cases=[] if precision=='bf16' else [dict(label='REFERENCE',policy='BR',P=0,trigger='T1',horizon=256,baseline=True,measure=False)]
    for r in finalists:cases.append(dict(label=r['label'],policy='BR',P=r['P'],trigger=r['trigger'],horizon=256,overlap=True,**({'partial_precision':precision} if precision!='exact' else {})))
    groups.append(dict(batch=batch,horizon=256,cases=cases))
   write(PACKET/'M13_CONFIRM_CONFIG.json',groups);write(PACKET/'M13_SCREEN_SELECTION.json',result)

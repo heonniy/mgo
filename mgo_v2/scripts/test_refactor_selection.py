@@ -17,11 +17,12 @@ def main():
   assert [x['P'] for x in r['finalists']]==[1,4]
   for b in [128,256]:
    f=s.ROOT/f'TEST_B{b}_H64/result.json';d=json.loads(f.read_text())
-   for x in d['results']:x['case']['partial_precision']='fp32'
+   for x in d['results']:x['case']['partial_precision']='bf16'
    f.write_text(json.dumps(d))
   s.select('TEST',64)
   config=json.loads((s.PACKET/'M13_CONFIRM_CONFIG.json').read_text())
-  assert all(c['partial_precision']=='fp32' for g in config for c in g['cases'] if not c.get('baseline'))
+  assert all(c['partial_precision']=='bf16' for g in config for c in g['cases'] if not c.get('baseline'))
+  assert all(not c.get('baseline') for g in config for c in g['cases'])
   bad=s.ROOT/'TEST_B128_H64/result.json';d=json.loads(bad.read_text());d['results'][0]['case']['policy']='LA';bad.write_text(json.dumps(d))
   try:s.select('TEST',64)
   except AssertionError:pass
