@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL_SCREEN",
-  "completed_cells": 5,
+  "completed_cells": 6,
   "planned_cells": 9,
   "results": [
     {
@@ -185,6 +185,111 @@
         "relative_difference": {
           "E2E_wall": 0.016358120555588097,
           "TPOT": 0.030824818665473246
+        },
+        "estimator": "median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": true
+    },
+    {
+      "status": "PASS",
+      "case": {
+        "label": "P2_T2",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16"
+      },
+      "numerical_comparison": {
+        "actual_argmax_hash": "6c42cad2281e6c265f5ceea7e3b4d5a4dd17b4c168fafd3cbc66c5f86883c0fd",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "samples": [
+        {
+          "E2E_wall": 112.31391481030732,
+          "TPOT": 1.3833209228515626
+        },
+        {
+          "E2E_wall": 116.62313889991492,
+          "TPOT": 1.452791015625
+        },
+        {
+          "E2E_wall": 117.69323906023055,
+          "TPOT": 1.470156494140625
+        },
+        {
+          "E2E_wall": 114.99855205137283,
+          "TPOT": 1.4238599853515626
+        },
+        {
+          "E2E_wall": 114.21169787924737,
+          "TPOT": 1.412221923828125
+        },
+        {
+          "E2E_wall": 112.46623943652958,
+          "TPOT": 1.3828143310546874
+        }
+      ],
+      "gate": {
+        "status": "UNRESOLVED_JITTER_FUTILITY",
+        "target_repeats": 6,
+        "complete": true,
+        "unstable": true,
+        "summary": {
+          "E2E_wall": {
+            "n": 6,
+            "mean": 114.71779702293377,
+            "median": 114.6051249653101,
+            "min": 112.31391481030732,
+            "max": 117.69323906023055,
+            "range_relative": 0.04677527771984903,
+            "mean_CI95": [
+              112.43461941593497,
+              117.00097462993256
+            ],
+            "relative_CI_half_width": 0.019902557983591217,
+            "early_late_drift": 0.009916778152351821
+          },
+          "TPOT": {
+            "n": 6,
+            "mean": 1.4208607788085938,
+            "median": 1.4180409545898438,
+            "min": 1.3828143310546874,
+            "max": 1.470156494140625,
+            "range_relative": 0.06122892131570135,
+            "mean_CI95": [
+              1.3833443555918157,
+              1.458377202025372
+            ],
+            "relative_CI_half_width": 0.02640401070697162,
+            "early_late_drift": 0.01458874182788847
+          }
+        },
+        "estimate": {
+          "E2E_wall": 114.71779702293377,
+          "TPOT": 1.4208607788085938
+        },
+        "rule": "BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.",
+        "optimistic_future_relative_CI_halfwidth": {
+          "7": {
+            "E2E_wall": 0.016011147999988692,
+            "TPOT": 0.021241070873733642
+          }
+        }
+      },
+      "estimate": {
+        "E2E_wall": 114.71779702293377,
+        "TPOT": 1.4208607788085938
+      },
+      "initial_gate": {
+        "status": "THIRD_REQUIRED",
+        "target_repeats": 3,
+        "relative_difference": {
+          "E2E_wall": 0.037645492678192755,
+          "TPOT": 0.048989669153012096
         },
         "estimator": "median",
         "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
