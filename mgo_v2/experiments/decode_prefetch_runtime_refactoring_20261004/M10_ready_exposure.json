@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "numerical_parity": "bitwise",
+  "rows": [
+    {
+      "repeat": 0,
+      "ready_first": false,
+      "H2D_ms": 1.48944091796875,
+      "hidden_ms": 0.0,
+      "exposed_ms": 1.48944091796875,
+      "metrics": {
+        "waits": 0,
+        "ready_before_first_wait": 0
+      }
+    },
+    {
+      "repeat": 0,
+      "ready_first": true,
+      "H2D_ms": 1.7303333282470703,
+      "hidden_ms": 0.37110137939453125,
+      "exposed_ms": 1.359231948852539,
+      "metrics": {
+        "waits": 3,
+        "ready_before_first_wait": 9
+      }
+    },
+    {
+      "repeat": 1,
+      "ready_first": true,
+      "H2D_ms": 1.3255023956298828,
+      "hidden_ms": 0.9239349365234375,
+      "exposed_ms": 0.4015674591064453,
+      "metrics": {
+        "waits": 1,
+        "ready_before_first_wait": 11
+      }
+    },
+    {
+      "repeat": 1,
+      "ready_first": false,
+      "H2D_ms": 1.7748165130615234,
+      "hidden_ms": 0.0,
+      "exposed_ms": 1.7748165130615234,
+      "metrics": {
+        "waits": 0,
+        "ready_before_first_wait": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "ready_first": false,
+      "H2D_ms": 1.3903007507324219,
+      "hidden_ms": 0.0,
+      "exposed_ms": 1.3903007507324219,
+      "metrics": {
+        "waits": 0,
+        "ready_before_first_wait": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "ready_first": true,
+      "H2D_ms": 1.2145919799804688,
+      "hidden_ms": 0.6469459533691406,
+      "exposed_ms": 0.5676460266113281,
+      "metrics": {
+        "waits": 2,
+        "ready_before_first_wait": 10
+      }
+    }
+  ],
+  "median_exposed_ms": {
+    "False": 1.48944091796875,
+    "True": 0.5676460266113281
+  },
+  "tolerance_ms": 0.1,
+  "attribution": "CUDA copy events intersect eager GEMM event windows; final kernel-level Nsight attribution remains M16"
+}
