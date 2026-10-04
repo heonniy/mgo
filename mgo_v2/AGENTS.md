@@ -1,3 +1,10 @@
+**OWNER QUEUE REDUCTION: run c60/s0 ONLY.**
+The owner cancelled c30/s1 before any timed measurement. Do not resume it.
+Run only `scripts/run_transport_stack_packet.py` (cache60, substitution OFF).
+R4 GPUs0,1,4,5; BR/CA; current/coslot/coslot-active; pinned H2D; Env1 then
+conditional stable Env2. Keep c30 cancellation artifacts; no c30 comparison.
+This supersedes every two-arm queue instruction below.
+
 **OWNER QUEUE CLARIFICATION (2026-10-04): 70780ff is a follow-up.**
 The owner's latest chat explicitly adds c60/s0 after the previously authorized
 c30/s1 packet. Resume c30/s1 from its successful BR PLAN, then run c60/s0.
