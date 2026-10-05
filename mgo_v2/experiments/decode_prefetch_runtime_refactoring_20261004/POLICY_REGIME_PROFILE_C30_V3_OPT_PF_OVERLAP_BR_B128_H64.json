@@ -1,0 +1,405 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "PASS",
+  "stage": "POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64",
+  "case": {
+    "label": "BR",
+    "policy": "BR",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "profile_cuda_flush_ms": 600000
+  },
+  "started_unix": 1791199300.1636267,
+  "source_sha": "c0b5dcd907d36a2e284cfbeb438237e160aa5719",
+  "primary_timing": false,
+  "pid": 1115842,
+  "ranks": [
+    {
+      "status": "PASS",
+      "rank": 0,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/copy_trace_rank0.json",
+      "copy_trace_sha256": "4a65e692bcdd9c62917586f922ebf1d30e6959b25cae4ab0049036b0fc8dc396",
+      "case": {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1127205,
+          "helper_tid": 1127209,
+          "staging_cpu": 1,
+          "helper_cpu": 2,
+          "stage_mask": [
+            1
+          ],
+          "helper_mask": [
+            2
+          ]
+        },
+        "isolated": true,
+        "main": [
+          0
+        ],
+        "staging": [
+          1
+        ],
+        "helpers": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 57369,
+        "bytes": 541401808896,
+        "background_copies": 6016,
+        "urgent_copies": 51353,
+        "canceled": 0,
+        "escalated": 4991,
+        "restaged": 0
+      },
+      "decode_expert_copies": 55847,
+      "decode_expert_bytes": 527038414848,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 20039,
+        "wasted": 4025,
+        "promotions": 20039,
+        "promotion_evictions": 20039,
+        "promotion_victim_reloads": 17150,
+        "mandatory": 200796,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 13379962880
+    },
+    {
+      "status": "PASS",
+      "rank": 1,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/copy_trace_rank1.json",
+      "copy_trace_sha256": "db18d4cd9dc707553f79d05cbdc05bc4ae2bbe2a5907af796229f6846e90debc",
+      "case": {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1127202,
+          "helper_tid": 1127206,
+          "staging_cpu": 25,
+          "helper_cpu": 26,
+          "stage_mask": [
+            25
+          ],
+          "helper_mask": [
+            26
+          ]
+        },
+        "isolated": true,
+        "main": [
+          24
+        ],
+        "staging": [
+          25
+        ],
+        "helpers": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 56623,
+        "bytes": 534361669632,
+        "background_copies": 6016,
+        "urgent_copies": 50607,
+        "canceled": 0,
+        "escalated": 4973,
+        "restaged": 0
+      },
+      "decode_expert_copies": 55106,
+      "decode_expert_bytes": 520045461504,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 20039,
+        "wasted": 4025,
+        "promotions": 20039,
+        "promotion_evictions": 20039,
+        "promotion_victim_reloads": 17150,
+        "mandatory": 200796,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 17444853248
+    },
+    {
+      "status": "PASS",
+      "rank": 2,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/copy_trace_rank2.json",
+      "copy_trace_sha256": "1f5e90ec57d289dd0aa238bdf13fbce0a390b1696f05530d87a7fe7e1dd8b4d2",
+      "case": {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1127204,
+          "helper_tid": 1127208,
+          "staging_cpu": 97,
+          "helper_cpu": 98,
+          "stage_mask": [
+            97
+          ],
+          "helper_mask": [
+            98
+          ]
+        },
+        "isolated": true,
+        "main": [
+          96
+        ],
+        "staging": [
+          97
+        ],
+        "helpers": [
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 55845,
+        "bytes": 527019540480,
+        "background_copies": 6016,
+        "urgent_copies": 49829,
+        "canceled": 0,
+        "escalated": 5048,
+        "restaged": 0
+      },
+      "decode_expert_copies": 54340,
+      "decode_expert_bytes": 512816578560,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 20039,
+        "wasted": 4025,
+        "promotions": 20039,
+        "promotion_evictions": 20039,
+        "promotion_victim_reloads": 17150,
+        "mandatory": 200796,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 14007969280
+    },
+    {
+      "status": "PASS",
+      "rank": 3,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/copy_trace_rank3.json",
+      "copy_trace_sha256": "0100b85f1937f6d54bdb953a8f054032c74c2b3354ef6f140b5b9ecd4597754d",
+      "case": {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1127203,
+          "helper_tid": 1127207,
+          "staging_cpu": 121,
+          "helper_cpu": 122,
+          "stage_mask": [
+            121
+          ],
+          "helper_mask": [
+            122
+          ]
+        },
+        "isolated": true,
+        "main": [
+          120
+        ],
+        "staging": [
+          121
+        ],
+        "helpers": [
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 55023,
+        "bytes": 519262175232,
+        "background_copies": 6016,
+        "urgent_copies": 49007,
+        "canceled": 0,
+        "escalated": 5027,
+        "restaged": 0
+      },
+      "decode_expert_copies": 53532,
+      "decode_expert_bytes": 505191333888,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 20039,
+        "wasted": 4025,
+        "promotions": 20039,
+        "promotion_evictions": 20039,
+        "promotion_victim_reloads": 17150,
+        "mandatory": 200796,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 15389825536
+    }
+  ],
+  "reports": [
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/profile_rank0.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/profile_rank1.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/profile_rank2.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_BR_B128_H64/profile_rank3.nsys-rep"
+  ],
+  "interpretation": "capture only; actual kernel/copy interval analysis still required",
+  "finished_unix": 1791199720.4729261
+}
