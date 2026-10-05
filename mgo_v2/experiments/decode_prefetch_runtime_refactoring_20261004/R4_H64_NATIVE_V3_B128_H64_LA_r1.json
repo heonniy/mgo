@@ -1,0 +1,442 @@
+{
+  "status": "PASS",
+  "source_sha": "0422b7a40940f8e25673a7ef3962aee61511a600",
+  "ranks": [
+    {
+      "E2E_wall": 109.46318095549941,
+      "decode_wall": 98.26610818877816,
+      "TPOT": 1.535396240234375,
+      "argmax_hash": "2d6be6365bbcf37f2b4f43ea6ec29cb6f4c9803ab0976f50606568167198ef49",
+      "teacher_hash": "96032e23c338c160e46618df826bad18b17998a3e5d9aa2152a09ebff429c626",
+      "state_hash": "403829be70aeecf505733f65e741ae0e3cb97daa15d4b6f1dfc223dfd6c4f319",
+      "status": "PASS",
+      "rank": 0,
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "memmove"
+      },
+      "repeat": 1,
+      "paired_order": [
+        "BR",
+        "LA"
+      ],
+      "numerical_comparison": {
+        "actual_argmax_hash": "2d6be6365bbcf37f2b4f43ea6ec29cb6f4c9803ab0976f50606568167198ef49",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "no_compile_in_measure": true,
+      "process_usage_delta": {
+        "ru_utime": 149.96102800000006,
+        "ru_stime": 1.3203220000000044,
+        "ru_nvcsw": 252450,
+        "ru_nivcsw": 467
+      },
+      "thread_usage_delta": {
+        "threads": {
+          "main": {
+            "user_seconds": 98.51000000000005,
+            "system_seconds": 0.5500000000000007,
+            "scheduler_runtime_ns": 99063351082,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 3,
+            "cpu_after": 4
+          },
+          "expert_staging": {
+            "user_seconds": 49.39,
+            "system_seconds": 0.71,
+            "scheduler_runtime_ns": 50110793185,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 4,
+            "cpu_after": 3
+          }
+        },
+        "schedstats_enabled": false,
+        "scope": "Snapshots bracket generation outside its E2E/TPOT timers. Main and expert-staging threads only; includes untimed generation entry/exit work. Wait/timeslice counters are withheld when kernel scheduler statistics are disabled; null does not mean zero waiting or switching."
+      },
+      "affinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "scheduler_metrics": {
+        "copies": 29358,
+        "bytes": 277056847872,
+        "background_copies": 6016,
+        "urgent_copies": 23342,
+        "canceled": 0,
+        "escalated": 4730,
+        "restaged": 0
+      },
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "physical_arena_count": 1,
+      "peak_gpu_bytes": 20504986624
+    },
+    {
+      "E2E_wall": 109.46230187918991,
+      "decode_wall": 98.27609891537577,
+      "TPOT": 1.53556201171875,
+      "argmax_hash": "bb26ac2962bad373b3b6a6f1b390173ca9f59d36e9fe189de42a079d64e330e7",
+      "teacher_hash": "f62f993fb40ba061529302c67de952f1a2cd20bec068ff31a9e9c9439e6357ce",
+      "state_hash": "e5cf7588ce0c98394071bd74398526c11aecd42e65e4432608dd71639c361611",
+      "status": "PASS",
+      "rank": 1,
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "memmove"
+      },
+      "repeat": 1,
+      "paired_order": [
+        "BR",
+        "LA"
+      ],
+      "numerical_comparison": {
+        "actual_argmax_hash": "bb26ac2962bad373b3b6a6f1b390173ca9f59d36e9fe189de42a079d64e330e7",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "no_compile_in_measure": true,
+      "process_usage_delta": {
+        "ru_utime": 145.04699699999998,
+        "ru_stime": 1.1169549999999973,
+        "ru_nvcsw": 256140,
+        "ru_nivcsw": 51
+      },
+      "thread_usage_delta": {
+        "threads": {
+          "main": {
+            "user_seconds": 104.69,
+            "system_seconds": 0.6300000000000026,
+            "scheduler_runtime_ns": 105327170972,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 24,
+            "cpu_after": 24
+          },
+          "expert_staging": {
+            "user_seconds": 38.43,
+            "system_seconds": 0.45,
+            "scheduler_runtime_ns": 38894263112,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 25,
+            "cpu_after": 25
+          }
+        },
+        "schedstats_enabled": false,
+        "scope": "Snapshots bracket generation outside its E2E/TPOT timers. Main and expert-staging threads only; includes untimed generation entry/exit work. Wait/timeslice counters are withheld when kernel scheduler statistics are disabled; null does not mean zero waiting or switching."
+      },
+      "affinity": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "scheduler_metrics": {
+        "copies": 28595,
+        "bytes": 269856276480,
+        "background_copies": 6016,
+        "urgent_copies": 22579,
+        "canceled": 0,
+        "escalated": 4687,
+        "restaged": 0
+      },
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "physical_arena_count": 1,
+      "peak_gpu_bytes": 21794347008
+    },
+    {
+      "E2E_wall": 109.46220229938626,
+      "decode_wall": 98.27628979180008,
+      "TPOT": 1.5355579833984374,
+      "argmax_hash": "8408bf11692f8e6f59ab1126a5b42772464e0d50b283c6e37869bdc3a58ad0e3",
+      "teacher_hash": "7e1b6582924e3d96617f8026f8859a83241677f07b6254b19cf34fd2d0626e3a",
+      "state_hash": "7be1cab8a2f467795b7253d450538b7e0acc0ba93df33fa0d7c7f6fe7496f214",
+      "status": "PASS",
+      "rank": 2,
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "memmove"
+      },
+      "repeat": 1,
+      "paired_order": [
+        "BR",
+        "LA"
+      ],
+      "numerical_comparison": {
+        "actual_argmax_hash": "8408bf11692f8e6f59ab1126a5b42772464e0d50b283c6e37869bdc3a58ad0e3",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "no_compile_in_measure": true,
+      "process_usage_delta": {
+        "ru_utime": 151.91718599999996,
+        "ru_stime": 1.265189999999997,
+        "ru_nvcsw": 243638,
+        "ru_nivcsw": 56
+      },
+      "thread_usage_delta": {
+        "threads": {
+          "main": {
+            "user_seconds": 95.60000000000002,
+            "system_seconds": 0.5399999999999991,
+            "scheduler_runtime_ns": 96143096227,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 96,
+            "cpu_after": 104
+          },
+          "expert_staging": {
+            "user_seconds": 54.25,
+            "system_seconds": 0.67,
+            "scheduler_runtime_ns": 54920369998,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 97,
+            "cpu_after": 97
+          }
+        },
+        "schedstats_enabled": false,
+        "scope": "Snapshots bracket generation outside its E2E/TPOT timers. Main and expert-staging threads only; includes untimed generation entry/exit work. Wait/timeslice counters are withheld when kernel scheduler statistics are disabled; null does not mean zero waiting or switching."
+      },
+      "affinity": [
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119
+      ],
+      "scheduler_metrics": {
+        "copies": 27798,
+        "bytes": 262334840832,
+        "background_copies": 6016,
+        "urgent_copies": 21782,
+        "canceled": 0,
+        "escalated": 4742,
+        "restaged": 0
+      },
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "physical_arena_count": 1,
+      "peak_gpu_bytes": 20488276992
+    },
+    {
+      "E2E_wall": 109.4621904194355,
+      "decode_wall": 98.27837951201946,
+      "TPOT": 1.535593505859375,
+      "argmax_hash": "b86f438b565f2281c0376d9e0529f00a3319c7053d1ad76573f0cc03054189bd",
+      "teacher_hash": "5990f508e556cdab6e82fcd9a81e52f381da84607565cf37783205c87dc86382",
+      "state_hash": "78255cff650d655f401c2b42206aec0db7e9a9916ca94a298d55c3ee8d4095ed",
+      "status": "PASS",
+      "rank": 3,
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "memmove"
+      },
+      "repeat": 1,
+      "paired_order": [
+        "BR",
+        "LA"
+      ],
+      "numerical_comparison": {
+        "actual_argmax_hash": "b86f438b565f2281c0376d9e0529f00a3319c7053d1ad76573f0cc03054189bd",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "no_compile_in_measure": true,
+      "process_usage_delta": {
+        "ru_utime": 151.72052300000007,
+        "ru_stime": 1.52778,
+        "ru_nvcsw": 236655,
+        "ru_nivcsw": 57
+      },
+      "thread_usage_delta": {
+        "threads": {
+          "main": {
+            "user_seconds": 96.81,
+            "system_seconds": 0.6799999999999997,
+            "scheduler_runtime_ns": 97491217831,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 141,
+            "cpu_after": 141
+          },
+          "expert_staging": {
+            "user_seconds": 53.75,
+            "system_seconds": 0.81,
+            "scheduler_runtime_ns": 54574873940,
+            "timeslices": null,
+            "runqueue_wait_ns": null,
+            "cpu_before": 143,
+            "cpu_after": 120
+          }
+        },
+        "schedstats_enabled": false,
+        "scope": "Snapshots bracket generation outside its E2E/TPOT timers. Main and expert-staging threads only; includes untimed generation entry/exit work. Wait/timeslice counters are withheld when kernel scheduler statistics are disabled; null does not mean zero waiting or switching."
+      },
+      "affinity": [
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143
+      ],
+      "scheduler_metrics": {
+        "copies": 27051,
+        "bytes": 255285264384,
+        "background_copies": 6016,
+        "urgent_copies": 21035,
+        "canceled": 0,
+        "escalated": 4732,
+        "restaged": 0
+      },
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "physical_arena_count": 1,
+      "peak_gpu_bytes": 20488422400
+    }
+  ]
+}
