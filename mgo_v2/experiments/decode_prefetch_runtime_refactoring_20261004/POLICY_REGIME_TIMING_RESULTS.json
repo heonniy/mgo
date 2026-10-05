@@ -1,0 +1,1203 @@
+{
+  "status": "TIMING_AUDITED",
+  "rows": [
+    {
+      "setting": "C30",
+      "policies": {
+        "BR": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.7824105224609377,
+              "mean": 1.7824105224609377,
+              "median": 1.7824105224609377,
+              "range": [
+                1.7781722412109375,
+                1.7866488037109376
+              ],
+              "samples": [
+                1.7781722412109375,
+                1.7866488037109376
+              ],
+              "spread_relative": 0.0047556735068510735
+            },
+            "E2E_wall": {
+              "value": 124.46820399537683,
+              "mean": 124.46820399537683,
+              "median": 124.46820399537683,
+              "range": [
+                124.3717063786462,
+                124.56470161210746
+              ],
+              "samples": [
+                124.3717063786462,
+                124.56470161210746
+              ],
+              "spread_relative": 0.0015505585142726837
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": 0.0
+        },
+        "OLD_CA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.8534854736328126,
+              "mean": 1.8534854736328126,
+              "median": 1.8534854736328126,
+              "range": [
+                1.8506424560546875,
+                1.8563284912109375
+              ],
+              "samples": [
+                1.8563284912109375,
+                1.8506424560546875
+              ],
+              "spread_relative": 0.003067752748612278
+            },
+            "E2E_wall": {
+              "value": 129.3954015201889,
+              "mean": 129.3954015201889,
+              "median": 129.3954015201889,
+              "range": [
+                129.3366729086265,
+                129.4541301317513
+              ],
+              "samples": [
+                129.4541301317513,
+                129.3366729086265
+              ],
+              "spread_relative": 0.0009077387739043869
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": -0.03987574707186048,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "OLD_CA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.039586198934101535,
+                "median": -0.03958698424117457,
+                "CI95": [
+                  -0.05594971420732908,
+                  -0.023476260728507503
+                ],
+                "CI_half_width": 0.01623672673941079,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.04086479072363791,
+                  -0.03830917775871123
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.03987746356711397,
+                "median": -0.03988541944267465,
+                "CI95": [
+                  -0.09286860046924628,
+                  0.010544233066558939
+                ],
+                "CI_half_width": 0.05170641676790261,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.043953138053024254,
+                  -0.03581770083232505
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 124.46820399537683,
+                    "median": 124.46820399537683,
+                    "min": 124.3717063786462,
+                    "max": 124.56470161210746,
+                    "range_relative": 0.0015505585142726837,
+                    "mean_CI95": [
+                      123.24208552062278,
+                      125.69432247013087
+                    ],
+                    "relative_CI_half_width": 0.00985085696905846,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7824105224609377,
+                    "median": 1.7824105224609377,
+                    "min": 1.7781722412109375,
+                    "max": 1.7866488037109376,
+                    "range_relative": 0.0047556735068510735,
+                    "mean_CI95": [
+                      1.728558053167992,
+                      1.8362629917538833
+                    ],
+                    "relative_CI_half_width": 0.030213280618761558,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 124.46820399537683,
+                  "TPOT": 1.7824105224609377
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "OLD_CA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 129.3954015201889,
+                    "median": 129.3954015201889,
+                    "min": 129.3366729086265,
+                    "max": 129.4541301317513,
+                    "range_relative": 0.0009077387739043869,
+                    "mean_CI95": [
+                      128.6491837577925,
+                      130.14161928258528
+                    ],
+                    "relative_CI_half_width": 0.005766957354198924,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.8534854736328126,
+                    "median": 1.8534854736328126,
+                    "min": 1.8506424560546875,
+                    "max": 1.8563284912109375,
+                    "range_relative": 0.003067752748612278,
+                    "mean_CI95": [
+                      1.8173615102159724,
+                      1.8896094370496528
+                    ],
+                    "relative_CI_half_width": 0.019489747252260728,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 129.3954015201889,
+                  "TPOT": 1.8534854736328126
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        },
+        "FCA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.93511083984375,
+              "mean": 1.93511083984375,
+              "median": 1.93511083984375,
+              "range": [
+                1.932148681640625,
+                1.938072998046875
+              ],
+              "samples": [
+                1.932148681640625,
+                1.938072998046875
+              ],
+              "spread_relative": 0.003061486858669173
+            },
+            "E2E_wall": {
+              "value": 135.88761942321435,
+              "mean": 135.88761942321435,
+              "median": 135.88761942321435,
+              "range": [
+                135.87799936905503,
+                135.89723947737366
+              ],
+              "samples": [
+                135.89723947737366,
+                135.87799936905503
+              ],
+              "spread_relative": 0.00014158838310872638
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": -0.08567067769100811,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "FCA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.09174596851998751,
+                "median": -0.09174635927802477,
+                "CI95": [
+                  -0.10354597102554863,
+                  -0.08007214114694228
+                ],
+                "CI_half_width": 0.011736914939303178,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.09267005683461726,
+                  -0.09082266172143227
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.0856724749906741,
+                "median": -0.085672864515144,
+                "CI95": [
+                  -0.09742109764549722,
+                  -0.07404962915441393
+                ],
+                "CI_half_width": 0.011685734245541646,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.08659253409828804,
+                  -0.08475319493199995
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 124.46820399537683,
+                    "median": 124.46820399537683,
+                    "min": 124.3717063786462,
+                    "max": 124.56470161210746,
+                    "range_relative": 0.0015505585142726837,
+                    "mean_CI95": [
+                      123.24208552062278,
+                      125.69432247013087
+                    ],
+                    "relative_CI_half_width": 0.00985085696905846,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7824105224609377,
+                    "median": 1.7824105224609377,
+                    "min": 1.7781722412109375,
+                    "max": 1.7866488037109376,
+                    "range_relative": 0.0047556735068510735,
+                    "mean_CI95": [
+                      1.728558053167992,
+                      1.8362629917538833
+                    ],
+                    "relative_CI_half_width": 0.030213280618761558,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 124.46820399537683,
+                  "TPOT": 1.7824105224609377
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "FCA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 135.88761942321435,
+                    "median": 135.88761942321435,
+                    "min": 135.87799936905503,
+                    "max": 135.89723947737366,
+                    "range_relative": 0.00014158838310872638,
+                    "mean_CI95": [
+                      135.76538504549086,
+                      136.00985380093783
+                    ],
+                    "relative_CI_half_width": 0.0008995254920376584,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.93511083984375,
+                    "median": 1.93511083984375,
+                    "min": 1.932148681640625,
+                    "max": 1.938072998046875,
+                    "range_relative": 0.003061486858669173,
+                    "mean_CI95": [
+                      1.8974730512532376,
+                      1.9727486284342624
+                    ],
+                    "relative_CI_half_width": 0.019449939412024303,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 135.88761942321435,
+                  "TPOT": 1.93511083984375
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        },
+        "LA_CA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.7794185791015624,
+              "mean": 1.7794185791015624,
+              "median": 1.7794185791015624,
+              "range": [
+                1.7790302734375,
+                1.779806884765625
+              ],
+              "samples": [
+                1.7790302734375,
+                1.779806884765625
+              ],
+              "spread_relative": 0.0004364410584703537
+            },
+            "E2E_wall": {
+              "value": 125.41803539916873,
+              "mean": 125.41803539916873,
+              "median": 125.41803539916873,
+              "range": [
+                125.21445549465716,
+                125.6216153036803
+              ],
+              "samples": [
+                125.21445549465716,
+                125.6216153036803
+              ],
+              "spread_relative": 0.003246421519259745
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": 0.0016785938602091877,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "LA_CA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.007630092171106773,
+                "median": -0.007630454409101928,
+                "CI95": [
+                  -0.018544999317060773,
+                  0.0031678489123909692
+                ],
+                "CI_half_width": 0.010856424114725871,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.0067760517287207556,
+                  -0.0084848570894831
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.0016757953101026457,
+                "median": 0.001673467236331494,
+                "CI95": [
+                  -0.026098126224155527,
+                  0.028697945938950697
+                ],
+                "CI_half_width": 0.027398036081553112,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.00048253605959924784,
+                  0.0038294705322622358
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 124.46820399537683,
+                    "median": 124.46820399537683,
+                    "min": 124.3717063786462,
+                    "max": 124.56470161210746,
+                    "range_relative": 0.0015505585142726837,
+                    "mean_CI95": [
+                      123.24208552062278,
+                      125.69432247013087
+                    ],
+                    "relative_CI_half_width": 0.00985085696905846,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7824105224609377,
+                    "median": 1.7824105224609377,
+                    "min": 1.7781722412109375,
+                    "max": 1.7866488037109376,
+                    "range_relative": 0.0047556735068510735,
+                    "mean_CI95": [
+                      1.728558053167992,
+                      1.8362629917538833
+                    ],
+                    "relative_CI_half_width": 0.030213280618761558,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 124.46820399537683,
+                  "TPOT": 1.7824105224609377
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA_CA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 125.41803539916873,
+                    "median": 125.41803539916873,
+                    "min": 125.21445549465716,
+                    "max": 125.6216153036803,
+                    "range_relative": 0.003246421519259745,
+                    "mean_CI95": [
+                      122.83130745222795,
+                      128.0047633461095
+                    ],
+                    "relative_CI_half_width": 0.020624848242184527,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7794185791015624,
+                    "median": 1.7794185791015624,
+                    "min": 1.7790302734375,
+                    "max": 1.779806884765625,
+                    "range_relative": 0.0004364410584703537,
+                    "mean_CI95": [
+                      1.7744846878336813,
+                      1.7843524703694436
+                    ],
+                    "relative_CI_half_width": 0.0027727547221477185,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 125.41803539916873,
+                  "TPOT": 1.7794185791015624
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        }
+      },
+      "unstable": false,
+      "raw_pairs": [
+        {
+          "BR": {
+            "E2E_wall": 124.3717063786462,
+            "TPOT": 1.7781722412109375
+          },
+          "OLD_CA": {
+            "E2E_wall": 129.4541301317513,
+            "TPOT": 1.8563284912109375
+          },
+          "FCA": {
+            "E2E_wall": 135.89723947737366,
+            "TPOT": 1.932148681640625
+          },
+          "LA_CA": {
+            "E2E_wall": 125.21445549465716,
+            "TPOT": 1.7790302734375
+          }
+        },
+        {
+          "LA_CA": {
+            "E2E_wall": 125.6216153036803,
+            "TPOT": 1.779806884765625
+          },
+          "FCA": {
+            "E2E_wall": 135.87799936905503,
+            "TPOT": 1.938072998046875
+          },
+          "OLD_CA": {
+            "E2E_wall": 129.3366729086265,
+            "TPOT": 1.8506424560546875
+          },
+          "BR": {
+            "E2E_wall": 124.56470161210746,
+            "TPOT": 1.7866488037109376
+          }
+        }
+      ]
+    },
+    {
+      "setting": "C60",
+      "policies": {
+        "BR": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.4064861450195312,
+              "mean": 1.4064861450195312,
+              "median": 1.4064861450195312,
+              "range": [
+                1.4045384521484374,
+                1.408433837890625
+              ],
+              "samples": [
+                1.4045384521484374,
+                1.408433837890625
+              ],
+              "spread_relative": 0.0027695869994747895
+            },
+            "E2E_wall": {
+              "value": 100.22954322071746,
+              "mean": 100.22954322071746,
+              "median": 100.22954322071746,
+              "range": [
+                100.04960501845926,
+                100.40948142297566
+              ],
+              "samples": [
+                100.04960501845926,
+                100.40948142297566
+              ],
+              "spread_relative": 0.003590522244762784
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": 0.0
+        },
+        "OLD_CA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.4479296264648438,
+              "mean": 1.4479296264648438,
+              "median": 1.4479296264648438,
+              "range": [
+                1.4463775634765625,
+                1.449481689453125
+              ],
+              "samples": [
+                1.4463775634765625,
+                1.449481689453125
+              ],
+              "spread_relative": 0.0021438376008240893
+            },
+            "E2E_wall": {
+              "value": 103.2809645566158,
+              "mean": 103.2809645566158,
+              "median": 103.2809645566158,
+              "range": [
+                103.09341651201248,
+                103.46851260121912
+              ],
+              "samples": [
+                103.09341651201248,
+                103.46851260121912
+              ],
+              "spread_relative": 0.003631802731673933
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": -0.029465972055300327,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "OLD_CA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.03044429205996524,
+                "median": -0.030444292279461327,
+                "CI95": [
+                  -0.030714571834836946,
+                  -0.030174083159376863
+                ],
+                "CI_half_width": 0.0002702443377300412,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.030423023589065012,
+                  -0.03046556096985764
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.029466367701952656,
+                "median": -0.02946641808963446,
+                "CI95": [
+                  -0.03356711173103988,
+                  -0.025381893638696473
+                ],
+                "CI_half_width": 0.004092609046171702,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.029788512563772462,
+                  -0.02914432361549646
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.22954322071746,
+                    "median": 100.22954322071746,
+                    "min": 100.04960501845926,
+                    "max": 100.40948142297566,
+                    "range_relative": 0.003590522244762784,
+                    "mean_CI95": [
+                      97.94321158292503,
+                      102.51587485850989
+                    ],
+                    "relative_CI_half_width": 0.022810955376277222,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4064861450195312,
+                    "median": 1.4064861450195312,
+                    "min": 1.4045384521484374,
+                    "max": 1.408433837890625,
+                    "range_relative": 0.0027695869994747895,
+                    "mean_CI95": [
+                      1.3817383606357871,
+                      1.4312339294032752
+                    ],
+                    "relative_CI_half_width": 0.01759546972529922,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.22954322071746,
+                  "TPOT": 1.4064861450195312
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "OLD_CA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 103.2809645566158,
+                    "median": 103.2809645566158,
+                    "min": 103.09341651201248,
+                    "max": 103.46851260121912,
+                    "range_relative": 0.003631802731673933,
+                    "mean_CI95": [
+                      100.89794070397457,
+                      105.66398840925703
+                    ],
+                    "relative_CI_half_width": 0.02307321453543289,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4479296264648438,
+                    "median": 1.4479296264648438,
+                    "min": 1.4463775634765625,
+                    "max": 1.449481689453125,
+                    "range_relative": 0.0021438376008240893,
+                    "mean_CI95": [
+                      1.4282087963719534,
+                      1.4676504565577342
+                    ],
+                    "relative_CI_half_width": 0.013620019738831727,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 103.2809645566158,
+                  "TPOT": 1.4479296264648438
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        },
+        "FCA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.5427434692382813,
+              "mean": 1.5427434692382813,
+              "median": 1.5427434692382813,
+              "range": [
+                1.541068359375,
+                1.5444185791015625
+              ],
+              "samples": [
+                1.5444185791015625,
+                1.541068359375
+              ],
+              "spread_relative": 0.002171598709289375
+            },
+            "E2E_wall": {
+              "value": 110.5816941424273,
+              "mean": 110.5816941424273,
+              "median": 110.5816941424273,
+              "range": [
+                110.50569502729923,
+                110.65769325755537
+              ],
+              "samples": [
+                110.65769325755537,
+                110.50569502729923
+              ],
+              "spread_relative": 0.0013745333839827879
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": -0.09687782897915298,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "FCA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.10328594418309134,
+                "median": -0.10328934393535383,
+                "CI95": [
+                  -0.13864217899606168,
+                  -0.06902756378234032
+                ],
+                "CI_half_width": 0.03480730760686068,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.10602828703960299,
+                  -0.10055040083110467
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.09687823410773144,
+                "median": -0.09688158169160521,
+                "CI95": [
+                  -0.13185745809236749,
+                  -0.06298001736638326
+                ],
+                "CI_half_width": 0.034438720362992115,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.09959152541474303,
+                  -0.09417163796846739
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.22954322071746,
+                    "median": 100.22954322071746,
+                    "min": 100.04960501845926,
+                    "max": 100.40948142297566,
+                    "range_relative": 0.003590522244762784,
+                    "mean_CI95": [
+                      97.94321158292503,
+                      102.51587485850989
+                    ],
+                    "relative_CI_half_width": 0.022810955376277222,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4064861450195312,
+                    "median": 1.4064861450195312,
+                    "min": 1.4045384521484374,
+                    "max": 1.408433837890625,
+                    "range_relative": 0.0027695869994747895,
+                    "mean_CI95": [
+                      1.3817383606357871,
+                      1.4312339294032752
+                    ],
+                    "relative_CI_half_width": 0.01759546972529922,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.22954322071746,
+                  "TPOT": 1.4064861450195312
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "FCA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 110.5816941424273,
+                    "median": 110.5816941424273,
+                    "min": 110.50569502729923,
+                    "max": 110.65769325755537,
+                    "range_relative": 0.0013745333839827879,
+                    "mean_CI95": [
+                      109.6160338258248,
+                      111.54735445902979
+                    ],
+                    "relative_CI_half_width": 0.008732551296951009,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.5427434692382813,
+                    "median": 1.5427434692382813,
+                    "min": 1.541068359375,
+                    "max": 1.5444185791015625,
+                    "range_relative": 0.002171598709289375,
+                    "mean_CI95": [
+                      1.521459180359467,
+                      1.5640277581170956
+                    ],
+                    "relative_CI_half_width": 0.013796388902766393,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 110.5816941424273,
+                  "TPOT": 1.5427434692382813
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        },
+        "LA_CA": {
+          "metrics": {
+            "TPOT": {
+              "value": 1.3986414794921875,
+              "mean": 1.3986414794921875,
+              "median": 1.3986414794921875,
+              "range": [
+                1.3981258544921875,
+                1.3991571044921876
+              ],
+              "samples": [
+                1.3981258544921875,
+                1.3991571044921876
+              ],
+              "spread_relative": 0.000737322619928633
+            },
+            "E2E_wall": {
+              "value": 100.82442261185497,
+              "mean": 100.82442261185497,
+              "median": 100.82442261185497,
+              "range": [
+                100.7802738007158,
+                100.86857142299414
+              ],
+              "samples": [
+                100.7802738007158,
+                100.86857142299414
+              ],
+              "spread_relative": 0.0008757562899046113
+            }
+          },
+          "excluded_repeats": [],
+          "estimator": "mean",
+          "noise_evidence": "No independent invalidation established; retain all observations.",
+          "TPOT_gain": 0.005577492217127222,
+          "paired_gate": {
+            "baseline": "BR",
+            "candidate": "LA_CA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.005936694742493032,
+                "median": -0.0059376214586502885,
+                "CI95": [
+                  -0.023436776319698538,
+                  0.011264147192074137
+                ],
+                "CI_half_width": 0.017350461755886337,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.007303065135756626,
+                  -0.004572177781543951
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.00557660631371093,
+                "median": 0.005576092929467313,
+                "CI95": [
+                  -0.0073458302487017235,
+                  0.018333271239715065
+                ],
+                "CI_half_width": 0.012839550744208394,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.004565626271349821,
+                  0.006586559587584806
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.22954322071746,
+                    "median": 100.22954322071746,
+                    "min": 100.04960501845926,
+                    "max": 100.40948142297566,
+                    "range_relative": 0.003590522244762784,
+                    "mean_CI95": [
+                      97.94321158292503,
+                      102.51587485850989
+                    ],
+                    "relative_CI_half_width": 0.022810955376277222,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4064861450195312,
+                    "median": 1.4064861450195312,
+                    "min": 1.4045384521484374,
+                    "max": 1.408433837890625,
+                    "range_relative": 0.0027695869994747895,
+                    "mean_CI95": [
+                      1.3817383606357871,
+                      1.4312339294032752
+                    ],
+                    "relative_CI_half_width": 0.01759546972529922,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.22954322071746,
+                  "TPOT": 1.4064861450195312
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA_CA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.82442261185497,
+                    "median": 100.82442261185497,
+                    "min": 100.7802738007158,
+                    "max": 100.86857142299414,
+                    "range_relative": 0.0008757562899046113,
+                    "mean_CI95": [
+                      100.26345877865207,
+                      101.38538644505788
+                    ],
+                    "relative_CI_half_width": 0.005563769359359033,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.3986414794921875,
+                    "median": 1.3986414794921875,
+                    "min": 1.3981258544921875,
+                    "max": 1.3991571044921876,
+                    "range_relative": 0.000737322619928633,
+                    "mean_CI95": [
+                      1.392089842674981,
+                      1.405193116309394
+                    ],
+                    "relative_CI_half_width": 0.004684286082796026,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.82442261185497,
+                  "TPOT": 1.3986414794921875
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          }
+        }
+      },
+      "unstable": false,
+      "raw_pairs": [
+        {
+          "BR": {
+            "E2E_wall": 100.04960501845926,
+            "TPOT": 1.4045384521484374
+          },
+          "OLD_CA": {
+            "E2E_wall": 103.09341651201248,
+            "TPOT": 1.4463775634765625
+          },
+          "FCA": {
+            "E2E_wall": 110.65769325755537,
+            "TPOT": 1.5444185791015625
+          },
+          "LA_CA": {
+            "E2E_wall": 100.7802738007158,
+            "TPOT": 1.3981258544921875
+          }
+        },
+        {
+          "LA_CA": {
+            "E2E_wall": 100.86857142299414,
+            "TPOT": 1.3991571044921876
+          },
+          "FCA": {
+            "E2E_wall": 110.50569502729923,
+            "TPOT": 1.541068359375
+          },
+          "OLD_CA": {
+            "E2E_wall": 103.46851260121912,
+            "TPOT": 1.449481689453125
+          },
+          "BR": {
+            "E2E_wall": 100.40948142297566,
+            "TPOT": 1.408433837890625
+          }
+        }
+      ]
+    }
+  ],
+  "source_sha256": {
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/status.json": "a15d55a64c6405060d7ed1694d628091e374a79b58fdef55ec8c9a4c51532682",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/result.json": "973d50fbb3f702f94184a3d382cbf55cb7900adc5496d23844eb5dbc6663f4b6",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r1_measure_rank0.json": "eaaf5786fc3c30b956971bf3e96c57200e85388b2e3ece37bf1c70d2e6f8114c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r1_measure_rank1.json": "79d5cac0f14c5ea93d9a6b0acdeadcc5e49f83ebf058e3135f369ace2424ee8b",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r1_measure_rank2.json": "19ea73e3ff55dfe2a6257a3b758d33223d07594a0af91fded8eca6e8aeb36e80",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r1_measure_rank3.json": "e0fce8beb5c72fb2e3f1b34f37ed1db19d8c937c5112223e33e1eb4fc6fe09cd",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r1_measure_rank0.json": "cda0451f0ebbb7216f04428cae362e54e15796c100a33a531fca95a3c9ae9f4c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r1_measure_rank1.json": "f02fafb005a8376750b6602da5dcf111d432fac451009e002246e15dacb8e8a7",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r1_measure_rank2.json": "a481716a1f302cc60245842213b881529b8d95c06b4860048c462cdcb39c784a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r1_measure_rank3.json": "a9e8fc168f1c1ebcba569b1d340e3c4f3d84f767a54441ec1771e17e03214429",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r1_measure_rank0.json": "9a230086510006cd2d31b50b53c43fa00eb62b057d03593b163153fa6c3afc6a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r1_measure_rank1.json": "1b94979f24bfe4b4fd4479585ae775a9fb8295c884ab8bfcb098d9ede4c59f47",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r1_measure_rank2.json": "2c5dd4021fde4bd84f3478dc6f86a5f8b89b602df32c41f254cb27d68410ba79",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r1_measure_rank3.json": "58dc8fde6cad362dc23db541e24155c6b24d052787574596992ab7842ce712ea",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r1_measure_rank0.json": "5ce695209b7a590e2b60bc446c947f1ba7a8dbd4cbc6001e25b7ac26d7ba637e",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r1_measure_rank1.json": "ca5424b8c1cbbf74d50dc81a0ceebf283fd8a39ef12276b97641af7e2c0b5f0b",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r1_measure_rank2.json": "b3435b4d4bf79a6df929e8a510ff3829c22130eb195893a863967c3fcfa47ae4",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r1_measure_rank3.json": "9682cee2f48f1274215750dd3bfab33b2c57acdf1e99717de95bd204b15cc76d",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r2_measure_rank0.json": "3cdc37bba3554a34a771b6180371ba83d153e651e7c04eb779be0ffe700c3df0",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r2_measure_rank1.json": "22564175faeda4a3b594772394f95a99eb5a8fcf56e466541d874bffd39a3353",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r2_measure_rank2.json": "fc0880976f26311575663c0d982850f2c17a529a9802ee4a5a4b72d5c6103d77",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/BR_r2_measure_rank3.json": "5584f0597a3d5dc2a0112f008df4fc0cf358478fdf54b43892f5e49eb1e1b204",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r2_measure_rank0.json": "783eed272d3eb4d30b51d7f818ba5116f7db51eb66e93a3468c86ae736d72cfe",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r2_measure_rank1.json": "d250bbb252c23624d2e778a4b86e3a8d8a5f9408e860ecdaf9165202c2ca4956",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r2_measure_rank2.json": "f4aa37f5ce5159206a473c4c251559ba4590c8c203c52be03c0cd116e46143c9",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/OLD_CA_r2_measure_rank3.json": "1c7c56910127a71962b96f27a1b2ae9f2b1ba6f340032aba74efa212f626333b",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r2_measure_rank0.json": "07bf25d2e0a7419475cfbab64a23c430582f51e97465f5d65def2374b50e6372",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r2_measure_rank1.json": "cc621f41269b3cae1ce90c8c93e51f83bb1e45df8deb3aa0857a4b2a036a7b3a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r2_measure_rank2.json": "58b37134ee81d4cb2433cd05f1ca1bef2e1ee0a3da348e7f39a057a50b35bb0a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/FCA_r2_measure_rank3.json": "83941a03e4e755df2b291aab813dad951b4466bdf7dbf13e9bcaeab9b8ea5db3",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r2_measure_rank0.json": "d15f034aa2987203bda6eb4fc8b163fead8ed2d30480e61603afc0d9f2da082a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r2_measure_rank1.json": "8a1bd4f411ea90f9f40ba50ecfe4de43ee875163e0aa4ad0e1463ab6e89035f9",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r2_measure_rank2.json": "b5b16f8dc597d18583fa3f34638b127eb50a75e8aa87624be40aae1df1d9b238",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_C30_B128_H64/LA_CA_r2_measure_rank3.json": "a598b415711ebc07f399783f17372ffe2256db02bc2a0dc794aad14fca437c88",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/status.json": "a4f9c36fb74c957e07fc69afcced5f58c050eb04553f7e02a98aede5b15cc1c4",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/result.json": "b63c8b15da45f109851d044e787cc6d0fedc0d61503bd6a3365f0270f858413b",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r1_measure_rank0.json": "234f41decbebde9da1e2b86d2169f6d3de323dd51b50069d57d241b8a604b3ee",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r1_measure_rank1.json": "95cfe82facc5076c43d5d438e0d1af2dfebe6b6a339921635b7b4aae4855be4a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r1_measure_rank2.json": "fe3f869e80d94c4124658a20c814c74ca0230ca7dbab1ce427fa3500ce0f14ea",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r1_measure_rank3.json": "6938ab6370ebba8ddf502529cd7bc30d14199e6fefd18055d26f9bf63bf25fb7",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r1_measure_rank0.json": "b006a8a4ab16f42f891a8ca1351f1508bc7ae8b0bc9e942424a08b5f2f4f2809",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r1_measure_rank1.json": "d8559b8b21a04974a03a50f67074debf941647836b476521c46e8f6b57704782",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r1_measure_rank2.json": "2890b8294a4067769fc1cc06829adcb42bc8ea2dae76073ff4356b9b1d0500e5",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r1_measure_rank3.json": "d0e0919515cf26bd6c8c5d0852cf5e666718cde6ac0402c992e54e8b01d1ce4d",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r1_measure_rank0.json": "8598006544262c7c26ef41a2958b9700a558b26fc0ce923bb24757b0f8bc34a0",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r1_measure_rank1.json": "598e8fc641c14c4ba91f519fbbb5187f31e635d9486ab8ee9771f9e96017c203",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r1_measure_rank2.json": "2ee75860eb182f83c613c2ff64a3c1de8d9bd880d83028b021c97d29bf893319",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r1_measure_rank3.json": "2b91a30c73338ed206344a2af785a0200086b683f96ec4030a89a93761d4104f",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r1_measure_rank0.json": "419b6924cbf32f1deb23543ffbcac7edbfb16b148c1a300d57f3add54ca6c0d2",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r1_measure_rank1.json": "c47f1ef3aed8d815374af2245d94d29508611cfbef23b60488ea70ebb07fb2c3",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r1_measure_rank2.json": "07f721b34e4a73ba29f600ca327ac07d5c75c2d04645042fdc4fdbb400dd5f5f",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r1_measure_rank3.json": "c332a793542f7a58f8db16b051b1a12a958cb53250b76deff016198de99a4692",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r2_measure_rank0.json": "291d19ad7d3245e03064c0b39e58301c2f6febef6695a170bac9ecd667483954",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r2_measure_rank1.json": "52e0d72382f4805628fdce2ab9821c16e742f31ecc9332630179a83df4b99daf",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r2_measure_rank2.json": "9e25ebbc3fbe054d495506286a9b9d6123582e6dd6a3210bf026d7e0f4cd98bd",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/BR_r2_measure_rank3.json": "c150c7b06e495f0b38af1b06ef58461b71d0e86dc7c1bf405be95b5057a34ab9",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r2_measure_rank0.json": "91164e68477e064937c00b276d60640f100cbfc731e7149169b60def0c469a3a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r2_measure_rank1.json": "b93c00fb8ce7ae90125e6758326203bc7558530ad3ccec1a856359a686bc795d",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r2_measure_rank2.json": "9cfad1ea8c2efb351909f84a4d211c76c690d6d5bb14ced89b9628eda17184b7",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/OLD_CA_r2_measure_rank3.json": "86fe58741820e84a89676dae774028f3320ceaa71ae6feb69185952e819efc36",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r2_measure_rank0.json": "7ecd824b84e724bab6910f034e2917cd62562b838008c042def90242128dd327",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r2_measure_rank1.json": "359c195e4a3cd46cda423458084f73c442c03b0f1cdbe8c6b57050334c4b772a",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r2_measure_rank2.json": "0258be1b92c5e4b8c0aa54ed6716f6aaa1a8ef5658ea408c89b3c7970b33c39f",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/FCA_r2_measure_rank3.json": "7d85ddbf44cd027be38cbc795017f4f8a980a8e07d38da0ecac70cf1333ef3a3",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r2_measure_rank0.json": "d4b915d085c6f1bd4a79df33aa7073805c532dd83d67b6987e9aaa99028fd253",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r2_measure_rank1.json": "9cac07fb9ead108fd346aa293b6ae94379b2f10bffd526ecdf93aad86ab07fbc",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r2_measure_rank2.json": "c23a92fbba91f40874d767c74abd1de827d03bd9d638d1a039e556cb91a8d6b1",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/POLICY_REGIME_C60_B128_H64/LA_CA_r2_measure_rank3.json": "b43099e335a1fe6904a88fec8441e68042b2aacf81c29f00c0d37f5e7440d9c9"
+  },
+  "common_inputs_and_stack": "PASS",
+  "scope": "R4 0/1/4/5, local B128, decode64, V3 P2/T2, BF16. Cache groups separate; no excluded repeats or latency-based noise selection. Mechanism attribution is separate and pending until profile audit completes."
+}
