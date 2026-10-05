@@ -1,0 +1,40 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "FAIL",
+  "stage": "R4_AFFINITY_ABBA_V3_OPT_PF_OVERLAP_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "expert_diagnostics": false,
+    "kernel_diagnostics": false,
+    "gil_switch_abba": false,
+    "thread_affinity_abba": true
+  },
+  "started_unix": 1791186574.905527,
+  "source_sha": "84d33a1a9c2e02aadbcb053fa8330813a4e41cde",
+  "primary_timing": false,
+  "repeats": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "pid": 860456,
+  "error": "AssertionError('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_AFFINITY_ABBA_V3_OPT_PF_OVERLAP_LA_B128_H64/run.log')",
+  "finished_unix": 1791186631.0866227
+}
