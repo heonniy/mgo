@@ -30,51 +30,51 @@
     "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
     "profile_disable_device_event_trace": true
   },
-  "started_unix": 1791221498.068582,
-  "source_sha": "8ace653c2c9c5c6acf05214ce74e2f46271becb8",
+  "started_unix": 1791221646.6112037,
+  "source_sha": "a5b0e563f1e61b03df2ebe817f866b57b333ecd7",
   "primary_timing": false,
   "latest_resource_sample": {
     "gpus": [
       {
         "gpu": 0,
-        "used_mib": 15297,
-        "free_mib": 65793,
-        "temperature_c": 41
+        "used_mib": 20683,
+        "free_mib": 60407,
+        "temperature_c": 39
       },
       {
         "gpu": 1,
-        "used_mib": 19557,
-        "free_mib": 61533,
+        "used_mib": 22731,
+        "free_mib": 58359,
         "temperature_c": 35
       },
       {
         "gpu": 4,
-        "used_mib": 15739,
-        "free_mib": 65351,
-        "temperature_c": 42
+        "used_mib": 24027,
+        "free_mib": 57063,
+        "temperature_c": 40
       },
       {
         "gpu": 5,
-        "used_mib": 22141,
-        "free_mib": 58949,
+        "used_mib": 4,
+        "free_mib": 81087,
         "temperature_c": 36
       }
     ],
-    "host_available_bytes": 1965956259840,
-    "unix": 1791221633.9988704,
-    "rss_bytes": 828628992,
+    "host_available_bytes": 1976333357056,
+    "unix": 1791221780.9647326,
+    "rss_bytes": 759115776,
     "foreign_pids": [],
-    "collection_seconds": 0.442566922865808,
+    "collection_seconds": 0.5041479198262095,
     "foreign_pids_on_other_gpus": []
   },
-  "pid": 1526242,
+  "pid": 1529959,
   "ranks": [
     {
       "status": "PASS",
       "rank": 0,
       "purpose": "instrumented diagnostic; not primary timing",
-      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank0.json",
-      "copy_trace_sha256": "1cc44533bf922d4b0d78279f2b8b6dea1733412d54034b840a00a8616f36e89f",
+      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank0.json",
+      "copy_trace_sha256": "1f735502c172ffab81230183763c6a5999c3ee6dc9bd0077ec75b7a5a68dcfcf",
       "case": {
         "label": "FCA",
         "policy": "FCA",
@@ -98,8 +98,8 @@
       },
       "thread_placement": {
         "fixed_team": {
-          "staging_tid": 1528211,
-          "helper_tid": 1528215,
+          "staging_tid": 1531623,
+          "helper_tid": 1531628,
           "staging_cpu": 1,
           "helper_cpu": 2,
           "stage_mask": [
@@ -142,35 +142,35 @@
       },
       "no_compile_in_capture": true,
       "scheduler_metrics": {
-        "copies": 6853,
-        "bytes": 64673021952,
+        "copies": 4408,
+        "bytes": 41599107072,
         "background_copies": 752,
-        "urgent_copies": 6101,
+        "urgent_copies": 3656,
         "canceled": 0,
-        "escalated": 482,
+        "escalated": 437,
         "restaged": 0
       },
-      "decode_expert_copies": 5331,
-      "decode_expert_bytes": 50309627904,
+      "decode_expert_copies": 2886,
+      "decode_expert_bytes": 27235713024,
       "controller_counters": {
         "issued": 3008,
-        "useful": 1947,
-        "wasted": 1061,
-        "promotions": 1947,
-        "promotion_evictions": 1947,
-        "promotion_victim_reloads": 1443,
-        "mandatory": 23735,
+        "useful": 1686,
+        "wasted": 1322,
+        "promotions": 1686,
+        "promotion_evictions": 1686,
+        "promotion_victim_reloads": 1115,
+        "mandatory": 13984,
         "quota_violations": 0
       },
       "transport_calls": 768,
-      "peak_gpu_bytes": 13657872384
+      "peak_gpu_bytes": 20504986624
     },
     {
       "status": "PASS",
       "rank": 1,
       "purpose": "instrumented diagnostic; not primary timing",
-      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank1.json",
-      "copy_trace_sha256": "82b5c2c137683040a54383cff40e66e2387fa697db3b331a3ca8fb91ed266130",
+      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank1.json",
+      "copy_trace_sha256": "6583882a9787f991487ecff90c41720a29baad7e77bc64d039ab07c05e8d1941",
       "case": {
         "label": "FCA",
         "policy": "FCA",
@@ -194,8 +194,8 @@
       },
       "thread_placement": {
         "fixed_team": {
-          "staging_tid": 1528212,
-          "helper_tid": 1528216,
+          "staging_tid": 1531624,
+          "helper_tid": 1531627,
           "staging_cpu": 25,
           "helper_cpu": 26,
           "stage_mask": [
@@ -238,35 +238,35 @@
       },
       "no_compile_in_capture": true,
       "scheduler_metrics": {
-        "copies": 6740,
-        "bytes": 63606620160,
+        "copies": 4303,
+        "bytes": 40608202752,
         "background_copies": 752,
-        "urgent_copies": 5988,
+        "urgent_copies": 3551,
         "canceled": 0,
-        "escalated": 463,
+        "escalated": 410,
         "restaged": 0
       },
-      "decode_expert_copies": 5223,
-      "decode_expert_bytes": 49290412032,
+      "decode_expert_copies": 2786,
+      "decode_expert_bytes": 26291994624,
       "controller_counters": {
         "issued": 3008,
-        "useful": 1947,
-        "wasted": 1061,
-        "promotions": 1947,
-        "promotion_evictions": 1947,
-        "promotion_victim_reloads": 1443,
-        "mandatory": 23735,
+        "useful": 1686,
+        "wasted": 1322,
+        "promotions": 1686,
+        "promotion_evictions": 1686,
+        "promotion_victim_reloads": 1115,
+        "mandatory": 13984,
         "quota_violations": 0
       },
       "transport_calls": 768,
-      "peak_gpu_bytes": 17417270784
+      "peak_gpu_bytes": 21766764032
     },
     {
       "status": "PASS",
       "rank": 2,
       "purpose": "instrumented diagnostic; not primary timing",
-      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank2.json",
-      "copy_trace_sha256": "debcb740ed46711112fb1214964b1f762d81def6a47da8376bb90caf205ec973",
+      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank2.json",
+      "copy_trace_sha256": "d16c4d4f524c40af8b0d54f0f304c27ce22d226253c128703478b9aca38cc83d",
       "case": {
         "label": "FCA",
         "policy": "FCA",
@@ -290,8 +290,8 @@
       },
       "thread_placement": {
         "fixed_team": {
-          "staging_tid": 1528210,
-          "helper_tid": 1528214,
+          "staging_tid": 1531622,
+          "helper_tid": 1531626,
           "staging_cpu": 97,
           "helper_cpu": 98,
           "stage_mask": [
@@ -334,35 +334,35 @@
       },
       "no_compile_in_capture": true,
       "scheduler_metrics": {
-        "copies": 6627,
-        "bytes": 62540218368,
+        "copies": 4193,
+        "bytes": 39570112512,
         "background_copies": 752,
-        "urgent_copies": 5875,
+        "urgent_copies": 3441,
         "canceled": 0,
-        "escalated": 481,
+        "escalated": 404,
         "restaged": 0
       },
-      "decode_expert_copies": 5122,
-      "decode_expert_bytes": 48337256448,
+      "decode_expert_copies": 2688,
+      "decode_expert_bytes": 25367150592,
       "controller_counters": {
         "issued": 3008,
-        "useful": 1947,
-        "wasted": 1061,
-        "promotions": 1947,
-        "promotion_evictions": 1947,
-        "promotion_victim_reloads": 1443,
-        "mandatory": 23735,
+        "useful": 1686,
+        "wasted": 1322,
+        "promotions": 1686,
+        "promotion_evictions": 1686,
+        "promotion_victim_reloads": 1115,
+        "mandatory": 13984,
         "quota_violations": 0
       },
       "transport_calls": 768,
-      "peak_gpu_bytes": 13980386816
+      "peak_gpu_bytes": 22772167168
     },
     {
       "status": "PASS",
       "rank": 3,
       "purpose": "instrumented diagnostic; not primary timing",
-      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank3.json",
-      "copy_trace_sha256": "7078cd75870434099dc774ac1366996fbab346d67b063ffb9f4da3eaa8dbc493",
+      "copy_trace_path": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/copy_trace_rank3.json",
+      "copy_trace_sha256": "8f4a10364b3553661ee3cffd73cd970bbf524efbc3be510530958c5bcc873980",
       "case": {
         "label": "FCA",
         "policy": "FCA",
@@ -386,8 +386,8 @@
       },
       "thread_placement": {
         "fixed_team": {
-          "staging_tid": 1528209,
-          "helper_tid": 1528213,
+          "staging_tid": 1531625,
+          "helper_tid": 1531629,
           "staging_cpu": 121,
           "helper_cpu": 122,
           "stage_mask": [
@@ -430,36 +430,36 @@
       },
       "no_compile_in_capture": true,
       "scheduler_metrics": {
-        "copies": 6523,
-        "bytes": 61558751232,
+        "copies": 4088,
+        "bytes": 38579208192,
         "background_copies": 752,
-        "urgent_copies": 5771,
+        "urgent_copies": 3336,
         "canceled": 0,
-        "escalated": 521,
+        "escalated": 435,
         "restaged": 0
       },
-      "decode_expert_copies": 5032,
-      "decode_expert_bytes": 47487909888,
+      "decode_expert_copies": 2597,
+      "decode_expert_bytes": 24508366848,
       "controller_counters": {
         "issued": 3008,
-        "useful": 1947,
-        "wasted": 1061,
-        "promotions": 1947,
-        "promotion_evictions": 1947,
-        "promotion_victim_reloads": 1443,
-        "mandatory": 23735,
+        "useful": 1686,
+        "wasted": 1322,
+        "promotions": 1686,
+        "promotion_evictions": 1686,
+        "promotion_victim_reloads": 1115,
+        "mandatory": 13984,
         "quota_violations": 0
       },
       "transport_calls": 768,
-      "peak_gpu_bytes": 20711582720
+      "peak_gpu_bytes": 20488422400
     }
   ],
   "reports": [
-    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank0.nsys-rep",
-    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank1.nsys-rep",
-    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank2.nsys-rep",
-    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank3.nsys-rep"
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank0.nsys-rep",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank1.nsys-rep",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank2.nsys-rep",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/profile_rank3.nsys-rep"
   ],
   "interpretation": "capture only; actual kernel/copy interval analysis still required",
-  "finished_unix": 1791221644.5775068
+  "finished_unix": 1791221791.6730409
 }
