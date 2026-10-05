@@ -23,6 +23,15 @@ class ProfileRuntime(DecodeOffloadRuntime):
   return result
 
  def arm_profile(self):
+  # Keep ticket ordering/labels, but use the same untimed completion
+  # events as primary execution. Actual DMA durations come from CUPTI.
+  # Extra timed CUDA events can perturb cross-stream dependencies.
+  import mgo_v2.pinned_h2d as h2d_module
+  original_ticket=h2d_module.CopyTicket
+  class UntimedProfileTicket(original_ticket):
+   def __init__(self,slot,key,tensors,urgent,profile):
+    super().__init__(slot,key,tensors,urgent,False)
+  h2d_module.CopyTicket=UntimedProfileTicket
   scheduler=self.h2d;scheduler.profile=True;self.profile_tickets=[];self.profile_communication=[]
   original_predict=self.predictor.predict_next
   def predict(*args,**kwargs):
@@ -40,8 +49,9 @@ class ProfileRuntime(DecodeOffloadRuntime):
   def promote(slot,key):
    with scheduler.cv:
     t=scheduler.tickets[slot]
-    readiness='ready' if t.submitted and t.done.query() else 'inflight' if t.submitted else 'queued'
-    t.profile_meta.update(use_event=self.index,readiness_at_use=readiness)
+    submitted=t.submitted
+   readiness='ready' if submitted and t.done.query() else 'inflight' if submitted else 'queued'
+   t.profile_meta.update(use_event=self.index,readiness_at_use=readiness)
    return original_promote(slot,key)
   scheduler.promote=promote
   original_discard=scheduler.discard
@@ -55,7 +65,7 @@ class ProfileRuntime(DecodeOffloadRuntime):
   for t in self.h2d.trace:
    if t.profile_meta['source_event']<48:continue
    row=dict(t.profile_meta)
-   row.update(kind='demand' if row['origin']=='demand' else 'useful_prefetch' if row['use_event'] is not None else 'wasted_prefetch',bytes=9437184,event_dma_ms=t.begin.elapsed_time(t.done),readiness_observation='Logical promotion in current-layer controller, before forward payload launch; not the later expert kernel start.')
+   row.update(kind='demand' if row['origin']=='demand' else 'useful_prefetch' if row['use_event'] is not None else 'wasted_prefetch',bytes=9437184,event_dma_ms=None,dma_timing_source='CUPTI actual memcpy intervals; per-ticket CUDA timing disabled',readiness_observation='Logical promotion in current-layer controller, before forward payload launch; not the later expert kernel start.')
    rows.append(row)
   assert len(rows)==self.h2d.metrics['copies']-self.profile_prefill_metrics['copies']
   return rows
