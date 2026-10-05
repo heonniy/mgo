@@ -1,0 +1,53 @@
+{
+  "status": "FAIL",
+  "jobs": [
+    {
+      "arm": "V1_OPT_NOPF_BARRIER",
+      "batch": 128,
+      "policy": "LA"
+    },
+    {
+      "arm": "V1_OPT_NOPF_BARRIER",
+      "batch": 256,
+      "policy": "LA"
+    },
+    {
+      "arm": "V2_OPT_PF_BARRIER",
+      "batch": 128,
+      "policy": "LA"
+    },
+    {
+      "arm": "V2_OPT_PF_BARRIER",
+      "batch": 256,
+      "policy": "LA"
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batch": 128,
+      "policy": "LA"
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batch": 256,
+      "policy": "LA"
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batch": 128,
+      "policy": "BR"
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batch": 256,
+      "policy": "BR"
+    }
+  ],
+  "completed": [
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B256_H64"
+  ],
+  "started_unix": 1791194912.4668937,
+  "active": "R4_FIXED_H2D_V2_OPT_PF_BARRIER_LA_B128_H64",
+  "error": "CalledProcessError(1, ['/home/hwlee/sub-moe/phase01/.venv/bin/python', '-u', '/home/hwlee/mgo/mgo_v2/scripts/run_refactor_profile.py', '--root', '/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64', '--gpus', '0', '1', '4', '5', '--stage', 'R4_FIXED_H2D', '--horizon', '64', '--arm', 'V2_OPT_PF_BARRIER', '--batch', '128', '--policy', 'LA', '--staging-backend', 'torch', '--unique-combine', '--async-metadata-inputs', '--fixed-staging-team', '--cuda-flush-ms', '600000', '--defer-idle-restore'])",
+  "finished_unix": 1791195894.5951087
+}
