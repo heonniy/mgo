@@ -1,7 +1,6 @@
 """Read-only attribution snapshot from completed sample receipts, never live scans."""
 import argparse,json,statistics
 from pathlib import Path
-from adaptive_timing import single_decision
 ROOT=Path('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004')
 PACKET=Path(__file__).resolve().parents[1]/'experiments/decode_prefetch_runtime_refactoring_20261004'
 def diagnose(out,case):
@@ -18,7 +17,7 @@ def diagnose(out,case):
  if result_path.exists():
   result=json.loads(result_path.read_text());gate=result['gate'];gate_scope='Authoritative completed paired BR/LA group, not a per-policy stopping decision'
  else:
-  gate=None;gate_scope='No completed paired result; diagnostic records only, no repeat scheduling' 
+  gate=None;gate_scope='No completed paired result; diagnostic records only, no repeat scheduling'
  boundaries=[b for b in state.get('boundaries',[]) if b['key'].startswith(case+'_r')]
  submitted=[sum(s['copies'] for s in r['rank_scheduler']) for r in records]
  canceled=[sum(s['canceled'] for s in r['rank_scheduler']) for r in records]
