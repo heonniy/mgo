@@ -1,0 +1,34 @@
+{
+  "environment": "env1",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "FAIL",
+  "stage": "POLICY_REGIME_PROFILE_C30_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H64",
+  "case": {
+    "label": "FCA",
+    "policy": "FCA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "profile_cuda_flush_ms": 600000
+  },
+  "started_unix": 1791200689.443213,
+  "source_sha": "af344e881191a8904d15d7e6befffdff2db857a9",
+  "primary_timing": false,
+  "pid": 1170296,
+  "error": "TimeoutError('all ranks made no captured decode progress for 180 seconds')",
+  "finished_unix": 1791201198.4215496
+}
