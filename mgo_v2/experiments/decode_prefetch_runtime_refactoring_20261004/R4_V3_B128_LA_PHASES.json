@@ -1,0 +1,721 @@
+{
+  "status": "PASS",
+  "ranks": 4,
+  "primary_timing": false,
+  "across_rank_distributions": {
+    "H2D": {
+      "bytes": {
+        "min": 241214423040,
+        "median": 251835973632.0,
+        "max": 262693453824,
+        "ranks_present": 4
+      },
+      "count": {
+        "min": 25560,
+        "median": 26685.5,
+        "max": 27836,
+        "ranks_present": 4
+      },
+      "hidden_ratio": {
+        "min": 0.021908211205437476,
+        "median": 0.029871866988753368,
+        "max": 0.05213902152273701,
+        "ranks_present": 4
+      },
+      "outside_comm_expert_ms": {
+        "min": 5230.310936,
+        "median": 6721.1236499999995,
+        "max": 7433.355438,
+        "ranks_present": 4
+      },
+      "overlap_comm_expert_ms": {
+        "min": 166.499221,
+        "median": 186.117826,
+        "max": 341.490866,
+        "ranks_present": 4
+      },
+      "total_union_ms": {
+        "min": 5422.861071,
+        "median": 6981.7118415,
+        "max": 7599.854659,
+        "ranks_present": 4
+      }
+    },
+    "kernel_union_ms": {
+      "moe.expert_compute": {
+        "min": 2126.738668,
+        "median": 2163.7043409999997,
+        "max": 2187.313246,
+        "ranks_present": 4
+      },
+      "moe.forward_a2a.local_gpu": {
+        "min": 112.47315,
+        "median": 113.37440699999999,
+        "max": 113.928581,
+        "ranks_present": 4
+      },
+      "moe.forward_a2a.nccl": {
+        "min": 2111.364803,
+        "median": 2682.441731,
+        "max": 4222.177892,
+        "ranks_present": 4
+      },
+      "moe.metadata.local_gpu": {
+        "min": 19.29539,
+        "median": 19.371137,
+        "max": 19.467117,
+        "ranks_present": 4
+      },
+      "moe.metadata.nccl": {
+        "min": 2590.9106,
+        "median": 3186.3303480000004,
+        "max": 4077.41546,
+        "ranks_present": 4
+      },
+      "moe.return_a2a.local_gpu": {
+        "min": 3412.642478,
+        "median": 3487.2000715000004,
+        "max": 3505.798729,
+        "ranks_present": 4
+      },
+      "moe.return_a2a.nccl": {
+        "min": 3922.250747,
+        "median": 10296.482407,
+        "max": 16476.602435,
+        "ranks_present": 4
+      }
+    },
+    "cpu_nvtx": {
+      "moe.combine": {
+        "outside_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "outside_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "ranks_present": 4
+      },
+      "moe.current_controller": {
+        "outside_comm_expert_ms": {
+          "min": 6946.616812,
+          "median": 7984.151498,
+          "max": 8307.827359
+        },
+        "outside_payload_A2A_ms": {
+          "min": 6946.616812,
+          "median": 7984.151498,
+          "max": 8307.827359
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 6946.616812,
+          "median": 7984.151498,
+          "max": 8307.827359
+        },
+        "ranks_present": 4
+      },
+      "moe.demand_h2d": {
+        "outside_comm_expert_ms": {
+          "min": 251.725283,
+          "median": 280.160755,
+          "max": 299.661446
+        },
+        "outside_payload_A2A_ms": {
+          "min": 251.725283,
+          "median": 280.160755,
+          "max": 299.661446
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 251.725283,
+          "median": 280.160755,
+          "max": 299.661446
+        },
+        "ranks_present": 4
+      },
+      "moe.dispatch": {
+        "outside_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "outside_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "ranks_present": 4
+      },
+      "moe.expert_compute": {
+        "outside_comm_expert_ms": {
+          "min": 43764.138702,
+          "median": 50114.372654499995,
+          "max": 54381.518816
+        },
+        "outside_payload_A2A_ms": {
+          "min": 45944.220579,
+          "median": 52251.404110999996,
+          "max": 56568.830537
+        },
+        "overlap_comm_expert_ms": {
+          "min": 2126.738668,
+          "median": 2163.703061,
+          "max": 2187.311721
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 45944.220579,
+          "median": 52251.404110999996,
+          "max": 56568.830537
+        },
+        "ranks_present": 4
+      },
+      "moe.forward_a2a": {
+        "outside_comm_expert_ms": {
+          "min": 1481.599445,
+          "median": 1849.7321665,
+          "max": 1973.910936
+        },
+        "outside_payload_A2A_ms": {
+          "min": 1481.599445,
+          "median": 1849.7321665,
+          "max": 1973.910936
+        },
+        "overlap_comm_expert_ms": {
+          "min": 133.468282,
+          "median": 164.5578165,
+          "max": 244.664999
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 133.468282,
+          "median": 164.5578165,
+          "max": 244.664999
+        },
+        "total_ms": {
+          "min": 1669.871217,
+          "median": 2042.4865965,
+          "max": 2107.379218
+        },
+        "ranks_present": 4
+      },
+      "moe.forward_complete": {
+        "outside_comm_expert_ms": {
+          "min": 114.606267,
+          "median": 322.1519175,
+          "max": 540.798707
+        },
+        "outside_payload_A2A_ms": {
+          "min": 114.606267,
+          "median": 322.1519175,
+          "max": 540.798707
+        },
+        "overlap_comm_expert_ms": {
+          "min": 91.462137,
+          "median": 192.759123,
+          "max": 611.660168
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 91.462137,
+          "median": 192.759123,
+          "max": 611.660168
+        },
+        "total_ms": {
+          "min": 452.342617,
+          "median": 604.870154,
+          "max": 726.266435
+        },
+        "ranks_present": 4
+      },
+      "moe.h2d_global_barrier": {
+        "outside_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "outside_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "ranks_present": 4
+      },
+      "moe.host_staging": {
+        "outside_comm_expert_ms": {
+          "min": 34770.09536,
+          "median": 39934.592046499994,
+          "max": 41490.101142
+        },
+        "outside_payload_A2A_ms": {
+          "min": 36105.644235,
+          "median": 41606.5299545,
+          "max": 43004.892847
+        },
+        "overlap_comm_expert_ms": {
+          "min": 1853.7779,
+          "median": 2398.5523350000003,
+          "max": 3512.188392
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 338.986195,
+          "median": 726.614427,
+          "max": 2176.639517
+        },
+        "total_ms": {
+          "min": 38282.283752,
+          "median": 42333.144381499995,
+          "max": 43343.879042
+        },
+        "ranks_present": 4
+      },
+      "moe.metadata": {
+        "outside_comm_expert_ms": {
+          "min": 6731.811987,
+          "median": 9904.890176500001,
+          "max": 12267.39126
+        },
+        "outside_payload_A2A_ms": {
+          "min": 6731.811987,
+          "median": 9904.890176500001,
+          "max": 12267.39126
+        },
+        "overlap_comm_expert_ms": {
+          "min": 883.014067,
+          "median": 4692.630172499999,
+          "max": 7892.539243
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 883.014067,
+          "median": 4692.630172499999,
+          "max": 7892.539243
+        },
+        "total_ms": {
+          "min": 7614.826054,
+          "median": 14597.520348999999,
+          "max": 20159.930503
+        },
+        "ranks_present": 4
+      },
+      "moe.metadata_collective_submit": {
+        "outside_comm_expert_ms": {
+          "min": 388.185794,
+          "median": 488.1026565,
+          "max": 500.84837
+        },
+        "outside_payload_A2A_ms": {
+          "min": 388.185794,
+          "median": 488.1026565,
+          "max": 500.84837
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 388.185794,
+          "median": 488.1026565,
+          "max": 500.84837
+        },
+        "ranks_present": 4
+      },
+      "moe.metadata_pack_host": {
+        "outside_comm_expert_ms": {
+          "min": 3181.640366,
+          "median": 5352.652225,
+          "max": 8341.387832
+        },
+        "outside_payload_A2A_ms": {
+          "min": 3181.640366,
+          "median": 5352.652225,
+          "max": 8341.387832
+        },
+        "overlap_comm_expert_ms": {
+          "min": 883.014067,
+          "median": 4692.630172499999,
+          "max": 7892.539243
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 883.014067,
+          "median": 4692.630172499999,
+          "max": 7892.539243
+        },
+        "total_ms": {
+          "min": 4064.654433,
+          "median": 10045.2823975,
+          "max": 16233.927075
+        },
+        "ranks_present": 4
+      },
+      "moe.metadata_readback_wait_and_unpack": {
+        "outside_comm_expert_ms": {
+          "min": 3062.299423,
+          "median": 3644.4614465,
+          "max": 4364.189159
+        },
+        "outside_payload_A2A_ms": {
+          "min": 3062.299423,
+          "median": 3644.4614465,
+          "max": 4364.189159
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 3062.299423,
+          "median": 3644.4614465,
+          "max": 4364.189159
+        },
+        "ranks_present": 4
+      },
+      "moe.packet_layout_cpu": {
+        "outside_comm_expert_ms": {
+          "min": 4839.047475,
+          "median": 5477.014747499999,
+          "max": 5820.816918
+        },
+        "outside_payload_A2A_ms": {
+          "min": 4839.047475,
+          "median": 5477.014747499999,
+          "max": 5820.816918
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 4839.047475,
+          "median": 5477.014747499999,
+          "max": 5820.816918
+        },
+        "ranks_present": 4
+      },
+      "moe.packet_layout_upload": {
+        "outside_comm_expert_ms": {
+          "min": 4445.647993,
+          "median": 4626.333449,
+          "max": 4995.594936
+        },
+        "outside_payload_A2A_ms": {
+          "min": 4445.647993,
+          "median": 4626.333449,
+          "max": 4995.594936
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 4445.647993,
+          "median": 4626.333449,
+          "max": 4995.594936
+        },
+        "ranks_present": 4
+      },
+      "moe.prefetch_controller": {
+        "outside_comm_expert_ms": {
+          "min": 2546.604636,
+          "median": 2631.186682,
+          "max": 2740.163673
+        },
+        "outside_payload_A2A_ms": {
+          "min": 2546.604636,
+          "median": 2631.186682,
+          "max": 2740.163673
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 2546.604636,
+          "median": 2631.186682,
+          "max": 2740.163673
+        },
+        "ranks_present": 4
+      },
+      "moe.prefetch_placement_and_bookkeeping": {
+        "outside_comm_expert_ms": {
+          "min": 2249.3308150000003,
+          "median": 2351.2591380000003,
+          "max": 2441.46901
+        },
+        "outside_payload_A2A_ms": {
+          "min": 2249.3308150000003,
+          "median": 2351.2591380000003,
+          "max": 2441.46901
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "total_ms": {
+          "min": 2249.3308150000003,
+          "median": 2351.2591380000003,
+          "max": 2441.46901
+        },
+        "ranks_present": 4
+      },
+      "moe.prefetch_predictor": {
+        "outside_comm_expert_ms": {
+          "min": 272.534886,
+          "median": 292.2970115,
+          "max": 298.694663
+        },
+        "outside_payload_A2A_ms": {
+          "min": 272.534886,
+          "median": 292.2970115,
+          "max": 298.694663
+        },
+        "overlap_comm_expert_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "total_ms": {
+          "min": 272.534886,
+          "median": 292.2970115,
+          "max": 298.694663
+        },
+        "ranks_present": 4
+      },
+      "moe.return_a2a": {
+        "outside_comm_expert_ms": {
+          "min": 17013.028327,
+          "median": 18119.7496215,
+          "max": 20289.995881
+        },
+        "outside_payload_A2A_ms": {
+          "min": 17013.028327,
+          "median": 18119.7496215,
+          "max": 20289.995881
+        },
+        "overlap_comm_expert_ms": {
+          "min": 1322.597313,
+          "median": 2115.9216545,
+          "max": 2671.675091
+        },
+        "overlap_payload_A2A_ms": {
+          "min": 1322.597313,
+          "median": 2115.9216545,
+          "max": 2671.675091
+        },
+        "total_ms": {
+          "min": 19351.158905,
+          "median": 20402.4435325,
+          "max": 21612.593194
+        },
+        "ranks_present": 4
+      }
+    },
+    "exclusive_ms": {
+      "idle_or_unattributed": {
+        "min": 87460.526822,
+        "median": 90681.3378275,
+        "max": 98761.170154
+      },
+      "H2D_only": {
+        "min": 5230.310936,
+        "median": 6720.9927210000005,
+        "max": 7433.355438
+      },
+      "COMM_only": {
+        "min": 8597.135176,
+        "median": 17357.2676605,
+        "max": 22113.422831
+      },
+      "H2D_COMM": {
+        "min": 27.390974,
+        "median": 36.241798,
+        "max": 206.263011
+      },
+      "COMPUTE_only": {
+        "min": 1991.248955,
+        "median": 2013.828313,
+        "max": 2048.204999
+      },
+      "H2D_COMPUTE": {
+        "min": 135.489713,
+        "median": 137.526823,
+        "max": 163.806657
+      },
+      "COMM_COMPUTE": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0
+      },
+      "H2D_COMM_COMPUTE": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0
+      }
+    }
+  },
+  "interpretation": "Each duration is a rank-local interval union. Min/median/max describe ranks, not repeat uncertainty. Do not sum ranks or phase maxima into wall time. Instrumented profiles are attribution only; unprofiled E2E/TPOT determine performance. Missing CPU ranges remain absent rather than being assigned zero.",
+  "capture": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP"
+  },
+  "sources": [
+    {
+      "rank": 0,
+      "report": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank0.nsys-rep",
+      "report_bytes": 191600738,
+      "receipt": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/rank0.json",
+      "receipt_sha256": "e00184add3480b64b7da0c36ac7004f1a9128172a31b562e5de41c02d42039f2",
+      "analysis": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank0_intervals.json",
+      "analysis_sha256": "94ee57ea032a4fdf34c2e12dac03aa7c2661d3aa97c59bcca3544b60b5be7bf4"
+    },
+    {
+      "rank": 1,
+      "report": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank1.nsys-rep",
+      "report_bytes": 190090216,
+      "receipt": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/rank1.json",
+      "receipt_sha256": "89d0db162efa0f0d004c2be9341fd0a5054a5740237bc1ce9a0adf5bc7ab1871",
+      "analysis": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank1_intervals.json",
+      "analysis_sha256": "1e1149b0feb79aaf1574397e884c4b3a477b2516504fd60894a37cea4e330ff3"
+    },
+    {
+      "rank": 2,
+      "report": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank2.nsys-rep",
+      "report_bytes": 189078629,
+      "receipt": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/rank2.json",
+      "receipt_sha256": "36aec19cfb2a600e31a88e4bdb6e5b8451a701812ff7c29a9ee7d75f2144f655",
+      "analysis": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank2_intervals.json",
+      "analysis_sha256": "d43c695b404befe7f3a75ea07dcedfa59d3daf5a5cb97f3d5c568e5c8e7aaf83"
+    },
+    {
+      "rank": 3,
+      "report": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank3.nsys-rep",
+      "report_bytes": 187094033,
+      "receipt": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/rank3.json",
+      "receipt_sha256": "7ae1db005dcde32a350f5edbf343bb8dc7609a3e97821576626976dc414a7953",
+      "analysis": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank3_intervals.json",
+      "analysis_sha256": "e672ad180f09b4fe0249ea82f500290962ad9fa8aad3ddb8dc8ec33624287df6"
+    }
+  ],
+  "analysis_revision": "ab35312",
+  "limitations": [
+    "One instrumented LA capture for V3 B128; not primary timing or causal proof.",
+    "CPU host-staging NVTX wall intervals may include scheduling and framework overhead.",
+    "Other arms/batches and BR attribution are not yet complete."
+  ]
+}
