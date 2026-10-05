@@ -1,37 +1,37 @@
 {
-  "status": "PASS",
-  "stage": "M14_SMOKE_V3_OPT_PF_OVERLAP",
-  "label": "M14_SMOKE_V3_OPT_PF_OVERLAP_B128_H8",
+  "status": "FAIL",
+  "stage": "M15_V1_OPT_NOPF_BARRIER",
+  "label": "M15_V1_OPT_NOPF_BARRIER_B128_H256",
   "group": {
     "batch": 128,
-    "horizon": 8,
+    "horizon": 256,
     "paired": true,
-    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
     "cases": [
       {
         "label": "BR",
         "policy": "BR",
-        "P": 2,
+        "P": 0,
         "trigger": "T2",
-        "horizon": 8,
-        "overlap": true,
+        "horizon": 256,
+        "overlap": false,
         "partial_precision": "bf16",
-        "runtime_arm": "V3_OPT_PF_OVERLAP"
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
       },
       {
         "label": "LA",
         "policy": "LA",
-        "P": 2,
+        "P": 0,
         "trigger": "T2",
-        "horizon": 8,
-        "overlap": true,
+        "horizon": 256,
+        "overlap": false,
         "partial_precision": "bf16",
-        "runtime_arm": "V3_OPT_PF_OVERLAP"
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
       }
     ]
   },
-  "started_unix": 1791157275.319034,
-  "source_sha": "8af4425fb766f099b5cee2262e7113382c599549",
+  "started_unix": 1791157846.5849721,
+  "source_sha": "1f271bebb1180a5dbd31a37ecd65f9966a37fc7f",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
@@ -106,27 +106,20 @@
     },
     "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
     "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
-    "input_receipt_sha256": "cf2e51dfef903377626884083ce377bda3930612605e99fb18b5dbba664ad21c",
+    "input_receipt_sha256": "10d67a7e8864faac5e2964f55676cfbbba310d70cec3073197791e4335e73160",
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 383832,
+  "pid": 392016,
   "completed": [
     "BR_r1",
     "LA_r1",
     "LA_r2",
     "BR_r2",
     "BR_r3",
-    "LA_r3",
-    "LA_r4",
-    "BR_r4",
-    "BR_r5",
-    "LA_r5",
-    "LA_r6",
-    "BR_r6",
-    "BR_r7",
-    "LA_r7"
+    "LA_r3"
   ],
-  "exit_code": 0,
-  "finished_unix": 1791157799.4452024
+  "error": "RuntimeError('owner STOP')",
+  "exit_code": 1,
+  "finished_unix": 1791161494.2136889
 }
