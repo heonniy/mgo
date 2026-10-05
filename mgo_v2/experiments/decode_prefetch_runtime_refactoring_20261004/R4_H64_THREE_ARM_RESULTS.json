@@ -1,0 +1,1013 @@
+{
+  "world": 4,
+  "horizon": 64,
+  "status": "NO_STABLE_CANDIDATE",
+  "winner": null,
+  "improvement_supported": false,
+  "rows": [
+    {
+      "arm": "V1_OPT_NOPF_BARRIER",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "UNRESOLVED_JITTER",
+            "complete": true,
+            "unstable": true,
+            "target_repeats": 3,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.003948121874643107,
+                "median": 0.002777250040404855,
+                "CI95": [
+                  -0.054544676642989565,
+                  0.044220834128921194
+                ],
+                "CI_half_width": 0.04938275538595538,
+                "early_late_drift": 0.004460012028264293,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.002777250040404855,
+                  -0.026565600836071512,
+                  0.011549490106050997
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.004171706898545624,
+                "median": -0.0002945899851147793,
+                "CI95": [
+                  -0.057220649352902386,
+                  0.04621535953471001
+                ],
+                "CI_half_width": 0.0517180044438062,
+                "early_late_drift": 0.0073960139743693976,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.0002945899851147793,
+                  -0.02690387823738316,
+                  0.014251265579796613
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 134.4800579811757,
+                    "median": 133.8025250006467,
+                    "min": 132.62895584944636,
+                    "max": 137.00869309343398,
+                    "range_relative": 0.032486095774521585,
+                    "mean_CI95": [
+                      128.84823081811936,
+                      140.11188514423202
+                    ],
+                    "relative_CI_half_width": 0.041878530152364125,
+                    "early_late_drift": 0.01196177102764887
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 1.925220458984375,
+                    "median": 1.91274853515625,
+                    "min": 1.89857763671875,
+                    "max": 1.964335205078125,
+                    "range_relative": 0.034045587385703145,
+                    "mean_CI95": [
+                      1.8392507687905042,
+                      2.011190149178246
+                    ],
+                    "relative_CI_half_width": 0.04465446530690986,
+                    "early_late_drift": 0.013444113437168715
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 133.8025250006467,
+                  "TPOT": 1.91274853515625
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 135.0031860768795,
+                    "median": 135.4263125481084,
+                    "min": 133.4309219326824,
+                    "max": 136.1523237498477,
+                    "range_relative": 0.02018969547069053,
+                    "mean_CI95": [
+                      131.50259268788943,
+                      138.50377946586957
+                    ],
+                    "relative_CI_half_width": 0.025929709444017138,
+                    "early_late_drift": 0.00737446846079952
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 1.9331032307942708,
+                    "median": 1.9363409423828124,
+                    "min": 1.91331201171875,
+                    "max": 1.94965673828125,
+                    "range_relative": 0.01881699227440029,
+                    "mean_CI95": [
+                      1.8874263706405277,
+                      1.978780090948014
+                    ],
+                    "relative_CI_half_width": 0.023628774411067248,
+                    "early_late_drift": 0.005943742528792656
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 135.4263125481084,
+                  "TPOT": 1.9363409423828124
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 133.8025250006467,
+                "TPOT": 1.91274853515625
+              },
+              "LA": {
+                "E2E_wall": 133.4309219326824,
+                "TPOT": 1.91331201171875
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 136.1523237498477,
+                "TPOT": 1.94965673828125
+              },
+              "BR": {
+                "E2E_wall": 132.62895584944636,
+                "TPOT": 1.89857763671875
+              }
+            },
+            {
+              "BR": {
+                "E2E_wall": 137.00869309343398,
+                "TPOT": 1.964335205078125
+              },
+              "LA": {
+                "E2E_wall": 135.4263125481084,
+                "TPOT": 1.9363409423828124
+              }
+            }
+          ],
+          "LA_TPOT": 1.9331032307942708,
+          "BR_TPOT": 1.925220458984375
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "UNRESOLVED_JITTER",
+            "complete": true,
+            "unstable": true,
+            "target_repeats": 3,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.017975806952553075,
+                "median": 0.0037979562861099048,
+                "CI95": [
+                  -0.08514436672283399,
+                  0.11129657462728382
+                ],
+                "CI_half_width": 0.0982204706750589,
+                "early_late_drift": 0.008121889327861176,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.013008571277635994,
+                  0.061561075593120074,
+                  0.0037979562861099048
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.018828039211878256,
+                "median": 0.0009005568853236445,
+                "CI95": [
+                  -0.09951550658170638,
+                  0.12443397944450152
+                ],
+                "CI_half_width": 0.11197474301310395,
+                "early_late_drift": 0.0077073551791951855,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.015128890206178802,
+                  0.06866594931497128,
+                  0.0009005568853236445
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 159.63671800494194,
+                    "median": 160.18323145899922,
+                    "min": 156.80137053038925,
+                    "max": 161.92555202543736,
+                    "range_relative": 0.03215405497570153,
+                    "mean_CI95": [
+                      153.16444666401537,
+                      166.1089893458685
+                    ],
+                    "relative_CI_half_width": 0.04054375097291959,
+                    "early_late_drift": 0.010554533390489599
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 2.2050442708333335,
+                    "median": 2.214070556640625,
+                    "min": 2.16142431640625,
+                    "max": 2.239637939453125,
+                    "range_relative": 0.035543065969014735,
+                    "mean_CI95": [
+                      2.1059758097965773,
+                      2.30411273187009
+                    ],
+                    "relative_CI_half_width": 0.044928105229976215,
+                    "early_late_drift": 0.011891045337963708
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 160.18323145899922,
+                  "TPOT": 2.214070556640625
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "EXTEND_JITTER",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": true,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 156.7910785867522,
+                    "median": 158.84113233536482,
+                    "min": 151.9572408767417,
+                    "max": 159.57486254815012,
+                    "range_relative": 0.04890424831124969,
+                    "mean_CI95": [
+                      146.3520591037493,
+                      167.23009806975512
+                    ],
+                    "relative_CI_half_width": 0.06657916749534323,
+                    "early_late_drift": 0.0023580082940829012
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 2.164017333984375,
+                    "median": 2.194124267578125,
+                    "min": 2.08585107421875,
+                    "max": 2.21207666015625,
+                    "range_relative": 0.05873788194619576,
+                    "mean_CI95": [
+                      1.9943842797393296,
+                      2.3336503882294206
+                    ],
+                    "relative_CI_half_width": 0.0783880293290988,
+                    "early_late_drift": 0.004185729873305056
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 158.84113233536482,
+                  "TPOT": 2.194124267578125
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 156.80137053038925,
+                "TPOT": 2.16142431640625
+              },
+              "LA": {
+                "E2E_wall": 158.84113233536482,
+                "TPOT": 2.194124267578125
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 151.9572408767417,
+                "TPOT": 2.08585107421875
+              },
+              "BR": {
+                "E2E_wall": 161.92555202543736,
+                "TPOT": 2.239637939453125
+              }
+            },
+            {
+              "BR": {
+                "E2E_wall": 160.18323145899922,
+                "TPOT": 2.214070556640625
+              },
+              "LA": {
+                "E2E_wall": 159.57486254815012,
+                "TPOT": 2.21207666015625
+              }
+            }
+          ],
+          "LA_TPOT": 2.164017333984375,
+          "BR_TPOT": 2.2050442708333335
+        }
+      },
+      "stable": false,
+      "positive_supported": false,
+      "score": -0.004171706898545624,
+      "mean_gain": 0.007328166156666316,
+      "dominated_by": [],
+      "eligible": false
+    },
+    {
+      "arm": "V2_OPT_PF_BARRIER",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.005907689934883664,
+                "median": 0.005906356842176663,
+                "CI95": [
+                  -0.014994931089656216,
+                  0.026379846183381295
+                ],
+                "CI_half_width": 0.020687388636518755,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.00753437287235037,
+                  0.0042783408120029565
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.0028504201055246092,
+                "median": 0.002848248815312926,
+                "CI95": [
+                  -0.023943760484996135,
+                  0.028943460515087227
+                ],
+                "CI_half_width": 0.02644361050004168,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.004929163748560783,
+                  0.0007673338820650688
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 128.2764328098856,
+                    "median": 128.2764328098856,
+                    "min": 128.01234532892704,
+                    "max": 128.54052029084414,
+                    "range_relative": 0.0041174746627067,
+                    "mean_CI95": [
+                      124.9208832085061,
+                      131.63198241126508
+                    ],
+                    "relative_CI_half_width": 0.02615873803064543,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.8267457885742187,
+                    "median": 1.8267457885742187,
+                    "min": 1.825619873046875,
+                    "max": 1.8278717041015624,
+                    "range_relative": 0.0012327008326895206,
+                    "mean_CI95": [
+                      1.812439675367897,
+                      1.8410519017805402
+                    ],
+                    "relative_CI_half_width": 0.007831474579441904,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 128.2764328098856,
+                  "TPOT": 1.8267457885742187
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 127.51921636192128,
+                    "median": 127.51921636192128,
+                    "min": 127.04785258695483,
+                    "max": 127.99058013688773,
+                    "range_relative": 0.00739282734656458,
+                    "mean_CI95": [
+                      121.52997173187521,
+                      133.50846099196735
+                    ],
+                    "relative_CI_half_width": 0.04696738892315315,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.8215451049804687,
+                    "median": 1.8215451049804687,
+                    "min": 1.81662109375,
+                    "max": 1.8264691162109374,
+                    "range_relative": 0.005406411531622767,
+                    "mean_CI95": [
+                      1.7589796101618005,
+                      1.884110599799137
+                    ],
+                    "relative_CI_half_width": 0.03434748590501639,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 127.51921636192128,
+                  "TPOT": 1.8215451049804687
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 128.01234532892704,
+                "TPOT": 1.825619873046875
+              },
+              "LA": {
+                "E2E_wall": 127.04785258695483,
+                "TPOT": 1.81662109375
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 127.99058013688773,
+                "TPOT": 1.8264691162109374
+              },
+              "BR": {
+                "E2E_wall": 128.54052029084414,
+                "TPOT": 1.8278717041015624
+              }
+            }
+          ],
+          "LA_TPOT": 1.8215451049804687,
+          "BR_TPOT": 1.8267457885742187
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "UNRESOLVED_JITTER",
+            "complete": true,
+            "unstable": true,
+            "target_repeats": 3,
+            "gain": {
+              "E2E_wall": {
+                "estimate": -0.0024778535621774456,
+                "median": -0.0045991070797697375,
+                "CI95": [
+                  -0.03193232067293117,
+                  0.02613589404071892
+                ],
+                "CI_half_width": 0.029034107356825045,
+                "early_late_drift": 0.004168215418568377,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.0045991070797697375,
+                  0.01004397179135963,
+                  -0.01301451665410891
+                ]
+              },
+              "TPOT": {
+                "estimate": -0.0032192764704286336,
+                "median": -0.00546832821263421,
+                "CI95": [
+                  -0.04009169273234381,
+                  0.03234597130769623
+                ],
+                "CI_half_width": 0.03621883202002002,
+                "early_late_drift": 0.005516888250177265,
+                "positive_supported": false,
+                "paired_gains": [
+                  -0.00546832821263421,
+                  0.012230251918898039,
+                  -0.016631328799532774
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 154.16966487808773,
+                    "median": 154.38577984739095,
+                    "min": 152.38212462328374,
+                    "max": 155.74109016358852,
+                    "range_relative": 0.021802742403737183,
+                    "mean_CI95": [
+                      149.97177228447393,
+                      158.36755747170153
+                    ],
+                    "relative_CI_half_width": 0.027229044033619462,
+                    "early_late_drift": 0.010889914063957345
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 2.1207720540364585,
+                    "median": 2.126674560546875,
+                    "min": 2.09127978515625,
+                    "max": 2.14436181640625,
+                    "range_relative": 0.0250644583481372,
+                    "mean_CI95": [
+                      2.053628830872858,
+                      2.187915277200059
+                    ],
+                    "relative_CI_half_width": 0.03165980192723081,
+                    "early_late_drift": 0.012506087704473335
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 154.38577984739095,
+                  "TPOT": 2.126674560546875
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 154.5525992885232,
+                    "median": 154.36530432198197,
+                    "min": 152.8351334296167,
+                    "max": 156.45736011397094,
+                    "range_relative": 0.023422661461027516,
+                    "mean_CI95": [
+                      150.03553717306718,
+                      159.0696614039792
+                    ],
+                    "relative_CI_half_width": 0.02922669781194322,
+                    "early_late_drift": 0.006786957922108795
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 2.1276044108072916,
+                    "median": 2.126060546875,
+                    "min": 2.100664794921875,
+                    "max": 2.156087890625,
+                    "range_relative": 0.02604008256871725,
+                    "mean_CI95": [
+                      2.0586850320237042,
+                      2.196523789590879
+                    ],
+                    "relative_CI_half_width": 0.03239294787767278,
+                    "early_late_drift": 0.007079017274098233
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 154.36530432198197,
+                  "TPOT": 2.126060546875
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 155.74109016358852,
+                "TPOT": 2.14436181640625
+              },
+              "LA": {
+                "E2E_wall": 156.45736011397094,
+                "TPOT": 2.156087890625
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 152.8351334296167,
+                "TPOT": 2.100664794921875
+              },
+              "BR": {
+                "E2E_wall": 154.38577984739095,
+                "TPOT": 2.126674560546875
+              }
+            },
+            {
+              "BR": {
+                "E2E_wall": 152.38212462328374,
+                "TPOT": 2.09127978515625
+              },
+              "LA": {
+                "E2E_wall": 154.36530432198197,
+                "TPOT": 2.126060546875
+              }
+            }
+          ],
+          "LA_TPOT": 2.1276044108072916,
+          "BR_TPOT": 2.1207720540364585
+        }
+      },
+      "stable": false,
+      "positive_supported": false,
+      "score": -0.0032192764704286336,
+      "mean_gain": -0.0001844281824520122,
+      "dominated_by": [],
+      "eligible": false
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "UNRESOLVED_JITTER",
+            "complete": true,
+            "unstable": true,
+            "target_repeats": 3,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.024344036309903783,
+                "median": 0.012052688042927917,
+                "CI95": [
+                  -0.04518803619513001,
+                  0.08925042526382698
+                ],
+                "CI_half_width": 0.0672192307294785,
+                "early_late_drift": 0.0217069904050623,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.012052688042927917,
+                  0.005386615962976182,
+                  0.05484719492211021
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.028201770413276206,
+                "median": 0.013247568048476266,
+                "CI95": [
+                  -0.04586252525399703,
+                  0.09702109385883506
+                ],
+                "CI_half_width": 0.07144180955641605,
+                "early_late_drift": 0.02409328169360303,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.013247568048476266,
+                  0.009750113499152224,
+                  0.060762759567816294
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "EXTEND_JITTER",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": true,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 106.07443106143425,
+                    "median": 108.00826943758875,
+                    "min": 100.64202266652137,
+                    "max": 109.57300108019263,
+                    "range_relative": 0.08496993463637596,
+                    "mean_CI95": [
+                      94.22704935792734,
+                      117.92181276494117
+                    ],
+                    "relative_CI_half_width": 0.1116893259285582,
+                    "early_late_drift": 0.007471287707006718
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 1.484938232421875,
+                    "median": 1.5164100341796876,
+                    "min": 1.399785888671875,
+                    "max": 1.5386187744140625,
+                    "range_relative": 0.09449541615985864,
+                    "mean_CI95": [
+                      1.2996825359190582,
+                      1.6701939289246917
+                    ],
+                    "relative_CI_half_width": 0.1247564999391739,
+                    "early_late_drift": 0.0075867652825778
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 108.00826943758875,
+                  "TPOT": 1.5164100341796876
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "EXTEND_JITTER",
+                "target_repeats": 3,
+                "complete": true,
+                "unstable": true,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 3,
+                    "mean": 103.4565371774758,
+                    "median": 103.5632293317467,
+                    "min": 100.09990274067968,
+                    "max": 106.70647946000099,
+                    "range_relative": 0.06389142007146012,
+                    "mean_CI95": [
+                      95.2475044674486,
+                      111.66556988750298
+                    ],
+                    "relative_CI_half_width": 0.07934764620958566,
+                    "early_late_drift": 0.015315388933673277
+                  },
+                  "TPOT": {
+                    "n": 3,
+                    "mean": 1.442529052734375,
+                    "median": 1.4451280517578124,
+                    "min": 1.3861378173828125,
+                    "max": 1.4963212890625,
+                    "range_relative": 0.07645102158314204,
+                    "mean_CI95": [
+                      1.3055594242349415,
+                      1.5794986812338085
+                    ],
+                    "relative_CI_half_width": 0.0949510363342782,
+                    "early_late_drift": 0.017919391473488862
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 103.5632293317467,
+                  "TPOT": 1.4451280517578124
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 108.00826943758875,
+                "TPOT": 1.5164100341796876
+              },
+              "LA": {
+                "E2E_wall": 106.70647946000099,
+                "TPOT": 1.4963212890625
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 100.09990274067968,
+                "TPOT": 1.3861378173828125
+              },
+              "BR": {
+                "E2E_wall": 100.64202266652137,
+                "TPOT": 1.399785888671875
+              }
+            },
+            {
+              "BR": {
+                "E2E_wall": 109.57300108019263,
+                "TPOT": 1.5386187744140625
+              },
+              "LA": {
+                "E2E_wall": 103.5632293317467,
+                "TPOT": 1.4451280517578124
+              }
+            }
+          ],
+          "LA_TPOT": 1.442529052734375,
+          "BR_TPOT": 1.484938232421875
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "UNRESOLVED_JITTER",
+            "complete": true,
+            "unstable": true,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.01472656642586423,
+                "median": 0.01464517886031641,
+                "CI95": [
+                  -0.16006940239762324,
+                  0.1631847742035094
+                ],
+                "CI_half_width": 0.16162708830056632,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.027309484457186062,
+                  0.0019808732634467585
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.021120767463503443,
+                "median": 0.021057378092990853,
+                "CI95": [
+                  -0.1311720270022496,
+                  0.15290996504695664
+                ],
+                "CI_half_width": 0.14204099602460313,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.032197624720823326,
+                  0.00991713146515838
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 123.50210569193587,
+                    "median": 123.50210569193587,
+                    "min": 123.08725657593459,
+                    "max": 123.91695480793715,
+                    "range_relative": 0.006718089763361273,
+                    "mean_CI95": [
+                      118.23094788930908,
+                      128.77326349456266
+                    ],
+                    "relative_CI_half_width": 0.042680711985390675,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.63949560546875,
+                    "median": 1.63949560546875,
+                    "min": 1.6310455322265625,
+                    "max": 1.6479456787109374,
+                    "range_relative": 0.010308137715040138,
+                    "mean_CI95": [
+                      1.5321272448159404,
+                      1.7468639661215595
+                    ],
+                    "relative_CI_half_width": 0.06548865412915324,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 123.50210569193587,
+                  "TPOT": 1.63949560546875
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 121.68814148847014,
+                    "median": 121.68814148847014,
+                    "min": 120.53284665662795,
+                    "max": 122.84343632031232,
+                    "range_relative": 0.01898779647237274,
+                    "mean_CI95": [
+                      107.00872882417853,
+                      136.36755415276173
+                    ],
+                    "relative_CI_half_width": 0.12063141473553086,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.6048779907226562,
+                    "median": 1.6048779907226562,
+                    "min": 1.5948857421875,
+                    "max": 1.6148702392578125,
+                    "range_relative": 0.012452346649301173,
+                    "mean_CI95": [
+                      1.477914435057968,
+                      1.7318415463873444
+                    ],
+                    "relative_CI_half_width": 0.07911103298732262,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 121.68814148847014,
+                  "TPOT": 1.6048779907226562
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 123.91695480793715,
+                "TPOT": 1.6479456787109374
+              },
+              "LA": {
+                "E2E_wall": 120.53284665662795,
+                "TPOT": 1.5948857421875
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 122.84343632031232,
+                "TPOT": 1.6148702392578125
+              },
+              "BR": {
+                "E2E_wall": 123.08725657593459,
+                "TPOT": 1.6310455322265625
+              }
+            }
+          ],
+          "LA_TPOT": 1.6048779907226562,
+          "BR_TPOT": 1.63949560546875
+        }
+      },
+      "stable": false,
+      "positive_supported": false,
+      "score": 0.021120767463503443,
+      "mean_gain": 0.024661268938389824,
+      "dominated_by": [],
+      "eligible": false
+    }
+  ],
+  "selection_scope": "BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA",
+  "gain_estimator": "1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained",
+  "source_hashes": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V1_OPT_NOPF_BARRIER_B128_H64/result.json": "ea0367c762a75d87ff53f1fe1ab10bb10890333af008e4c734c59b8372f56b26",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V1_OPT_NOPF_BARRIER_B128_H64/status.json": "73d5906395b6a01c0e307bf99dc7733af539033da1e34dfbf5e9416b09840f37",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V1_OPT_NOPF_BARRIER_B256_H64/result.json": "6857996c0747946ca39e0384387e1f53c5ff532bfc83d6ec7f8dbc2f874d9b37",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V1_OPT_NOPF_BARRIER_B256_H64/status.json": "2816d96a4a06c1d9ec7391f96e42e7e494330fb5fb6d1ddd54a8df6302a35821",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V2_OPT_PF_BARRIER_B128_H64/result.json": "8ed3f8afd9e02cb51852150081ba058c820684aeaf415af6dab659edc9da7a39",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V2_OPT_PF_BARRIER_B128_H64/status.json": "78ddcecf702c244031c3b490ec5e7cace0380936c3d7d9bae738cbb6b3cd2dad",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V2_OPT_PF_BARRIER_B256_H64/result.json": "80f055d85e04b945c6e5ee83283a0ef5c8011230ad03feea3964ca2760d93b48",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V2_OPT_PF_BARRIER_B256_H64/status.json": "a0f0f8698f82ca76445e8ad213e46c107f5fc39a23b447e240d6fc87992f97b8",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/result.json": "9f57a515765a7256d5a756d47e58813e824f9e1a7862bb22259eee11056aaf85",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/status.json": "24b82dc2f95cf1443a2f500f9e3e09cffe0f77236b33360720d8fe7925aff438",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B256_H64/result.json": "16a282cc4f896f09caf3c50dd190855e27af9c52f738c909867c79c87b099936",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B256_H64/status.json": "892800d0684ccf0abf63823edf94410b5d25128a2ca24cb41789f926367cf83c"
+  },
+  "common_stack_equivalence": "PASS: source/input/environment fingerprints match across arms"
+}
