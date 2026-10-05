@@ -25,8 +25,13 @@ GPU-active budget instead uses actual compiled GPU intervals plus gather/weight
 GPU intervals. Never add host and GPU budgets. Compare tau plus measured GPU
 wrapper against GPU active work; tau plus measured noncompiled host budget
 against host loop. Host compiled-call minus GPU tau exposes enqueue/backpressure
-that cannot be called pure kernel service. Both relative-error checks must be
-<=25% for the expert accounting gate.
+that cannot be called pure kernel service. For the actual expert accounting gate, use a physical-timeline union: compiled
+GPU intervals first, nonoverlapping ready-wait host intervals second, nonoverlapping
+wrapper CPU/GPU intervals third, and remaining host-loop intervals last. Replace
+only the compiled GPU term with tau; retain uncovered gaps. Both GPU-active and
+this physical-loop error must be<=25%. The host-substitution comparison is an
+additional enqueue diagnostic, not the physical-loop gate. Other host time is
+measured but remains causally unidentified; accounting closure is not proof of A.
 
 For waits on actual slots, join9MiB DMA in submission order to checked copy-ticket
 provenance. Bound potential GPU waiting by previous same-stream work and host
