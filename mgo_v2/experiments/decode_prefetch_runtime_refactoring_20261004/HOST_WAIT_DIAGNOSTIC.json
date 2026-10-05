@@ -25,5 +25,29 @@
     "CPU runqueue wait counters are unavailable because scheduler statistics are disabled.",
     "No causal attribution or speed gain claimed."
   ],
-  "next_action": "After primary B256 terminates, inspect CUDA synchronization API durations in completed diagnostic traces before choosing a bounded host-wait implementation candidate. Preserve device stream dependencies, event readiness, frozen routing and paired measurement gates."
+  "next_action": "After primary B256 terminates, inspect CUDA synchronization API durations in completed diagnostic traces before choosing a bounded host-wait implementation candidate. Preserve device stream dependencies, event readiness, frozen routing and paired measurement gates.",
+  "profile_followup": {
+    "source": "R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank{0..3}.sqlite",
+    "backend": "torch, not native memmove",
+    "scope": "All captured CUDA API calls; not restricted to a decode-layer interval; diagnostic only",
+    "event_sync_api_seconds": [
+      2.748677182,
+      2.690345876,
+      3.964327963,
+      4.13848873
+    ],
+    "stream_sync_api_seconds": [
+      6.78861283,
+      19.833318539,
+      11.756443526,
+      17.753624108
+    ],
+    "cudaLaunchKernel_api_seconds": [
+      15.435721647,
+      14.005302183,
+      14.921337845,
+      14.632527417
+    ],
+    "conclusion": "Event synchronization alone does not explain the long host intervals. No event-wait implementation candidate justified solely by these totals; inspect launch and staging attribution next."
+  }
 }
