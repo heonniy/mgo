@@ -1,0 +1,651 @@
+{
+  "status": "PASS",
+  "stage": "R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER",
+  "label": "R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64",
+  "group": {
+    "batch": 128,
+    "horizon": 64,
+    "paired": true,
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      }
+    ],
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ]
+  },
+  "started_unix": 1791191531.5621107,
+  "source_sha": "f6c45a611002180af417714f9461d9f47f509b9f",
+  "monitor": "boundaries only; file polling during MEASURE",
+  "common_stack": {
+    "code": {
+      "examples/env_offload_worker.py": "a4a7850c9e05c99506bf518dab9c651d46685c0169826706489c9012a079e3b9",
+      "examples/fetch_relaxed_worker.py": "d35ca8fa8785edd062a19361ce514367ad892d3fcbcfc579b023e1205481ed32",
+      "examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
+      "examples/refactor_baseline_worker.py": "d6a576da07d90b6de6fc7b0f7092a159563fa6d2c87e904b165ab86cffb56d38",
+      "examples/refactor_measure_worker.py": "7d1ce1df4ffd2b6bf83305290f4d107e6e95460aabcfee60c017abf09f0174d4",
+      "examples/refactor_paired_worker.py": "93499828d85e24b29b9c18e6733c72442bf78ea596ad48219a0de0b5f7d46421",
+      "mgo_v2/__init__.py": "2fbb9e985e66e628bfc977a41df92df0bb089228f7646d0a534c3bf46e0205ef",
+      "mgo_v2/active_peer.py": "a33334b2f2b55a37d5b53e9fa8178c53ccea80fc681297066567b1373a7ddfa3",
+      "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+      "mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+      "mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+      "mgo_v2/cache.py": "45abe19a3b19972e0ead86fa6fdb7b15e97d81a2c021ca3c4e878f795d74dfeb",
+      "mgo_v2/coalesced_return.py": "790dce47d8a993086bc706497d730be66265621cfee8abfa235d65d9f378882e",
+      "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+      "mgo_v2/compact_metadata.py": "527043d17bb30c53eec5e9dbebef22a49a880ebac1cf3f232f53ef1fa9ab8c70",
+      "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+      "mgo_v2/controller.py": "ef8f68fd94575b91ad5e7cf352fba43f8780d35a57e354f4c90a183ccfba49ff",
+      "mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
+      "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
+      "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
+      "mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
+      "mgo_v2/decode_runtime.py": "0b3e63a8c6c2578a30a6bb697c0da7aaa0d97892ca003bea353d5046c91b847c",
+      "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+      "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+      "mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
+      "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+      "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+      "mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+      "mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+      "mgo_v2/phase_timing.py": "0189fc1a2e508caa865782e2d678d1766e09d79b3ab98e9166ac6b57fe9efca1",
+      "mgo_v2/pinned_h2d.py": "965fd433ec3124c7ee0544844169bba02edff35ae164a99cbd67643b23998721",
+      "mgo_v2/predictor.py": "015d1102081ef597b20ff24b9b70a4fbf8e03ddfd922d29038b4c44a13b06d03",
+      "mgo_v2/prefetch.py": "6528860a5892a2621767fabf427c471bd1a0e3be0b14f4e93c2b903bd93469a6",
+      "mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+      "mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+      "mgo_v2/rank_oracle.py": "a6995879d072dc11963925e4ce8cada340d6d0ada6af690bac9974f834e41cf7",
+      "mgo_v2/ready_compute.py": "6f8f2fe4ca34c995483c5483334d0d09e8571f42ef1be243212df49e89fe636b",
+      "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+      "mgo_v2/selected_runtime.py": "998ed913fcd606421b96237b358608d2a18cbf2eaf7e4a7dd85a3a5871ec18db",
+      "mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
+      "mgo_v2/staging_cpu_team.py": "40c2a8a17aa75ea7d85ff6f9aac074974a2e922d02f014911fdc6b35679dcb30",
+      "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+      "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+      "mgo_v2/unique_combine.py": "97f0a17187348a67957d999dd1f5c02f19c194baa12123f67ef760f851a8b00d",
+      "scripts/adaptive_timing.py": "7b63e4135e7c29b8740112ce26677c136f0c20d6e7d64d6d5a7f651514f4b93f",
+      "scripts/br_carep_cpu.py": "b24c51f8e7189fe6385faa78af5ad64b4d208e45f6434f83a7223757dec65b8f",
+      "scripts/env_offload_layout.py": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
+      "scripts/env_offload_policy.py": "1c824d2f3b333590052501a670c636e6f1355167f20264dd726ec3a8bd5a3746",
+      "scripts/env_offload_tensors.py": "529deabb0f689b285e4125227561b14a605cac42ccf3639bd4ef2e76a1ad2279",
+      "scripts/la_placement.py": "2904437e22cf3d0557158427ecbdc228d8e7fd95c0527ef2d13fe5a431c2f4fe",
+      "scripts/old_ca_fanout_policy.py": "ef0492d0f403fad7dca41b70b5916a70ac3b28ff01c7ff962b30ca6fc2724ffc",
+      "scripts/refactor_thread_affinity.py": "1ec8e0c02b0524a6331e18215c0870466766ca102530ceba4fba83b7a309d7e0",
+      "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510"
+    },
+    "inputs": {
+      "selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+      "weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+      "offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+      "prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+      "decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+      "gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+      "teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+      "requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c"
+    },
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "0,1,4,5",
+      "OMP_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "TORCHINDUCTOR_COMPILE_THREADS": "2",
+      "NCCL_CUMEM_ENABLE": "0",
+      "MGO_V2_PHYSICAL_GPUS": "0,1,4,5"
+    },
+    "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
+    "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
+    "input_receipt_sha256": "0559a6ff1e9cbd24e70ad551fdae7cec342a0e53f688204a1b9dc234146c9c8b",
+    "precision": "bf16",
+    "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
+  },
+  "pid": 961356,
+  "boundaries": [
+    {
+      "key": "BR_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 22697,
+            "free_mib": 58393,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 24795,
+            "free_mib": 56295,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 22729,
+            "free_mib": 58361,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 22489,
+            "free_mib": 58601,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1737172709376,
+        "unix": 1791191817.1303174,
+        "rss_bytes": 478035959808,
+        "foreign_pids": [],
+        "collection_seconds": 0.44725197833031416
+      },
+      "diagnostics": {
+        "load_average": [
+          9.697265625,
+          10.40283203125,
+          10.431640625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.46, 0",
+          "1, 1980, 2619, 123.84, 0",
+          "2, 345, 2619, 70.61, 0",
+          "3, 345, 2619, 70.71, 0",
+          "4, 1980, 2619, 123.27, 0",
+          "5, 1980, 2619, 118.71, 0",
+          "6, 345, 2619, 69.28, 0",
+          "7, 345, 2619, 71.29, 0"
+        ]
+      }
+    },
+    {
+      "key": "LA_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 22697,
+            "free_mib": 58393,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 24795,
+            "free_mib": 56295,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 22729,
+            "free_mib": 58361,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 22489,
+            "free_mib": 58601,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1739880824832,
+        "unix": 1791191923.497743,
+        "rss_bytes": 478033379328,
+        "foreign_pids": [],
+        "collection_seconds": 0.42298318445682526
+      },
+      "diagnostics": {
+        "load_average": [
+          7.80078125,
+          9.6455078125,
+          10.15966796875
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.30, 0",
+          "1, 1980, 2619, 123.62, 0",
+          "2, 345, 2619, 70.56, 0",
+          "3, 345, 2619, 71.02, 0",
+          "4, 1980, 2619, 123.69, 0",
+          "5, 1980, 2619, 118.55, 0",
+          "6, 345, 2619, 69.24, 0",
+          "7, 345, 2619, 71.39, 0"
+        ]
+      }
+    },
+    {
+      "key": "LA_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 22697,
+            "free_mib": 58393,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 24795,
+            "free_mib": 56295,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 22729,
+            "free_mib": 58361,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 22489,
+            "free_mib": 58601,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1737114042368,
+        "unix": 1791192029.8991976,
+        "rss_bytes": 478044884992,
+        "foreign_pids": [],
+        "collection_seconds": 0.5200468562543392
+      },
+      "diagnostics": {
+        "load_average": [
+          9.73974609375,
+          9.8466796875,
+          10.17822265625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.27, 0",
+          "1, 1980, 2619, 123.62, 0",
+          "2, 345, 2619, 70.57, 0",
+          "3, 345, 2619, 71.01, 0",
+          "4, 1980, 2619, 123.19, 0",
+          "5, 1980, 2619, 117.82, 0",
+          "6, 345, 2619, 69.22, 0",
+          "7, 345, 2619, 71.40, 0"
+        ]
+      }
+    },
+    {
+      "key": "BR_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 22697,
+            "free_mib": 58393,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 24795,
+            "free_mib": 56295,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 29
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 22729,
+            "free_mib": 58361,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 22489,
+            "free_mib": 58601,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1737090932736,
+        "unix": 1791192136.1857119,
+        "rss_bytes": 478042873856,
+        "foreign_pids": [],
+        "collection_seconds": 0.42032613046467304
+      },
+      "diagnostics": {
+        "load_average": [
+          9.4111328125,
+          9.72216796875,
+          10.0966796875
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.21, 0",
+          "1, 1980, 2619, 123.57, 0",
+          "2, 345, 2619, 70.53, 0",
+          "3, 345, 2619, 70.94, 0",
+          "4, 1980, 2619, 123.08, 0",
+          "5, 1980, 2619, 118.54, 0",
+          "6, 345, 2619, 69.21, 0",
+          "7, 345, 2619, 71.37, 0"
+        ]
+      }
+    }
+  ],
+  "completed": [
+    "BR_r1",
+    "LA_r1",
+    "LA_r2",
+    "BR_r2"
+  ],
+  "result": {
+    "status": "PASS",
+    "baseline": "BR",
+    "candidate": "LA",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      }
+    ],
+    "pairs": [
+      {
+        "BR": {
+          "E2E_wall": 100.6957180891186,
+          "TPOT": 1.4162099609375
+        },
+        "LA": {
+          "E2E_wall": 100.11519367899746,
+          "TPOT": 1.40746728515625
+        }
+      },
+      {
+        "LA": {
+          "E2E_wall": 100.05059556849301,
+          "TPOT": 1.4072801513671875
+        },
+        "BR": {
+          "E2E_wall": 100.50228290259838,
+          "TPOT": 1.411726318359375
+        }
+      }
+    ],
+    "gate": {
+      "baseline": "BR",
+      "candidate": "LA",
+      "status": "STABLE_PAIRED_GAIN",
+      "complete": true,
+      "unstable": false,
+      "target_repeats": 2,
+      "gain": {
+        "E2E_wall": {
+          "estimate": 0.005129920048088432,
+          "median": 0.005129717129207234,
+          "CI95": [
+            -0.002976678716326786,
+            0.013170996906639143
+          ],
+          "CI_half_width": 0.008073837811482965,
+          "early_late_drift": 0.0,
+          "positive_supported": false,
+          "paired_gains": [
+            0.0057651350140566215,
+            0.004494299244357847
+          ]
+        },
+        "TPOT": {
+          "estimate": 0.004662520613703092,
+          "median": 0.004661372311774492,
+          "CI95": [
+            -0.01473480568667429,
+            0.023689054204995563
+          ],
+          "CI_half_width": 0.019211929945834927,
+          "early_late_drift": 0.0,
+          "positive_supported": false,
+          "paired_gains": [
+            0.006173290700103973,
+            0.0031494539234450114
+          ]
+        }
+      },
+      "absolute": {
+        "BR": {
+          "status": "STABLE",
+          "target_repeats": 2,
+          "complete": true,
+          "unstable": false,
+          "summary": {
+            "E2E_wall": {
+              "n": 2,
+              "mean": 100.59900049585849,
+              "median": 100.59900049585849,
+              "min": 100.50228290259838,
+              "max": 100.6957180891186,
+              "range_relative": 0.0019228340795312603,
+              "mean_CI95": [
+                99.37008695428368,
+                101.8279140374333
+              ],
+              "relative_CI_half_width": 0.012215961744325717,
+              "early_late_drift": 0.0
+            },
+            "TPOT": {
+              "n": 2,
+              "mean": 1.4139681396484374,
+              "median": 1.4139681396484374,
+              "min": 1.411726318359375,
+              "max": 1.4162099609375,
+              "range_relative": 0.003170964360795259,
+              "mean_CI95": [
+                1.385483099367188,
+                1.4424531799296867
+              ],
+              "relative_CI_half_width": 0.020145461190046156,
+              "early_late_drift": 0.0
+            }
+          },
+          "estimate": {
+            "E2E_wall": 100.59900049585849,
+            "TPOT": 1.4139681396484374
+          },
+          "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+        },
+        "LA": {
+          "status": "STABLE",
+          "target_repeats": 2,
+          "complete": true,
+          "unstable": false,
+          "summary": {
+            "E2E_wall": {
+              "n": 2,
+              "mean": 100.08289462374523,
+              "median": 100.08289462374523,
+              "min": 100.05059556849301,
+              "max": 100.11519367899746,
+              "range_relative": 0.0006454460649574593,
+              "mean_CI95": [
+                99.67249621491817,
+                100.4932930325723
+              ],
+              "relative_CI_half_width": 0.0041005849238266055,
+              "early_late_drift": 0.0
+            },
+            "TPOT": {
+              "n": 2,
+              "mean": 1.4073737182617188,
+              "median": 1.4073737182617188,
+              "min": 1.4072801513671875,
+              "max": 1.40746728515625,
+              "range_relative": 0.00013296666452857026,
+              "mean_CI95": [
+                1.406184838143256,
+                1.4085625983801815
+              ],
+              "relative_CI_half_width": 0.0008447508313081146,
+              "early_late_drift": 0.0
+            }
+          },
+          "estimate": {
+            "E2E_wall": 100.08289462374523,
+            "TPOT": 1.4073737182617188
+          },
+          "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+        }
+      },
+      "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+    },
+    "unstable": false,
+    "numerical_comparison": {
+      "BR": {
+        "actual_argmax_hash": "8e61b777251cf464c650ce38534f153c0dd0042465c5a19b6c5f2d1e78d87c74",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "LA": {
+        "actual_argmax_hash": "55bf3d607fd7f34e38e25f17c2ef80afa06b61b1cde79b91c9f700d2f5f4fe03",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      }
+    },
+    "physical_arena_count": 1
+  },
+  "exit_code": 0,
+  "finished_unix": 1791192248.7696242
+}
