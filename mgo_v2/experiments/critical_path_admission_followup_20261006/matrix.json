@@ -1,5 +1,5 @@
 {
-  "status": "PLANNED",
+  "status": "CHECKPOINT_A_COMPLETE_STAGE_B_AUTHORIZED",
   "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
   "hardware": {
     "world": 4,
@@ -108,7 +108,17 @@
         "qualitative_order": "LA_CA ~= BR < OLD_CA < FCA",
         "event_spearman_min": 0.6,
         "median_absolute_relative_error_max": 0.25
-      }
+      },
+      "execution": "offline_existing_artifacts_only",
+      "model": {
+        "forward": "A1-calibrated F(S) using total_packets/max_send/max_recv/max_incident/max_peer_edge",
+        "expert": "per-rank sum of A3 tau(n_e)",
+        "return": "base return R(S) plus rank-local waiting derived from ready_max-ready[r]",
+        "combined": "T_fwd_hat + max_r(sum_e tau(n_e)) + T_ret_wire_hat",
+        "no_double_counting": true,
+        "h2d": "report separately; do not fit H2D coefficient to old policy TPOT"
+      },
+      "stop_after_stage_b": true
     },
     {
       "id": "C_ORACLE",
@@ -154,5 +164,8 @@
     "B8/B256 sweeps",
     "replication",
     "substitution"
-  ]
+  ],
+  "checkpoint_a_commit": "dd28e4dd4d23be07b68e647d53b33f59c94a1d21",
+  "stage_b_authorized": true,
+  "stage_c_oracle_authorized": false
 }

@@ -31,17 +31,24 @@ Rotate the delayed rank.
 ### A3. Expert tau(n)
 Use the real compiled expert kernel. Measure n=1..512 powers of two and validate additive prediction on real multi-expert row bundles.
 
-STOP and publish MICROBENCH_RESULTS before doing Stage B.
+Checkpoint A is complete at `dd28e4d`. Stage B is now owner-authorized. Read `STAGE_B_EXECUTION.md` before starting Stage B.
 
 ### B. Critical-path model
+Stage B is authorized.
+
 Use only A1-A3 to calibrate the model. Do not fit coefficients to 9c20847 TPOT.
 
 Validate it against the existing C30/C60 BR/OLD_CA/FCA/LA_CA mechanism captures.
 
-Do not proceed unless it reproduces the policy ordering and passes the PLAN gates.
+Use the no-double-counting return model in `STAGE_B_EXECUTION.md`:
+- expert skew determines relative rank-ready times;
+- return residency may include waiting for the last rank;
+- do not independently add the same waiting twice.
+
+Publish Stage-B validation and STOP for owner review even if it passes.
 
 ### C/D. Exact current-layer oracle and frozen replay
-Only after Stage B passes, solve the current-layer placement problem under the same balanced H2D quota using the validated physical cost.
+NOT authorized in this checkpoint. Even if Stage B passes, stop and report before any oracle planning or GPU replay.
 
 Do not read future routes.
 
