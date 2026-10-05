@@ -25,3 +25,22 @@ these limits and lead to a controlled test of the strongest supported cause.
 These are not extra primary BR-vs-LA samples and cannot support a gain claim.
 Primary repeat gates remain unchanged. Keep scientific/foreign-process/OOM
 safety checks and restore owned model-load jobs when no experiment is active.
+
+## Expert subdivision follow-up
+
+Initial and owner-requested restart both reproduced a ~13s increase in the
+second generation. Large expert-call increases changed rank (rank3 initially,
+rank0 on restart), while other ranks accumulated metadata time. GC differences
+were only milliseconds. Neither observation establishes the initiating cause.
+
+`--expert-diagnostics` subdivides decode into ready traversal (including
+scheduler readiness/submission), input/weight views, compiled kernel call,
+slot-use event, routing-weight lookup and multiplication. Wrap existing CUDA
+Event record/query/synchronize and Stream wait/synchronize calls on their own
+threads without adding CUDA synchronization. CPU call intervals still cannot
+be called GPU kernel durations. The generation parent includes final scheduler
+drain to reconcile all recorded main-thread intervals. No primary code change.
+
+CPU regression checks passed for traversal, return positions, BF16 arithmetic,
+nested labels and complete hook restoration. Physical diagnostic outputs must
+match the uninstrumented full-model warmup with no recompilation.

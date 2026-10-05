@@ -40,13 +40,18 @@ def main(a):
   def staging(*args,**kwargs):
    with diag.phase('moe.host_staging'):return original_stage(*args,**kwargs)
   runtime_module.nvtx_phase=phase;h2d_module.copy_expert_to_stage=staging
+  uninstall=lambda:None
+  if case.get('expert_diagnostics',False):
+   from refactor_expert_diagnostics import install
+   uninstall=install(rt,diag)
   write(a.output/f'progress_rank{rank}.json',dict(stage='DIAGNOSTIC',repeat=repeat))
   before=dict(counters['stats']);u0=resource.getrusage(resource.RUSAGE_SELF);diag.start()
   try:
-   with diag.phase('generation'),torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
-   rt.h2d.synchronize()
+   with diag.phase('generation'):
+    with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
+    rt.h2d.synchronize()
   finally:
-   detail=diag.finish();runtime_module.nvtx_phase=original_phase;h2d_module.copy_expert_to_stage=original_stage
+   detail=diag.finish();uninstall();runtime_module.nvtx_phase=original_phase;h2d_module.copy_expert_to_stage=original_stage
   u1=resource.getrusage(resource.RUSAGE_SELF)
   assert before==dict(counters['stats']) and np.array_equal(expected,tokens)
   validate(rt,row,proof,rank)
