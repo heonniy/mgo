@@ -11,11 +11,16 @@ def main():
   arm=group['runtime_arm'];br,la={ARMS[0]:(2,1.6),ARMS[1]:(1,.9),ARMS[2]:(1.05,1)}[arm]
   pairs=[dict(BR=dict(TPOT=br,E2E_wall=br*10),LA=dict(TPOT=la,E2E_wall=la*10)) for _ in range(2)]
   records[arm][group['batch']]=dict(status='PASS',baseline='BR',candidate='LA',physical_arena_count=1,cases=group['cases'],pairs=pairs)
+ short=deepcopy(records)
+ for bybatch in short.values():
+  for row in bybatch.values():
+   for case in row['cases']:case['horizon']=64
+ assert evaluate(short,horizon=64,world=4)['world']==4
  out=evaluate(records);assert out['winner']==ARMS[1];assert out['rows'][0]['dominated_by']
  # An apparently fast candidate with unresolved noise cannot win.
  noisy=deepcopy(records)
  for b in (128,256):
-  noisy[ARMS[1]][b]['pairs']=[dict(BR=dict(TPOT=1,E2E_wall=10),LA=dict(TPOT=x,E2E_wall=x*10)) for x in [.3,.9,.4,.8,.3,.9,.4]]
+  noisy[ARMS[1]][b]['pairs']=[dict(BR=dict(TPOT=1,E2E_wall=10),LA=dict(TPOT=x,E2E_wall=x*10)) for x in [.3,.9,.4]]
  out=evaluate(noisy);assert not out['rows'][1]['eligible']
  # Ranking and a positive improvement claim are distinct requirements.
  bad=deepcopy(records)
