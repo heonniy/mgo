@@ -1,0 +1,131 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "PASS",
+  "stage": "R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "expert_diagnostics": true
+  },
+  "started_unix": 1791183638.2987485,
+  "source_sha": "44eeeaa29abe8271da3c9c8adfb5d594eec79f7f",
+  "primary_timing": false,
+  "pid": 812623,
+  "scheduler_comparison": [
+    {
+      "rank": 0,
+      "identical": true,
+      "first": {
+        "copies": 29358,
+        "bytes": 277056847872,
+        "background_copies": 6016,
+        "urgent_copies": 23342,
+        "canceled": 0,
+        "escalated": 4730,
+        "restaged": 0
+      },
+      "second": {
+        "copies": 29358,
+        "bytes": 277056847872,
+        "background_copies": 6016,
+        "urgent_copies": 23342,
+        "canceled": 0,
+        "escalated": 4730,
+        "restaged": 0
+      }
+    },
+    {
+      "rank": 1,
+      "identical": true,
+      "first": {
+        "copies": 28595,
+        "bytes": 269856276480,
+        "background_copies": 6016,
+        "urgent_copies": 22579,
+        "canceled": 0,
+        "escalated": 4687,
+        "restaged": 0
+      },
+      "second": {
+        "copies": 28595,
+        "bytes": 269856276480,
+        "background_copies": 6016,
+        "urgent_copies": 22579,
+        "canceled": 0,
+        "escalated": 4687,
+        "restaged": 0
+      }
+    },
+    {
+      "rank": 2,
+      "identical": true,
+      "first": {
+        "copies": 27798,
+        "bytes": 262334840832,
+        "background_copies": 6016,
+        "urgent_copies": 21782,
+        "canceled": 0,
+        "escalated": 4742,
+        "restaged": 0
+      },
+      "second": {
+        "copies": 27798,
+        "bytes": 262334840832,
+        "background_copies": 6016,
+        "urgent_copies": 21782,
+        "canceled": 0,
+        "escalated": 4742,
+        "restaged": 0
+      }
+    },
+    {
+      "rank": 3,
+      "identical": true,
+      "first": {
+        "copies": 27051,
+        "bytes": 255285264384,
+        "background_copies": 6016,
+        "urgent_copies": 21035,
+        "canceled": 0,
+        "escalated": 4732,
+        "restaged": 0
+      },
+      "second": {
+        "copies": 27051,
+        "bytes": 255285264384,
+        "background_copies": 6016,
+        "urgent_copies": 21035,
+        "canceled": 0,
+        "escalated": 4732,
+        "restaged": 0
+      }
+    }
+  ],
+  "records": [
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank0.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank1.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank2.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank3.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank0.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank1.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank2.json",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank3.json"
+  ],
+  "interpretation": "Two diagnostic same-policy generations; no primary gain claim. Host phase attribution still requires analysis.",
+  "finished_unix": 1791184029.5904868
+}
