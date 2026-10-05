@@ -1,12 +1,19 @@
 {
   "status": "PASS",
-  "stage": "R4_FIXED_SEARCH_V2_OPT_PF_BARRIER",
-  "label": "R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64",
+  "stage": "POLICY_REGIME_C30",
+  "label": "POLICY_REGIME_C30_B128_H64",
   "group": {
-    "batch": 256,
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 128,
     "horizon": 64,
     "paired": true,
-    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "policy_regime": true,
     "cases": [
       {
         "label": "BR",
@@ -14,9 +21,9 @@
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
         "staging_backend": "torch",
         "unique_combine": true,
         "async_metadata_inputs": true,
@@ -24,37 +31,61 @@
         "fixed_staging_team": true
       },
       {
-        "label": "LA",
-        "policy": "LA",
+        "label": "OLD_CA",
+        "policy": "OLD_CA",
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "LA_CA",
+        "policy": "LA_CA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
         "staging_backend": "torch",
         "unique_combine": true,
         "async_metadata_inputs": true,
         "isolated_cpu_threads": true,
         "fixed_staging_team": true
       }
-    ],
-    "world": 4,
-    "gpus": [
-      0,
-      1,
-      4,
-      5
     ]
   },
-  "started_unix": 1791193880.9768267,
-  "source_sha": "d98e1cb98adaf91144014c417f64ea8ad306d6b3",
+  "started_unix": 1791196154.9009569,
+  "source_sha": "1f1c36eeb4ad08e95066e739777762b461da8eac",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
       "examples/env_offload_worker.py": "a4a7850c9e05c99506bf518dab9c651d46685c0169826706489c9012a079e3b9",
       "examples/fetch_relaxed_worker.py": "d35ca8fa8785edd062a19361ce514367ad892d3fcbcfc579b023e1205481ed32",
       "examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
+      "examples/policy_regime_worker.py": "30621b19fae4ed4c142d90c23406815d72fba8a1ceaef39b0b102a63d759368d",
       "examples/refactor_baseline_worker.py": "d6a576da07d90b6de6fc7b0f7092a159563fa6d2c87e904b165ab86cffb56d38",
       "examples/refactor_measure_worker.py": "7d1ce1df4ffd2b6bf83305290f4d107e6e95460aabcfee60c017abf09f0174d4",
       "examples/refactor_paired_worker.py": "93499828d85e24b29b9c18e6733c72442bf78ea596ad48219a0de0b5f7d46421",
@@ -68,7 +99,7 @@
       "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
       "mgo_v2/compact_metadata.py": "527043d17bb30c53eec5e9dbebef22a49a880ebac1cf3f232f53ef1fa9ab8c70",
       "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
-      "mgo_v2/controller.py": "ef8f68fd94575b91ad5e7cf352fba43f8780d35a57e354f4c90a183ccfba49ff",
+      "mgo_v2/controller.py": "2872cec5bd5aa3d9abd758ddc10ac004c6151d0644aa2c7d2f395b1247ba72c0",
       "mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
       "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
       "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
@@ -76,6 +107,7 @@
       "mgo_v2/decode_runtime.py": "0b3e63a8c6c2578a30a6bb697c0da7aaa0d97892ca003bea353d5046c91b847c",
       "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
       "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+      "mgo_v2/fanout_admission.py": "17e75ace440c9201b6da7d224b63d894961a1d0e87d7ec15b851c59843ebac86",
       "mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
       "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
       "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
@@ -99,7 +131,7 @@
       "scripts/adaptive_timing.py": "7b63e4135e7c29b8740112ce26677c136f0c20d6e7d64d6d5a7f651514f4b93f",
       "scripts/br_carep_cpu.py": "b24c51f8e7189fe6385faa78af5ad64b4d208e45f6434f83a7223757dec65b8f",
       "scripts/env_offload_layout.py": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
-      "scripts/env_offload_policy.py": "1c824d2f3b333590052501a670c636e6f1355167f20264dd726ec3a8bd5a3746",
+      "scripts/env_offload_policy.py": "701b8e95f1b9628a010ea33b0df8cc040592c262f86d931c2d10c5e242ef5dc0",
       "scripts/env_offload_tensors.py": "529deabb0f689b285e4125227561b14a605cac42ccf3639bd4ef2e76a1ad2279",
       "scripts/la_placement.py": "2904437e22cf3d0557158427ecbdc228d8e7fd95c0527ef2d13fe5a431c2f4fe",
       "scripts/old_ca_fanout_policy.py": "ef0492d0f403fad7dca41b70b5916a70ac3b28ff01c7ff962b30ca6fc2724ffc",
@@ -107,14 +139,14 @@
       "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510"
     },
     "inputs": {
-      "selected.npy": "d8ed0b6d5ce714344614b4184453a4ca516c4ee930cb988cb87f2f4b3ad56c13",
-      "weights.npy": "3f2b2c0958b93d2cf63426d4b7088eb503e5d55e70fe07c931f0a4149dfc8d9b",
-      "offsets.npy": "b50a6081750591d7bf1b73775409f318897ee111147c187af2ce74c061473148",
-      "prefill_origins.npy": "e765868553d81a12d282211c960f100b45701ff02cc6c8a15eabf254cabf0768",
-      "decode_origins.npy": "766c229305de98cdb0eff6ab38037895928c903575d284f8cdbf6a7884e2a7cc",
-      "gates.npy": "c8b2624fc35366c2a86c14233940785dbeeeaf2e2e91e0a5607007dc8f3d41c7",
-      "teacher.npy": "bf53998938651dc1c7f6e879e36ae390bc6e66ebac8f4eba9ef26d4d8f72e39d",
-      "requests.json": "b13de21162e203c7720928530960f6194cf494f2eb3ecfd410eae6293697a524"
+      "selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+      "weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+      "offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+      "prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+      "decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+      "gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+      "teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+      "requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c"
     },
     "environment": {
       "CUDA_VISIBLE_DEVICES": "0,1,4,5",
@@ -127,17 +159,21 @@
     },
     "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
     "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
-    "input_receipt_sha256": "2fbf52972598445bd225af8ae2e8d3e049c12e6c0b35cc13934aabbf811c2aad",
+    "input_receipt_sha256": "9ef248a141c6013b71486391a4b3adfc22310b7f8e9b75e89b6a9951c802170b",
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 999759,
+  "pid": 1042642,
   "completed": [
     "BR_r1",
-    "LA_r1",
-    "LA_r2",
+    "OLD_CA_r1",
+    "FCA_r1",
+    "LA_CA_r1",
+    "LA_CA_r2",
+    "FCA_r2",
+    "OLD_CA_r2",
     "BR_r2"
   ],
   "exit_code": 0,
-  "finished_unix": 1791194779.690763
+  "finished_unix": 1791197866.0482244
 }

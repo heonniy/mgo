@@ -1,0 +1,1307 @@
+{
+  "status": "PASS",
+  "stage": "POLICY_REGIME_C30",
+  "label": "POLICY_REGIME_C30_B128_H64",
+  "group": {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 128,
+    "horizon": 64,
+    "paired": true,
+    "policy_regime": true,
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "OLD_CA",
+        "policy": "OLD_CA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "LA_CA",
+        "policy": "LA_CA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      }
+    ]
+  },
+  "started_unix": 1791196154.9009569,
+  "source_sha": "1f1c36eeb4ad08e95066e739777762b461da8eac",
+  "monitor": "boundaries only; file polling during MEASURE",
+  "common_stack": {
+    "code": {
+      "examples/env_offload_worker.py": "a4a7850c9e05c99506bf518dab9c651d46685c0169826706489c9012a079e3b9",
+      "examples/fetch_relaxed_worker.py": "d35ca8fa8785edd062a19361ce514367ad892d3fcbcfc579b023e1205481ed32",
+      "examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
+      "examples/policy_regime_worker.py": "30621b19fae4ed4c142d90c23406815d72fba8a1ceaef39b0b102a63d759368d",
+      "examples/refactor_baseline_worker.py": "d6a576da07d90b6de6fc7b0f7092a159563fa6d2c87e904b165ab86cffb56d38",
+      "examples/refactor_measure_worker.py": "7d1ce1df4ffd2b6bf83305290f4d107e6e95460aabcfee60c017abf09f0174d4",
+      "examples/refactor_paired_worker.py": "93499828d85e24b29b9c18e6733c72442bf78ea596ad48219a0de0b5f7d46421",
+      "mgo_v2/__init__.py": "2fbb9e985e66e628bfc977a41df92df0bb089228f7646d0a534c3bf46e0205ef",
+      "mgo_v2/active_peer.py": "a33334b2f2b55a37d5b53e9fa8178c53ccea80fc681297066567b1373a7ddfa3",
+      "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+      "mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+      "mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+      "mgo_v2/cache.py": "45abe19a3b19972e0ead86fa6fdb7b15e97d81a2c021ca3c4e878f795d74dfeb",
+      "mgo_v2/coalesced_return.py": "790dce47d8a993086bc706497d730be66265621cfee8abfa235d65d9f378882e",
+      "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+      "mgo_v2/compact_metadata.py": "527043d17bb30c53eec5e9dbebef22a49a880ebac1cf3f232f53ef1fa9ab8c70",
+      "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+      "mgo_v2/controller.py": "2872cec5bd5aa3d9abd758ddc10ac004c6151d0644aa2c7d2f395b1247ba72c0",
+      "mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
+      "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
+      "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
+      "mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
+      "mgo_v2/decode_runtime.py": "0b3e63a8c6c2578a30a6bb697c0da7aaa0d97892ca003bea353d5046c91b847c",
+      "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+      "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+      "mgo_v2/fanout_admission.py": "17e75ace440c9201b6da7d224b63d894961a1d0e87d7ec15b851c59843ebac86",
+      "mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
+      "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+      "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+      "mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+      "mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+      "mgo_v2/phase_timing.py": "0189fc1a2e508caa865782e2d678d1766e09d79b3ab98e9166ac6b57fe9efca1",
+      "mgo_v2/pinned_h2d.py": "965fd433ec3124c7ee0544844169bba02edff35ae164a99cbd67643b23998721",
+      "mgo_v2/predictor.py": "015d1102081ef597b20ff24b9b70a4fbf8e03ddfd922d29038b4c44a13b06d03",
+      "mgo_v2/prefetch.py": "6528860a5892a2621767fabf427c471bd1a0e3be0b14f4e93c2b903bd93469a6",
+      "mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+      "mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+      "mgo_v2/rank_oracle.py": "a6995879d072dc11963925e4ce8cada340d6d0ada6af690bac9974f834e41cf7",
+      "mgo_v2/ready_compute.py": "6f8f2fe4ca34c995483c5483334d0d09e8571f42ef1be243212df49e89fe636b",
+      "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+      "mgo_v2/selected_runtime.py": "998ed913fcd606421b96237b358608d2a18cbf2eaf7e4a7dd85a3a5871ec18db",
+      "mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
+      "mgo_v2/staging_cpu_team.py": "40c2a8a17aa75ea7d85ff6f9aac074974a2e922d02f014911fdc6b35679dcb30",
+      "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+      "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+      "mgo_v2/unique_combine.py": "97f0a17187348a67957d999dd1f5c02f19c194baa12123f67ef760f851a8b00d",
+      "scripts/adaptive_timing.py": "7b63e4135e7c29b8740112ce26677c136f0c20d6e7d64d6d5a7f651514f4b93f",
+      "scripts/br_carep_cpu.py": "b24c51f8e7189fe6385faa78af5ad64b4d208e45f6434f83a7223757dec65b8f",
+      "scripts/env_offload_layout.py": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
+      "scripts/env_offload_policy.py": "701b8e95f1b9628a010ea33b0df8cc040592c262f86d931c2d10c5e242ef5dc0",
+      "scripts/env_offload_tensors.py": "529deabb0f689b285e4125227561b14a605cac42ccf3639bd4ef2e76a1ad2279",
+      "scripts/la_placement.py": "2904437e22cf3d0557158427ecbdc228d8e7fd95c0527ef2d13fe5a431c2f4fe",
+      "scripts/old_ca_fanout_policy.py": "ef0492d0f403fad7dca41b70b5916a70ac3b28ff01c7ff962b30ca6fc2724ffc",
+      "scripts/refactor_thread_affinity.py": "1ec8e0c02b0524a6331e18215c0870466766ca102530ceba4fba83b7a309d7e0",
+      "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510"
+    },
+    "inputs": {
+      "selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+      "weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+      "offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+      "prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+      "decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+      "gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+      "teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+      "requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c"
+    },
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "0,1,4,5",
+      "OMP_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "TORCHINDUCTOR_COMPILE_THREADS": "2",
+      "NCCL_CUMEM_ENABLE": "0",
+      "MGO_V2_PHYSICAL_GPUS": "0,1,4,5"
+    },
+    "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
+    "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
+    "input_receipt_sha256": "9ef248a141c6013b71486391a4b3adfc22310b7f8e9b75e89b6a9951c802170b",
+    "precision": "bf16",
+    "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
+  },
+  "pid": 1042642,
+  "boundaries": [
+    {
+      "key": "BR_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831495798784,
+        "unix": 1791196786.407111,
+        "rss_bytes": 383049248768,
+        "foreign_pids": [],
+        "collection_seconds": 0.45239566545933485
+      },
+      "diagnostics": {
+        "load_average": [
+          13.046875,
+          11.1796875,
+          9.5087890625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.07, 0",
+          "1, 1980, 2619, 124.24, 0",
+          "2, 345, 2619, 70.48, 0",
+          "3, 345, 2619, 70.69, 0",
+          "4, 1980, 2619, 124.58, 0",
+          "5, 1980, 2619, 119.35, 0",
+          "6, 345, 2619, 69.14, 0",
+          "7, 345, 2619, 71.34, 0"
+        ]
+      }
+    },
+    {
+      "key": "OLD_CA_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831562579968,
+        "unix": 1791196916.8863823,
+        "rss_bytes": 383015620608,
+        "foreign_pids": [],
+        "collection_seconds": 0.42322538513690233
+      },
+      "diagnostics": {
+        "load_average": [
+          12.44482421875,
+          11.80126953125,
+          9.97265625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.54, 0",
+          "1, 1980, 2619, 123.40, 0",
+          "2, 345, 2619, 70.49, 0",
+          "3, 345, 2619, 70.67, 0",
+          "4, 1980, 2619, 124.21, 0",
+          "5, 1980, 2619, 118.72, 0",
+          "6, 345, 2619, 69.15, 0",
+          "7, 345, 2619, 71.37, 0"
+        ]
+      }
+    },
+    {
+      "key": "FCA_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1834275950592,
+        "unix": 1791197051.3072286,
+        "rss_bytes": 383056887808,
+        "foreign_pids": [],
+        "collection_seconds": 0.4927523024380207
+      },
+      "diagnostics": {
+        "load_average": [
+          13.044921875,
+          12.26220703125,
+          10.3818359375
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.60, 0",
+          "1, 1980, 2619, 123.49, 0",
+          "2, 345, 2619, 70.47, 0",
+          "3, 345, 2619, 70.71, 0",
+          "4, 1980, 2619, 124.25, 0",
+          "5, 1980, 2619, 118.79, 0",
+          "6, 345, 2619, 69.15, 0",
+          "7, 345, 2619, 71.39, 0"
+        ]
+      }
+    },
+    {
+      "key": "LA_CA_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831491903488,
+        "unix": 1791197193.8667111,
+        "rss_bytes": 383025561600,
+        "foreign_pids": [],
+        "collection_seconds": 0.459555353038013
+      },
+      "diagnostics": {
+        "load_average": [
+          12.01611328125,
+          12.51171875,
+          10.77099609375
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.57, 0",
+          "1, 1980, 2619, 123.42, 0",
+          "2, 345, 2619, 70.48, 0",
+          "3, 345, 2619, 70.72, 0",
+          "4, 1980, 2619, 124.30, 0",
+          "5, 1980, 2619, 118.78, 0",
+          "6, 345, 2619, 69.19, 0",
+          "7, 345, 2619, 71.39, 0"
+        ]
+      }
+    },
+    {
+      "key": "LA_CA_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1834149212160,
+        "unix": 1791197324.1348462,
+        "rss_bytes": 383065989120,
+        "foreign_pids": [],
+        "collection_seconds": 0.45202905405312777
+      },
+      "diagnostics": {
+        "load_average": [
+          11.54443359375,
+          12.30224609375,
+          10.93017578125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.62, 0",
+          "1, 1980, 2619, 123.47, 0",
+          "2, 345, 2619, 70.49, 0",
+          "3, 345, 2619, 70.70, 0",
+          "4, 1980, 2619, 124.32, 0",
+          "5, 1980, 2619, 118.73, 0",
+          "6, 345, 2619, 69.15, 0",
+          "7, 345, 2619, 71.33, 0"
+        ]
+      }
+    },
+    {
+      "key": "FCA_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831474577408,
+        "unix": 1791197454.437268,
+        "rss_bytes": 383030849536,
+        "foreign_pids": [],
+        "collection_seconds": 0.41836151387542486
+      },
+      "diagnostics": {
+        "load_average": [
+          12.2138671875,
+          12.357421875,
+          11.12841796875
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.04, 0",
+          "1, 1980, 2619, 123.43, 0",
+          "2, 345, 2619, 70.49, 0",
+          "3, 345, 2619, 70.65, 0",
+          "4, 1980, 2619, 123.91, 0",
+          "5, 1980, 2619, 118.74, 0",
+          "6, 345, 2619, 69.14, 0",
+          "7, 345, 2619, 71.39, 0"
+        ]
+      }
+    },
+    {
+      "key": "OLD_CA_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831531016192,
+        "unix": 1791197594.7308283,
+        "rss_bytes": 383074689024,
+        "foreign_pids": [],
+        "collection_seconds": 0.4467406487092376
+      },
+      "diagnostics": {
+        "load_average": [
+          12.28125,
+          12.34326171875,
+          11.29443359375
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.68, 0",
+          "1, 1980, 2619, 123.52, 0",
+          "2, 345, 2619, 70.49, 0",
+          "3, 345, 2619, 70.70, 0",
+          "4, 1980, 2619, 124.33, 0",
+          "5, 1980, 2619, 118.77, 0",
+          "6, 345, 2619, 69.14, 0",
+          "7, 345, 2619, 71.37, 0"
+        ]
+      }
+    },
+    {
+      "key": "BR_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 16841,
+            "free_mib": 64249,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21643,
+            "free_mib": 59447,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 18331,
+            "free_mib": 62759,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 5,
+            "used_mib": 19105,
+            "free_mib": 61985,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1831507447808,
+        "unix": 1791197729.185678,
+        "rss_bytes": 383038492672,
+        "foreign_pids": [],
+        "collection_seconds": 0.4507487192749977
+      },
+      "diagnostics": {
+        "load_average": [
+          10.88427734375,
+          11.8515625,
+          11.25439453125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 124.63, 0",
+          "1, 1980, 2619, 122.91, 0",
+          "2, 345, 2619, 70.51, 0",
+          "3, 345, 2619, 70.71, 0",
+          "4, 1980, 2619, 124.19, 0",
+          "5, 1980, 2619, 118.86, 0",
+          "6, 345, 2619, 69.17, 0",
+          "7, 345, 2619, 71.42, 0"
+        ]
+      }
+    }
+  ],
+  "completed": [
+    "BR_r1",
+    "OLD_CA_r1",
+    "FCA_r1",
+    "LA_CA_r1",
+    "LA_CA_r2",
+    "FCA_r2",
+    "OLD_CA_r2",
+    "BR_r2"
+  ],
+  "result": {
+    "status": "PASS",
+    "baseline": "BR",
+    "candidates": [
+      "OLD_CA",
+      "FCA",
+      "LA_CA"
+    ],
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "OLD_CA",
+        "policy": "OLD_CA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      },
+      {
+        "label": "LA_CA",
+        "policy": "LA_CA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true
+      }
+    ],
+    "pairs": [
+      {
+        "BR": {
+          "E2E_wall": 124.3717063786462,
+          "TPOT": 1.7781722412109375
+        },
+        "OLD_CA": {
+          "E2E_wall": 129.4541301317513,
+          "TPOT": 1.8563284912109375
+        },
+        "FCA": {
+          "E2E_wall": 135.89723947737366,
+          "TPOT": 1.932148681640625
+        },
+        "LA_CA": {
+          "E2E_wall": 125.21445549465716,
+          "TPOT": 1.7790302734375
+        }
+      },
+      {
+        "LA_CA": {
+          "E2E_wall": 125.6216153036803,
+          "TPOT": 1.779806884765625
+        },
+        "FCA": {
+          "E2E_wall": 135.87799936905503,
+          "TPOT": 1.938072998046875
+        },
+        "OLD_CA": {
+          "E2E_wall": 129.3366729086265,
+          "TPOT": 1.8506424560546875
+        },
+        "BR": {
+          "E2E_wall": 124.56470161210746,
+          "TPOT": 1.7866488037109376
+        }
+      }
+    ],
+    "gates": {
+      "OLD_CA": {
+        "baseline": "BR",
+        "candidate": "OLD_CA",
+        "status": "STABLE_PAIRED_GAIN",
+        "complete": true,
+        "unstable": false,
+        "target_repeats": 2,
+        "gain": {
+          "E2E_wall": {
+            "estimate": -0.039586198934101535,
+            "median": -0.03958698424117457,
+            "CI95": [
+              -0.05594971420732908,
+              -0.023476260728507503
+            ],
+            "CI_half_width": 0.01623672673941079,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.04086479072363791,
+              -0.03830917775871123
+            ]
+          },
+          "TPOT": {
+            "estimate": -0.03987746356711397,
+            "median": -0.03988541944267465,
+            "CI95": [
+              -0.09286860046924628,
+              0.010544233066558939
+            ],
+            "CI_half_width": 0.05170641676790261,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.043953138053024254,
+              -0.03581770083232505
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 124.46820399537683,
+                "median": 124.46820399537683,
+                "min": 124.3717063786462,
+                "max": 124.56470161210746,
+                "range_relative": 0.0015505585142726837,
+                "mean_CI95": [
+                  123.24208552062278,
+                  125.69432247013087
+                ],
+                "relative_CI_half_width": 0.00985085696905846,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.7824105224609377,
+                "median": 1.7824105224609377,
+                "min": 1.7781722412109375,
+                "max": 1.7866488037109376,
+                "range_relative": 0.0047556735068510735,
+                "mean_CI95": [
+                  1.728558053167992,
+                  1.8362629917538833
+                ],
+                "relative_CI_half_width": 0.030213280618761558,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 124.46820399537683,
+              "TPOT": 1.7824105224609377
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "OLD_CA": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 129.3954015201889,
+                "median": 129.3954015201889,
+                "min": 129.3366729086265,
+                "max": 129.4541301317513,
+                "range_relative": 0.0009077387739043869,
+                "mean_CI95": [
+                  128.6491837577925,
+                  130.14161928258528
+                ],
+                "relative_CI_half_width": 0.005766957354198924,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.8534854736328126,
+                "median": 1.8534854736328126,
+                "min": 1.8506424560546875,
+                "max": 1.8563284912109375,
+                "range_relative": 0.003067752748612278,
+                "mean_CI95": [
+                  1.8173615102159724,
+                  1.8896094370496528
+                ],
+                "relative_CI_half_width": 0.019489747252260728,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 129.3954015201889,
+              "TPOT": 1.8534854736328126
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "FCA": {
+        "baseline": "BR",
+        "candidate": "FCA",
+        "status": "STABLE_PAIRED_GAIN",
+        "complete": true,
+        "unstable": false,
+        "target_repeats": 2,
+        "gain": {
+          "E2E_wall": {
+            "estimate": -0.09174596851998751,
+            "median": -0.09174635927802477,
+            "CI95": [
+              -0.10354597102554863,
+              -0.08007214114694228
+            ],
+            "CI_half_width": 0.011736914939303178,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.09267005683461726,
+              -0.09082266172143227
+            ]
+          },
+          "TPOT": {
+            "estimate": -0.0856724749906741,
+            "median": -0.085672864515144,
+            "CI95": [
+              -0.09742109764549722,
+              -0.07404962915441393
+            ],
+            "CI_half_width": 0.011685734245541646,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.08659253409828804,
+              -0.08475319493199995
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 124.46820399537683,
+                "median": 124.46820399537683,
+                "min": 124.3717063786462,
+                "max": 124.56470161210746,
+                "range_relative": 0.0015505585142726837,
+                "mean_CI95": [
+                  123.24208552062278,
+                  125.69432247013087
+                ],
+                "relative_CI_half_width": 0.00985085696905846,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.7824105224609377,
+                "median": 1.7824105224609377,
+                "min": 1.7781722412109375,
+                "max": 1.7866488037109376,
+                "range_relative": 0.0047556735068510735,
+                "mean_CI95": [
+                  1.728558053167992,
+                  1.8362629917538833
+                ],
+                "relative_CI_half_width": 0.030213280618761558,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 124.46820399537683,
+              "TPOT": 1.7824105224609377
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "FCA": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 135.88761942321435,
+                "median": 135.88761942321435,
+                "min": 135.87799936905503,
+                "max": 135.89723947737366,
+                "range_relative": 0.00014158838310872638,
+                "mean_CI95": [
+                  135.76538504549086,
+                  136.00985380093783
+                ],
+                "relative_CI_half_width": 0.0008995254920376584,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.93511083984375,
+                "median": 1.93511083984375,
+                "min": 1.932148681640625,
+                "max": 1.938072998046875,
+                "range_relative": 0.003061486858669173,
+                "mean_CI95": [
+                  1.8974730512532376,
+                  1.9727486284342624
+                ],
+                "relative_CI_half_width": 0.019449939412024303,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 135.88761942321435,
+              "TPOT": 1.93511083984375
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "LA_CA": {
+        "baseline": "BR",
+        "candidate": "LA_CA",
+        "status": "STABLE_PAIRED_GAIN",
+        "complete": true,
+        "unstable": false,
+        "target_repeats": 2,
+        "gain": {
+          "E2E_wall": {
+            "estimate": -0.007630092171106773,
+            "median": -0.007630454409101928,
+            "CI95": [
+              -0.018544999317060773,
+              0.0031678489123909692
+            ],
+            "CI_half_width": 0.010856424114725871,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.0067760517287207556,
+              -0.0084848570894831
+            ]
+          },
+          "TPOT": {
+            "estimate": 0.0016757953101026457,
+            "median": 0.001673467236331494,
+            "CI95": [
+              -0.026098126224155527,
+              0.028697945938950697
+            ],
+            "CI_half_width": 0.027398036081553112,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.00048253605959924784,
+              0.0038294705322622358
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 124.46820399537683,
+                "median": 124.46820399537683,
+                "min": 124.3717063786462,
+                "max": 124.56470161210746,
+                "range_relative": 0.0015505585142726837,
+                "mean_CI95": [
+                  123.24208552062278,
+                  125.69432247013087
+                ],
+                "relative_CI_half_width": 0.00985085696905846,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.7824105224609377,
+                "median": 1.7824105224609377,
+                "min": 1.7781722412109375,
+                "max": 1.7866488037109376,
+                "range_relative": 0.0047556735068510735,
+                "mean_CI95": [
+                  1.728558053167992,
+                  1.8362629917538833
+                ],
+                "relative_CI_half_width": 0.030213280618761558,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 124.46820399537683,
+              "TPOT": 1.7824105224609377
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "LA_CA": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 125.41803539916873,
+                "median": 125.41803539916873,
+                "min": 125.21445549465716,
+                "max": 125.6216153036803,
+                "range_relative": 0.003246421519259745,
+                "mean_CI95": [
+                  122.83130745222795,
+                  128.0047633461095
+                ],
+                "relative_CI_half_width": 0.020624848242184527,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.7794185791015624,
+                "median": 1.7794185791015624,
+                "min": 1.7790302734375,
+                "max": 1.779806884765625,
+                "range_relative": 0.0004364410584703537,
+                "mean_CI95": [
+                  1.7744846878336813,
+                  1.7843524703694436
+                ],
+                "relative_CI_half_width": 0.0027727547221477185,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 125.41803539916873,
+              "TPOT": 1.7794185791015624
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      }
+    },
+    "unstable": false,
+    "numerical_comparison": {
+      "BR": {
+        "actual_argmax_hash": "4095bbd0bb77b05f069867b73e9405ba81ab3ca35bc831190a5c74d2689c5f1b",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "OLD_CA": {
+        "actual_argmax_hash": "eb2ee7846728e31ecb6f0da08805a0a9649611eeff9b777ccd81b8222c7facae",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "FCA": {
+        "actual_argmax_hash": "594ef4d2ff135588db6c8abf5f1a58d17aeae29dc2c41581246b5740763bf885",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      },
+      "LA_CA": {
+        "actual_argmax_hash": "af94960af1717fca68e47e7a4d516636122a783d3cccd00aa75afde4747de507",
+        "partial_precision": "bf16",
+        "legacy_comparison": "not collected: owner BF16-only amendment"
+      }
+    },
+    "physical_arena_count": 1
+  },
+  "exit_code": 0,
+  "finished_unix": 1791197866.0482244
+}
