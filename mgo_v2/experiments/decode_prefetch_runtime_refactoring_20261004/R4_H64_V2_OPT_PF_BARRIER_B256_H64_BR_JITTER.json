@@ -1,0 +1,721 @@
+{
+  "status": "DIAGNOSTIC_SNAPSHOT",
+  "world": 4,
+  "gate_scope": "Authoritative completed paired BR/LA group, not a per-policy stopping decision",
+  "case": "BR",
+  "completed_repeats": 3,
+  "timing_gate": {
+    "baseline": "BR",
+    "candidate": "LA",
+    "status": "UNRESOLVED_JITTER",
+    "complete": true,
+    "unstable": true,
+    "target_repeats": 3,
+    "gain": {
+      "E2E_wall": {
+        "estimate": -0.0024778535621774456,
+        "median": -0.0045991070797697375,
+        "CI95": [
+          -0.03193232067293117,
+          0.02613589404071892
+        ],
+        "CI_half_width": 0.029034107356825045,
+        "early_late_drift": 0.004168215418568377,
+        "positive_supported": false,
+        "paired_gains": [
+          -0.0045991070797697375,
+          0.01004397179135963,
+          -0.01301451665410891
+        ]
+      },
+      "TPOT": {
+        "estimate": -0.0032192764704286336,
+        "median": -0.00546832821263421,
+        "CI95": [
+          -0.04009169273234381,
+          0.03234597130769623
+        ],
+        "CI_half_width": 0.03621883202002002,
+        "early_late_drift": 0.005516888250177265,
+        "positive_supported": false,
+        "paired_gains": [
+          -0.00546832821263421,
+          0.012230251918898039,
+          -0.016631328799532774
+        ]
+      }
+    },
+    "absolute": {
+      "BR": {
+        "status": "STABLE",
+        "target_repeats": 3,
+        "complete": true,
+        "unstable": false,
+        "summary": {
+          "E2E_wall": {
+            "n": 3,
+            "mean": 154.16966487808773,
+            "median": 154.38577984739095,
+            "min": 152.38212462328374,
+            "max": 155.74109016358852,
+            "range_relative": 0.021802742403737183,
+            "mean_CI95": [
+              149.97177228447393,
+              158.36755747170153
+            ],
+            "relative_CI_half_width": 0.027229044033619462,
+            "early_late_drift": 0.010889914063957345
+          },
+          "TPOT": {
+            "n": 3,
+            "mean": 2.1207720540364585,
+            "median": 2.126674560546875,
+            "min": 2.09127978515625,
+            "max": 2.14436181640625,
+            "range_relative": 0.0250644583481372,
+            "mean_CI95": [
+              2.053628830872858,
+              2.187915277200059
+            ],
+            "relative_CI_half_width": 0.03165980192723081,
+            "early_late_drift": 0.012506087704473335
+          }
+        },
+        "estimate": {
+          "E2E_wall": 154.38577984739095,
+          "TPOT": 2.126674560546875
+        },
+        "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+      },
+      "LA": {
+        "status": "STABLE",
+        "target_repeats": 3,
+        "complete": true,
+        "unstable": false,
+        "summary": {
+          "E2E_wall": {
+            "n": 3,
+            "mean": 154.5525992885232,
+            "median": 154.36530432198197,
+            "min": 152.8351334296167,
+            "max": 156.45736011397094,
+            "range_relative": 0.023422661461027516,
+            "mean_CI95": [
+              150.03553717306718,
+              159.0696614039792
+            ],
+            "relative_CI_half_width": 0.02922669781194322,
+            "early_late_drift": 0.006786957922108795
+          },
+          "TPOT": {
+            "n": 3,
+            "mean": 2.1276044108072916,
+            "median": 2.126060546875,
+            "min": 2.100664794921875,
+            "max": 2.156087890625,
+            "range_relative": 0.02604008256871725,
+            "mean_CI95": [
+              2.0586850320237042,
+              2.196523789590879
+            ],
+            "relative_CI_half_width": 0.03239294787767278,
+            "early_late_drift": 0.007079017274098233
+          }
+        },
+        "estimate": {
+          "E2E_wall": 154.36530432198197,
+          "TPOT": 2.126060546875
+        },
+        "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+      }
+    },
+    "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+  },
+  "copy_bytes_identical": true,
+  "per_rank_logical_work_identical": true,
+  "per_rank_scheduler_identical": true,
+  "samples": [
+    {
+      "repeat": 1,
+      "E2E_wall": 155.74109016358852,
+      "TPOT": 2.14436181640625,
+      "copy_bytes": 1174514171904,
+      "rank_scheduler": [
+        {
+          "copies": 32269,
+          "bytes": 304528490496,
+          "background_copies": 6016,
+          "urgent_copies": 26253,
+          "canceled": 0,
+          "escalated": 5082,
+          "restaged": 0
+        },
+        {
+          "copies": 31506,
+          "bytes": 297327919104,
+          "background_copies": 6016,
+          "urgent_copies": 25490,
+          "canceled": 0,
+          "escalated": 5090,
+          "restaged": 0
+        },
+        {
+          "copies": 30744,
+          "bytes": 290136784896,
+          "background_copies": 6016,
+          "urgent_copies": 24728,
+          "canceled": 0,
+          "escalated": 5095,
+          "restaged": 0
+        },
+        {
+          "copies": 29937,
+          "bytes": 282520977408,
+          "background_copies": 6016,
+          "urgent_copies": 23921,
+          "canceled": 0,
+          "escalated": 5118,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 245.14514399999996,
+          "ru_stime": 2.935101000000003,
+          "ru_nvcsw": 196488,
+          "ru_nivcsw": 742
+        },
+        {
+          "ru_utime": 241.5908179999999,
+          "ru_stime": 2.1801150000000007,
+          "ru_nvcsw": 172727,
+          "ru_nivcsw": 92
+        },
+        {
+          "ru_utime": 241.075336,
+          "ru_stime": 1.8963930000000033,
+          "ru_nvcsw": 170157,
+          "ru_nivcsw": 104
+        },
+        {
+          "ru_utime": 242.40749599999992,
+          "ru_stime": 1.1225260000000006,
+          "ru_nvcsw": 137149,
+          "ru_nivcsw": 78
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "E2E_wall": 154.38577984739095,
+      "TPOT": 2.126674560546875,
+      "copy_bytes": 1174514171904,
+      "rank_scheduler": [
+        {
+          "copies": 32269,
+          "bytes": 304528490496,
+          "background_copies": 6016,
+          "urgent_copies": 26253,
+          "canceled": 0,
+          "escalated": 5082,
+          "restaged": 0
+        },
+        {
+          "copies": 31506,
+          "bytes": 297327919104,
+          "background_copies": 6016,
+          "urgent_copies": 25490,
+          "canceled": 0,
+          "escalated": 5090,
+          "restaged": 0
+        },
+        {
+          "copies": 30744,
+          "bytes": 290136784896,
+          "background_copies": 6016,
+          "urgent_copies": 24728,
+          "canceled": 0,
+          "escalated": 5095,
+          "restaged": 0
+        },
+        {
+          "copies": 29937,
+          "bytes": 282520977408,
+          "background_copies": 6016,
+          "urgent_copies": 23921,
+          "canceled": 0,
+          "escalated": 5118,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 236.28005200000007,
+          "ru_stime": 2.22016,
+          "ru_nvcsw": 142211,
+          "ru_nivcsw": 494
+        },
+        {
+          "ru_utime": 234.345411,
+          "ru_stime": 2.1693969999999965,
+          "ru_nvcsw": 126154,
+          "ru_nivcsw": 96
+        },
+        {
+          "ru_utime": 243.3942559999998,
+          "ru_stime": 2.8021659999999997,
+          "ru_nvcsw": 182433,
+          "ru_nivcsw": 143
+        },
+        {
+          "ru_utime": 240.97756400000003,
+          "ru_stime": 1.501066999999999,
+          "ru_nvcsw": 154899,
+          "ru_nivcsw": 73
+        }
+      ]
+    },
+    {
+      "repeat": 3,
+      "E2E_wall": 152.38212462328374,
+      "TPOT": 2.09127978515625,
+      "copy_bytes": 1174514171904,
+      "rank_scheduler": [
+        {
+          "copies": 32269,
+          "bytes": 304528490496,
+          "background_copies": 6016,
+          "urgent_copies": 26253,
+          "canceled": 0,
+          "escalated": 5082,
+          "restaged": 0
+        },
+        {
+          "copies": 31506,
+          "bytes": 297327919104,
+          "background_copies": 6016,
+          "urgent_copies": 25490,
+          "canceled": 0,
+          "escalated": 5090,
+          "restaged": 0
+        },
+        {
+          "copies": 30744,
+          "bytes": 290136784896,
+          "background_copies": 6016,
+          "urgent_copies": 24728,
+          "canceled": 0,
+          "escalated": 5095,
+          "restaged": 0
+        },
+        {
+          "copies": 29937,
+          "bytes": 282520977408,
+          "background_copies": 6016,
+          "urgent_copies": 23921,
+          "canceled": 0,
+          "escalated": 5118,
+          "restaged": 0
+        }
+      ],
+      "rank_controller": [
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        },
+        {
+          "issued": 24064,
+          "useful": 20385,
+          "wasted": 3679,
+          "promotions": 20385,
+          "promotion_evictions": 20385,
+          "promotion_victim_reloads": 16136,
+          "mandatory": 100392,
+          "quota_violations": 0
+        }
+      ],
+      "rank_usage": [
+        {
+          "ru_utime": 235.232078,
+          "ru_stime": 2.4257550000000023,
+          "ru_nvcsw": 155772,
+          "ru_nivcsw": 429
+        },
+        {
+          "ru_utime": 231.25136899999984,
+          "ru_stime": 2.074968999999996,
+          "ru_nvcsw": 125104,
+          "ru_nivcsw": 94
+        },
+        {
+          "ru_utime": 235.9165989999999,
+          "ru_stime": 1.8932439999999957,
+          "ru_nvcsw": 179082,
+          "ru_nivcsw": 106
+        },
+        {
+          "ru_utime": 238.270759,
+          "ru_stime": 1.2056669999999983,
+          "ru_nvcsw": 166991,
+          "ru_nivcsw": 67
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "key": "BR_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 37059,
+            "free_mib": 44031,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 33527,
+            "free_mib": 47563,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 29
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 30465,
+            "free_mib": 50625,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 36855,
+            "free_mib": 44235,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 31
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1740524019712,
+        "unix": 1791165649.891538,
+        "rss_bytes": 477776691200,
+        "foreign_pids": [],
+        "collection_seconds": 0.45091527234762907
+      },
+      "diagnostics": {
+        "load_average": [
+          8.45703125,
+          8.17529296875,
+          8.2822265625
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.76, 0",
+          "1, 1980, 2619, 124.66, 0",
+          "2, 345, 2619, 70.71, 0",
+          "3, 345, 2619, 70.49, 0",
+          "4, 1980, 2619, 124.26, 0",
+          "5, 1980, 2619, 119.65, 0",
+          "6, 345, 2619, 68.78, 0",
+          "7, 345, 2619, 71.37, 0"
+        ]
+      }
+    },
+    {
+      "key": "BR_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 37059,
+            "free_mib": 44031,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 33527,
+            "free_mib": 47563,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 30465,
+            "free_mib": 50625,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 36855,
+            "free_mib": 44235,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1740434362368,
+        "unix": 1791166130.9912238,
+        "rss_bytes": 477762191360,
+        "foreign_pids": [],
+        "collection_seconds": 0.4055629735812545
+      },
+      "diagnostics": {
+        "load_average": [
+          9.2021484375,
+          8.31982421875,
+          8.203125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.77, 0",
+          "1, 1980, 2619, 125.09, 0",
+          "2, 345, 2619, 70.77, 0",
+          "3, 345, 2619, 70.55, 0",
+          "4, 1980, 2619, 124.89, 0",
+          "5, 1980, 2619, 119.34, 0",
+          "6, 345, 2619, 68.82, 0",
+          "7, 345, 2619, 71.44, 0"
+        ]
+      }
+    },
+    {
+      "key": "BR_r3",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 37059,
+            "free_mib": 44031,
+            "temperature_c": 42
+          },
+          {
+            "gpu": 1,
+            "used_mib": 33527,
+            "free_mib": 47563,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 2,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          },
+          {
+            "gpu": 3,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 4,
+            "used_mib": 30465,
+            "free_mib": 50625,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 36855,
+            "free_mib": 44235,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 6,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 32
+          },
+          {
+            "gpu": 7,
+            "used_mib": 0,
+            "free_mib": 81090,
+            "temperature_c": 30
+          }
+        ],
+        "host_available_bytes": 1740482818048,
+        "unix": 1791166291.3048077,
+        "rss_bytes": 477791244288,
+        "foreign_pids": [],
+        "collection_seconds": 0.445993235334754
+      },
+      "diagnostics": {
+        "load_average": [
+          8.23876953125,
+          8.43359375,
+          8.27392578125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.41, 0",
+          "1, 1980, 2619, 124.47, 0",
+          "2, 345, 2619, 70.77, 0",
+          "3, 345, 2619, 70.55, 0",
+          "4, 1980, 2619, 124.92, 0",
+          "5, 1980, 2619, 119.54, 0",
+          "6, 345, 2619, 68.84, 0",
+          "7, 345, 2619, 71.43, 0"
+        ]
+      }
+    }
+  ],
+  "submitted_copies": [
+    124456,
+    124456,
+    124456
+  ],
+  "canceled_copies": [
+    0,
+    0,
+    0
+  ],
+  "submitted_plus_canceled_identical": true,
+  "copy_bytes_relative_range": 0.0,
+  "causal_conclusion": "Logical work and submitted-copy bytes are identical. Causal timing attribution remains unestablished. Boundary snapshots are not continuous telemetry. No samples excluded."
+}
