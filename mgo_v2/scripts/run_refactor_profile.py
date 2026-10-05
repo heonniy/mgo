@@ -13,6 +13,7 @@ def main(a):
  frozen=json.loads((PACKET/'M13_FROZEN_PREFETCH.json').read_text())
  group=next(g for g in groups_for(frozen,a.horizon,[a.batch]) if g['runtime_arm']==a.arm)
  case=next(c for c in group['cases'] if c['policy']==a.policy)
+ case['staging_backend']=a.staging_backend
  label=f'{a.stage}_{a.arm}_{a.policy}_B{a.batch}_H{a.horizon}';out=ROOT/label;out.mkdir(exist_ok=False);h.write(out/'case.json',case)
  state=dict(world=world,physical_gpus=a.gpus,status='RUNNING',stage=label,case=case,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),primary_timing=False)
  stop_idle_load();proc=None
@@ -41,4 +42,4 @@ def main(a):
   state['finished_unix']=time.time();h.write(out/'status.json',state);receipt=PACKET/(label+'.json');h.write(receipt,state);publish(f'{label}: {state["status"]}',[receipt])
   if not (ROOT/'STOP').exists():h.write(out/'resident_models.json',dict(processes=start_idle_load(),unix=time.time()))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--gpus',nargs='+',type=int,default=list(range(8)));p.add_argument('--stage',default='M16');p.add_argument('--horizon',type=int,choices=[8,64,256],default=256);p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA'],default='LA');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--gpus',nargs='+',type=int,default=list(range(8)));p.add_argument('--stage',default='M16');p.add_argument('--horizon',type=int,choices=[8,64,256],default=256);p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA'],default='LA');p.add_argument('--staging-backend',choices=['torch','memmove'],default='torch');main(p.parse_args())
