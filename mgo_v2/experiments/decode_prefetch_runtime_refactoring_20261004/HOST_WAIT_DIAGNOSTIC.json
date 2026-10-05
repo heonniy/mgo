@@ -1,0 +1,29 @@
+{
+  "status": "HYPOTHESIS_PENDING_ATTRIBUTION",
+  "current_measurement_unchanged": true,
+  "evidence": {
+    "completed_receipts": "R4_H64_NATIVE_V3_B128_H64_BR_JITTER.json and LA_JITTER.json",
+    "work_volume": "All controller and scheduler counters identical within each policy across three repeats",
+    "rank0_BR_main_cpu_seconds": [
+      89.5,
+      96.26,
+      85.17
+    ],
+    "rank0_BR_staging_cpu_seconds": [
+      51.61,
+      54.27,
+      50.49
+    ],
+    "runtime_paths": [
+      "pinned_h2d.py: CopyTicket.done uses CUDA Event default blocking=False; staging worker synchronizes stage_done",
+      "decode_runtime.py: T2 physical-forward completion uses default CUDA Event then synchronize"
+    ],
+    "local_cuda_documentation": "/usr/local/cuda/include/cuda_runtime_api.h:3638-3645 states cudaEventSynchronize busy-waits without cudaEventBlockingSync"
+  },
+  "limitations": [
+    "CPU runtime alone cannot distinguish useful work from spin waiting.",
+    "CPU runqueue wait counters are unavailable because scheduler statistics are disabled.",
+    "No causal attribution or speed gain claimed."
+  ],
+  "next_action": "After primary B256 terminates, inspect CUDA synchronization API durations in completed diagnostic traces before choosing a bounded host-wait implementation candidate. Preserve device stream dependencies, event readiness, frozen routing and paired measurement gates."
+}
