@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "tests": {
+    "test_h2d_lock_scope.py": {
+      "status": "PASS",
+      "output": "{\"status\": \"PASS\", \"delayed_record_lock_free\": true, \"delayed_query_lock_free\": true, \"inflight_replacement_hazard_preserved\": true, \"prior_compute_preserved\": true, \"invalidation_during_query\": true, \"urgent_and_cancellation\": true, \"stage_reuse_checks\": 5}\n"
+    },
+    "test_h2d_invalidation.py": {
+      "status": "PASS",
+      "output": "PASS logically retired same-key transfers are copied again\n"
+    },
+    "test_prefetch_transfer_state.py": {
+      "status": "PASS",
+      "output": "PASS queued/inflight/ready demand, cancellation, safe late discard\n"
+    }
+  }
+}

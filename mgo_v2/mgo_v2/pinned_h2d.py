@@ -140,7 +140,7 @@ class PriorityH2DScheduler:
                 self.cv.notify_all();return old
             t=CopyTicket(slot,key,tensors,urgent,self.profile)
             if old is not None:
-                if old.submitted:t.previous_copy=old.done
+                if old.submitted or old.state.state=='INFLIGHT':t.previous_copy=old.done
                 elif old.state.state=='QUEUED':
                     if old.state.urgent:raise RuntimeError('overwriting unsubmitted current demand')
                     # Superseded reservation: don't enqueue its staged bytes.
@@ -167,14 +167,15 @@ class PriorityH2DScheduler:
     def cancel_if_queued(self,slot,key):
         with self.cv:
             t=self.tickets.get(slot)
-            if t is None or t.key!=key or t.state.urgent or t.submitted:return False
+            if t is None or t.key!=key or t.state.urgent or t.state.state!='QUEUED':return False
             t.valid=False;t.state.discard();self._retire_pending(t);self.metrics['canceled']+=1;self.cv.notify_all();return True
     def discard(self,slot,key):
         with self.cv:
             t=self.tickets.get(slot)
             if t is None or t.key!=key:return
+            queued=t.state.state=='QUEUED'
             t.valid=False;t.state.discard()
-            if not t.submitted:self._retire_pending(t);self.metrics['canceled']+=1
+            if queued:self._retire_pending(t);self.metrics['canceled']+=1
             self.cv.notify_all()
     def _pop(self):
         for queue in (self.urgent,self.background):
@@ -204,12 +205,19 @@ class PriorityH2DScheduler:
                         # bytes instead of placing them ahead on the DMA stream.
                         self.background.appendleft(t);self.metrics['restaged']+=1;continue
                     t.state.start()
-                    with torch.cuda.stream(self.h2d_stream):
-                        if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
-                        if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
-                        if t.begin is not None:t.begin.record(self.h2d_stream)
-                        self.cache[t.slot].copy_(self.stages[sid],non_blocking=True)
-                        t.done.record(self.h2d_stream)
+                # CUDA/CUPTI calls can block. Never hold the planner's lock
+                # across them: compute must still publish slot-use events.
+                # INFLIGHT commits this copy; discarding it only retires the
+                # logical reservation after completion. One worker serializes
+                # submissions, so a replacement's previous_copy is recorded
+                # before that replacement can reach this stream.
+                with torch.cuda.stream(self.h2d_stream):
+                    if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
+                    if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
+                    if t.begin is not None:t.begin.record(self.h2d_stream)
+                    self.cache[t.slot].copy_(self.stages[sid],non_blocking=True)
+                    t.done.record(self.h2d_stream)
+                with self.cv:
                     t.submitted=True;t.submitted_at=time.perf_counter();self._retire_pending(t)
                     self.stage_done[sid]=t.done;self.cursor=(sid+1)%len(self.stages)
                     self.metrics['copies']+=1;self.metrics['bytes']+=self.bytes_per_expert
@@ -235,8 +243,12 @@ class PriorityH2DScheduler:
             if t is None or not t.valid:return False
             if t.state.state=='READY':return True
             if not t.submitted:return False
-            if t.done.query():t.state.complete();return t.state.state=='READY'
-            return False
+        complete=t.done.query()
+        with self.cv:
+            self._check()
+            if self.tickets.get(slot) is not t or not t.valid:return False
+            if complete and t.state.state=='INFLIGHT':t.state.complete()
+            return t.state.state=='READY'
     def wait_for_slot(self,slot):
         t=self.tickets[slot];self._submitted(t)
         torch.cuda.current_stream(device=self.device).wait_event(t.done)
