@@ -17,10 +17,10 @@ def distribution(values):
     return dict(min=min(values), median=statistics.median(values), max=max(values))
 
 
-def summarize(rows):
-    assert len(rows) == 8 and all(row['status'] == 'PASS' for row in rows)
+def summarize(rows,world=8):
+    assert len(rows) == world and all(row['status'] == 'PASS' for row in rows)
     assert len({row['decode_events'] for row in rows}) == 1
-    assert rows[0]['decode_events'] in (48*8, 48*256)
+    assert rows[0]['decode_events'] in (48*8, 48*64, 48*256)
     sections = {}
     for section in ('H2D', 'kernel_union_ms', 'cpu_nvtx'):
         keys = sorted(set().union(*(row[section] for row in rows)))
@@ -43,7 +43,7 @@ def summarize(rows):
         key: distribution([row[key] for row in exclusive]) for key in exclusive[0]
     }
     return dict(
-        status='PASS', ranks=8, primary_timing=False,
+        status='PASS', ranks=world, primary_timing=False,
         across_rank_distributions=sections,
         interpretation='Each duration is a rank-local interval union. Min/median/max describe ranks, not repeat uncertainty. Do not sum ranks or phase maxima into wall time. Instrumented profiles are attribution only; unprofiled E2E/TPOT determine performance. Missing CPU ranges remain absent rather than being assigned zero.',
     )
@@ -57,7 +57,9 @@ def main(args):
     output.mkdir(exist_ok=False)
     rows = []
     sources = []
-    for rank in range(8):
+    world=state.get('world',8)
+    assert world in (4,8) and len(state['ranks'])==world
+    for rank in range(world):
         report = root / f'profile_rank{rank}.nsys-rep'
         receipt_path = root / f'rank{rank}.json'
         receipt_raw = receipt_path.read_bytes()
@@ -78,7 +80,7 @@ def main(args):
                             receipt=str(receipt_path), receipt_sha256=hashlib.sha256(receipt_raw).hexdigest(),
                             analysis=str(result), analysis_sha256=hashlib.sha256(result.read_bytes()).hexdigest()))
         print(f'rank {rank}: exported and reconciled', flush=True)
-    summary = summarize(rows)
+    summary = summarize(rows,world)
     summary.update(capture=str(root), case=state['case'], sources=sources)
     (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
 
