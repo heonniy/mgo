@@ -59,3 +59,17 @@ lifetimes untouched and only wraps the compiled kernel callable with one host
 interval. Retain the original coarse phase/staging/GC accounting. Two LA/B128
 runs, same frozen conditions. Use the narrower instrumentation to test whether
 large expert-phase variance is inside the compiled callable or outside it.
+
+## Controlled Python thread scheduling intervention
+
+Kernel-only capture did not reproduce the large increase (E2E 90.255/89.119s,
+TPOT 1.24021/1.21314s). No stabilization claim follows. Test a specific
+remaining hypothesis: Python execution handoff between main dispatch and
+expert-staging can affect host dispatch variance. Set Python switch interval
+to the original value (recorded, normally 5ms) versus 1ms in ABBA order in
+one loaded model. Exactly two generations per setting, with the same coarse
+phase instrumentation on all four and no fine kernel wrappers. Preserve
+tokens, logical workload, BF16 and frozen routes. This is a diagnostic
+intervention, not BR-vs-LA timing or proof that GIL is the sole cause. Record
+all samples and context switches. Test B128 first; no unchanged repetition.
+If promising, validate B256 and then uninstrumented timing before adoption.
