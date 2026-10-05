@@ -23,7 +23,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   super().__init__(a,model,backing,experts)
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
-  if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache)
+  if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"))
   self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world)
  def stage_frozen_inputs(self,horizon):
   # Benchmark input delivery is common across strategies and outside timing.
@@ -39,7 +39,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.frozen_input_bytes=all_ids.numel()*all_ids.element_size()+all_weights.numel()*all_weights.element_size()
  def reset(self):
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):
-   self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache)
+   self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"))
   super().reset()
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena

@@ -1,0 +1,36 @@
+{
+  "status": "PREPARED",
+  "physically_validated": false,
+  "reason": "No stable cross-batch winner in initial arms; measured profile indicates long host staging intervals and bounded CPU probe motivates a different implementation.",
+  "scope": "New implementation candidate, not a repetition of unchanged timing conditions. Do not pool old torch-staging observations with memmove observations.",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "batches": [
+    128,
+    256
+  ],
+  "horizon": 64,
+  "precision": "bf16",
+  "runtime_arm": "V3_OPT_PF_OVERLAP",
+  "P": 2,
+  "trigger": "T2",
+  "staging_backend": "memmove",
+  "shared_between": [
+    "BR",
+    "LA"
+  ],
+  "repeat_limit": 3,
+  "stop_at_two": "Both policies E2E and TPOT differences <=2%",
+  "correctness": "All BF16 bit patterns preserved; reject invalid size, dtype, noncontiguous or non-CPU inputs before pointer writes; existing pinned double-buffer lifetime and per-slot CUDA events unchanged.",
+  "capacity": "Same C+P arena and two pinned staging buffers; no whole-model pinning or additional model copies.",
+  "evidence": [
+    "R4_V3_B128_LA_PHASES.json",
+    "R4_STAGING_CPU_PROBE.json"
+  ],
+  "limitations": "CPU-only copy improvement is not a model speed claim. Existing candidate results and exclusions remain intact."
+}

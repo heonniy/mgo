@@ -7,8 +7,31 @@ Per-slot compute/fetch events prevent cache-slot overwrite races.
 """
 from __future__ import annotations
 import torch
+import ctypes
 
-def copy_expert_to_stage(stage: torch.Tensor, tensors) -> int:
+_MEMMOVE=ctypes.CDLL(None).memmove
+_MEMMOVE.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_size_t]
+_MEMMOVE.restype=ctypes.c_void_p
+
+def copy_expert_to_stage(stage: torch.Tensor, tensors, backend="torch") -> int:
+    if backend not in ("torch","memmove"):
+        raise ValueError("unknown staging backend")
+    if backend=="memmove":
+        # Validate every source and destination before raw pointer access.
+        # Tensor references stay alive throughout each GIL-releasing C call.
+        tensors=tuple(tensors)
+        if stage.device.type!="cpu" or stage.ndim!=1 or not stage.is_contiguous():
+            raise ValueError("native staging requires a contiguous one-dimensional CPU destination")
+        if stage.dtype!=torch.bfloat16 or any(t.device.type!="cpu" or t.dtype!=stage.dtype or not t.is_contiguous() for t in tensors):
+            raise ValueError("native staging requires contiguous CPU BF16 sources")
+        sizes=[t.numel() for t in tensors]
+        if sum(sizes)!=stage.numel():
+            raise ValueError("expert size does not match staging capacity")
+        pos=0;itemsize=stage.element_size();base=stage.data_ptr()
+        for tensor,size in zip(tensors,sizes):
+            if size:_MEMMOVE(base+pos*itemsize,tensor.data_ptr(),size*itemsize)
+            pos+=size
+        return pos
     if stage.device.type != "cpu":
         raise ValueError("stage must be CPU")
     pos=0
@@ -81,7 +104,9 @@ class PriorityH2DScheduler:
     prior compute. A promoted reservation reuses its ticket/copy rather than
     issuing a second H2D. Physical readiness is not replicated controller state.
     """
-    def __init__(self,cache,stage_count=2,profile=False,autostart=True):
+    def __init__(self,cache,stage_count=2,profile=False,autostart=True,staging_backend="torch"):
+        if staging_backend not in ("torch","memmove"):raise ValueError("unknown staging backend")
+        self.staging_backend=staging_backend
         if not cache.is_cuda or stage_count<2:raise ValueError('CUDA arena and >=2 stages required')
         self.cache=cache;self.profile=profile;self.device=cache.device
         self.h2d_stream=torch.cuda.Stream(device=self.device)
@@ -170,7 +195,7 @@ class PriorityH2DScheduler:
                 with self.cv:
                     t=self._pop()
                     if t is None:continue
-                copy_expert_to_stage(self.stages[sid],t.tensors)
+                copy_expert_to_stage(self.stages[sid],t.tensors,self.staging_backend)
                 with self.cv:
                     t.staging=False
                     if t.state.state=='EMPTY':self.cv.notify_all();continue

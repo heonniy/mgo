@@ -37,7 +37,11 @@ def selected_options(selection_path=None, arm=None):
     prefetch = selection['prefetch']
     if prefetch['P'] not in (1, 2, 4) or prefetch['trigger'] not in ('T0', 'T1', 'T2'):
         raise ValueError('Invalid frozen BR-only prefetch configuration')
-    return arm_options(chosen, 0 if chosen == ARMS[0] else prefetch['P'], prefetch['trigger'])
+    options=arm_options(chosen, 0 if chosen == ARMS[0] else prefetch['P'], prefetch['trigger'])
+    if 'staging_backend' in selection:
+        if selection['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown selected staging backend')
+        options['staging_backend']=selection['staging_backend']
+    return options
 
 
 def _create_runtime(args, model, backing, experts, options):
@@ -50,6 +54,8 @@ def _create_runtime(args, model, backing, experts, options):
 def create_explicit_runtime(args, model, backing, experts, case):
     """Construct an explicit experimental arm using the default's same path."""
     options = arm_options(case['runtime_arm'], case['P'], case['trigger'])
+    options['staging_backend']=case.get('staging_backend','torch')
+    if options['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown staging backend')
     if case['partial_precision'] != 'bf16' or case['overlap'] != options['streaming']:
         raise ValueError('Case disagrees with the common BF16 runtime arm')
     return _create_runtime(args, model, backing, experts, options)
