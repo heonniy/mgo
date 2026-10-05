@@ -13,7 +13,8 @@ def main(a):
  ROOT=a.root;h.ROOT=ROOT;world=len(a.gpus)
  frozen=json.loads((PACKET/'M13_FROZEN_PREFETCH.json').read_text())
  group=next(g for g in groups_for(frozen,a.horizon,[a.batch]) if g['runtime_arm']==a.arm)
- case=next(c for c in group['cases'] if c['policy']==a.policy)
+ case=(json.loads(a.case_override.read_text()) if getattr(a,'case_override',None) else next(c for c in group['cases'] if c['policy']==a.policy))
+ assert case['policy']==a.policy and case['runtime_arm']==a.arm and case['horizon']==a.horizon
  case['staging_backend']=a.staging_backend
  case['unique_combine']=a.unique_combine
  case['profile_cuda_flush_ms']=a.cuda_flush_ms
@@ -51,4 +52,4 @@ def main(a):
   state['finished_unix']=time.time();h.write(out/'status.json',state);receipt=PACKET/(label+'.json');h.write(receipt,state);publish(f'{label}: {state["status"]}',[receipt])
   if not (ROOT/'STOP').exists() and not getattr(a,'defer_idle_restore',False):h.write(out/'resident_models.json',dict(processes=start_idle_load(),unix=time.time()))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--gpus',nargs='+',type=int,default=list(range(8)));p.add_argument('--stage',default='M16');p.add_argument('--horizon',type=int,choices=[8,64,256],default=256);p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA'],default='LA');p.add_argument('--staging-backend',choices=['torch','memmove'],default='torch');p.add_argument('--unique-combine',action='store_true');p.add_argument('--async-metadata-inputs',action='store_true');p.add_argument('--fixed-staging-team',action='store_true');p.add_argument('--defer-idle-restore',action='store_true');p.add_argument('--cuda-flush-ms',type=int,choices=[0,600000],default=0);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--gpus',nargs='+',type=int,default=list(range(8)));p.add_argument('--stage',default='M16');p.add_argument('--horizon',type=int,choices=[8,64,256],default=256);p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA','OLD_CA','FCA','LA_CA'],default='LA');p.add_argument('--staging-backend',choices=['torch','memmove'],default='torch');p.add_argument('--unique-combine',action='store_true');p.add_argument('--async-metadata-inputs',action='store_true');p.add_argument('--fixed-staging-team',action='store_true');p.add_argument('--case-override',type=Path);p.add_argument('--defer-idle-restore',action='store_true');p.add_argument('--cuda-flush-ms',type=int,choices=[0,600000],default=0);main(p.parse_args())

@@ -80,7 +80,7 @@ def main(a):
  for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
- source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//world+(r<3686%world) for r in range(world)];a.comm_mode='current'
+ source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=source.get('capacities',[3686//world+(r<3686%world) for r in range(world)]);a.comm_mode='current'
  case=json.loads(a.case.read_text());horizon=case['horizon'];assert horizon in (8,64,256) and case['partial_precision']=='bf16'
  a.staging_backend=case.get('staging_backend','torch');assert a.staging_backend in ('torch','memmove')
  a.unique_combine=case.get('unique_combine',False);assert type(a.unique_combine) is bool
