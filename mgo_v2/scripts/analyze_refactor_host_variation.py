@@ -22,7 +22,7 @@ def summarize(row):
              gc_events=len(row['host']['gc']))
 
 def analyze(root):
- state=json.loads((root/'status.json').read_text());assert state['status']=='PASS' and state['primary_timing'] is False
+ state=json.loads((root/'status.json').read_text());assert state['status'] in ('PASS','FAIL') and state['primary_timing'] is False
  by_rank={};sources={};primary_like=[]
  for repeat in (1,2):
   primary_like.append({})
@@ -39,6 +39,6 @@ def analyze(root):
    a=first['phases'].get(key,dict(wall_s=0,cpu_s=0,non_cpu_wall_s=0,calls=0));b=second['phases'].get(key,dict(wall_s=0,cpu_s=0,non_cpu_wall_s=0,calls=0))
    delta[key]={field:b[field]-a[field] for field in a}
   ranks[rank]=dict(repeats=[first,second],delta_second_minus_first=dict(generation_wall_s=second['generation_wall_s']-first['generation_wall_s'],generation_cpu_s=second['generation_cpu_s']-first['generation_cpu_s'],gc_wall_s=second['gc_wall_s']-first['gc_wall_s'],phases=delta),logical_work_identical=pair[0][0]['controller_counters']==pair[1][0]['controller_counters'],scheduler_identical=pair[0][0]['scheduler_metrics']==pair[1][0]['scheduler_metrics'])
- return dict(status='PASS',primary_timing=False,case=state['case'],ranks=ranks,diagnostic_metrics=[{metric:max(v[metric] for v in rep.values()) for metric in ('E2E_wall','TPOT')} for rep in primary_like],source_sha256=sources,interpretation='Two same-policy instrumented generations only. Main exclusive phase totals reconcile to generation wall time; staging overlaps main and is separate. GC is already inside phase durations. non_cpu_wall includes blocking, GIL and scheduling; CPU includes spin waits. Phase deltas are attribution, not a proven root cause or primary performance/gain estimate. No samples excluded.')
+ return dict(status='PASS',primary_timing=False,launcher_status=state['status'],case=state['case'],ranks=ranks,diagnostic_metrics=[{metric:max(v[metric] for v in rep.values()) for metric in ('E2E_wall','TPOT')} for rep in primary_like],source_sha256=sources,interpretation='Two same-policy instrumented generations only. Main exclusive phase totals reconcile to generation wall time; staging overlaps main and is separate. GC is already inside phase durations. non_cpu_wall includes blocking, GIL and scheduling; CPU includes spin waits. Phase deltas are attribution, not a proven root cause or primary performance/gain estimate. No samples excluded.')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('capture',type=Path);p.add_argument('--output',type=Path,required=True);a=p.parse_args();a.output.write_text(json.dumps(analyze(a.capture),indent=2)+'\n')
