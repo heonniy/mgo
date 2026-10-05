@@ -1,0 +1,472 @@
+{
+  "status": "EXCLUDED_UNSTABLE",
+  "improvement_supported": false,
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "horizon": 64,
+  "precision": "bf16",
+  "staging_backend": "torch",
+  "unique_combine": true,
+  "async_metadata_inputs": true,
+  "robust_TPOT_gain": 0.007912233525010914,
+  "batches": {
+    "128": {
+      "gate": {
+        "baseline": "BR",
+        "candidate": "LA",
+        "status": "UNRESOLVED_JITTER",
+        "complete": true,
+        "unstable": true,
+        "target_repeats": 3,
+        "gain": {
+          "E2E_wall": {
+            "estimate": 0.00979915084056926,
+            "median": 0.025124867934863904,
+            "CI95": [
+              -0.08221310092572165,
+              0.09398830892238974
+            ],
+            "CI_half_width": 0.0881007049240557,
+            "early_late_drift": 0.027806376701824065,
+            "positive_supported": false,
+            "paired_gains": [
+              0.025124867934863904,
+              0.034557315447661385,
+              -0.031559766039170656
+            ]
+          },
+          "TPOT": {
+            "estimate": 0.007912233525010914,
+            "median": 0.026311434065351857,
+            "CI95": [
+              -0.0999376710242399,
+              0.10518735532275236
+            ],
+            "CI_half_width": 0.10256251317349613,
+            "early_late_drift": 0.032666621249411,
+            "positive_supported": false,
+            "paired_gains": [
+              0.026311434065351857,
+              0.0361620903158868,
+              -0.04046196530490298
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "EXTEND_JITTER",
+            "target_repeats": 3,
+            "complete": true,
+            "unstable": true,
+            "summary": {
+              "E2E_wall": {
+                "n": 3,
+                "mean": 93.56543870518605,
+                "median": 94.14473755192012,
+                "min": 86.9572106236592,
+                "max": 99.59436793997884,
+                "range_relative": 0.13548164441834248,
+                "mean_CI95": [
+                  77.81982110214024,
+                  109.31105630823187
+                ],
+                "relative_CI_half_width": 0.1682845484501862,
+                "early_late_drift": 0.03780017354940658
+              },
+              "TPOT": {
+                "n": 3,
+                "mean": 1.282714599609375,
+                "median": 1.292383056640625,
+                "min": 1.1764088134765625,
+                "max": 1.3793519287109375,
+                "range_relative": 0.15881229559905835,
+                "mean_CI95": [
+                  1.0297885553946373,
+                  1.5356406438241126
+                ],
+                "relative_CI_half_width": 0.19718029582867558,
+                "early_late_drift": 0.04437086100447534
+              }
+            },
+            "estimate": {
+              "E2E_wall": 94.14473755192012,
+              "TPOT": 1.292383056640625
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "LA": {
+            "status": "EXTEND_JITTER",
+            "target_repeats": 3,
+            "complete": true,
+            "unstable": true,
+            "summary": {
+              "E2E_wall": {
+                "n": 3,
+                "mean": 92.68033319463332,
+                "median": 96.15265395026654,
+                "min": 84.7724221907556,
+                "max": 97.11592344287783,
+                "range_relative": 0.13572613692341765,
+                "mean_CI95": [
+                  75.62581606737535,
+                  109.73485032189129
+                ],
+                "relative_CI_half_width": 0.1840144131920915,
+                "early_late_drift": 0.06597386746429773
+              },
+              "TPOT": {
+                "n": 3,
+                "mean": 1.2732009684244792,
+                "median": 1.3294716796875,
+                "min": 1.145455810546875,
+                "max": 1.3446754150390625,
+                "range_relative": 0.1600073140284487,
+                "mean_CI95": [
+                  0.9977314057982554,
+                  1.548670531050703
+                ],
+                "relative_CI_half_width": 0.21635984377792555,
+                "early_late_drift": 0.07738074141479875
+              }
+            },
+            "estimate": {
+              "E2E_wall": 96.15265395026654,
+              "TPOT": 1.3294716796875
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "statistics": {
+        "BR": {
+          "E2E_wall": {
+            "mean": 93.56543870518605,
+            "median": 94.14473755192012,
+            "full_range": [
+              86.9572106236592,
+              99.59436793997884
+            ]
+          },
+          "TPOT": {
+            "mean": 1.282714599609375,
+            "median": 1.292383056640625,
+            "full_range": [
+              1.1764088134765625,
+              1.3793519287109375
+            ]
+          }
+        },
+        "LA": {
+          "E2E_wall": {
+            "mean": 92.68033319463332,
+            "median": 96.15265395026654,
+            "full_range": [
+              84.7724221907556,
+              97.11592344287783
+            ]
+          },
+          "TPOT": {
+            "mean": 1.2732009684244792,
+            "median": 1.3294716796875,
+            "full_range": [
+              1.145455810546875,
+              1.3446754150390625
+            ]
+          }
+        }
+      },
+      "samples": [
+        {
+          "BR": {
+            "E2E_wall": 86.9572106236592,
+            "TPOT": 1.1764088134765625
+          },
+          "LA": {
+            "E2E_wall": 84.7724221907556,
+            "TPOT": 1.145455810546875
+          }
+        },
+        {
+          "LA": {
+            "E2E_wall": 96.15265395026654,
+            "TPOT": 1.3294716796875
+          },
+          "BR": {
+            "E2E_wall": 99.59436793997884,
+            "TPOT": 1.3793519287109375
+          }
+        },
+        {
+          "BR": {
+            "E2E_wall": 94.14473755192012,
+            "TPOT": 1.292383056640625
+          },
+          "LA": {
+            "E2E_wall": 97.11592344287783,
+            "TPOT": 1.3446754150390625
+          }
+        }
+      ]
+    },
+    "256": {
+      "gate": {
+        "baseline": "BR",
+        "candidate": "LA",
+        "status": "UNRESOLVED_JITTER",
+        "complete": true,
+        "unstable": true,
+        "target_repeats": 3,
+        "gain": {
+          "E2E_wall": {
+            "estimate": 0.010734168181885106,
+            "median": -0.03156650546220563,
+            "CI95": [
+              -0.23172669852828065,
+              0.20546750576072137
+            ],
+            "CI_half_width": 0.218597102144501,
+            "early_late_drift": 0.00850844418835528,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.03156650546220563,
+              0.10611368528916942,
+              -0.04992797410569283
+            ]
+          },
+          "TPOT": {
+            "estimate": 0.011019402068977113,
+            "median": -0.04114180181688898,
+            "CI95": [
+              -0.2852865675381766,
+              0.2390159145929518
+            ],
+            "CI_half_width": 0.2621512410655642,
+            "early_late_drift": 0.008896659524741057,
+            "positive_supported": false,
+            "paired_gains": [
+              -0.04114180181688898,
+              0.12402992496368248,
+              -0.06063062027639177
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "EXTEND_JITTER",
+            "target_repeats": 3,
+            "complete": true,
+            "unstable": true,
+            "summary": {
+              "E2E_wall": {
+                "n": 3,
+                "mean": 121.56901717465371,
+                "median": 123.30212720669806,
+                "min": 116.0171897849068,
+                "max": 125.38773453235626,
+                "range_relative": 0.07763341840644766,
+                "mean_CI95": [
+                  109.34753172825458,
+                  133.79050262105284
+                ],
+                "relative_CI_half_width": 0.10053125155105085,
+                "early_late_drift": 0.03840314959576293
+              },
+              "TPOT": {
+                "n": 3,
+                "mean": 1.600863321940104,
+                "median": 1.624636474609375,
+                "min": 1.5146915283203124,
+                "max": 1.663261962890625,
+                "range_relative": 0.09350069784293838,
+                "mean_CI95": [
+                  1.409372464740696,
+                  1.7923541791395121
+                ],
+                "relative_CI_half_width": 0.11961724313062408,
+                "early_late_drift": 0.046231585567220165
+              }
+            },
+            "estimate": {
+              "E2E_wall": 123.30212720669806,
+              "TPOT": 1.624636474609375
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "LA": {
+            "status": "EXTEND_JITTER",
+            "target_repeats": 3,
+            "complete": true,
+            "unstable": true,
+            "summary": {
+              "E2E_wall": {
+                "n": 3,
+                "mean": 120.51520707334082,
+                "median": 119.67944703996181,
+                "min": 110.21808408480138,
+                "max": 131.64809009525925,
+                "range_relative": 0.1772054821895352,
+                "mean_CI95": [
+                  93.83700669890109,
+                  147.19340744778054
+                ],
+                "relative_CI_half_width": 0.22136791714762127,
+                "early_late_drift": 0.05073999089253403
+              },
+              "TPOT": {
+                "n": 3,
+                "mean": 1.588082722981771,
+                "median": 1.5770086669921874,
+                "min": 1.4231329345703125,
+                "max": 1.7641065673828125,
+                "range_relative": 0.2139617261919306,
+                "mean_CI95": [
+                  1.1639004377714395,
+                  2.0122650081921023
+                ],
+                "relative_CI_half_width": 0.267103393967973,
+                "early_late_drift": 0.06047725112142117
+              }
+            },
+            "estimate": {
+              "E2E_wall": 119.67944703996181,
+              "TPOT": 1.5770086669921874
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "statistics": {
+        "BR": {
+          "E2E_wall": {
+            "mean": 121.56901717465371,
+            "median": 123.30212720669806,
+            "full_range": [
+              116.0171897849068,
+              125.38773453235626
+            ]
+          },
+          "TPOT": {
+            "mean": 1.600863321940104,
+            "median": 1.624636474609375,
+            "full_range": [
+              1.5146915283203124,
+              1.663261962890625
+            ]
+          }
+        },
+        "LA": {
+          "E2E_wall": {
+            "mean": 120.51520707334082,
+            "median": 119.67944703996181,
+            "full_range": [
+              110.21808408480138,
+              131.64809009525925
+            ]
+          },
+          "TPOT": {
+            "mean": 1.588082722981771,
+            "median": 1.5770086669921874,
+            "full_range": [
+              1.4231329345703125,
+              1.7641065673828125
+            ]
+          }
+        }
+      },
+      "samples": [
+        {
+          "BR": {
+            "E2E_wall": 116.0171897849068,
+            "TPOT": 1.5146915283203124
+          },
+          "LA": {
+            "E2E_wall": 119.67944703996181,
+            "TPOT": 1.5770086669921874
+          }
+        },
+        {
+          "LA": {
+            "E2E_wall": 110.21808408480138,
+            "TPOT": 1.4231329345703125
+          },
+          "BR": {
+            "E2E_wall": 123.30212720669806,
+            "TPOT": 1.624636474609375
+          }
+        },
+        {
+          "BR": {
+            "E2E_wall": 125.38773453235626,
+            "TPOT": 1.663261962890625
+          },
+          "LA": {
+            "E2E_wall": 131.64809009525925,
+            "TPOT": 1.7641065673828125
+          }
+        }
+      ]
+    }
+  },
+  "source_hashes": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/result.json": "03662b413399fdd50b07b90dfe3b54193b3c3863d06ad512443c1b5484f3743b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/status.json": "8222d9eca17d93f0dbdfa1fb7ebec4a4e97a0be7415e9fab54a81604aa962c46",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r1_measure_rank0.json": "0e8204600131eeb0ada937f7283ffd695861a0e9a6adef0536ecdc1918930533",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r1_measure_rank1.json": "7ce40aa685716a34150544fe4a06bf74db017f5c0395a9102c924923597cce2a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r1_measure_rank2.json": "78bca169dc4436a8aafbd5456673511ef68b5fe4cfbfea5f2fccff352263898e",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r1_measure_rank3.json": "4d650c8bc347c8a79e7897d446f5988fa139d8d66f9f6da2ac9f62dac434c2ab",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r1_measure_rank0.json": "def158ed22169b7bd560f02c657592d3651b3017f7c5f7a166a7833474283acd",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r1_measure_rank1.json": "b05c80307b0170b667c93c7b53abba9275592e9da739726fa1cded3a189b012a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r1_measure_rank2.json": "dfdec5b8c903315ad61661291609e45f8d36c673befa2044b904250d72d86afa",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r1_measure_rank3.json": "a71a41bb19bbe03a10f686bafdb144dc8526e7a13ae649d7dcd4dd41eeaeca40",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r2_measure_rank0.json": "6a45ecef09f4b9cebebc80e649849ac3b75bf718e6b0fad033c86b035eddc9a7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r2_measure_rank1.json": "0d1629d031edbb98d101d246a288eb62f8f27fad3a7d0dc59b5c9f701a8bdd7a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r2_measure_rank2.json": "c630ca91be710ca537758ed7ecc3ee7ec8f3624a5c9754b491c72dc72017c02b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r2_measure_rank3.json": "cf3c0115084b3b74bdfd7cd641141c9206e6c00703ebd853f8c98f9871d33a8b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r2_measure_rank0.json": "d221882eae6a5335044583b93f1e290b9b71284902393e246c71acbfe240097e",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r2_measure_rank1.json": "fe4de0bed3ddf7cc54b9c617f575df5900a0a43ff0f4368b97491d5c8b0e2b8e",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r2_measure_rank2.json": "d730cf20371e446884e3fcca77285d3c8163f4ce2ea2c661a19ccc4d275b0e16",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r2_measure_rank3.json": "815183f145a90f3813e690288c6bc7f6728ad3252b4f5810d75220278793f8c8",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r3_measure_rank0.json": "69c250a2e9f763db47602ca8507d69d0b119ff30c7197f120e64308151a03f25",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r3_measure_rank1.json": "c5c34d8b6e146ee414af5cc56eda4f4bf4264f9994446c4e2d2a005b035c6b3c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r3_measure_rank2.json": "171f5903709405f1ac5486fd713bb43444ad3c391aaa11afcf2b87b3c25268e4",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/BR_r3_measure_rank3.json": "26cfdb7f9bbeeaee12a5db4ca99f526b9b4c298a7324ced0b73a8a821c37d643",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r3_measure_rank0.json": "a89806ab47f013b62aebcc1978eb6e04193def7b9c39489249615ad9827b52bc",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r3_measure_rank1.json": "c818d282377e6b85c502cc9c75175ab224a5c7974b3051dbc588c93cfb39780d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r3_measure_rank2.json": "b45275fb1ec0475cf203dec1a0aceb9c2b352c2d304bc510e1c41f11ee5e5d30",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B128_H64/LA_r3_measure_rank3.json": "1067b1d4bcb71a2cb657fab79561c757e685dbd22cf5a292b75bdb69cbe08063",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/result.json": "3c1a265dcac5cb36f085672093c06bd4a7f70da401a7c7a19a307a48607c93b3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/status.json": "1115cf17432e6ce6d24aa2b12998116fd3f57b2285126cc8a5edba834c041793",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r1_measure_rank0.json": "e8dda21b5e9bfac399375ebdf318b7e4b8fcc00d6c3ff2cc1ffb8f6eaad55f24",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r1_measure_rank1.json": "0d59d953b71afe5de71fa8a71394980cc42321b4de52b568d428df398b49dfef",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r1_measure_rank2.json": "061ff742ed4d3273580f0be42e15634ddb366c42031cdd2ac0ee2c4a696013c2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r1_measure_rank3.json": "fe6aa7f38684e4c93b13840a06e47218fc24730dbb6416113435fe0b4863dd92",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r1_measure_rank0.json": "a016a893efa3f403bb57dcd6d6b55b95c305a07ea1d87ab01776d1c69f87cdfd",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r1_measure_rank1.json": "88b35cb67256d50d7044d007166783778e40bf584a5409ac6ad69a328b913ff8",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r1_measure_rank2.json": "5ed9836ade2175f34ad9bfb761cf62c00254136827af9d383d0f6e2f4409c41c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r1_measure_rank3.json": "92d0f334ce22ee2c7a52abd650c273139faa3fd3d6a71c8de345f7c1303d3832",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r2_measure_rank0.json": "8c73a75917055d7065c93596993f25dcb9217dacc9e9e22f8afd6eb7503f885a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r2_measure_rank1.json": "1674c8873356b173ce070bc4883861815da8937728233ab80ebcd04b7045fd41",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r2_measure_rank2.json": "8ae033cd0391e5838d2ba83007cadfcd76fd7dcab7bcea76b304a509b61e72e3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r2_measure_rank3.json": "b6b28c15d5a56517430c27319da8b136a6f27dd43abf454717ce88cc165efde3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r2_measure_rank0.json": "70366e3d5d27ae5888e8610fecee262d7579eb36fbb0dee6679288d037f78425",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r2_measure_rank1.json": "23947595a5b7257e98d85f0b9e38090a482396b0143985fca92b1ea0d938e081",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r2_measure_rank2.json": "742055ab93b2145c4944404be20333cda5424a7dae8982f35e8108d6035e2c7c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r2_measure_rank3.json": "29781f6a7f72368b064651b17f532ec2211d012c74110c17998f887441cff1af",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r3_measure_rank0.json": "a28547f680f688e7c786588a80ed2eed5b965ded4f9841fdf48e159ba28c3807",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r3_measure_rank1.json": "9cde9ac48d4681992a69a1f72229f5156d33bc0ff7edad7620e227b536d8dd49",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r3_measure_rank2.json": "448ee6dace5a5dcd46a8cb352d51b2e62c9e3ed37451f7a3b33c6a7ef7213b44",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/BR_r3_measure_rank3.json": "6a2124b5bf1af7f6c33b534b23c044c017f002c08f12e48961287df6b9069eb8",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r3_measure_rank0.json": "7434a25ba354078dcd825dd7efa3dbebacf12592902dc50067c1f307a799e300",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r3_measure_rank1.json": "a52e58d0962ec8be666f77a8115041c6b44d59430bc8d0ecaba5301c27e1df81",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r3_measure_rank2.json": "a8ecf8b3aa92454480ef63a00ab8ae6bf95484744df9820c9a826625ca410735",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_ASYNC_METADATA_B256_H64/LA_r3_measure_rank3.json": "846ac8cd91db03d211d31e4d237a67422733f4731af8d6dc34a46e8844c0d87b"
+  },
+  "scope": "Separate implementation candidate; all pairs retained; no pooling with other implementations. This report does not activate a default or complete phase/CA validation."
+}
