@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "batch": 128,
+  "world": 4,
+  "horizon": 64,
+  "precision": "bf16",
+  "scope": "Stored full-model warmup argmax hashes match original torch-staging V3; this does not assert full-logit bitwise equivalence or timing improvement.",
+  "rows": [
+    {
+      "policy": "BR",
+      "rank": 0,
+      "argmax_hash": "9528119939932577f21e7f453e507fa0dbb8fe4e0b1edb001bd53c3245c1b8ff",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/BR_validation_rank0.json": "28634869d9bd2273fba9344cb77cd5d320c8b15e38061654347f08beb7c9fa4b",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/BR_validation_rank0.json": "de68af51101b56553513943fd18145199cfda8ebd76597d5d0b3abb9b3e4637e"
+      }
+    },
+    {
+      "policy": "BR",
+      "rank": 1,
+      "argmax_hash": "c00afc15a429f6f90f368f915115bae4f88ecd7e88a444b13a446dd40dc2b079",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/BR_validation_rank1.json": "ce5a3d083c0a24f0dcb08cbf505d23c98e70c069894c3a9f9746a8c9a1c984e0",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/BR_validation_rank1.json": "d6b803d2f5d450e1437de131c8be2a53c2c085d10b6ab6e66f93e03e1addb92a"
+      }
+    },
+    {
+      "policy": "BR",
+      "rank": 2,
+      "argmax_hash": "b704c864f50f376b2c9accb6b1c9e44d9639c0bd97e12c799d9d469ccd24cb9c",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/BR_validation_rank2.json": "ed3142a4ef3880d2495a9b0ed9171b9d8a1723f6e0efd059273df3772e27b246",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/BR_validation_rank2.json": "6239c06f823ba7785adbae37d804f1728aa6a7bc13d5580347f76d1cb7d33fa8"
+      }
+    },
+    {
+      "policy": "BR",
+      "rank": 3,
+      "argmax_hash": "1a936a8443b3d796135fae7124dd3d2958a7fedfd84914843905c9b1911abfbc",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/BR_validation_rank3.json": "48308e0d9580ef3f95edd6de1c34daa4922c7f9e192bb707630b51911e04e8cc",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/BR_validation_rank3.json": "b702881b88692e9035abceff7d74be6663a44908c5a2c606597b8c078be5b267"
+      }
+    },
+    {
+      "policy": "LA",
+      "rank": 0,
+      "argmax_hash": "2d6be6365bbcf37f2b4f43ea6ec29cb6f4c9803ab0976f50606568167198ef49",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/LA_validation_rank0.json": "8a5b2a665b0d3684467ee2d5f3f564238321a25fd9ea0091aa1f6867714e8f1c",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/LA_validation_rank0.json": "74298d308a31da116a031305c417abae9d146966c18c93dfafbfcabe4ae1bef4"
+      }
+    },
+    {
+      "policy": "LA",
+      "rank": 1,
+      "argmax_hash": "bb26ac2962bad373b3b6a6f1b390173ca9f59d36e9fe189de42a079d64e330e7",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/LA_validation_rank1.json": "849ad8b55746b49f63adadc0d7c227c1d1fcac262f9a9751b9324fa67fab359b",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/LA_validation_rank1.json": "dd231e6510148dada7126abb3e8352ac50e4191703918a4fd0eef2d254e2608b"
+      }
+    },
+    {
+      "policy": "LA",
+      "rank": 2,
+      "argmax_hash": "8408bf11692f8e6f59ab1126a5b42772464e0d50b283c6e37869bdc3a58ad0e3",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/LA_validation_rank2.json": "19808fabb56c4e7c3361d277fedae3d0632e368aa7e74d49c797e2a01b625e1f",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/LA_validation_rank2.json": "f7fe2ecde5433042b2d0354b14af8120ad0aa3cf979010961df819a383d5f38a"
+      }
+    },
+    {
+      "policy": "LA",
+      "rank": 3,
+      "argmax_hash": "b86f438b565f2281c0376d9e0529f00a3319c7053d1ad76573f0cc03054189bd",
+      "sources": {
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_V3_OPT_PF_OVERLAP_B128_H64/LA_validation_rank3.json": "92ecfa5f1bfa4a3cdb49222644a9a4b2195abe86c3ea708c9f43014ba621c704",
+        "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_UNIQUE_V3_B128_H64/LA_validation_rank3.json": "80b99d1d5f5131e19a9289d67f248c6b46d656819cca459949ddf516b79e3283"
+      }
+    }
+  ]
+}
