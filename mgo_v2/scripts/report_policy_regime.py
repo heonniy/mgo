@@ -89,6 +89,18 @@ def build():
         for row in sorted(data['mechanism']['rows'], key=lambda x: (x['setting'], POLICIES.index(x['policy']))):
             values = ' | '.join(f"{row['rank_local_ms_per_step'][k]['mean']:.3f}" for k in keys)
             lines.append(f"| {env} | {row['setting']} | {row['policy']} | {values} |")
+    lines += ['', '## Eventwise imbalance and packet counts', '',
+              'Each duration below sums per-event rank maxima and divides by 64. '
+              'It is an imbalance proxy, not a critical-path wall time. Rank means '
+              'can hide a busy rank that changes between events.', '',
+              '| Env | Cache | Policy | Remote packets | Sum max incident packets | Expert max ms/step | Forward max ms/step | Return max ms/step |',
+              '|---|---|---|---:|---:|---:|---:|---:|']
+    for env, data in evidence.items():
+        for row in sorted(data['mechanism']['rows'], key=lambda x: (x['setting'], POLICIES.index(x['policy']))):
+            values = ' | '.join(f"{row['imbalance'][phase]['sum_event_max_ms_per_step']:.3f}"
+                                for phase in ('moe.expert_compute', 'moe.forward_a2a.nccl', 'moe.return_a2a.nccl'))
+            lines.append(f"| {env} | {row['setting']} | {row['policy']} | "
+                         f"{row['remote_token_rank_pairs']:,} | {row['sum_event_max_rank_incident_packets']:,} | {values} |")
     lines += ['', 'Full rank min/max distributions, per-event expert/communication imbalance, '
               'remote packet counts, and critical-rank packet load are retained in each '
               '`POLICY_REGIME_MECHANISMS.json`. Actual decode copy counts, prefetch usage, '
