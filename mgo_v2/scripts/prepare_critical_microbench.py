@@ -43,7 +43,12 @@ def main():
  src=dest.T
  for v in volumes:
   for name,m in [('BALANCED',balanced),('PAIR_HOT',pair),('DEST_HOT',dest),('SRC_HOT',src)]:
-   a=scaled(m,v);shapes.append(dict(id=f'V{v}_{name}',shape=name,matrix=a,**features(a)))
+   a=scaled(m,v)
+   if name=='BALANCED':
+    a=np.zeros((4,4),int)
+    for k in range(v):a[k%4,(k%4+1+(k//4)%3)%4]+=1
+    a=a.tolist()
+   shapes.append(dict(id=f'V{v}_{name}',shape=name,matrix=a,**features(a)))
   for pol in ('BR','FCA'):
    item=min((x for x in records if x['policy']==pol),key=lambda x:(abs(x['total_packets']-v),x['cache'],x['event']))
    a=scaled(item['matrix'],v)
