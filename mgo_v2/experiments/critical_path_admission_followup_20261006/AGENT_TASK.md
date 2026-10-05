@@ -47,8 +47,22 @@ Use the no-double-counting return model in `STAGE_B_EXECUTION.md`:
 
 Publish Stage-B validation and STOP for owner review even if it passes.
 
+### B2. Runtime gap attribution
+Stage B failed at `e656666` because isolated A2A/expert service times under-predict full-runtime forward/return active time by 90%+.
+
+B2 is now owner-authorized. Read `STAGE_B2_RUNTIME_GAP_ATTRIBUTION.md`.
+
+Instrument only diagnostic runs needed to separate:
+- forward pack / launch / queue / NCCL;
+- expert ready-wait / wrapper / compiled kernel;
+- return partial-build / arrival / NCCL / combine.
+
+Primary cells are C30/C60 × BR/FCA at B128. LA_CA is confirmation-only if needed.
+
+After B2 and any revised delta-model validation, STOP for owner review.
+
 ### C/D. Exact current-layer oracle and frozen replay
-NOT authorized in this checkpoint. Even if Stage B passes, stop and report before any oracle planning or GPU replay.
+NOT authorized in this checkpoint. Do not run any oracle planning or frozen-oracle GPU replay after B2 without owner approval.
 
 Do not read future routes.
 
@@ -76,7 +90,7 @@ Use physical oracle TPOT headroom:
 - no replication/migration;
 - no latency-based sample exclusion.
 
-Do not use instrumented runs as primary TPOT.
+Do not use instrumented runs as primary TPOT. B2 instrumentation is mechanism-only.
 
 Do not terminate foreign jobs.
 

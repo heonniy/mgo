@@ -1,5 +1,5 @@
 {
-  "status": "CHECKPOINT_A_COMPLETE_STAGE_B_AUTHORIZED",
+  "status": "STAGE_B_FAILED_STAGE_B2_AUTHORIZED",
   "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
   "hardware": {
     "world": 4,
@@ -121,6 +121,51 @@
       "stop_after_stage_b": true
     },
     {
+      "id": "B2_RUNTIME_GAP_ATTRIBUTION",
+      "scope": {
+        "settings": [
+          "C30_B128",
+          "C60_B128"
+        ],
+        "primary_policies": [
+          "BR",
+          "FCA"
+        ],
+        "confirmation_policy": "LA_CA_if_needed",
+        "decode_steps": 8,
+        "environment": "env1_normal_nccl",
+        "runtime": "V3_OPT_PF_OVERLAP"
+      },
+      "instrumentation": [
+        "forward_pack_gpu",
+        "forward_collective_host_entry",
+        "forward_nccl_gpu",
+        "forward_unpack_gpu",
+        "expert_ready_wait",
+        "expert_gather",
+        "expert_compiled_kernel",
+        "expert_weight_partial",
+        "return_partial_build_gpu",
+        "return_collective_host_entry",
+        "return_nccl_gpu",
+        "return_output_combine_gpu"
+      ],
+      "gates": {
+        "forward_inflation_explained_fraction_min": 0.8,
+        "return_inflation_explained_fraction_min": 0.8,
+        "common_residual_policy_difference_max": 0.1,
+        "expert_loop_relative_error_max": 0.25,
+        "dominant_slowdown_must_be_admission_controllable": true
+      },
+      "optional_revised_model": {
+        "type": "placement-controllable delta cost only",
+        "event_spearman_min": 0.6,
+        "aggregate_policy_delta_error_max": 0.25,
+        "free_global_scale_forbidden": true
+      },
+      "stop_after_stage_b2": true
+    },
+    {
       "id": "C_ORACLE",
       "action_space": "current-layer residual miss expert-to-rank assignment only",
       "future_routes": false,
@@ -167,5 +212,8 @@
   ],
   "checkpoint_a_commit": "dd28e4dd4d23be07b68e647d53b33f59c94a1d21",
   "stage_b_authorized": true,
-  "stage_c_oracle_authorized": false
+  "stage_c_oracle_authorized": false,
+  "stage_b_result_commit": "e656666d2b768510e7c1ee0b87264e8b2319d101",
+  "stage_b_passed": false,
+  "stage_b2_authorized": true
 }
