@@ -50,6 +50,10 @@ def build():
         'NCCL_P2P_DISABLE=1, NCCL_IB_DISABLE=1, with other inherited NCCL overrides '
         'cleared. Both Env2 cache groups must show SHM channels before timing. '
         'This is not a measurement on physically NVLink-free hardware.', '',
+        'Env1 preceded Env2; environments were not interleaved. Within-environment '
+        'policy gains are the primary comparison. An absolute Env1-to-Env2 time '
+        'difference can also include temporal host drift and is not, by itself, '
+        'an isolated estimate of transport cost.', '',
         'Primary timing is unprofiled. Two-repeat estimates use the mean; '
         'three-repeat estimates use the median. All raw samples and full ranges '
         'remain in the timing JSON. A slow observation alone is not a reason '
