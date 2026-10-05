@@ -9,7 +9,7 @@ from adaptive_timing import paired_decision
 from refactor_fingerprint import assert_equivalent
 
 
-def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_combine=False):
+def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_combine=False, async_metadata_inputs=False):
     batches, identities, sources = {}, {}, {}
     for batch in (128, 256):
         folder = root / f'{stage}_B{batch}_H64'
@@ -30,11 +30,12 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
         assert [c['policy'] for c in cases] == ['BR', 'LA']
         for case in cases:
             assert case.get('unique_combine', False) == unique_combine
+            assert case.get('async_metadata_inputs', False) == async_metadata_inputs
             for key, value in dict(runtime_arm='V3_OPT_PF_OVERLAP', staging_backend=staging_backend, horizon=64, partial_precision='bf16', P=2, trigger='T2', overlap=True).items():
                 assert case[key] == value, (key, case)
         gate = paired_decision(result['pairs'])
         assert gate['complete'] and 2 <= len(result['pairs']) <= 3
-        if unique_combine:
+        if unique_combine or async_metadata_inputs:
             for repeat in range(1, len(result['pairs']) + 1):
                 for policy in ('BR', 'LA'):
                     receipts = []
@@ -43,8 +44,12 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
                         raw = path.read_bytes()
                         receipt = json.loads(raw)
                         assert receipt['status'] == 'PASS' and receipt['rank'] == rank
-                        assert receipt['unique_combine_layers'] == 64 * 48
-                        assert receipt['case']['unique_combine'] is True
+                        if unique_combine:
+                            assert receipt['unique_combine_layers'] == 64 * 48
+                            assert receipt['case']['unique_combine'] is True
+                        if async_metadata_inputs:
+                            assert receipt['async_metadata_inputs'] is True
+                            assert receipt['case']['async_metadata_inputs'] is True
                         sources[str(path)] = hashlib.sha256(raw).hexdigest()
                         receipts.append(receipt)
                     for metric in ('E2E_wall', 'TPOT'):
@@ -61,7 +66,7 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
     stable = all(not b['gate']['unstable'] for b in batches.values())
     positive = stable and all(b['gate']['gain']['TPOT']['positive_supported'] for b in batches.values())
     return dict(status='STABLE_CANDIDATE' if stable else 'EXCLUDED_UNSTABLE', improvement_supported=positive,
-                world=4, physical_gpus=[0, 1, 4, 5], horizon=64, precision='bf16', staging_backend=staging_backend, unique_combine=unique_combine,
+                world=4, physical_gpus=[0, 1, 4, 5], horizon=64, precision='bf16', staging_backend=staging_backend, unique_combine=unique_combine, async_metadata_inputs=async_metadata_inputs,
                 robust_TPOT_gain=min(b['gate']['gain']['TPOT']['estimate'] for b in batches.values()),
                 batches=batches, source_hashes=sources,
                 scope='Separate implementation candidate; all pairs retained; no pooling with other implementations. This report does not activate a default or complete phase/CA validation.')
@@ -74,7 +79,8 @@ if __name__ == '__main__':
     parser.add_argument('--stage', default='R4_H64_NATIVE_V3')
     parser.add_argument('--staging-backend', choices=['torch', 'memmove'], default='memmove')
     parser.add_argument('--unique-combine', action='store_true')
+    parser.add_argument('--async-metadata-inputs', action='store_true')
     args = parser.parse_args()
-    report = summarize(args.root, args.stage, args.staging_backend, args.unique_combine)
+    report = summarize(args.root, args.stage, args.staging_backend, args.unique_combine, args.async_metadata_inputs)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(report['status'])
