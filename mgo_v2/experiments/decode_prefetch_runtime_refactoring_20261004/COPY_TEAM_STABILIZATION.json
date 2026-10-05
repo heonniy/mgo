@@ -1,0 +1,1384 @@
+{
+  "status": "STABLE_IN_TESTED_CONDITIONS",
+  "scope": "R4 GPUs0,1,4,5; local B128/B256; BF16; frozen decode64; BR/LA; two counterbalanced clean pairs each.",
+  "change": "Initialize the CPU copy helper before timing on each scheduler reset, pin staging and helper separately to singleton CPUs, and isolate main dispatch. Opt-in fixed_staging_team.",
+  "cause_assessment": "Evidence supports CPU copy-team placement/scheduling as a contributor: a shared two-CPU mask produced staging CPU-time spikes associated with endpoint-CPU changes; fixed singleton team placement removed those spikes and both batches passed clean timing stability. Endpoint snapshots are not a continuous migration trace, and initialization also moved before timing, so this does not isolate one sole OS cause or exclude host interference.",
+  "excluded_hypotheses": "Python switch-interval reduction and a shared two-CPU staging mask alone did not stabilize. GC differences were too small to explain earlier multi-second variation.",
+  "results": {
+    "128": {
+      "gate": {
+        "baseline": "BR",
+        "candidate": "LA",
+        "status": "STABLE_PAIRED_GAIN",
+        "complete": true,
+        "unstable": false,
+        "target_repeats": 2,
+        "gain": {
+          "E2E_wall": {
+            "estimate": 0.012654271612905554,
+            "median": 0.012653030726927694,
+            "CI95": [
+              -0.007437261993791022,
+              0.032345115531124624
+            ],
+            "CI_half_width": 0.019891188762457823,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              0.011087665440747907,
+              0.014218396013107482
+            ]
+          },
+          "TPOT": {
+            "estimate": 0.012430474808492797,
+            "median": 0.012429262851032019,
+            "CI95": [
+              -0.007425357676966504,
+              0.03189495911049989
+            ],
+            "CI_half_width": 0.019660158393733196,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              0.010882076379707284,
+              0.013976449322356754
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 98.93281744793057,
+                "median": 98.93281744793057,
+                "min": 98.88682549539953,
+                "max": 98.97880940046161,
+                "range_relative": 0.0009297613010009703,
+                "mean_CI95": [
+                  98.3484342828444,
+                  99.51720061301675
+                ],
+                "relative_CI_half_width": 0.005906868723249977,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.3875211181640625,
+                "median": 1.3875211181640625,
+                "min": 1.3868602294921875,
+                "max": 1.3881820068359374,
+                "range_relative": 0.0009526178206922632,
+                "mean_CI95": [
+                  1.3791237313912517,
+                  1.3959185049368734
+                ],
+                "relative_CI_half_width": 0.00605207853262954,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 98.93281744793057,
+              "TPOT": 1.3875211181640625
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "LA": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 97.68094547465444,
+                "median": 97.68094547465444,
+                "min": 97.57148949149996,
+                "max": 97.79040145780891,
+                "range_relative": 0.0022410918039870234,
+                "mean_CI95": [
+                  96.29017534306972,
+                  99.07171560623915
+                ],
+                "relative_CI_half_width": 0.014237885647263566,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.3702742309570313,
+                "median": 1.3702742309570313,
+                "min": 1.3687801513671876,
+                "max": 1.371768310546875,
+                "range_relative": 0.0021807015794206553,
+                "mean_CI95": [
+                  1.3512901497960006,
+                  1.389258312118062
+                ],
+                "relative_CI_half_width": 0.013854220368554843,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 97.68094547465444,
+              "TPOT": 1.3702742309570313
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "statistics": {
+        "BR": {
+          "E2E_wall": {
+            "mean": 98.93281744793057,
+            "median": 98.93281744793057,
+            "full_range": [
+              98.88682549539953,
+              98.97880940046161
+            ]
+          },
+          "TPOT": {
+            "mean": 1.3875211181640625,
+            "median": 1.3875211181640625,
+            "full_range": [
+              1.3868602294921875,
+              1.3881820068359374
+            ]
+          }
+        },
+        "LA": {
+          "E2E_wall": {
+            "mean": 97.68094547465444,
+            "median": 97.68094547465444,
+            "full_range": [
+              97.57148949149996,
+              97.79040145780891
+            ]
+          },
+          "TPOT": {
+            "mean": 1.3702742309570313,
+            "median": 1.3702742309570313,
+            "full_range": [
+              1.3687801513671876,
+              1.371768310546875
+            ]
+          }
+        }
+      },
+      "samples": [
+        {
+          "BR": {
+            "E2E_wall": 98.88682549539953,
+            "TPOT": 1.3868602294921875
+          },
+          "LA": {
+            "E2E_wall": 97.79040145780891,
+            "TPOT": 1.371768310546875
+          }
+        },
+        {
+          "LA": {
+            "E2E_wall": 97.57148949149996,
+            "TPOT": 1.3687801513671876
+          },
+          "BR": {
+            "E2E_wall": 98.97880940046161,
+            "TPOT": 1.3881820068359374
+          }
+        }
+      ]
+    },
+    "256": {
+      "gate": {
+        "baseline": "BR",
+        "candidate": "LA",
+        "status": "STABLE_PAIRED_GAIN",
+        "complete": true,
+        "unstable": false,
+        "target_repeats": 2,
+        "gain": {
+          "E2E_wall": {
+            "estimate": 0.013622983383941412,
+            "median": 0.013621051717410737,
+            "CI95": [
+              -0.011495316081594043,
+              0.03811752418444969
+            ],
+            "CI_half_width": 0.024806420133021867,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              0.011668948577043148,
+              0.015573154857778326
+            ]
+          },
+          "TPOT": {
+            "estimate": 0.01328092855968932,
+            "median": 0.013279710313647664,
+            "CI95": [
+              -0.006618378250859758,
+              0.03278685648893043
+            ],
+            "CI_half_width": 0.019702617369895092,
+            "early_late_drift": 0.0,
+            "positive_supported": false,
+            "paired_gains": [
+              0.01172918308394666,
+              0.014830237543348668
+            ]
+          }
+        },
+        "absolute": {
+          "BR": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 124.9668141794391,
+                "median": 124.9668141794391,
+                "min": 124.6625198898837,
+                "max": 125.2711084689945,
+                "range_relative": 0.004870001552867728,
+                "mean_CI95": [
+                  121.10038863623079,
+                  128.8332397226474
+                ],
+                "relative_CI_half_width": 0.03093961839866164,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.6716502075195312,
+                "median": 1.6716502075195312,
+                "min": 1.668025390625,
+                "max": 1.6752750244140624,
+                "range_relative": 0.004336812663589312,
+                "mean_CI95": [
+                  1.625592541925656,
+                  1.7177078731134063
+                ],
+                "relative_CI_half_width": 0.027552214803489006,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 124.9668141794391,
+              "TPOT": 1.6716502075195312
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          },
+          "LA": {
+            "status": "STABLE",
+            "target_repeats": 2,
+            "complete": true,
+            "unstable": false,
+            "summary": {
+              "E2E_wall": {
+                "n": 2,
+                "mean": 123.26404072670266,
+                "median": 123.26404072670266,
+                "min": 123.20783935580403,
+                "max": 123.3202420976013,
+                "range_relative": 0.0009118859087743552,
+                "mean_CI95": [
+                  122.54993460159827,
+                  123.97814685180705
+                ],
+                "relative_CI_half_width": 0.0057933045265625635,
+                "early_late_drift": 0.0
+              },
+              "TPOT": {
+                "n": 2,
+                "mean": 1.6494455566406252,
+                "median": 1.6494455566406252,
+                "min": 1.6484608154296876,
+                "max": 1.6504302978515626,
+                "range_relative": 0.0011940269346544458,
+                "mean_CI95": [
+                  1.636933233202083,
+                  1.6619578800791674
+                ],
+                "relative_CI_half_width": 0.007585775346247745,
+                "early_late_drift": 0.0
+              }
+            },
+            "estimate": {
+              "E2E_wall": 123.26404072670266,
+              "TPOT": 1.6494455566406252
+            },
+            "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+          }
+        },
+        "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+      },
+      "statistics": {
+        "BR": {
+          "E2E_wall": {
+            "mean": 124.9668141794391,
+            "median": 124.9668141794391,
+            "full_range": [
+              124.6625198898837,
+              125.2711084689945
+            ]
+          },
+          "TPOT": {
+            "mean": 1.6716502075195312,
+            "median": 1.6716502075195312,
+            "full_range": [
+              1.668025390625,
+              1.6752750244140624
+            ]
+          }
+        },
+        "LA": {
+          "E2E_wall": {
+            "mean": 123.26404072670266,
+            "median": 123.26404072670266,
+            "full_range": [
+              123.20783935580403,
+              123.3202420976013
+            ]
+          },
+          "TPOT": {
+            "mean": 1.6494455566406252,
+            "median": 1.6494455566406252,
+            "full_range": [
+              1.6484608154296876,
+              1.6504302978515626
+            ]
+          }
+        }
+      },
+      "samples": [
+        {
+          "BR": {
+            "E2E_wall": 124.6625198898837,
+            "TPOT": 1.668025390625
+          },
+          "LA": {
+            "E2E_wall": 123.20783935580403,
+            "TPOT": 1.6484608154296876
+          }
+        },
+        {
+          "LA": {
+            "E2E_wall": 123.3202420976013,
+            "TPOT": 1.6504302978515626
+          },
+          "BR": {
+            "E2E_wall": 125.2711084689945,
+            "TPOT": 1.6752750244140624
+          }
+        }
+      ]
+    }
+  },
+  "thread_evidence": {
+    "128": {
+      "BR": [
+        {
+          "rank": 0,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 29346,
+              "bytes": 276943601664,
+              "background_copies": 6016,
+              "urgent_copies": 23330,
+              "canceled": 0,
+              "escalated": 4699,
+              "restaged": 0
+            },
+            {
+              "copies": 29346,
+              "bytes": 276943601664,
+              "background_copies": 6014,
+              "urgent_copies": 23332,
+              "canceled": 0,
+              "escalated": 4699,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            33.040000000000006,
+            33.08
+          ],
+          "endpoint_cpu": [
+            1,
+            1
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 919354,
+              "helper_tid": 919355,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            },
+            {
+              "staging_tid": 921641,
+              "helper_tid": 921642,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 1,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 28579,
+              "bytes": 269705281536,
+              "background_copies": 6016,
+              "urgent_copies": 22563,
+              "canceled": 0,
+              "escalated": 4732,
+              "restaged": 0
+            },
+            {
+              "copies": 28579,
+              "bytes": 269705281536,
+              "background_copies": 6016,
+              "urgent_copies": 22563,
+              "canceled": 0,
+              "escalated": 4732,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            31.8,
+            31.759999999999998
+          ],
+          "endpoint_cpu": [
+            25,
+            25
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 919348,
+              "helper_tid": 919349,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            },
+            {
+              "staging_tid": 921635,
+              "helper_tid": 921636,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 27803,
+              "bytes": 262382026752,
+              "background_copies": 6016,
+              "urgent_copies": 21787,
+              "canceled": 0,
+              "escalated": 4743,
+              "restaged": 0
+            },
+            {
+              "copies": 27803,
+              "bytes": 262382026752,
+              "background_copies": 6016,
+              "urgent_copies": 21787,
+              "canceled": 0,
+              "escalated": 4743,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            32.05,
+            32.089999999999996
+          ],
+          "endpoint_cpu": [
+            97,
+            97
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 919351,
+              "helper_tid": 919353,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            },
+            {
+              "staging_tid": 921639,
+              "helper_tid": 921640,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 27030,
+              "bytes": 255087083520,
+              "background_copies": 6016,
+              "urgent_copies": 21014,
+              "canceled": 0,
+              "escalated": 4735,
+              "restaged": 0
+            },
+            {
+              "copies": 27030,
+              "bytes": 255087083520,
+              "background_copies": 6016,
+              "urgent_copies": 21014,
+              "canceled": 0,
+              "escalated": 4735,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            27.459999999999997,
+            27.47
+          ],
+          "endpoint_cpu": [
+            121,
+            121
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 919350,
+              "helper_tid": 919352,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            },
+            {
+              "staging_tid": 921637,
+              "helper_tid": 921638,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            }
+          ]
+        }
+      ],
+      "LA": [
+        {
+          "rank": 0,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 29358,
+              "bytes": 277056847872,
+              "background_copies": 6016,
+              "urgent_copies": 23342,
+              "canceled": 0,
+              "escalated": 4730,
+              "restaged": 0
+            },
+            {
+              "copies": 29358,
+              "bytes": 277056847872,
+              "background_copies": 6016,
+              "urgent_copies": 23342,
+              "canceled": 0,
+              "escalated": 4730,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            33.02,
+            32.94
+          ],
+          "endpoint_cpu": [
+            1,
+            1
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 920064,
+              "helper_tid": 920065,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            },
+            {
+              "staging_tid": 920812,
+              "helper_tid": 920813,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 1,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 28595,
+              "bytes": 269856276480,
+              "background_copies": 6016,
+              "urgent_copies": 22579,
+              "canceled": 0,
+              "escalated": 4687,
+              "restaged": 0
+            },
+            {
+              "copies": 28595,
+              "bytes": 269856276480,
+              "background_copies": 6016,
+              "urgent_copies": 22579,
+              "canceled": 0,
+              "escalated": 4687,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            31.689999999999998,
+            31.729999999999997
+          ],
+          "endpoint_cpu": [
+            25,
+            25
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 920060,
+              "helper_tid": 920061,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            },
+            {
+              "staging_tid": 920806,
+              "helper_tid": 920808,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 27798,
+              "bytes": 262334840832,
+              "background_copies": 6016,
+              "urgent_copies": 21782,
+              "canceled": 0,
+              "escalated": 4742,
+              "restaged": 0
+            },
+            {
+              "copies": 27798,
+              "bytes": 262334840832,
+              "background_copies": 6016,
+              "urgent_copies": 21782,
+              "canceled": 0,
+              "escalated": 4742,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            32.03,
+            31.959999999999997
+          ],
+          "endpoint_cpu": [
+            97,
+            97
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 920062,
+              "helper_tid": 920063,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            },
+            {
+              "staging_tid": 920810,
+              "helper_tid": 920811,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 27051,
+              "bytes": 255285264384,
+              "background_copies": 6016,
+              "urgent_copies": 21035,
+              "canceled": 0,
+              "escalated": 4732,
+              "restaged": 0
+            },
+            {
+              "copies": 27051,
+              "bytes": 255285264384,
+              "background_copies": 6016,
+              "urgent_copies": 21035,
+              "canceled": 0,
+              "escalated": 4732,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            27.419999999999998,
+            27.44
+          ],
+          "endpoint_cpu": [
+            121,
+            121
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 920058,
+              "helper_tid": 920059,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            },
+            {
+              "staging_tid": 920807,
+              "helper_tid": 920809,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "256": {
+      "BR": [
+        {
+          "rank": 0,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 32268,
+              "bytes": 304519053312,
+              "background_copies": 6015,
+              "urgent_copies": 26253,
+              "canceled": 1,
+              "escalated": 5082,
+              "restaged": 0
+            },
+            {
+              "copies": 32269,
+              "bytes": 304528490496,
+              "background_copies": 6015,
+              "urgent_copies": 26254,
+              "canceled": 0,
+              "escalated": 5082,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            37.11,
+            37.269999999999996
+          ],
+          "endpoint_cpu": [
+            1,
+            1
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 927112,
+              "helper_tid": 927113,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            },
+            {
+              "staging_tid": 940157,
+              "helper_tid": 940158,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 1,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 31506,
+              "bytes": 297327919104,
+              "background_copies": 6016,
+              "urgent_copies": 25490,
+              "canceled": 0,
+              "escalated": 5090,
+              "restaged": 0
+            },
+            {
+              "copies": 31506,
+              "bytes": 297327919104,
+              "background_copies": 6016,
+              "urgent_copies": 25490,
+              "canceled": 0,
+              "escalated": 5090,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            35.330000000000005,
+            35.48
+          ],
+          "endpoint_cpu": [
+            25,
+            25
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 927108,
+              "helper_tid": 927111,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            },
+            {
+              "staging_tid": 940155,
+              "helper_tid": 940156,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 30744,
+              "bytes": 290136784896,
+              "background_copies": 6016,
+              "urgent_copies": 24728,
+              "canceled": 0,
+              "escalated": 5095,
+              "restaged": 0
+            },
+            {
+              "copies": 30744,
+              "bytes": 290136784896,
+              "background_copies": 6016,
+              "urgent_copies": 24728,
+              "canceled": 0,
+              "escalated": 5095,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            36.09,
+            36.14
+          ],
+          "endpoint_cpu": [
+            97,
+            97
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 927107,
+              "helper_tid": 927110,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            },
+            {
+              "staging_tid": 940153,
+              "helper_tid": 940154,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 29937,
+              "bytes": 282520977408,
+              "background_copies": 6016,
+              "urgent_copies": 23921,
+              "canceled": 0,
+              "escalated": 5118,
+              "restaged": 0
+            },
+            {
+              "copies": 29937,
+              "bytes": 282520977408,
+              "background_copies": 6016,
+              "urgent_copies": 23921,
+              "canceled": 0,
+              "escalated": 5118,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            30.43,
+            30.389999999999997
+          ],
+          "endpoint_cpu": [
+            121,
+            121
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 927106,
+              "helper_tid": 927109,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            },
+            {
+              "staging_tid": 940159,
+              "helper_tid": 940160,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            }
+          ]
+        }
+      ],
+      "LA": [
+        {
+          "rank": 0,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 32277,
+              "bytes": 304603987968,
+              "background_copies": 6016,
+              "urgent_copies": 26261,
+              "canceled": 0,
+              "escalated": 5129,
+              "restaged": 0
+            },
+            {
+              "copies": 32277,
+              "bytes": 304603987968,
+              "background_copies": 6016,
+              "urgent_copies": 26261,
+              "canceled": 0,
+              "escalated": 5129,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            37.230000000000004,
+            37.09
+          ],
+          "endpoint_cpu": [
+            1,
+            1
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 930642,
+              "helper_tid": 930643,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            },
+            {
+              "staging_tid": 939184,
+              "helper_tid": 939185,
+              "staging_cpu": 1,
+              "helper_cpu": 2,
+              "stage_mask": [
+                1
+              ],
+              "helper_mask": [
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 1,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 31525,
+              "bytes": 297507225600,
+              "background_copies": 6016,
+              "urgent_copies": 25509,
+              "canceled": 0,
+              "escalated": 5070,
+              "restaged": 0
+            },
+            {
+              "copies": 31525,
+              "bytes": 297507225600,
+              "background_copies": 6016,
+              "urgent_copies": 25509,
+              "canceled": 0,
+              "escalated": 5070,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            35.55,
+            35.36
+          ],
+          "endpoint_cpu": [
+            25,
+            25
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 930639,
+              "helper_tid": 930641,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            },
+            {
+              "staging_tid": 939181,
+              "helper_tid": 939183,
+              "staging_cpu": 25,
+              "helper_cpu": 26,
+              "stage_mask": [
+                25
+              ],
+              "helper_mask": [
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 30756,
+              "bytes": 290250031104,
+              "background_copies": 6016,
+              "urgent_copies": 24740,
+              "canceled": 0,
+              "escalated": 5073,
+              "restaged": 0
+            },
+            {
+              "copies": 30756,
+              "bytes": 290250031104,
+              "background_copies": 6016,
+              "urgent_copies": 24740,
+              "canceled": 0,
+              "escalated": 5073,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            36.18,
+            36.089999999999996
+          ],
+          "endpoint_cpu": [
+            97,
+            97
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 930638,
+              "helper_tid": 930640,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            },
+            {
+              "staging_tid": 939180,
+              "helper_tid": 939182,
+              "staging_cpu": 97,
+              "helper_cpu": 98,
+              "stage_mask": [
+                97
+              ],
+              "helper_mask": [
+                98
+              ]
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "logical_work_and_tokens_identical": true,
+          "scheduler_metrics": [
+            {
+              "copies": 29942,
+              "bytes": 282568163328,
+              "background_copies": 6016,
+              "urgent_copies": 23926,
+              "canceled": 0,
+              "escalated": 5108,
+              "restaged": 0
+            },
+            {
+              "copies": 29942,
+              "bytes": 282568163328,
+              "background_copies": 6016,
+              "urgent_copies": 23926,
+              "canceled": 0,
+              "escalated": 5108,
+              "restaged": 0
+            }
+          ],
+          "staging_cpu_seconds": [
+            30.759999999999998,
+            30.669999999999998
+          ],
+          "endpoint_cpu": [
+            121,
+            121
+          ],
+          "cpu_team": [
+            {
+              "staging_tid": 930644,
+              "helper_tid": 930645,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            },
+            {
+              "staging_tid": 939186,
+              "helper_tid": 939187,
+              "staging_cpu": 121,
+              "helper_cpu": 122,
+              "stage_mask": [
+                121
+              ],
+              "helper_mask": [
+                122
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scheduler_differences": [
+    {
+      "batch": 128,
+      "policy": "BR",
+      "rank": 0,
+      "samples": [
+        {
+          "copies": 29346,
+          "bytes": 276943601664,
+          "background_copies": 6016,
+          "urgent_copies": 23330,
+          "canceled": 0,
+          "escalated": 4699,
+          "restaged": 0
+        },
+        {
+          "copies": 29346,
+          "bytes": 276943601664,
+          "background_copies": 6014,
+          "urgent_copies": 23332,
+          "canceled": 0,
+          "escalated": 4699,
+          "restaged": 0
+        }
+      ]
+    },
+    {
+      "batch": 256,
+      "policy": "BR",
+      "rank": 0,
+      "samples": [
+        {
+          "copies": 32268,
+          "bytes": 304519053312,
+          "background_copies": 6015,
+          "urgent_copies": 26253,
+          "canceled": 1,
+          "escalated": 5082,
+          "restaged": 0
+        },
+        {
+          "copies": 32269,
+          "bytes": 304528490496,
+          "background_copies": 6015,
+          "urgent_copies": 26254,
+          "canceled": 0,
+          "escalated": 5082,
+          "restaged": 0
+        }
+      ]
+    }
+  ],
+  "copy_accounting_note": "Logical controller work and output/cache hashes match. Timing-dependent scheduling labels are not identical: B128 BR rank0 reclassified two background copies as urgent. B256 BR rank0 issued one additional 9-MiB prefetch copy instead of cancelling it (32268+1 cancelled versus 32269+0); the existing frozen proof permits this via copies+cancelled. All differences and samples retained.",
+  "limitations": [
+    "Only this host, CPU mapping, two-thread Torch copy backend and frozen workloads are covered.",
+    "Two pairs satisfy the owner stability gate, but gain confidence intervals include zero; LA speedup is descriptive, not statistically established.",
+    "No unstable sample was removed. Cancelled diagnostic setup attempts and failed-candidate B256 warmup remain recorded.",
+    "No production runtime winner or FINAL_RUNTIME_SELECTION is declared; overall largest validated LA gain objective remains open."
+  ]
+}

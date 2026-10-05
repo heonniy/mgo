@@ -147,3 +147,29 @@ default. Test B128 first, and only proceed to B256 if B128 is stable.
 Validation: CPU successive-worker initialization passed; GPU BF16 9-MiB
 copy contents, byte/count accounting, post-copy singleton masks, and worker
 recreation passed. Existing delayed-CUDA scheduler-lock regression also passed.
+
+## Fixed copy-team clean validation: stable on both batches
+
+FIXED_TEAM_RESULTS.json and COPY_TEAM_STABILIZATION.json record completed
+R4/0145 B128/B256 frozen decode64 BF16 BR/LA validation. Both batches stopped
+at two counterbalanced pairs: every policy's E2E and TPOT relative difference
+was below 0.5%. No third or extra unchanged repetitions were run. Logical
+controller counters, cache hashes and output hashes matched between repeats.
+Staging endpoint CPUs matched fixed singleton masks. Physical scheduler
+accounting has two documented differences: B128 BR rank0 reclassified two
+background copies as urgent; B256 BR rank0 issued one extra 9-MiB prefetch
+copy instead of cancelling it (32268+1 cancelled vs32269+0). Existing frozen
+proof copies+cancelled remains satisfied. Do not claim identical physical
+copy counts or hide these scheduling differences.
+
+B128 means: BR E2E98.9328s / TPOT1.38752s; LA E2E97.6809s / TPOT1.37027s.
+B256 means: BR E2E124.9668s / TPOT1.67165s; LA E2E123.2640s / TPOT1.64945s.
+Descriptive paired TPOT gains are ~1.24% and ~1.33%; both CI95s include zero.
+Do not inflate these into established positive improvements. Respect the
+owner's two-stable-pairs stopping rule rather than repeating for significance.
+
+The result supports copy-team placement/scheduling and initialization as a
+practical stabilization on this host. It does not prove that endpoint CPU
+changes alone caused all historical jitter. Keep fixed_staging_team explicit
+for follow-up timing; default runtime selection and overall optimization goal
+remain open. GPU model load workers are restored after the bounded run.
