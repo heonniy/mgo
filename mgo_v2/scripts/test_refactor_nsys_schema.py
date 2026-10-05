@@ -32,7 +32,7 @@ def main():
     db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_KERNEL VALUES (?,?,?,?,?)',(base+c,base+d,pid,corr,kernel))
   db.execute('INSERT INTO CUPTI_ACTIVITY_KIND_MEMCPY VALUES (1010,1040,1,9437184)');db.commit();db.close()
   trace=root/'copy.json';trace.write_text(json.dumps([dict(source_event=48,bytes=9437184,kind='useful_prefetch',readiness_at_use='inflight')]))
-  receipt=dict(status='PASS',decode_expert_copies=1,decode_expert_bytes=9437184,copy_trace_path=str(trace),copy_trace_sha256=hashlib.sha256(trace.read_bytes()).hexdigest())
+  receipt=dict(status='PASS',case=dict(horizon=8),decode_expert_copies=1,decode_expert_bytes=9437184,copy_trace_path=str(trace),copy_trace_sha256=hashlib.sha256(trace.read_bytes()).hexdigest())
   out=analyze(path,receipt)
   assert out['decode_events']==384 and out['kernel_counts']['moe.expert_compute']==384
   assert out['H2D']['total_union_ms']==30/1e6
@@ -52,6 +52,11 @@ def main():
   cpu=out['cpu_nvtx']
   metadata_parts=sum(cpu[name]['total_ms'] for name in ('moe.metadata_pack_host','moe.metadata_collective_submit','moe.metadata_readback_wait_and_unpack'))
   assert abs(metadata_parts-cpu['moe.metadata']['total_ms'])<1e-12
+  receipt['case']['horizon']=256
+  try:analyze(path,receipt)
+  except AssertionError as exc:assert 'wrong captured horizon' in str(exc)
+  else:raise AssertionError('short capture must not masquerade as full-horizon evidence')
+  receipt['case']['horizon']=8
   receipt['decode_expert_copies']=2
   try:analyze(path,receipt)
   except AssertionError as exc:assert 'copy count mismatch' in str(exc)

@@ -9,21 +9,21 @@ P=Path(__file__).resolve().parents[1];ROOT=Path('/home/hwlee/mgo-results/decode_
 
 def main(a):
  frozen=json.loads((PACKET/'M13_FROZEN_PREFETCH.json').read_text())
- group=next(g for g in groups_for(frozen,8,[a.batch]) if g['runtime_arm']==a.arm)
+ group=next(g for g in groups_for(frozen,a.horizon,[a.batch]) if g['runtime_arm']==a.arm)
  case=next(c for c in group['cases'] if c['policy']==a.policy)
- label=f'{a.stage}_{a.arm}_{a.policy}_B{a.batch}_H8';out=ROOT/label;out.mkdir(exist_ok=False);h.write(out/'case.json',case)
+ label=f'{a.stage}_{a.arm}_{a.policy}_B{a.batch}_H{a.horizon}';out=ROOT/label;out.mkdir(exist_ok=False);h.write(out/'case.json',case)
  state=dict(status='RUNNING',stage=label,case=case,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),primary_timing=False)
  stop_idle_load();proc=None
  try:
   deadline=time.monotonic()+180
   while any(g['temperature_c']>=65 for g in h.snapshot()['gpus']) and time.monotonic()<deadline:time.sleep(5)
   h.safe(h.sample(),True);env=h.env_for('env1');cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
-  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'scripts/refactor_nsys_rank.py'),'--inputs',str(ROOT/f'inputs_B{a.batch}_H8'),'--case',str(out/'case.json'),'--output',str(out)]
+  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/'scripts/refactor_nsys_rank.py'),'--inputs',str(ROOT/f'inputs_B{a.batch}_H{a.horizon}'),'--case',str(out/'case.json'),'--output',str(out)]
   with (out/'run.log').open('w') as log:
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(out/'status.json',state)
    while proc.poll() is None:
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
-    if time.time()-state['started_unix']>1800:raise TimeoutError('bounded short profiling run')
+    if time.time()-state['started_unix']>(1800 if a.horizon==8 else 7200):raise TimeoutError('bounded profiling run')
     h.safe(h.sample(proc.pid));time.sleep(10)
    assert proc.returncode==0,str(out/'run.log')
   rows=[json.loads((out/f'rank{r}.json').read_text()) for r in range(8)];assert all(r['status']=='PASS' for r in rows)
@@ -39,4 +39,4 @@ def main(a):
   state['finished_unix']=time.time();h.write(out/'status.json',state);receipt=PACKET/(label+'.json');h.write(receipt,state);publish(f'{label}: {state["status"]}',[receipt])
   if not (ROOT/'STOP').exists():h.write(out/'resident_models.json',dict(processes=start_idle_load(),unix=time.time()))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--stage',default='M16');p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA'],default='LA');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--stage',default='M16');p.add_argument('--horizon',type=int,choices=[8,256],default=256);p.add_argument('--arm',choices=ARMS,required=True);p.add_argument('--batch',type=int,choices=[128,256],required=True);p.add_argument('--policy',choices=['BR','LA'],default='LA');main(p.parse_args())

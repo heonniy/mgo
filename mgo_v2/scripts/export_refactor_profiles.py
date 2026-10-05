@@ -19,7 +19,8 @@ def distribution(values):
 
 def summarize(rows):
     assert len(rows) == 8 and all(row['status'] == 'PASS' for row in rows)
-    assert all(row['decode_events'] == 384 for row in rows)
+    assert len({row['decode_events'] for row in rows}) == 1
+    assert rows[0]['decode_events'] in (48*8, 48*256)
     sections = {}
     for section in ('H2D', 'kernel_union_ms', 'cpu_nvtx'):
         keys = sorted(set().union(*(row[section] for row in rows)))

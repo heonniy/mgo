@@ -21,6 +21,15 @@ def intersection(left,right):
   else:j+=1
  return out
 
+class IntervalIndex:
+ """Clip disjoint unions without rescanning an entire long capture per layer."""
+ def __init__(self,intervals):
+  self.intervals=union(intervals)
+  self.starts=[a for a,b in self.intervals];self.ends=[b for a,b in self.intervals]
+ def clip(self,start,end):
+  lo=bisect.bisect_right(self.ends,start);hi=bisect.bisect_left(self.starts,end)
+  return [(max(start,a),min(end,b)) for a,b in self.intervals[lo:hi]]
+
 def exclusive_partition(window,h2d,comm,compute):
  """Disjoint actual-time bins, including activity outside the three classes."""
  names=('idle_or_unattributed','H2D_only','COMM_only','H2D_COMM',
@@ -44,6 +53,7 @@ def exclusive_partition(window,h2d,comm,compute):
  return {name:value/1e6 for name,value in totals.items()}
 
 def analyze(path,receipt):
+ expected_events=48*receipt['case']['horizon']
  db=sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
  strings={r['id']:r['value'] for r in db.execute('SELECT id,value FROM StringIds')}
  ranges=defaultdict(list);decode=[];decode_ids=[];cpu=defaultdict(list);event_ids={}
@@ -56,7 +66,7 @@ def analyze(path,receipt):
    decode.append((r['start'],r['end']));name='decode.event'
   ranges[(r['globalTid'],name)].append((r['start'],r['end']))
   if name.startswith('moe.'):cpu[name].append((r['start'],r['end']))
- assert len(decode)==384,('expected eight decode steps, 48 layers',len(decode))
+ assert len(decode)==expected_events,('wrong captured horizon',len(decode),expected_events)
  window=[(min(a for a,b in decode),max(b for a,b in decode))]
  for key,value in list(ranges.items()):
   value.sort();ranges[key]=([a for a,b in value],value)
@@ -127,10 +137,11 @@ def analyze(path,receipt):
  # GPU work is assigned by actual timestamp, not the launch's layer label.
  # A copy spanning a boundary is split, never counted twice.
  ordered=sorted(decode_ids,key=lambda x:x[1]);per_event=[]
+ indexed=[IntervalIndex(intervals) for intervals in (h2d,decomposition_comm,expert)]
  for i,(event,start,end) in enumerate(ordered):
   stop=ordered[i+1][1] if i+1<len(ordered) else window[0][1]
   per_event.append(dict(event=event,layer=event%48,step=event//48-1,
-                        window_ns=[start,stop],exclusive_ms=exclusive_partition([(start,stop)],h2d,decomposition_comm,expert)))
+                        window_ns=[start,stop],exclusive_ms=exclusive_partition([(start,stop)],*[index.clip(start,stop) for index in indexed])))
  for key,value in exclusive.items():
   assert abs(sum(row['exclusive_ms'][key] for row in per_event)-value)<1e-6
  split_report={kind:dict(count=len(ints),bytes=len(ints)*9437184,total_union_ms=duration(ints)/1e6,overlap_comm_expert_ms=duration(intersection(ints,cover))/1e6) for kind,ints in split.items()}
@@ -152,7 +163,7 @@ def analyze(path,receipt):
     assert j-i==1 and children[i][1]<=b,'expected one nested decode metadata collective'
     c,d=children[i];cpu['moe.metadata_pack_host'].append((a,c))
     cpu['moe.metadata_readback_wait_and_unpack'].append((d,b));partitioned+=1
-  assert partitioned==384
+  assert partitioned==expected_events
  for name,ints in cpu.items():
   ints=intersection(ints,window);full=duration(ints);overlap=duration(intersection(ints,cover));a2a_overlap=duration(intersection(ints,comm));cpu_report[name]=dict(total_ms=full/1e6,overlap_comm_expert_ms=overlap/1e6,outside_comm_expert_ms=(full-overlap)/1e6,overlap_payload_A2A_ms=a2a_overlap/1e6,outside_payload_A2A_ms=(full-a2a_overlap)/1e6)
  if 'moe.prefetch_predictor' in cpu_report:
@@ -162,7 +173,7 @@ def analyze(path,receipt):
   cpu_report['moe.prefetch_placement_and_bookkeeping']={key:max(0,value-cpu_report['moe.prefetch_predictor'][key]) for key,value in cpu_report['moe.prefetch_controller'].items()}
  decomposition=dict(aggregate_exclusive_ms=exclusive,per_event=per_event,window_definition='Adjacent host decode-event start timestamps, through final captured decode work. Actual GPU intervals are split at boundaries; these are time windows, not causal layer ownership. COMM includes metadata and both payload NCCL collectives. Local pack/combine kernels and non-MoE work remain unattributed. Idle_or_unattributed is not necessarily GPU idle.')
  causal={str(event):{phase:duration(intervals)/1e6 for phase,intervals in phases.items()} for event,phases in event_kernels.items()}
- assert len(causal)==384
+ assert len(causal)==expected_events
  distributions={}
  for phase in kernels:
   values=[phases.get(phase,0.) for phases in causal.values()]

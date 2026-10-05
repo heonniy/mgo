@@ -65,7 +65,7 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//8+(r<3686%8) for r in range(8)];a.comm_mode='current'
- case=json.loads(a.case.read_text());horizon=case['horizon'];assert horizon==8 and case['partial_precision']=='bf16'
+ case=json.loads(a.case.read_text());horizon=case['horizon'];assert horizon in (8,256) and case['partial_precision']=='bf16'
  a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision='bf16';a.streaming=case['overlap'];a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')
@@ -99,7 +99,7 @@ def main(a):
   for module,name,original in diagnostic_hooks:setattr(module,name,original)
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
- assert len(rt.profile_communication)==384 and rt.transport.calls==768
+ assert len(rt.profile_communication)==48*horizon and rt.transport.calls==96*horizon
  assert sum(r['forward_wire_bytes'] for r in rt.profile_communication)==rt.transport.forward_bytes
  assert sum(r['return_wire_bytes'] for r in rt.profile_communication)==rt.transport.return_bytes
  write(a.output/f'communication_rank{rank}.json',dict(status='PASS',rank=rank,events=rt.profile_communication,metadata_calls=rt.metadata.calls,payload_calls=rt.transport.calls,forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes,scope='Decode BF16 token/rank payload bytes excluding self, protocol overhead and metadata. Per-event peer counts come from the executed layout.'))
