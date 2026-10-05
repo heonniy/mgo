@@ -4,16 +4,19 @@ from pathlib import Path
 import run_timing_stability as h
 from run_refactor_measure import publish,PACKET
 from batch_comm_common import start_idle_load
-from policy_regime_paths import ROOT,PACKET,ENVIRONMENT
+from policy_regime_paths import ROOT,PACKET,ENVIRONMENT,BASE
 def main():
  os.environ['MGO_RESULT_BRANCH']='codex/policy-regime-20261005'
  assert json.loads((ROOT/'status.json').read_text())['status']=='TIMING_COMPLETE'
+ tool_file=BASE/'profile_tool.json';tool=json.loads(tool_file.read_text()) if tool_file.exists() else {}
+ if tool:os.environ['MGO_NSYS_BINARY']=tool['binary']
  state=dict(status='RUNNING',completed=[],started_unix=time.time())
  try:
   for setting in ('C30','C60'):
    base=ROOT/setting;cases=json.loads((base/f'POLICY_REGIME_{setting}_B128_H64/cases.json').read_text())
+   if tool:cases.sort(key=lambda c:c['policy']!='FCA')
    for case in cases:
-    policy=case['policy'];retry_file=ROOT/'profile_retries.json';retry=json.loads(retry_file.read_text()).get(setting+'/'+policy,{}) if retry_file.exists() else {};stage=retry.get('stage','POLICY_REGIME_PROFILE_'+setting);label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H64';out=base/label
+    policy=case['policy'];retry_file=ROOT/'profile_retries.json';retry=json.loads(retry_file.read_text()).get(setting+'/'+policy,{}) if retry_file.exists() else {};stage=('POLICY_REGIME_PROFILE_'+setting+'_'+tool['stage_suffix']) if tool else retry.get('stage','POLICY_REGIME_PROFILE_'+setting);label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H64';out=base/label
     state['active']=label;h.write(ROOT/'profile_status.json',state)
     if (out/'status.json').exists():assert json.loads((out/'status.json').read_text())['status']=='PASS','repair explicitly before retrying failed capture'
     else:

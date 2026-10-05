@@ -21,6 +21,11 @@ def main(a):
  case['async_metadata_inputs']=a.async_metadata_inputs
  case['fixed_staging_team']=a.fixed_staging_team
  case['isolated_cpu_threads']=a.fixed_staging_team
+ if os.environ.get('MGO_NSYS_BINARY'):
+  binary=Path(os.environ['MGO_NSYS_BINARY']).resolve();assert binary.is_file()
+  case['profile_nsys_binary']=str(binary)
+  case['profile_nsys_version']=subprocess.check_output([str(binary),'--version'],text=True).strip()
+  case['profile_disable_device_event_trace']=True
  label=f'{a.stage}_{a.arm}_{a.policy}_B{a.batch}_H{a.horizon}';out=ROOT/label;out.mkdir(exist_ok=False);h.write(out/'case.json',case)
  state=dict(environment=a.environment,world=world,physical_gpus=a.gpus,status='RUNNING',stage=label,case=case,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),primary_timing=False)
  stop_idle_load();proc=None;descendants={}

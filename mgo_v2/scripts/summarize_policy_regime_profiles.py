@@ -17,7 +17,7 @@ def main():
   analysis=capture/'interval_analysis'
   if not (analysis/'summary.json').exists():
    assert not analysis.exists(),'repair incomplete export into a new directory explicitly'
-   with (capture/'export_driver.log').open('w') as log:subprocess.run([h.PYTHON,str(h.P/'scripts/export_refactor_profiles.py'),str(capture)],stdout=log,stderr=subprocess.STDOUT,check=True)
+   with (capture/'export_driver.log').open('w') as log:subprocess.run([h.PYTHON,str(h.P/'scripts/export_refactor_profiles.py'),str(capture),'--nsys',status['case'].get('profile_nsys_binary','/usr/local/bin/nsys')],stdout=log,stderr=subprocess.STDOUT,check=True)
   data=[read(analysis/f'rank{r}_intervals.json') for r in range(4)]
   comm=[read(capture/f'communication_rank{r}.json') for r in range(4)]
   phases=('moe.forward_a2a.nccl','moe.return_a2a.nccl','moe.expert_compute')
