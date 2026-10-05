@@ -1,0 +1,421 @@
+{
+  "environment": "env2",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "PASS",
+  "stage": "POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64",
+  "case": {
+    "label": "FCA",
+    "policy": "FCA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "profile_cuda_flush_ms": 600000,
+    "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+    "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+    "profile_disable_device_event_trace": true
+  },
+  "started_unix": 1791209573.5876887,
+  "source_sha": "ef2319cb18100c820cc75d49fad820abc16cbd9c",
+  "primary_timing": false,
+  "pid": 1316635,
+  "ranks": [
+    {
+      "status": "PASS",
+      "rank": 0,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/copy_trace_rank0.json",
+      "copy_trace_sha256": "5bee9a595ba07f862814f0906c691bb4835cf9ff5d5de3fee671514f18323a78",
+      "case": {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000,
+        "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+        "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+        "profile_disable_device_event_trace": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1318477,
+          "helper_tid": 1318481,
+          "staging_cpu": 1,
+          "helper_cpu": 2,
+          "stage_mask": [
+            1
+          ],
+          "helper_mask": [
+            2
+          ]
+        },
+        "isolated": true,
+        "main": [
+          0
+        ],
+        "staging": [
+          1
+        ],
+        "helpers": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 29612,
+        "bytes": 279453892608,
+        "background_copies": 6015,
+        "urgent_copies": 23597,
+        "canceled": 0,
+        "escalated": 4827,
+        "restaged": 0
+      },
+      "decode_expert_copies": 28090,
+      "decode_expert_bytes": 265090498560,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18969,
+        "wasted": 5095,
+        "promotions": 18969,
+        "promotion_evictions": 18969,
+        "promotion_victim_reloads": 14532,
+        "mandatory": 89790,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20504986624
+    },
+    {
+      "status": "PASS",
+      "rank": 1,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/copy_trace_rank1.json",
+      "copy_trace_sha256": "42ca2275cb2af5d354d419e3f3f1355010345992ece26327659a326678eb95df",
+      "case": {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000,
+        "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+        "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+        "profile_disable_device_event_trace": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1318476,
+          "helper_tid": 1318480,
+          "staging_cpu": 25,
+          "helper_cpu": 26,
+          "stage_mask": [
+            25
+          ],
+          "helper_mask": [
+            26
+          ]
+        },
+        "isolated": true,
+        "main": [
+          24
+        ],
+        "staging": [
+          25
+        ],
+        "helpers": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 28862,
+        "bytes": 272376004608,
+        "background_copies": 6016,
+        "urgent_copies": 22846,
+        "canceled": 0,
+        "escalated": 4779,
+        "restaged": 0
+      },
+      "decode_expert_copies": 27345,
+      "decode_expert_bytes": 258059796480,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18969,
+        "wasted": 5095,
+        "promotions": 18969,
+        "promotion_evictions": 18969,
+        "promotion_victim_reloads": 14532,
+        "mandatory": 89790,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 21794346496
+    },
+    {
+      "status": "PASS",
+      "rank": 2,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/copy_trace_rank2.json",
+      "copy_trace_sha256": "c0c0fce77af6120dc8aea356b3c4e6aea76a0f85adacdd53275faba7e7344015",
+      "case": {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000,
+        "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+        "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+        "profile_disable_device_event_trace": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1318475,
+          "helper_tid": 1318479,
+          "staging_cpu": 97,
+          "helper_cpu": 98,
+          "stage_mask": [
+            97
+          ],
+          "helper_mask": [
+            98
+          ]
+        },
+        "isolated": true,
+        "main": [
+          96
+        ],
+        "staging": [
+          97
+        ],
+        "helpers": [
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 28076,
+        "bytes": 264958377984,
+        "background_copies": 6016,
+        "urgent_copies": 22060,
+        "canceled": 0,
+        "escalated": 4601,
+        "restaged": 0
+      },
+      "decode_expert_copies": 26571,
+      "decode_expert_bytes": 250755416064,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18969,
+        "wasted": 5095,
+        "promotions": 18969,
+        "promotion_evictions": 18969,
+        "promotion_victim_reloads": 14532,
+        "mandatory": 89790,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20488276992
+    },
+    {
+      "status": "PASS",
+      "rank": 3,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/copy_trace_rank3.json",
+      "copy_trace_sha256": "6abf88e639dce26fd62a7d52d771903740cb9b55e418632414c5e4989ad21893",
+      "case": {
+        "label": "FCA",
+        "policy": "FCA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "async_metadata_inputs": true,
+        "isolated_cpu_threads": true,
+        "fixed_staging_team": true,
+        "profile_cuda_flush_ms": 600000,
+        "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+        "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+        "profile_disable_device_event_trace": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1318478,
+          "helper_tid": 1318482,
+          "staging_cpu": 121,
+          "helper_cpu": 122,
+          "stage_mask": [
+            121
+          ],
+          "helper_mask": [
+            122
+          ]
+        },
+        "isolated": true,
+        "main": [
+          120
+        ],
+        "staging": [
+          121
+        ],
+        "helpers": [
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 27304,
+        "bytes": 257672871936,
+        "background_copies": 6016,
+        "urgent_copies": 21288,
+        "canceled": 0,
+        "escalated": 4762,
+        "restaged": 0
+      },
+      "decode_expert_copies": 25813,
+      "decode_expert_bytes": 243602030592,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18969,
+        "wasted": 5095,
+        "promotions": 18969,
+        "promotion_evictions": 18969,
+        "promotion_victim_reloads": 14532,
+        "mandatory": 89790,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20488422400
+    }
+  ],
+  "reports": [
+    "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/profile_rank0.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/profile_rank1.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/profile_rank2.nsys-rep",
+    "/home/hwlee/mgo-results/policy_regime_20261005/ENV2/C60/POLICY_REGIME_PROFILE_C60_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/profile_rank3.nsys-rep"
+  ],
+  "interpretation": "capture only; actual kernel/copy interval analysis still required",
+  "finished_unix": 1791209942.7943993
+}
