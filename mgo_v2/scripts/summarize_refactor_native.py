@@ -9,9 +9,9 @@ from adaptive_timing import paired_decision
 from refactor_fingerprint import assert_equivalent
 
 
-def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_combine=False, async_metadata_inputs=False, isolated_cpu_threads=False):
+def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_combine=False, async_metadata_inputs=False, isolated_cpu_threads=False, fixed_staging_team=False, batches_to_read=(128,256)):
     batches, identities, sources = {}, {}, {}
-    for batch in (128, 256):
+    for batch in batches_to_read:
         folder = root / f'{stage}_B{batch}_H64'
         data = {}
         for name in ('result.json', 'status.json'):
@@ -32,6 +32,7 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
             assert case.get('unique_combine', False) == unique_combine
             assert case.get('async_metadata_inputs', False) == async_metadata_inputs
             assert case.get('isolated_cpu_threads', False) == isolated_cpu_threads
+            assert case.get('fixed_staging_team', False) == fixed_staging_team
             for key, value in dict(runtime_arm='V3_OPT_PF_OVERLAP', staging_backend=staging_backend, horizon=64, partial_precision='bf16', P=2, trigger='T2', overlap=True).items():
                 assert case[key] == value, (key, case)
         gate = paired_decision(result['pairs'])
@@ -53,7 +54,10 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
                             assert receipt['case']['async_metadata_inputs'] is True
                         if isolated_cpu_threads:
                             placement=receipt['thread_placement'];assert placement['isolated'] is True
-                            assert len(placement['main'])==1 and len(placement['staging'])==2
+                            assert len(placement['main'])==1 and len(placement['staging'])==(1 if fixed_staging_team else 2)
+                            if fixed_staging_team:
+                                team=placement['fixed_team'];assert team['stage_mask']==[team['staging_cpu']] and team['helper_mask']==[team['helper_cpu']]
+                                assert team['staging_cpu']!=team['helper_cpu']
                             assert not set(placement['main'])&set(placement['staging'])
                             assert receipt['case']['isolated_cpu_threads'] is True
                         sources[str(path)] = hashlib.sha256(raw).hexdigest()
@@ -72,7 +76,7 @@ def summarize(root, stage='R4_H64_NATIVE_V3', staging_backend='memmove', unique_
     stable = all(not b['gate']['unstable'] for b in batches.values())
     positive = stable and all(b['gate']['gain']['TPOT']['positive_supported'] for b in batches.values())
     return dict(status='STABLE_CANDIDATE' if stable else 'EXCLUDED_UNSTABLE', improvement_supported=positive,
-                world=4, physical_gpus=[0, 1, 4, 5], horizon=64, precision='bf16', staging_backend=staging_backend, unique_combine=unique_combine, async_metadata_inputs=async_metadata_inputs, isolated_cpu_threads=isolated_cpu_threads,
+                evaluated_batches=list(batches_to_read), world=4, physical_gpus=[0, 1, 4, 5], horizon=64, precision='bf16', staging_backend=staging_backend, unique_combine=unique_combine, async_metadata_inputs=async_metadata_inputs, isolated_cpu_threads=isolated_cpu_threads, fixed_staging_team=fixed_staging_team,
                 robust_TPOT_gain=min(b['gate']['gain']['TPOT']['estimate'] for b in batches.values()),
                 batches=batches, source_hashes=sources,
                 scope='Separate implementation candidate; all pairs retained; no pooling with other implementations. This report does not activate a default or complete phase/CA validation.')
@@ -87,7 +91,9 @@ if __name__ == '__main__':
     parser.add_argument('--unique-combine', action='store_true')
     parser.add_argument('--async-metadata-inputs', action='store_true')
     parser.add_argument('--isolated-cpu-threads', action='store_true')
+    parser.add_argument('--fixed-staging-team', action='store_true')
+    parser.add_argument('--batches',nargs='+',type=int,choices=[128,256],default=[128,256])
     args = parser.parse_args()
-    report = summarize(args.root, args.stage, args.staging_backend, args.unique_combine, args.async_metadata_inputs, args.isolated_cpu_threads)
+    report = summarize(args.root, args.stage, args.staging_backend, args.unique_combine, args.async_metadata_inputs, args.isolated_cpu_threads, args.fixed_staging_team, args.batches)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(report['status'])

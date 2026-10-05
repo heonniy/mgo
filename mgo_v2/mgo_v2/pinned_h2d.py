@@ -104,9 +104,11 @@ class PriorityH2DScheduler:
     prior compute. A promoted reservation reuses its ticket/copy rather than
     issuing a second H2D. Physical readiness is not replicated controller state.
     """
-    def __init__(self,cache,stage_count=2,profile=False,autostart=True,staging_backend="torch"):
+    def __init__(self,cache,stage_count=2,profile=False,autostart=True,staging_backend="torch",cpu_team=None):
         if staging_backend not in ("torch","memmove"):raise ValueError("unknown staging backend")
         self.staging_backend=staging_backend
+        self.cpu_team=cpu_team;self.cpu_team_receipt=None;self.startup_done=threading.Event()
+        if cpu_team is not None and staging_backend!="torch":raise ValueError("fixed copy team requires torch staging")
         if not cache.is_cuda or stage_count<2:raise ValueError('CUDA arena and >=2 stages required')
         self.cache=cache;self.profile=profile;self.device=cache.device
         self.h2d_stream=torch.cuda.Stream(device=self.device)
@@ -124,6 +126,9 @@ class PriorityH2DScheduler:
     def start(self):
         if self.thread is not None:return
         self.thread=threading.Thread(target=self._worker,name='expert-staging',daemon=True);self.thread.start()
+        if self.cpu_team is not None:
+            if not self.startup_done.wait(30):raise TimeoutError('staging CPU team initialization timeout')
+            self._check()
     def _check(self):
         if self.error is not None:raise RuntimeError('expert staging worker failed') from self.error
     def _retire_pending(self,t):
@@ -187,6 +192,10 @@ class PriorityH2DScheduler:
     def _worker(self):
         try:
             torch.cuda.set_device(self.device)
+            if self.cpu_team is not None:
+                from .staging_cpu_team import initialize
+                self.cpu_team_receipt=initialize(self.stages[0],self.cpu_team)
+            self.startup_done.set()
             while True:
                 with self.cv:
                     while not self.pending and not self.stopping:self.cv.wait()
@@ -228,6 +237,7 @@ class PriorityH2DScheduler:
                     t.tensors=None;self.cv.notify_all()
         except BaseException as exc:
             with self.cv:self.error=exc;self.cv.notify_all()
+            self.startup_done.set()
     def _submitted(self,t,timeout=120):
         deadline=time.monotonic()+timeout
         with self.cv:

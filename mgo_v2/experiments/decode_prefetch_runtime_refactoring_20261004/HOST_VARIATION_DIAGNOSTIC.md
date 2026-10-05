@@ -122,3 +122,28 @@ reset, including warmups. Two stable pairs stop; at most one third as already
 authorized. No phase hooks and no process/GPU scans during MEASURE. Record
 actual thread masks and include the helper source in the common fingerprint.
 No default change: isolated_cpu_threads is explicit in both case records.
+
+## Clean isolated-mask pilot failed; fix copy-team placement
+
+B128 clean paired timing remained unstable: BR TPOT 1.38437/1.38633/1.41659;
+LA 1.36697/1.45338/1.46785. B256 was cancelled during warmup, with no timed
+samples, after this failed pilot. Do not adopt the shared two-CPU staging mask.
+
+The LA second sample changed rank2 staging endpoint CPU97->98 and staging
+CPU time ~32.15->46.14s; other staging ranks changed <1s. BR third changed
+rank1 staging endpoint CPU25->26 and CPU time ~31.5->35.7s. Endpoint CPU
+is not a migration trace; these observations motivate, but do not prove,
+copy-team interference as the initiating cause. Counters/output were valid.
+
+Add opt-in fixed_staging_team: initialize the worker's two-thread OpenMP
+copy pool with a private stage zero-fill outside timing, require exactly one
+new native helper, and pin staging and helper to distinct singleton CPUs.
+The scheduler records IDs/masks and waits for setup success before accepting
+work. Repeat this on each runtime reset. No extra expert copy/GPU operation
+or buffer; default behavior unchanged. Fail closed if helper identity cannot
+be established. This Linux/Torch-two-thread experiment is not a portable
+default. Test B128 first, and only proceed to B256 if B128 is stable.
+
+Validation: CPU successive-worker initialization passed; GPU BF16 9-MiB
+copy contents, byte/count accounting, post-copy singleton masks, and worker
+recreation passed. Existing delayed-CUDA scheduler-lock regression also passed.
