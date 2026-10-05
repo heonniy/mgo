@@ -1,0 +1,1990 @@
+{
+  "status": "REPRODUCED_DIAGNOSTIC_STALL",
+  "primary_timing": false,
+  "observed_cycle": "Rank1 staging thread holds scheduler.cv during t.done.record; main thread waits for scheduler.cv in record_slot_use. Other ranks wait in CompactMetadata.collect. Identical stacks observed 60 seconds apart; capture progress stopped at event1536.",
+  "limitation": "Python stacks identify the held scheduler lock and blocked CUDA call, not the internal CUDA/CUPTI cause.",
+  "samples": {
+    "stacks_rank0.jsonl": [
+      {
+        "unix": 1791175726.7250097,
+        "threads": [
+          {
+            "thread": 140219957278272,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140149039400512,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140219353458240,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140232995857984,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140238565644160,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      },
+      {
+        "unix": 1791175786.7259436,
+        "threads": [
+          {
+            "thread": 140219957278272,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140149039400512,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140219353458240,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140232995857984,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140238565644160,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      }
+    ],
+    "stacks_rank1.jsonl": [
+      {
+        "unix": 1791175726.888268,
+        "threads": [
+          {
+            "thread": 140607112607296,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/cuda/streams.py",
+                "function": "record",
+                "line": 209
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 212
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140606718338624,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140606726731328,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140620141651520,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140625711462272,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "__enter__",
+                "line": 300
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "record_slot_use",
+                "line": 253
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "compute",
+                "line": 109
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 147
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      },
+      {
+        "unix": 1791175786.889134,
+        "threads": [
+          {
+            "thread": 140607112607296,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/cuda/streams.py",
+                "function": "record",
+                "line": 209
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 212
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140606718338624,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140606726731328,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140620141651520,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140625711462272,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "__enter__",
+                "line": 300
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "record_slot_use",
+                "line": 253
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "compute",
+                "line": 109
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 147
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      }
+    ],
+    "stacks_rank2.jsonl": [
+      {
+        "unix": 1791175726.8898263,
+        "threads": [
+          {
+            "thread": 139969385461312,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139968789870144,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139969377068608,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139982777312832,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139988348581760,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      },
+      {
+        "unix": 1791175786.8906271,
+        "threads": [
+          {
+            "thread": 139969385461312,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139968789870144,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139969377068608,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139982777312832,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 139988348581760,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      }
+    ],
+    "stacks_rank3.jsonl": [
+      {
+        "unix": 1791175726.888625,
+        "threads": [
+          {
+            "thread": 140356603606592,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140356008015424,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140356595213888,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140369681933888,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140375252854656,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      },
+      {
+        "unix": 1791175786.889505,
+        "threads": [
+          {
+            "thread": 140356603606592,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 355
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/pinned_h2d.py",
+                "function": "_worker",
+                "line": 191
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140356008015424,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "wait",
+                "line": 655
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/tqdm/_monitor.py",
+                "function": "run",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140356595213888,
+            "stack": [
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_recv_msg",
+                "line": 76
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py",
+                "function": "_read_thread",
+                "line": 271
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140369681933888,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/scripts/profile_watchdog.py",
+                "function": "monitor",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "run",
+                "line": 1012
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap_inner",
+                "line": 1075
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/threading.py",
+                "function": "_bootstrap",
+                "line": 1032
+              }
+            ]
+          },
+          {
+            "thread": 140375252854656,
+            "stack": [
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/compact_metadata.py",
+                "function": "collect",
+                "line": 22
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "plan_event",
+                "line": 52
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "plan_event",
+                "line": 6
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/mgo_v2/decode_runtime.py",
+                "function": "execute",
+                "line": 118
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "execute",
+                "line": 19
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/la_physical_worker.py",
+                "function": "forward",
+                "line": 40
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 359
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py",
+                "function": "wrapped_func",
+                "line": 172
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py",
+                "function": "__call__",
+                "line": 94
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 487
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 1072
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py",
+                "function": "forward",
+                "line": 650
+              },
+              {
+                "file": "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py",
+                "function": "wrapper",
+                "line": 918
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_call_impl",
+                "line": 1790
+              },
+              {
+                "file": "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py",
+                "function": "_wrapped_call_impl",
+                "line": 1779
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/fetch_relaxed_worker.py",
+                "function": "generate",
+                "line": 69
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "main",
+                "line": 103
+              },
+              {
+                "file": "/home/hwlee/mgo/mgo_v2/examples/refactor_profile_worker.py",
+                "function": "<module>",
+                "line": 118
+              }
+            ]
+          }
+        ],
+        "scope": "Cooperative Python snapshots require the GIL; absence is not proof of native progress."
+      }
+    ]
+  },
+  "source_hashes": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_WATCH_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank0.jsonl": "271457e294daaa58a20cb59a0e503b46d98ffe868da01a02dbb2a89bc5d85b22",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_WATCH_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank1.jsonl": "f4fa52f8c5b1ebe13c159cc66fad49db4a513cf67a4db251b0e1fecca283d7e8",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_WATCH_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank2.jsonl": "7ac2fd97df0cdfb0bf7f2dbd830bfea0041a4e6b90c94ebdebf2f18501238764",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_WATCH_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank3.jsonl": "0b8ecc61ff6e45166f892c7f5b94d64e4d9579d0168cd3941577980edf393faa"
+  }
+}
