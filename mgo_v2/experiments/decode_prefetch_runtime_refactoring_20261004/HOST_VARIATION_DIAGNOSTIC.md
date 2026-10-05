@@ -96,3 +96,13 @@ Affinity setup audit caught that runtime reset replaces the staging thread.
 The first affinity launch was terminated during warmup before any measurements;
 it is an infrastructure FAIL, not a timing sample. Apply masks after reset
 to the live thread and record its actual affinity. Relaunch as V2.
+
+V2 was also terminated during its first isolated sample: a native affinity
+audit found two threads on each staging singleton CPU. The copy operation
+creates an OpenMP helper lazily, inheriting the staging thread's mask; assigning
+all existing helpers elsewhere does not cover future helpers. This is a
+diagnostic configuration error, not evidence about the original runtime's
+jitter. Preserve V2's completed baseline and affinity_midrun_audit.json.
+V3 gives staging plus its lazy copy helper two dedicated CPUs (indices1:3),
+main one CPU (index0), existing helpers the remaining21 CPUs. Main/staging
+masks remain disjoint. Validate live masks during the isolated diagnostic.
