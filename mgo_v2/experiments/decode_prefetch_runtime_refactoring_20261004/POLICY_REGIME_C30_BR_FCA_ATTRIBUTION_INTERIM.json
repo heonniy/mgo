@@ -1,0 +1,189 @@
+{
+  "status": "INTERIM_SAME_TOOL_ATTRIBUTION",
+  "setting": "C30",
+  "rows": [
+    {
+      "policy": "BR",
+      "rank_local_ms_per_step": {
+        "moe.forward_a2a.nccl": {
+          "mean": 49.187948414062504,
+          "ranks": [
+            37.277012453125,
+            42.68695078125,
+            49.953970921875,
+            66.8338595
+          ]
+        },
+        "moe.return_a2a.nccl": {
+          "mean": 103.4885157265625,
+          "ranks": [
+            34.12215440625,
+            89.07931553125,
+            90.563334953125,
+            200.189258015625
+          ]
+        },
+        "moe.expert_compute": {
+          "mean": 33.7263146015625,
+          "ranks": [
+            34.192903984375,
+            33.89683053125,
+            33.653776375,
+            33.161747515625
+          ]
+        },
+        "CPU moe.current_controller": {
+          "mean": 127.5893368046875,
+          "ranks": [
+            136.044015484375,
+            128.872676671875,
+            128.048672921875,
+            117.391982140625
+          ]
+        },
+        "CPU moe.prefetch_controller": {
+          "mean": 46.600651015625,
+          "ranks": [
+            46.06015821875,
+            47.61859921875,
+            48.072135328125,
+            44.651711296875
+          ]
+        },
+        "CPU moe.host_staging": {
+          "mean": 975.2421513984375,
+          "ranks": [
+            1025.32881971875,
+            1003.518982328125,
+            1004.6507844375,
+            867.470019109375
+          ]
+        },
+        "total_H2D_ms": {
+          "mean": 168.14484237109374,
+          "ranks": [
+            171.40545703125,
+            169.894794390625,
+            168.23010428125,
+            163.04901378125
+          ]
+        },
+        "outside_COMM_COMPUTE_H2D_ms": {
+          "mean": 159.95901751953124,
+          "ranks": [
+            165.491974015625,
+            163.048648625,
+            161.505837265625,
+            149.789610171875
+          ]
+        },
+        "observed_window_ms": {
+          "mean": 1967.740618464844,
+          "ranks": [
+            1967.7485478906249,
+            1967.7474737187501,
+            1967.7335582968751,
+            1967.732893953125
+          ]
+        }
+      }
+    },
+    {
+      "policy": "FCA",
+      "rank_local_ms_per_step": {
+        "moe.forward_a2a.nccl": {
+          "mean": 76.12976912109374,
+          "ranks": [
+            64.08398815625,
+            66.18230703125,
+            82.056685875,
+            92.196095421875
+          ]
+        },
+        "moe.return_a2a.nccl": {
+          "mean": 272.5093239765625,
+          "ranks": [
+            209.9980026875,
+            251.09955975,
+            264.721033328125,
+            364.218700140625
+          ]
+        },
+        "moe.expert_compute": {
+          "mean": 33.65068669140625,
+          "ranks": [
+            34.326057203125,
+            33.89285234375,
+            33.2020095,
+            33.18182771875
+          ]
+        },
+        "CPU moe.current_controller": {
+          "mean": 123.54125773828125,
+          "ranks": [
+            128.255524859375,
+            127.775458296875,
+            122.173991890625,
+            115.96005590625
+          ]
+        },
+        "CPU moe.prefetch_controller": {
+          "mean": 40.565915890625,
+          "ranks": [
+            40.360431234375,
+            41.6341425,
+            41.9835785625,
+            38.285511265625
+          ]
+        },
+        "CPU moe.host_staging": {
+          "mean": 969.8778611679687,
+          "ranks": [
+            1018.619603359375,
+            992.7694068125,
+            1002.358461515625,
+            865.763972984375
+          ]
+        },
+        "total_H2D_ms": {
+          "mean": 168.85825953124998,
+          "ranks": [
+            172.3163180625,
+            169.755106359375,
+            169.16609228125,
+            164.195521421875
+          ]
+        },
+        "outside_COMM_COMPUTE_H2D_ms": {
+          "mean": 155.5139851953125,
+          "ranks": [
+            161.105477625,
+            158.04755853125,
+            155.939186984375,
+            146.963717640625
+          ]
+        },
+        "observed_window_ms": {
+          "mean": 2207.7836735546875,
+          "ranks": [
+            2207.70392753125,
+            2207.79884865625,
+            2207.812732,
+            2207.81918603125
+          ]
+        }
+      }
+    }
+  ],
+  "source_sha256": {
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_BR_B128_H64/interval_analysis/rank0_intervals.json": "ac4157791f5b766b923135e3cbbeff1d4e9b9580d9be38126d900c4c44b6cefb",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_BR_B128_H64/interval_analysis/rank1_intervals.json": "82ae9dcb0e6aec8ac089a03b8b503a91bc83f8ee3c6a9dc56632c8275ce4eced",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_BR_B128_H64/interval_analysis/rank2_intervals.json": "8ec3c3c57f7766480ffdf116861cdb290f7a480301cbe95ae08ba2e92836488d",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_BR_B128_H64/interval_analysis/rank3_intervals.json": "1a9ecf1c15abe60db3afe14e39156df071527a58dcb5ac8e4412ad3aed8392b7",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/interval_analysis/rank0_intervals.json": "77ff5803e8fef176d3028fa75b1408bacfc0f84da4fb046273161f444c6589b6",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/interval_analysis/rank1_intervals.json": "7f080d626a56032adcf5901797d7fcf7bf4fe231122a5f6d0d9d3fdab1a6ef9b",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/interval_analysis/rank2_intervals.json": "98fae97e0d991f5e541f2bc9c2b5c1b822661869b7f0280dffa319c3218db17f",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64/interval_analysis/rank3_intervals.json": "c08ba845e845459748d1210da8caefc3a20134743640927e35fa30e278658696"
+  },
+  "interpretation": "FCA has fewer remote packets but greater captured forward and return NCCL residency. NCCL residency includes peer readiness/waiting, not just wire transfer. Mean expert kernel unions remain similar despite higher eventwise worst-rank row counts; do not claim that the row-count increase is a proven expert-GPU-time increase. Host staging and H2D means are similar in these single captures. These descriptive instrumented phases do not sum to TPOT and do not replace primary unprofiled timing. Remaining policies and C60 are pending."
+}
