@@ -4,7 +4,7 @@ from pathlib import Path
 from run_refactor_measure import PACKET
 from refactor_h2d_steps import summarize_rank
 import run_timing_stability as h
-ROOT=Path('/home/hwlee/mgo-results/policy_regime_20261005')
+from policy_regime_paths import ROOT,PACKET,ENVIRONMENT
 def distribution(values):
  return dict(mean=statistics.mean(values),min=min(values),max=max(values),max_over_mean=max(values)/statistics.mean(values) if statistics.mean(values) else None)
 def main():

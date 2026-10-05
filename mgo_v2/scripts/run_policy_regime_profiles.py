@@ -4,7 +4,7 @@ from pathlib import Path
 import run_timing_stability as h
 from run_refactor_measure import publish,PACKET
 from batch_comm_common import start_idle_load
-ROOT=Path('/home/hwlee/mgo-results/policy_regime_20261005')
+from policy_regime_paths import ROOT,PACKET,ENVIRONMENT
 def main():
  os.environ['MGO_RESULT_BRANCH']='codex/policy-regime-20261005'
  assert json.loads((ROOT/'status.json').read_text())['status']=='TIMING_COMPLETE'
@@ -18,7 +18,7 @@ def main():
     if (out/'status.json').exists():assert json.loads((out/'status.json').read_text())['status']=='PASS','repair explicitly before retrying failed capture'
     else:
      path=base/f'profile_case_{policy}.json';h.write(path,case)
-     cmd=[h.PYTHON,'-u',str(h.P/'scripts/run_refactor_profile.py'),'--root',str(base),'--gpus','0','1','4','5','--stage','POLICY_REGIME_PROFILE_'+setting,'--horizon','64','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(path),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
+     cmd=[h.PYTHON,'-u',str(h.P/'scripts/run_refactor_profile.py'),'--environment',ENVIRONMENT,'--root',str(base),'--gpus','0','1','4','5','--stage','POLICY_REGIME_PROFILE_'+setting,'--horizon','64','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(path),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
      with (base/(label+'_driver.log')).open('w') as log:subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,check=True)
     state['completed'].append(str(out))
   state['status']='CAPTURES_COMPLETE'

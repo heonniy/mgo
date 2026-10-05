@@ -30,17 +30,24 @@ Validation before GPU: 16 CPU replays (two capacities, four policies, P0/P2)
 passed. Independent packet-set reconstruction checks incremental incident counts,
 packet cost, and balanced quota for FCA/LA_CA across 12 fixtures.
 
-## Owner follow-up: physical server without NVLink
+## Owner follow-up: historical same-host Env2
 
-After the current mechanism captures and attribution analysis finish, repeat
-C30/C60, local B128, decode64, four policies on a physical server without NVLink.
-This is an additional requested stage, not a simulated NCCL transport switch on
-the current NVSwitch host. Server SSH destination and usable GPU IDs are pending
-owner input. Do not assume current physical IDs or CPU affinity on that server.
-Verify actual topology and transport, device memory and available host memory,
-model/expert/input identity, and regenerate host-specific CPU placement before
-execution. Keep frozen request/route/teacher/predictor bytes, policy definitions,
-BF16 V3 P2/T2 settings, and repeat/noise rules unchanged. Store its raw results and
-receipts separately; BR denominators are within the same server/cache setting.
-Report hardware/runtime differences and do not attribute cross-server latency
-changes solely to NVLink availability.
+After current Env1 mechanism captures and attribution analysis finish, repeat
+C30/C60, local B128, decode64, four policies using historical Env2 on the current
+host and the same GPUs 0/1/4/5. No remote server is needed. This supersedes the
+initial interpretation as a separate physical no-NVLink machine.
+
+Reuse run_timing_stability.env_for('env2'): NCCL_CUMEM_ENABLE=0,
+NCCL_P2P_DISABLE=1, NCCL_IB_DISABLE=1; clear other inherited NCCL overrides,
+including NCCL_P2P_LEVEL. This is the newer Env2 harness definition, not the older
+R3 recipe using P2P_LEVEL=LOC. Verify SHM channel lines and absence of P2P/NET
+before releasing the first timed boundary. Initialization INFO logs are retained.
+
+Preserve identical requests/routes/weights/teacher tokens/predictor, policies,
+BF16 V3 P2/T2 runtime, affinity, and repeat/noise rules. Reuse CPU proofs because
+transport does not alter the logical cache simulation. Keep Env2 raw results
+under policy_regime_20261005/ENV2 and committed receipts under this packet/ENV2.
+Use within-environment/cache BR denominators. Repeat uninstrumented timing first,
+then separate all-policy mechanism captures. Do not label this a measurement on
+physically NVLink-free hardware. The environment is host-staged SHM with direct
+GPU P2P disabled on the existing host.

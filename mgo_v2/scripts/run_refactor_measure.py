@@ -1,5 +1,5 @@
 """Checkpointed queue; no process/GPU scans inside clean MEASURE regions."""
-import os,json,subprocess,signal,time,argparse
+import os,json,subprocess,signal,time,argparse,re
 from pathlib import Path
 import run_timing_stability as h
 from batch_comm_common import stop_idle_load,start_idle_load
@@ -26,7 +26,8 @@ def run(stage,group):
   saved=json.loads((out/'status.json').read_text());assert saved['status']=='PASS','use a new attempt label after repair';return saved
  out.mkdir(exist_ok=True);h.write(out/'cases.json',group['cases']);receipt=PACKET/(label+'.json')
  state=dict(status='RUNNING',stage=stage,label=label,group=group,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),monitor='boundaries only; file polling during MEASURE')
- h.safe(h.sample(),True);env=h.env_for('env1');env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
+ h.safe(h.sample(),True);env=h.env_for(group.get('environment','env1'));env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
+ if group.get('environment')=='env2':env['NCCL_DEBUG']='INFO'
  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
   from refactor_fingerprint import capture
@@ -46,6 +47,10 @@ def run(stage,group):
     else:
      boundary=json.loads((out/'boundary.json').read_text()) if (out/'boundary.json').exists() else None
      if boundary and boundary['key'] not in released:
+      if group.get('environment')=='env2' and 'transport_verification' not in state:
+       paths=set(re.findall(r'via (SHM|P2P|NET)/',(out/'run.log').read_text()))
+       assert paths=={'SHM'},('Env2 requires verified SHM channels',paths)
+       state['transport_verification']=dict(status='PASS',observed_paths=sorted(paths),scope='NCCL initialization channel log before first MEASURE; P2P and NET absent')
       key=boundary['key'];assert len(list(out.glob(f'{key}_ready_rank*.json')))==world
       sample=h.sample(proc.pid);h.safe(sample);state.setdefault('boundaries',[]).append(dict(key=key,sample=sample,diagnostics=boundary_diagnostics()));h.write(out/'status.json',state)
       h.write(PACKET/'status.json',dict(status='RUNNING',stage=stage,label=label,active=boundary,started_unix=state['started_unix'],pid=proc.pid))

@@ -2,7 +2,7 @@
 import json,hashlib
 from pathlib import Path
 from run_refactor_measure import PACKET
-ROOT=Path('/home/hwlee/mgo-results/policy_regime_20261005')
+from policy_regime_paths import ROOT,PACKET,ENVIRONMENT
 def main():
  sources={};rows=[]
  def read(p):
