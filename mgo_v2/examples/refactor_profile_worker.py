@@ -85,13 +85,19 @@ def main(a):
  a.staging_backend=case.get('staging_backend','torch');assert a.staging_backend in ('torch','memmove')
  a.unique_combine=case.get('unique_combine',False);assert type(a.unique_combine) is bool
  a.async_metadata_inputs=case.get('async_metadata_inputs',False);assert type(a.async_metadata_inputs) is bool
+ a.staging_cpu_team=cpus[1:3] if case.get('fixed_staging_team',False) else None
  a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision='bf16';a.streaming=case['overlap'];a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')
  proof=json.loads((a.inputs/f'{a.policy}_P{a.arena_budget}_proof.json').read_text());assert proof['horizon']==horizon
  rt=ProfileRuntime(a,model,backing,experts);rt.stage_frozen_inputs(horizon)
+ def place_threads():
+  if case.get('fixed_staging_team',False):
+   from refactor_thread_affinity import configure
+   rt.profile_thread_placement=configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
+ place_threads()
  warm,expected=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
- rt.reset();a.phase='MEASURE';rt.capture=True;rt.arm_profile();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
+ rt.reset();place_threads();a.phase='MEASURE';rt.capture=True;rt.arm_profile();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
  from torch._dynamo.utils import counters
  # Attribute pageable-to-pinned staging on its actual worker thread. This
  # monkeypatch exists only in this dedicated diagnostic process, never timing.
@@ -122,7 +128,7 @@ def main(a):
  assert sum(r['forward_wire_bytes'] for r in rt.profile_communication)==rt.transport.forward_bytes
  assert sum(r['return_wire_bytes'] for r in rt.profile_communication)==rt.transport.return_bytes
  write(a.output/f'communication_rank{rank}.json',dict(status='PASS',rank=rank,events=rt.profile_communication,metadata_calls=rt.metadata.calls,payload_calls=rt.transport.calls,forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes,scope='Decode BF16 token/rank payload bytes excluding self, protocol overhead and metadata. Per-event peer counts come from the executed layout.'))
- write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
+ write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,thread_placement=getattr(rt,'profile_thread_placement',None),no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
  progress('COMPLETE');stop_watchdog.set()
 if __name__=='__main__':
