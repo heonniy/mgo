@@ -17,7 +17,7 @@ def publish(message,paths):
  subprocess.run(['git','add',*[str(p) for p in paths]],cwd=P.parent,check=True)
  if subprocess.run(['git','diff','--cached','--quiet'],cwd=P.parent).returncode:
   subprocess.run(['git','commit','-m',message],cwd=P.parent,check=True)
-  if subprocess.run(['git','push','origin','HEAD:refactoring'],cwd=P.parent).returncode:h.write(ROOT/'publication_pending.json',dict(message=message,unix=time.time()))
+  if subprocess.run(['git','push','origin','HEAD:'+os.environ.get('MGO_RESULT_BRANCH','refactoring')],cwd=P.parent).returncode:h.write(ROOT/'publication_pending.json',dict(message=message,unix=time.time()))
 
 def run(stage,group):
  world=group.get('world',8);gpus=group.get('gpus',list(range(world)));assert len(gpus)==world
@@ -27,7 +27,7 @@ def run(stage,group):
  out.mkdir(exist_ok=True);h.write(out/'cases.json',group['cases']);receipt=PACKET/(label+'.json')
  state=dict(status='RUNNING',stage=stage,label=label,group=group,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),monitor='boundaries only; file polling during MEASURE')
  h.safe(h.sample(),True);env=h.env_for('env1');env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
- cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py')),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
+ cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
   from refactor_fingerprint import capture
   state['common_stack']=capture(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}',env)

@@ -12,7 +12,7 @@ def sha(path):
 
 def capture(inputs,env):
  paths=list((P/'mgo_v2').glob('*.py'))
- paths += [P/'examples'/name for name in ('env_offload_worker.py','fetch_relaxed_worker.py','la_physical_worker.py','refactor_baseline_worker.py','refactor_measure_worker.py','refactor_paired_worker.py')]
+ paths += [P/'examples'/name for name in ('env_offload_worker.py','fetch_relaxed_worker.py','la_physical_worker.py','refactor_baseline_worker.py','refactor_measure_worker.py','refactor_paired_worker.py','policy_regime_worker.py')]
  paths += [P/'scripts'/name for name in ('env_offload_policy.py','env_offload_layout.py','env_offload_tensors.py','br_carep_cpu.py','la_placement.py','old_ca_fanout_policy.py','adaptive_timing.py','refactor_thread_usage.py','refactor_thread_affinity.py')]
  code={str(p.relative_to(P)):sha(p) for p in sorted(paths)}
  inputs_hashes={name:sha(inputs/name) for name in INPUTS}

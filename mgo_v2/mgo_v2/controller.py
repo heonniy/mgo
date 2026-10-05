@@ -233,7 +233,7 @@ from .cache import SlotArena
 class DecodePrefetchController:
  def __init__(self,capacities,budget,policy,seed,predictor):
   self.world=len(capacities);self.policy_name=policy;self.seed=seed;self.budget=budget;self.predictor=predictor
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'FCA':5,'LA_CA':6}[policy],seed)
+  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6}[policy],seed)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):
@@ -271,7 +271,7 @@ class DecodePrefetchController:
   demand=np.rint(predicted.T*1_000_000).astype(np.int64)
   if self.policy_name=='BR':
    slots=np.repeat(np.arange(self.world),[n//self.world+(r<n%self.world) for r in range(self.world)]);order=np.random.default_rng(np.random.SeedSequence([self.seed,self.event,991])).permutation(n);assignment=np.empty(n,np.int64);assignment[order]=slots
-  elif self.policy_name in ('CA','FCA'):
+  elif self.policy_name in ('CA','OLD_CA','FCA'):
    # Predictor exposes expert/rank demand but not token co-routing; packet-aware
    # current admission therefore falls back to demand-locality for prefetch.
    assignment=balanced_assignment(demand,candidates,self.world,False)
