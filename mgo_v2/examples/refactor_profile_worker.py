@@ -84,6 +84,7 @@ def main(a):
  case=json.loads(a.case.read_text());horizon=case['horizon'];assert horizon in (8,64,256) and case['partial_precision']=='bf16'
  a.staging_backend=case.get('staging_backend','torch');assert a.staging_backend in ('torch','memmove')
  a.unique_combine=case.get('unique_combine',False);assert type(a.unique_combine) is bool
+ a.async_metadata_inputs=case.get('async_metadata_inputs',False);assert type(a.async_metadata_inputs) is bool
  a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision='bf16';a.streaming=case['overlap'];a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')

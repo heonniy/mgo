@@ -24,7 +24,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"))
-  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world)
+  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world,async_inputs=getattr(a,'async_metadata_inputs',False))
  def stage_frozen_inputs(self,horizon):
   # Benchmark input delivery is common across strategies and outside timing.
   # Only the current event is exposed to the runtime; prediction never reads

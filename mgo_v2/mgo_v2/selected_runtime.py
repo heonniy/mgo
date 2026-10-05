@@ -44,6 +44,9 @@ def selected_options(selection_path=None, arm=None):
     if 'unique_combine' in selection:
         if type(selection['unique_combine']) is not bool:raise ValueError('Invalid unique combine flag')
         options['unique_combine']=selection['unique_combine']
+    if 'async_metadata_inputs' in selection:
+        if type(selection['async_metadata_inputs']) is not bool:raise ValueError('Invalid async metadata flag')
+        options['async_metadata_inputs']=selection['async_metadata_inputs']
     return options
 
 
@@ -59,6 +62,8 @@ def create_explicit_runtime(args, model, backing, experts, case):
     options = arm_options(case['runtime_arm'], case['P'], case['trigger'])
     options['staging_backend']=case.get('staging_backend','torch')
     options['unique_combine']=case.get('unique_combine',False)
+    options['async_metadata_inputs']=case.get('async_metadata_inputs',False)
+    if type(options['async_metadata_inputs']) is not bool:raise ValueError('Invalid async metadata flag')
     if type(options['unique_combine']) is not bool:raise ValueError('Invalid unique combine flag')
     if options['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown staging backend')
     if case['partial_precision'] != 'bf16' or case['overlap'] != options['streaming']:
