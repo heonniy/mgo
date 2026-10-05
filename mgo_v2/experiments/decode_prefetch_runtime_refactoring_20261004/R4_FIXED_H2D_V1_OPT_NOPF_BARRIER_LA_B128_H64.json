@@ -1,0 +1,405 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "PASS",
+  "stage": "R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 0,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": false,
+    "partial_precision": "bf16",
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "profile_cuda_flush_ms": 600000,
+    "async_metadata_inputs": true,
+    "fixed_staging_team": true,
+    "isolated_cpu_threads": true
+  },
+  "started_unix": 1791194912.5563536,
+  "source_sha": "9177fad917cf53289e28dd4e8e38273947b7aba7",
+  "primary_timing": false,
+  "pid": 1010786,
+  "ranks": [
+    {
+      "status": "PASS",
+      "rank": 0,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/copy_trace_rank0.json",
+      "copy_trace_sha256": "e2f863ee85c337b864aad317f48cd60d3c32fda94ae3edf28817d54dbc06597a",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "profile_cuda_flush_ms": 600000,
+        "async_metadata_inputs": true,
+        "fixed_staging_team": true,
+        "isolated_cpu_threads": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1012838,
+          "helper_tid": 1012842,
+          "staging_cpu": 1,
+          "helper_cpu": 2,
+          "stage_mask": [
+            1
+          ],
+          "helper_mask": [
+            2
+          ]
+        },
+        "isolated": true,
+        "main": [
+          0
+        ],
+        "staging": [
+          1
+        ],
+        "helpers": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 28089,
+        "bytes": 265081061376,
+        "background_copies": 0,
+        "urgent_copies": 28089,
+        "canceled": 0,
+        "escalated": 0,
+        "restaged": 0
+      },
+      "decode_expert_copies": 26567,
+      "decode_expert_bytes": 250717667328,
+      "controller_counters": {
+        "issued": 0,
+        "useful": 0,
+        "wasted": 0,
+        "promotions": 0,
+        "promotion_evictions": 0,
+        "promotion_victim_reloads": 0,
+        "mandatory": 107643,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20486112256
+    },
+    {
+      "status": "PASS",
+      "rank": 1,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/copy_trace_rank1.json",
+      "copy_trace_sha256": "355bc186e74c0fd8e325344d92e59fcee72e3b899e94917a6b6c555e9a425a42",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "profile_cuda_flush_ms": 600000,
+        "async_metadata_inputs": true,
+        "fixed_staging_team": true,
+        "isolated_cpu_threads": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1012839,
+          "helper_tid": 1012841,
+          "staging_cpu": 25,
+          "helper_cpu": 26,
+          "stage_mask": [
+            25
+          ],
+          "helper_mask": [
+            26
+          ]
+        },
+        "isolated": true,
+        "main": [
+          24
+        ],
+        "staging": [
+          25
+        ],
+        "helpers": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 27299,
+        "bytes": 257625686016,
+        "background_copies": 0,
+        "urgent_copies": 27299,
+        "canceled": 0,
+        "escalated": 0,
+        "restaged": 0
+      },
+      "decode_expert_copies": 25782,
+      "decode_expert_bytes": 243309477888,
+      "controller_counters": {
+        "issued": 0,
+        "useful": 0,
+        "wasted": 0,
+        "promotions": 0,
+        "promotion_evictions": 0,
+        "promotion_victim_reloads": 0,
+        "mandatory": 107643,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 21775472128
+    },
+    {
+      "status": "PASS",
+      "rank": 2,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/copy_trace_rank2.json",
+      "copy_trace_sha256": "949ae62195a0930d3033eccb42b239167e56ceb5fd127afb0385a44eb929c030",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "profile_cuda_flush_ms": 600000,
+        "async_metadata_inputs": true,
+        "fixed_staging_team": true,
+        "isolated_cpu_threads": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1012843,
+          "helper_tid": 1012845,
+          "staging_cpu": 97,
+          "helper_cpu": 98,
+          "stage_mask": [
+            97
+          ],
+          "helper_mask": [
+            98
+          ]
+        },
+        "isolated": true,
+        "main": [
+          96
+        ],
+        "staging": [
+          97
+        ],
+        "helpers": [
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 26519,
+        "bytes": 250264682496,
+        "background_copies": 0,
+        "urgent_copies": 26519,
+        "canceled": 0,
+        "escalated": 0,
+        "restaged": 0
+      },
+      "decode_expert_copies": 25014,
+      "decode_expert_bytes": 236061720576,
+      "controller_counters": {
+        "issued": 0,
+        "useful": 0,
+        "wasted": 0,
+        "promotions": 0,
+        "promotion_evictions": 0,
+        "promotion_victim_reloads": 0,
+        "mandatory": 107643,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20469402624
+    },
+    {
+      "status": "PASS",
+      "rank": 3,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/copy_trace_rank3.json",
+      "copy_trace_sha256": "0c47bc7d849bd4f3e3d2a9f5a722a553bf6f2b1196e19fb66b4f7fe0a458cb98",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER",
+        "staging_backend": "torch",
+        "unique_combine": true,
+        "profile_cuda_flush_ms": 600000,
+        "async_metadata_inputs": true,
+        "fixed_staging_team": true,
+        "isolated_cpu_threads": true
+      },
+      "thread_placement": {
+        "fixed_team": {
+          "staging_tid": 1012840,
+          "helper_tid": 1012844,
+          "staging_cpu": 121,
+          "helper_cpu": 122,
+          "stage_mask": [
+            121
+          ],
+          "helper_mask": [
+            122
+          ]
+        },
+        "isolated": true,
+        "main": [
+          120
+        ],
+        "staging": [
+          121
+        ],
+        "helpers": [
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 25736,
+        "bytes": 242875367424,
+        "background_copies": 0,
+        "urgent_copies": 25736,
+        "canceled": 0,
+        "escalated": 0,
+        "restaged": 0
+      },
+      "decode_expert_copies": 24245,
+      "decode_expert_bytes": 228804526080,
+      "controller_counters": {
+        "issued": 0,
+        "useful": 0,
+        "wasted": 0,
+        "promotions": 0,
+        "promotion_evictions": 0,
+        "promotion_victim_reloads": 0,
+        "mandatory": 107643,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20469548032
+    }
+  ],
+  "reports": [
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/profile_rank0.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/profile_rank1.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/profile_rank2.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_H2D_V1_OPT_NOPF_BARRIER_LA_B128_H64/profile_rank3.nsys-rep"
+  ],
+  "interpretation": "capture only; actual kernel/copy interval analysis still required",
+  "finished_unix": 1791195274.8311021
+}
