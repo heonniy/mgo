@@ -1,0 +1,1918 @@
+{
+  "primary_timing": false,
+  "samples": [
+    {
+      "repeat": 1,
+      "switch_interval_s": 0.005,
+      "E2E_wall": 88.67230796534568,
+      "TPOT": 1.210651611328125
+    },
+    {
+      "repeat": 2,
+      "switch_interval_s": 0.001,
+      "E2E_wall": 91.3766683684662,
+      "TPOT": 1.2607313232421875
+    },
+    {
+      "repeat": 3,
+      "switch_interval_s": 0.001,
+      "E2E_wall": 97.97897367179394,
+      "TPOT": 1.3697991943359376
+    },
+    {
+      "repeat": 4,
+      "switch_interval_s": 0.005,
+      "E2E_wall": 102.46035133022815,
+      "TPOT": 1.4279954833984374
+    }
+  ],
+  "conditions": {
+    "original": {
+      "E2E_wall": {
+        "samples": [
+          88.67230796534568,
+          102.46035133022815
+        ],
+        "mean": 95.56632964778692,
+        "relative_difference": 0.14427720951195666,
+        "range": [
+          88.67230796534568,
+          102.46035133022815
+        ]
+      },
+      "TPOT": {
+        "samples": [
+          1.210651611328125,
+          1.4279954833984374
+        ],
+        "mean": 1.3193235473632812,
+        "relative_difference": 0.16473887129861553,
+        "range": [
+          1.210651611328125,
+          1.4279954833984374
+        ]
+      }
+    },
+    "short": {
+      "E2E_wall": {
+        "samples": [
+          91.3766683684662,
+          97.97897367179394
+        ],
+        "mean": 94.67782102013007,
+        "relative_difference": 0.0697344450071784,
+        "range": [
+          91.3766683684662,
+          97.97897367179394
+        ]
+      },
+      "TPOT": {
+        "samples": [
+          1.2607313232421875,
+          1.3697991943359376
+        ],
+        "mean": 1.3152652587890625,
+        "relative_difference": 0.08292461947498452,
+        "range": [
+          1.2607313232421875,
+          1.3697991943359376
+        ]
+      }
+    }
+  },
+  "ranks": {
+    "0": [
+      {
+        "repeat": 1,
+        "host": {
+          "generation_wall_s": 88.711622767,
+          "generation_cpu_s": 81.457798158,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.675800788,
+              "cpu_s": 16.354733766,
+              "calls": 1,
+              "non_cpu_wall_s": 0.32106702200000115
+            },
+            "main/moe.combine": {
+              "wall_s": 0.831999422,
+              "cpu_s": 0.831838299,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00016112300000004076
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.475212084000004,
+              "cpu_s": 11.457976749000004,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.017235335000000518
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5915081769999999,
+              "cpu_s": 0.4403406819999999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.15116749500000004
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022393403,
+              "cpu_s": 0.022267,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012640300000000063
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 39.968731648999984,
+              "cpu_s": 35.492544818,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.4761868309999855
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.56399631,
+              "cpu_s": 0.544303925,
+              "calls": 48,
+              "non_cpu_wall_s": 2.019692385
+            },
+            "main/moe.metadata": {
+              "wall_s": 8.643313662999999,
+              "cpu_s": 8.630989783999999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.012323879000000204
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.3244603129999997,
+              "cpu_s": 1.262628887,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06183142599999969
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.32722710999999993,
+              "cpu_s": 0.302612211,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.024614898999999912
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.935273446000001,
+              "cpu_s": 2.874437065,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.060836381000000994
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.3517064019999996,
+              "cpu_s": 3.2431249720000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1085814299999992
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 39.16558201000001,
+              "cpu_s": 34.09088709899999,
+              "calls": 29358,
+              "non_cpu_wall_s": 5.074694911000016
+            }
+          },
+          "gc_wall_s": 0.955593339,
+          "gc_events": 3069
+        },
+        "usage": {
+          "ru_utime": 184.569417,
+          "ru_stime": 2.4399329999999964,
+          "ru_nvcsw": 457047,
+          "ru_nivcsw": 375
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 29358,
+          "bytes": 277056847872,
+          "background_copies": 6016,
+          "urgent_copies": 23342,
+          "canceled": 0,
+          "escalated": 4730,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 2,
+        "host": {
+          "generation_wall_s": 91.41090337,
+          "generation_cpu_s": 86.007157857,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.599485068,
+              "cpu_s": 16.395959358,
+              "calls": 1,
+              "non_cpu_wall_s": 0.20352571000000097
+            },
+            "main/moe.combine": {
+              "wall_s": 0.822336663,
+              "cpu_s": 0.821996475,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00034018800000001903
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.562665122000002,
+              "cpu_s": 11.544949628999992,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01771549300000963
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.46895573000000007,
+              "cpu_s": 0.42705749500000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.041898235000000006
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022057843,
+              "cpu_s": 0.021941416,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011642700000000228
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 43.139504056,
+              "cpu_s": 40.055290164999995,
+              "calls": 3120,
+              "non_cpu_wall_s": 3.0842138910000045
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.312862947,
+              "cpu_s": 0.572608917,
+              "calls": 48,
+              "non_cpu_wall_s": 1.74025403
+            },
+            "main/moe.metadata": {
+              "wall_s": 7.675789141000003,
+              "cpu_s": 7.658082441999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01770669900000499
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.7602717999999997,
+              "cpu_s": 1.691662413,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06860938699999974
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.639188217,
+              "cpu_s": 0.5162046230000001,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.12298359399999981
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 3.192694124,
+              "cpu_s": 3.1505203810000006,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.04217374299999932
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.2150926590000006,
+              "cpu_s": 3.150884543,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06420811600000054
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 40.026910003999994,
+              "cpu_s": 34.809729747000006,
+              "calls": 29358,
+              "non_cpu_wall_s": 5.217180256999988
+            }
+          },
+          "gc_wall_s": 0.977195218,
+          "gc_events": 3067
+        },
+        "usage": {
+          "ru_utime": 187.33961500000004,
+          "ru_stime": 1.884177000000001,
+          "ru_nvcsw": 398737,
+          "ru_nivcsw": 284
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 29358,
+          "bytes": 277056847872,
+          "background_copies": 6016,
+          "urgent_copies": 23342,
+          "canceled": 0,
+          "escalated": 4730,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 3,
+        "host": {
+          "generation_wall_s": 98.013461543,
+          "generation_cpu_s": 90.81928694,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.418446692,
+              "cpu_s": 16.957978489,
+              "calls": 1,
+              "non_cpu_wall_s": 0.46046820300000135
+            },
+            "main/moe.combine": {
+              "wall_s": 0.762929158,
+              "cpu_s": 0.762636908,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0002922500000001049
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.57763732300001,
+              "cpu_s": 11.557163908999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.02047341400001379
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5942752840000001,
+              "cpu_s": 0.45865222600000016,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.1356230579999999
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022215071,
+              "cpu_s": 0.022087593,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001274780000000003
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 41.64456762,
+              "cpu_s": 36.70231732000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.9422502999999836
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.125634702,
+              "cpu_s": 0.801855279,
+              "calls": 48,
+              "non_cpu_wall_s": 1.3237794230000002
+            },
+            "main/moe.metadata": {
+              "wall_s": 15.549322798000006,
+              "cpu_s": 15.536898723,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01242407500000553
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.4801744290000003,
+              "cpu_s": 1.4123186059999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06785582300000059
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.452047669,
+              "cpu_s": 0.38820083399999994,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06384683500000005
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.990114177999999,
+              "cpu_s": 2.935228982,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05488519599999897
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.3960966190000006,
+              "cpu_s": 3.2839480710000006,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.11214854799999996
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 39.48755151299997,
+              "cpu_s": 34.80920393999999,
+              "calls": 29358,
+              "non_cpu_wall_s": 4.678347572999982
+            }
+          },
+          "gc_wall_s": 0.979892569,
+          "gc_events": 3067
+        },
+        "usage": {
+          "ru_utime": 196.767655,
+          "ru_stime": 2.562253999999996,
+          "ru_nvcsw": 446095,
+          "ru_nivcsw": 371
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 29358,
+          "bytes": 277056847872,
+          "background_copies": 6016,
+          "urgent_copies": 23342,
+          "canceled": 0,
+          "escalated": 4730,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 4,
+        "host": {
+          "generation_wall_s": 102.49474814,
+          "generation_cpu_s": 94.652481641,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.356113106,
+              "cpu_s": 16.192913188,
+              "calls": 1,
+              "non_cpu_wall_s": 0.1631999180000001
+            },
+            "main/moe.combine": {
+              "wall_s": 0.875288392,
+              "cpu_s": 0.875023138,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00026525399999999255
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.616927045,
+              "cpu_s": 11.592182306999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.024744738000002542
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.607397918,
+              "cpu_s": 0.445896895,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.16150102299999997
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022075153,
+              "cpu_s": 0.021960394,
+              "calls": 48,
+              "non_cpu_wall_s": 0.000114758999999999
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 54.569743925000004,
+              "cpu_s": 49.289908415,
+              "calls": 3120,
+              "non_cpu_wall_s": 5.279835510000005
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.424009993,
+              "cpu_s": 0.508962767,
+              "calls": 48,
+              "non_cpu_wall_s": 1.915047226
+            },
+            "main/moe.metadata": {
+              "wall_s": 6.578555754000003,
+              "cpu_s": 6.566241444999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.012314309000004187
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.8998375440000004,
+              "cpu_s": 1.7957942470000003,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.10404329700000003
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.5552648319999999,
+              "cpu_s": 0.508163925,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.047100906999999914
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 3.582134831999999,
+              "cpu_s": 3.5020433089999994,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08009152299999966
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.407399646000001,
+              "cpu_s": 3.3533916109999993,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05400803500000162
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 45.002909596,
+              "cpu_s": 38.63606136600001,
+              "calls": 29358,
+              "non_cpu_wall_s": 6.366848229999995
+            }
+          },
+          "gc_wall_s": 0.972576996,
+          "gc_events": 3067
+        },
+        "usage": {
+          "ru_utime": 214.78286900000012,
+          "ru_stime": 3.0077870000000004,
+          "ru_nvcsw": 491712,
+          "ru_nivcsw": 299
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 29358,
+          "bytes": 277056847872,
+          "background_copies": 6016,
+          "urgent_copies": 23342,
+          "canceled": 0,
+          "escalated": 4730,
+          "restaged": 0
+        }
+      }
+    ],
+    "1": [
+      {
+        "repeat": 1,
+        "host": {
+          "generation_wall_s": 88.711459068,
+          "generation_cpu_s": 80.833226204,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.804470806,
+              "cpu_s": 16.398468955,
+              "calls": 1,
+              "non_cpu_wall_s": 0.40600185100000274
+            },
+            "main/moe.combine": {
+              "wall_s": 0.878065487,
+              "cpu_s": 0.87794284,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012264699999997575
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.485669841000002,
+              "cpu_s": 11.469542525000005,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01612731599999684
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.610973273,
+              "cpu_s": 0.4439246770000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.16704859599999994
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.020843318,
+              "cpu_s": 0.02072793,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011538800000000099
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 39.535781382,
+              "cpu_s": 34.547465343000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.988316038999997
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.570556522,
+              "cpu_s": 0.54103934,
+              "calls": 48,
+              "non_cpu_wall_s": 2.029517182
+            },
+            "main/moe.metadata": {
+              "wall_s": 8.901680212,
+              "cpu_s": 8.889139157,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.012541054999999801
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2753286300000002,
+              "cpu_s": 1.2084683930000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06686023699999977
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.32499002900000007,
+              "cpu_s": 0.297753324,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.027236705000000083
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.942824493,
+              "cpu_s": 2.9020147100000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.04080978299999938
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.3602750750000006,
+              "cpu_s": 3.23673901,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.12353606500000058
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 38.976052671999994,
+              "cpu_s": 33.959937722,
+              "calls": 28595,
+              "non_cpu_wall_s": 5.016114949999995
+            }
+          },
+          "gc_wall_s": 0.960611948,
+          "gc_events": 3136
+        },
+        "usage": {
+          "ru_utime": 184.07220200000003,
+          "ru_stime": 2.6823909999999955,
+          "ru_nvcsw": 482407,
+          "ru_nivcsw": 110
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 28595,
+          "bytes": 269856276480,
+          "background_copies": 6016,
+          "urgent_copies": 22579,
+          "canceled": 0,
+          "escalated": 4687,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 2,
+        "host": {
+          "generation_wall_s": 91.411148791,
+          "generation_cpu_s": 84.042806084,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.925706164,
+              "cpu_s": 16.503109051,
+              "calls": 1,
+              "non_cpu_wall_s": 0.4225971130000019
+            },
+            "main/moe.combine": {
+              "wall_s": 0.830785288,
+              "cpu_s": 0.830579005,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00020628299999991828
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.820718923999994,
+              "cpu_s": 11.808178665000002,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01254025899999256
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.607841884,
+              "cpu_s": 0.4607896080000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.14705227599999998
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021087191,
+              "cpu_s": 0.020972568,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001146230000000012
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 39.24170276000001,
+              "cpu_s": 34.45997811900001,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.781724640999997
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.314310574,
+              "cpu_s": 0.574823851,
+              "calls": 48,
+              "non_cpu_wall_s": 1.7394867229999997
+            },
+            "main/moe.metadata": {
+              "wall_s": 11.644214277999996,
+              "cpu_s": 11.632457182000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01175709599999486
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2910761940000002,
+              "cpu_s": 1.2278911140000002,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06318508
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3394922789999999,
+              "cpu_s": 0.3083005749999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.031191703999999987
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.956992298000001,
+              "cpu_s": 2.9171033779999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03988892000000144
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.4172209570000005,
+              "cpu_s": 3.2986229679999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.11859798900000085
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 38.87073485700001,
+              "cpu_s": 34.28825772399998,
+              "calls": 28595,
+              "non_cpu_wall_s": 4.582477133000026
+            }
+          },
+          "gc_wall_s": 0.979030596,
+          "gc_events": 3137
+        },
+        "usage": {
+          "ru_utime": 186.79316099999994,
+          "ru_stime": 2.779296000000002,
+          "ru_nvcsw": 440581,
+          "ru_nivcsw": 83
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 28595,
+          "bytes": 269856276480,
+          "background_copies": 6016,
+          "urgent_copies": 22579,
+          "canceled": 0,
+          "escalated": 4687,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 3,
+        "host": {
+          "generation_wall_s": 98.013556694,
+          "generation_cpu_s": 94.725722067,
+          "phases": {
+            "main/generation": {
+              "wall_s": 15.681072899,
+              "cpu_s": 15.687886508,
+              "calls": 1,
+              "non_cpu_wall_s": -0.006813608999999943
+            },
+            "main/moe.combine": {
+              "wall_s": 0.77607927,
+              "cpu_s": 0.775996852,
+              "calls": 48,
+              "non_cpu_wall_s": 8.241799999997301e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.839625587000002,
+              "cpu_s": 11.815630254000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.023995332999996677
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.490699182,
+              "cpu_s": 0.45589707300000004,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.03480210899999997
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.02049532,
+              "cpu_s": 0.020384447,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011087300000000092
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 48.92412361999999,
+              "cpu_s": 47.43118483600001,
+              "calls": 3120,
+              "non_cpu_wall_s": 1.492938783999982
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.125654749,
+              "cpu_s": 0.814353328,
+              "calls": 48,
+              "non_cpu_wall_s": 1.311301421
+            },
+            "main/moe.metadata": {
+              "wall_s": 7.983267423999998,
+              "cpu_s": 7.974285327000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.008982096999996969
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 2.5389562679999997,
+              "cpu_s": 2.4419374219999987,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.09701884600000099
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 1.0695607890000003,
+              "cpu_s": 0.8504689430000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.21909184599999987
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 3.623827744000001,
+              "cpu_s": 3.5229429180000005,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1008848260000006
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.940193842000001,
+              "cpu_s": 2.934754159,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.005439683000000972
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 33.18114282000001,
+              "cpu_s": 28.09859268499999,
+              "calls": 28595,
+              "non_cpu_wall_s": 5.082550135000023
+            }
+          },
+          "gc_wall_s": 0.963655862,
+          "gc_events": 3141
+        },
+        "usage": {
+          "ru_utime": 183.23124199999995,
+          "ru_stime": 1.5599909999999966,
+          "ru_nvcsw": 334644,
+          "ru_nivcsw": 60
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 28595,
+          "bytes": 269856276480,
+          "background_copies": 6016,
+          "urgent_copies": 22579,
+          "canceled": 0,
+          "escalated": 4687,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 4,
+        "host": {
+          "generation_wall_s": 102.494593887,
+          "generation_cpu_s": 93.992194734,
+          "phases": {
+            "main/generation": {
+              "wall_s": 16.914888378,
+              "cpu_s": 16.387817277,
+              "calls": 1,
+              "non_cpu_wall_s": 0.5270711010000007
+            },
+            "main/moe.combine": {
+              "wall_s": 0.888703197,
+              "cpu_s": 0.888612587,
+              "calls": 48,
+              "non_cpu_wall_s": 9.060999999999098e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.923072696000006,
+              "cpu_s": 11.903712030000005,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.019360666000000748
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5213749029999999,
+              "cpu_s": 0.428139235,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.09323566799999988
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.020881129,
+              "cpu_s": 0.020767767,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001133619999999988
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 39.521661102,
+              "cpu_s": 33.901494837,
+              "calls": 3120,
+              "non_cpu_wall_s": 5.620166265000002
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.425936226,
+              "cpu_s": 0.493874074,
+              "calls": 48,
+              "non_cpu_wall_s": 1.932062152
+            },
+            "main/moe.metadata": {
+              "wall_s": 22.234173415,
+              "cpu_s": 22.211954210000002,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.022219204999998965
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2843882420000006,
+              "cpu_s": 1.2133602469999998,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.07102799500000079
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.36107909300000013,
+              "cpu_s": 0.3168751760000001,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.04420391700000004
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.9843668309999996,
+              "cpu_s": 2.9460201439999993,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03834668700000021
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.4140686749999998,
+              "cpu_s": 3.279567149999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.13450152500000057
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 41.81097824600001,
+              "cpu_s": 36.763496308000015,
+              "calls": 28595,
+              "non_cpu_wall_s": 5.047481937999997
+            }
+          },
+          "gc_wall_s": 0.975740279,
+          "gc_events": 3138
+        },
+        "usage": {
+          "ru_utime": 201.934798,
+          "ru_stime": 2.420963999999998,
+          "ru_nvcsw": 484100,
+          "ru_nivcsw": 84
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 28595,
+          "bytes": 269856276480,
+          "background_copies": 6016,
+          "urgent_copies": 22579,
+          "canceled": 0,
+          "escalated": 4687,
+          "restaged": 0
+        }
+      }
+    ],
+    "2": [
+      {
+        "repeat": 1,
+        "host": {
+          "generation_wall_s": 88.711252757,
+          "generation_cpu_s": 81.291555035,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.55483486,
+              "cpu_s": 17.247929572,
+              "calls": 1,
+              "non_cpu_wall_s": 0.3069052879999994
+            },
+            "main/moe.combine": {
+              "wall_s": 0.879776153,
+              "cpu_s": 0.879540922,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0002352310000000024
+            },
+            "main/moe.current_controller": {
+              "wall_s": 9.535735457,
+              "cpu_s": 9.50345219,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.03228326699999862
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.6159214590000002,
+              "cpu_s": 0.43883128099999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.1770901780000002
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022131269,
+              "cpu_s": 0.022017093,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011417599999999709
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 38.516791741,
+              "cpu_s": 33.88450664500001,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.63228509599999
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.574783634,
+              "cpu_s": 0.660775538,
+              "calls": 48,
+              "non_cpu_wall_s": 1.914008096
+            },
+            "main/moe.metadata": {
+              "wall_s": 11.955487706999996,
+              "cpu_s": 11.935568641,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.019919065999996377
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2110416110000002,
+              "cpu_s": 1.135601607,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.07544000400000028
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3495650819999998,
+              "cpu_s": 0.312422896,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0371421859999998
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.607275853,
+              "cpu_s": 2.5119319300000007,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.09534392299999928
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.887907931,
+              "cpu_s": 2.7589767200000006,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.12893121099999938
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 36.342320576999995,
+              "cpu_s": 32.924119039,
+              "calls": 27798,
+              "non_cpu_wall_s": 3.418201537999998
+            }
+          },
+          "gc_wall_s": 0.864240213,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 185.26027499999998,
+          "ru_stime": 3.147064999999998,
+          "ru_nvcsw": 444069,
+          "ru_nivcsw": 105
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27798,
+          "bytes": 262334840832,
+          "background_copies": 6016,
+          "urgent_copies": 21782,
+          "canceled": 0,
+          "escalated": 4742,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 2,
+        "host": {
+          "generation_wall_s": 91.41093958,
+          "generation_cpu_s": 84.905783847,
+          "phases": {
+            "main/generation": {
+              "wall_s": 18.109190952,
+              "cpu_s": 17.772144112,
+              "calls": 1,
+              "non_cpu_wall_s": 0.3370468399999993
+            },
+            "main/moe.combine": {
+              "wall_s": 0.883746797,
+              "cpu_s": 0.883637083,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001097140000000385
+            },
+            "main/moe.current_controller": {
+              "wall_s": 9.824136371999996,
+              "cpu_s": 9.812187901999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.0119484700000001
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.42635231600000006,
+              "cpu_s": 0.39013842800000004,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.03621388800000003
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022080671,
+              "cpu_s": 0.021964386,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001162850000000007
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 36.718094308,
+              "cpu_s": 32.78883921200001,
+              "calls": 3120,
+              "non_cpu_wall_s": 3.9292550959999843
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.316929103,
+              "cpu_s": 0.437052589,
+              "calls": 48,
+              "non_cpu_wall_s": 1.8798765140000002
+            },
+            "main/moe.metadata": {
+              "wall_s": 16.161890374,
+              "cpu_s": 16.111153231,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.05073714299999921
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.1891399370000002,
+              "cpu_s": 1.126454047,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06268589000000024
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.33792313300000004,
+              "cpu_s": 0.30903873200000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.028884401000000004
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.523797928999999,
+              "cpu_s": 2.461056666,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06274126299999905
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.8976576880000007,
+              "cpu_s": 2.7921174589999986,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.10554022900000204
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 43.377001782,
+              "cpu_s": 39.805593780999985,
+              "calls": 27798,
+              "non_cpu_wall_s": 3.571408001000016
+            }
+          },
+          "gc_wall_s": 0.87780884,
+          "gc_events": 3079
+        },
+        "usage": {
+          "ru_utime": 193.813733,
+          "ru_stime": 2.733108999999999,
+          "ru_nvcsw": 410279,
+          "ru_nivcsw": 63
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27798,
+          "bytes": 262334840832,
+          "background_copies": 6016,
+          "urgent_copies": 21782,
+          "canceled": 0,
+          "escalated": 4742,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 3,
+        "host": {
+          "generation_wall_s": 98.013271822,
+          "generation_cpu_s": 89.685226483,
+          "phases": {
+            "main/generation": {
+              "wall_s": 18.811159321,
+              "cpu_s": 18.319818908,
+              "calls": 1,
+              "non_cpu_wall_s": 0.4913404130000032
+            },
+            "main/moe.combine": {
+              "wall_s": 0.869741187,
+              "cpu_s": 0.86944468,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0002965070000000569
+            },
+            "main/moe.current_controller": {
+              "wall_s": 9.578772136999998,
+              "cpu_s": 9.548626774,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.03014536299999726
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5977284959999998,
+              "cpu_s": 0.439705545,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.1580229509999998
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022108984,
+              "cpu_s": 0.021996262,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001127220000000026
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 39.970063481,
+              "cpu_s": 34.576646419999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 5.393417061000001
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.129534087,
+              "cpu_s": 0.299559546,
+              "calls": 48,
+              "non_cpu_wall_s": 1.8299745410000001
+            },
+            "main/moe.metadata": {
+              "wall_s": 18.777697306,
+              "cpu_s": 18.757703083000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.019994222999994093
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.195383958,
+              "cpu_s": 1.125125938,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.07025802000000003
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.4296735069999999,
+              "cpu_s": 0.36072160499999995,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06895190199999995
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.573869861,
+              "cpu_s": 2.5114485040000005,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0624213569999994
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.0575394970000005,
+              "cpu_s": 2.854429218,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.20311027900000056
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 40.78028414299998,
+              "cpu_s": 37.310818450000006,
+              "calls": 27798,
+              "non_cpu_wall_s": 3.469465692999975
+            }
+          },
+          "gc_wall_s": 0.891895052,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 200.13460800000007,
+          "ru_stime": 3.336902000000002,
+          "ru_nvcsw": 446934,
+          "ru_nivcsw": 75
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27798,
+          "bytes": 262334840832,
+          "background_copies": 6016,
+          "urgent_copies": 21782,
+          "canceled": 0,
+          "escalated": 4742,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 4,
+        "host": {
+          "generation_wall_s": 102.494469455,
+          "generation_cpu_s": 97.964389982,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.584953144,
+              "cpu_s": 17.570658064,
+              "calls": 1,
+              "non_cpu_wall_s": 0.014295080000000127
+            },
+            "main/moe.combine": {
+              "wall_s": 0.913052062,
+              "cpu_s": 0.912961409,
+              "calls": 48,
+              "non_cpu_wall_s": 9.06529999999961e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 9.619916477000004,
+              "cpu_s": 9.591077781000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.028838695999997555
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.569715494,
+              "cpu_s": 0.4299299530000001,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.1397855409999999
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022210534,
+              "cpu_s": 0.022095394,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011513999999999969
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 34.717852584000006,
+              "cpu_s": 32.02410808899999,
+              "calls": 3120,
+              "non_cpu_wall_s": 2.6937444950000184
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.426930938,
+              "cpu_s": 0.985819292,
+              "calls": 48,
+              "non_cpu_wall_s": 1.441111646
+            },
+            "main/moe.metadata": {
+              "wall_s": 29.894776462000003,
+              "cpu_s": 29.885191560000003,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.009584902000000284
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.217279707,
+              "cpu_s": 1.131589526,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08569018100000014
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3350840539999999,
+              "cpu_s": 0.3069441419999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.02813991199999999
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.5642074900000003,
+              "cpu_s": 2.507527953,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05667953700000039
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.6284905089999997,
+              "cpu_s": 2.596486818999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.032003690000000695
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 31.139752805000004,
+              "cpu_s": 27.741632385,
+              "calls": 27798,
+              "non_cpu_wall_s": 3.398120420000005
+            }
+          },
+          "gc_wall_s": 0.887692398,
+          "gc_events": 3079
+        },
+        "usage": {
+          "ru_utime": 186.01555099999996,
+          "ru_stime": 1.8927770000000024,
+          "ru_nvcsw": 331176,
+          "ru_nivcsw": 57
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27798,
+          "bytes": 262334840832,
+          "background_copies": 6016,
+          "urgent_copies": 21782,
+          "canceled": 0,
+          "escalated": 4742,
+          "restaged": 0
+        }
+      }
+    ],
+    "3": [
+      {
+        "repeat": 1,
+        "host": {
+          "generation_wall_s": 88.711337142,
+          "generation_cpu_s": 80.956063441,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.0970314,
+              "cpu_s": 16.69324713,
+              "calls": 1,
+              "non_cpu_wall_s": 0.40378426999999917
+            },
+            "main/moe.combine": {
+              "wall_s": 0.867238881,
+              "cpu_s": 0.867048297,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00019058400000004916
+            },
+            "main/moe.current_controller": {
+              "wall_s": 10.188628181,
+              "cpu_s": 10.159033237999997,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.02959494300000287
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5115734870000002,
+              "cpu_s": 0.37472618500000004,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.13684730200000012
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021280382,
+              "cpu_s": 0.021160009,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012037300000000001
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 37.767037194,
+              "cpu_s": 32.807505637000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 4.959531556999991
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.574594868,
+              "cpu_s": 0.733446661,
+              "calls": 48,
+              "non_cpu_wall_s": 1.8411482070000003
+            },
+            "main/moe.metadata": {
+              "wall_s": 12.688333753999995,
+              "cpu_s": 12.672188665999997,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.016145087999998253
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2231512079999998,
+              "cpu_s": 1.133315424,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0898357839999997
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.38535280400000005,
+              "cpu_s": 0.32642365600000006,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05892914799999999
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.5813453510000004,
+              "cpu_s": 2.4986165629999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08272878800000072
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.8057696319999996,
+              "cpu_s": 2.669351975,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.13641765699999953
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 36.624632447,
+              "cpu_s": 33.06645356000001,
+              "calls": 27051,
+              "non_cpu_wall_s": 3.558178886999997
+            }
+          },
+          "gc_wall_s": 0.909124462,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 183.256532,
+          "ru_stime": 2.7072900000000004,
+          "ru_nvcsw": 485972,
+          "ru_nivcsw": 91
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27051,
+          "bytes": 255285264384,
+          "background_copies": 6016,
+          "urgent_copies": 21035,
+          "canceled": 0,
+          "escalated": 4732,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 2,
+        "host": {
+          "generation_wall_s": 91.410775304,
+          "generation_cpu_s": 85.031334113,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.579854087,
+              "cpu_s": 17.262077749,
+              "calls": 1,
+              "non_cpu_wall_s": 0.3177763380000016
+            },
+            "main/moe.combine": {
+              "wall_s": 0.86853566,
+              "cpu_s": 0.868410602,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012505800000006673
+            },
+            "main/moe.current_controller": {
+              "wall_s": 10.214844600000003,
+              "cpu_s": 10.198209684999995,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01663491500000802
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.44986311500000004,
+              "cpu_s": 0.3690312259999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.08083188900000021
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021305411,
+              "cpu_s": 0.021168896,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00013651500000000025
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 36.348677277,
+              "cpu_s": 32.428359271,
+              "calls": 3120,
+              "non_cpu_wall_s": 3.9203180060000022
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.316440218,
+              "cpu_s": 0.599919635,
+              "calls": 48,
+              "non_cpu_wall_s": 1.7165205829999999
+            },
+            "main/moe.metadata": {
+              "wall_s": 16.677359396000007,
+              "cpu_s": 16.657971321,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.0193880750000055
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.1905097800000002,
+              "cpu_s": 1.124062138,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0664476420000002
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.38474505099999995,
+              "cpu_s": 0.33445754899999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.050287501999999984
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.5593074549999995,
+              "cpu_s": 2.488194722,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.07111273299999965
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.799333254000001,
+              "cpu_s": 2.6794713189999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1198619350000012
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 37.576313052999986,
+              "cpu_s": 34.399385806,
+              "calls": 27051,
+              "non_cpu_wall_s": 3.1769272469999876
+            }
+          },
+          "gc_wall_s": 0.926748584,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 186.852464,
+          "ru_stime": 2.579889999999999,
+          "ru_nvcsw": 413214,
+          "ru_nivcsw": 62
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27051,
+          "bytes": 255285264384,
+          "background_copies": 6016,
+          "urgent_copies": 21035,
+          "canceled": 0,
+          "escalated": 4732,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 3,
+        "host": {
+          "generation_wall_s": 98.013356498,
+          "generation_cpu_s": 94.39390724,
+          "phases": {
+            "main/generation": {
+              "wall_s": 18.022325767,
+              "cpu_s": 17.921238709,
+              "calls": 1,
+              "non_cpu_wall_s": 0.10108705800000095
+            },
+            "main/moe.combine": {
+              "wall_s": 0.814788778,
+              "cpu_s": 0.814699315,
+              "calls": 48,
+              "non_cpu_wall_s": 8.946300000001184e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 10.161190223000002,
+              "cpu_s": 10.153971008,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.007219215000002777
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.36111634300000006,
+              "cpu_s": 0.34436401299999997,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.016752330000000093
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021431807,
+              "cpu_s": 0.021312103,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00011970400000000173
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 32.95807895099999,
+              "cpu_s": 30.993751433,
+              "calls": 3120,
+              "non_cpu_wall_s": 1.9643275179999904
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.126591325,
+              "cpu_s": 0.776874384,
+              "calls": 48,
+              "non_cpu_wall_s": 1.349716941
+            },
+            "main/moe.metadata": {
+              "wall_s": 26.85856954200001,
+              "cpu_s": 26.84253607399999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.016033468000017592
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.1676252320000002,
+              "cpu_s": 1.129114874,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03851035800000013
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3567844640000001,
+              "cpu_s": 0.32323677,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03354769400000007
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.4988997540000013,
+              "cpu_s": 2.4696674910000005,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.029232263000000813
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.665954312,
+              "cpu_s": 2.6031410659999996,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0628132460000006
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 37.52603157999998,
+              "cpu_s": 33.982081312,
+              "calls": 27051,
+              "non_cpu_wall_s": 3.543950267999982
+            }
+          },
+          "gc_wall_s": 0.922301727,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 190.0628650000001,
+          "ru_stime": 1.5895119999999991,
+          "ru_nvcsw": 370349,
+          "ru_nivcsw": 69
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27051,
+          "bytes": 255285264384,
+          "background_copies": 6016,
+          "urgent_copies": 21035,
+          "canceled": 0,
+          "escalated": 4732,
+          "restaged": 0
+        }
+      },
+      {
+        "repeat": 4,
+        "host": {
+          "generation_wall_s": 102.494392234,
+          "generation_cpu_s": 98.061007772,
+          "phases": {
+            "main/generation": {
+              "wall_s": 17.074808748,
+              "cpu_s": 17.00271035,
+              "calls": 1,
+              "non_cpu_wall_s": 0.07209839799999784
+            },
+            "main/moe.combine": {
+              "wall_s": 0.965687368,
+              "cpu_s": 0.965579342,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00010802600000003881
+            },
+            "main/moe.current_controller": {
+              "wall_s": 9.954903816000003,
+              "cpu_s": 9.941613026,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.013290790000002772
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.39697382999999997,
+              "cpu_s": 0.36369156400000013,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.03328226599999984
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021136819,
+              "cpu_s": 0.021008689,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001281300000000006
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 38.868186632000004,
+              "cpu_s": 36.947066707000005,
+              "calls": 3120,
+              "non_cpu_wall_s": 1.9211199249999993
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 2.42996847,
+              "cpu_s": 0.39699111,
+              "calls": 48,
+              "non_cpu_wall_s": 2.03297736
+            },
+            "main/moe.metadata": {
+              "wall_s": 24.940784495999996,
+              "cpu_s": 24.927964518000007,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.012819977999988907
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.727703231,
+              "cpu_s": 1.6450577150000003,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0826455159999997
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.713940626,
+              "cpu_s": 0.5578128299999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.15612779600000004
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.7708477119999992,
+              "cpu_s": 2.708183272,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06266443999999938
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.629450486000001,
+              "cpu_s": 2.5833286490000007,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.046121837000000276
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 34.44667642200001,
+              "cpu_s": 29.889170199,
+              "calls": 27051,
+              "non_cpu_wall_s": 4.557506223000011
+            }
+          },
+          "gc_wall_s": 0.937264473,
+          "gc_events": 3078
+        },
+        "usage": {
+          "ru_utime": 188.490639,
+          "ru_stime": 1.378906999999998,
+          "ru_nvcsw": 384662,
+          "ru_nivcsw": 55
+        },
+        "controller": {
+          "issued": 24064,
+          "useful": 18891,
+          "wasted": 5173,
+          "promotions": 18891,
+          "promotion_evictions": 18891,
+          "promotion_victim_reloads": 14474,
+          "mandatory": 88738,
+          "quota_violations": 0
+        },
+        "scheduler": {
+          "copies": 27051,
+          "bytes": 255285264384,
+          "background_copies": 6016,
+          "urgent_copies": 21035,
+          "canceled": 0,
+          "escalated": 4732,
+          "restaged": 0
+        }
+      }
+    ]
+  },
+  "interpretation": "ABBA two diagnostic generations per switch interval. All samples retained. Within-setting stability and between-setting association only; instrumentation and temporal interference remain possible. No primary policy gain claim."
+}

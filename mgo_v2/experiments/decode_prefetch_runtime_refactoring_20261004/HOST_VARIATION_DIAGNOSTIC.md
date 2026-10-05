@@ -73,3 +73,21 @@ tokens, logical workload, BF16 and frozen routes. This is a diagnostic
 intervention, not BR-vs-LA timing or proof that GIL is the sole cause. Record
 all samples and context switches. Test B128 first; no unchanged repetition.
 If promising, validate B256 and then uninstrumented timing before adoption.
+
+### Switch-interval result and CPU placement control
+
+GIL ABBA: original TPOT 1.21065/1.42800s (16.47% difference); 1ms
+TPOT 1.26073/1.36980s (8.29%). All four got progressively slower, so do not
+attribute the smaller middle-pair spread to the interval. Reject 1ms as an
+established stabilization. Work and tokens remained validated. In the middle
+pair rank1 expert host CPU increased ~12.97s, while ranks0/3 metadata CPU
+increased ~7.88/~10.18s; this again suggests one rank's delay propagating,
+without distinguishing dispatch/spin/memory/scheduling as its cause.
+
+Next diagnostic ABBA changes only process-local CPU placement: existing
+24-CPU rank mask versus main pinned to its first CPU, staging to its second,
+and existing helper threads to the remaining 22. No host affinity or foreign
+process changes, no new buffers. Restore the original rank mask for the last
+generation. Keep default Python switch interval. Two samples each, B128 first.
+This tests migration/shared-core contention within a rank, not physical NUMA
+placement (the guest does not expose it). Record actual masks in every sample.

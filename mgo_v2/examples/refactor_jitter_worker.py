@@ -32,9 +32,13 @@ def main(a):
  original_phase=runtime_module.nvtx_phase;original_stage=h2d_module.copy_expert_to_stage
  from torch._dynamo.utils import counters
  original_switch=sys.getswitchinterval()
- schedule=[original_switch,.001,.001,original_switch] if case.get('gil_switch_abba') else [original_switch]*2
+ schedule=[original_switch,.001,.001,original_switch] if case.get('gil_switch_abba') else [original_switch]*(4 if case.get('thread_affinity_abba') else 2)
  for repeat,switch_interval in enumerate(schedule,1):
   sys.setswitchinterval(switch_interval)
+  placement=None
+  if case.get('thread_affinity_abba'):
+   from refactor_thread_affinity import configure
+   placement=configure(cpus,rt.h2d.thread.native_id,repeat in (2,3))
   rt.reset();a.phase='MEASURE';torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
   diag=HostDiagnostics(lambda:rt.index)
   @contextmanager
@@ -61,7 +65,7 @@ def main(a):
   u1=resource.getrusage(resource.RUSAGE_SELF)
   assert before==dict(counters['stats']) and np.array_equal(expected,tokens)
   validate(rt,row,proof,rank)
-  write(a.output/f'diagnostic_r{repeat}_rank{rank}.json',dict(status='PASS',primary_timing=False,rank=rank,repeat=repeat,case=case,switch_interval_s=sys.getswitchinterval(),metrics=row,host=detail,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),process_usage={k:getattr(u1,k)-getattr(u0,k) for k in ['ru_utime','ru_stime','ru_nvcsw','ru_nivcsw']},interpretation='Two instrumented same-policy generations for phase variation, not additional primary BR-vs-LA samples. No samples excluded.'))
+  write(a.output/f'diagnostic_r{repeat}_rank{rank}.json',dict(status='PASS',primary_timing=False,rank=rank,repeat=repeat,case=case,switch_interval_s=sys.getswitchinterval(),thread_placement=placement,metrics=row,host=detail,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),process_usage={k:getattr(u1,k)-getattr(u0,k) for k in ['ru_utime','ru_stime','ru_nvcsw','ru_nivcsw']},interpretation='Two instrumented same-policy generations for phase variation, not additional primary BR-vs-LA samples. No samples excluded.'))
   dist.barrier()
  sys.setswitchinterval(original_switch)
  rt.close();dist.barrier();dist.destroy_process_group()
