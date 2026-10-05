@@ -1,0 +1,158 @@
+{
+  "status": "PLANNED",
+  "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
+  "hardware": {
+    "world": 4,
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "primary_environment": "env1_normal_nccl"
+  },
+  "stages": [
+    {
+      "id": "A1_A2A_SPLIT",
+      "packet_bytes": [
+        4120,
+        4096
+      ],
+      "volume_source": "derive three representative packet-volume levels from 9c20847 BR C30/C60 traces",
+      "shapes": [
+        "BALANCED",
+        "PAIR_HOT",
+        "DEST_HOT",
+        "SRC_HOT",
+        "TRACE_BR",
+        "TRACE_FCA"
+      ],
+      "repeats": 100,
+      "warmups": 20,
+      "primary_metrics": [
+        "gpu_ms",
+        "max_peer_edge",
+        "max_incident",
+        "max_send",
+        "max_recv",
+        "active_directed_edges"
+      ]
+    },
+    {
+      "id": "A2_ARRIVAL_SKEW",
+      "delays_ms": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        1,
+        2
+      ],
+      "delayed_rank_rotation": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "matrices": [
+        "BALANCED",
+        "TRACE_REPRESENTATIVE"
+      ],
+      "repeats": 100,
+      "warmups": 20,
+      "primary_metrics": [
+        "achieved_delay_ms",
+        "collective_completion_ms",
+        "incremental_tail_ms"
+      ]
+    },
+    {
+      "id": "A3_EXPERT_TAU",
+      "rows": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512
+      ],
+      "extend_to_trace_max": true,
+      "bundle_sizes": [
+        2,
+        4,
+        8
+      ],
+      "primary_metrics": [
+        "kernel_gpu_ms",
+        "bundle_gpu_ms",
+        "prediction_error"
+      ]
+    },
+    {
+      "id": "B_MODEL_VALIDATION",
+      "validation_cells": [
+        "C30_BR",
+        "C30_OLD_CA",
+        "C30_FCA",
+        "C30_LA_CA",
+        "C60_BR",
+        "C60_OLD_CA",
+        "C60_FCA",
+        "C60_LA_CA"
+      ],
+      "gates": {
+        "qualitative_order": "LA_CA ~= BR < OLD_CA < FCA",
+        "event_spearman_min": 0.6,
+        "median_absolute_relative_error_max": 0.25
+      }
+    },
+    {
+      "id": "C_ORACLE",
+      "action_space": "current-layer residual miss expert-to-rank assignment only",
+      "future_routes": false,
+      "replication": false,
+      "migration": false,
+      "balanced_h2d_quota": true,
+      "solver": "exact MILP/HiGHS if validated model is exactly representable; otherwise STOP"
+    },
+    {
+      "id": "D_PHYSICAL_HEADROOM",
+      "settings": [
+        {
+          "cache_ratio": 0.3,
+          "local_batch": 128
+        },
+        {
+          "cache_ratio": 0.6,
+          "local_batch": 128
+        }
+      ],
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "prefetch_slots_per_rank": 2,
+      "trigger": "T2",
+      "decode_horizon": 64,
+      "policies": [
+        "BR",
+        "FROZEN_CRITICAL_PATH_ORACLE"
+      ],
+      "decision": {
+        "go": "oracle TPOT gain >=5% in one cell and >=3% in the other",
+        "marginal": "2-5% headroom",
+        "no_go": "oracle TPOT gain <=2% in both cells"
+      }
+    }
+  ],
+  "automatic_followups_disallowed": [
+    "online CPA implementation",
+    "FCA or LA_CA retuning",
+    "lambda-weighted packet/row objective",
+    "R8",
+    "B8/B256 sweeps",
+    "replication",
+    "substitution"
+  ]
+}
