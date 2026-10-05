@@ -17,6 +17,8 @@ class ProfileRuntime(DecodeOffloadRuntime):
   if not getattr(self,'capture',False):return super().execute(*args)
   with nvtx_phase(f'{"decode" if self.index>=48 else "prefill"}.event.{self.index}'):
    result=super().execute(*args)
+  if self.index%192==0:
+   write(self.args.output/f'progress_rank{self.rank}.json',dict(stage='CAPTURE',completed_events=self.index,unix=time.time()))
   if self.index==48:self.profile_prefill_metrics=dict(self.h2d.metrics)
   return result
 
@@ -60,6 +62,12 @@ class ProfileRuntime(DecodeOffloadRuntime):
 
 def main(a):
  rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);physical=int(os.environ.get('MGO_V2_PHYSICAL_GPUS','0,1,2,3,4,5,6,7').split(',')[rank]);a.output.mkdir(parents=True,exist_ok=True)
+ import faulthandler
+ stack_log=(a.output/f'stacks_rank{rank}.log').open('w')
+ faulthandler.enable(file=stack_log)
+ faulthandler.dump_traceback_later(120,repeat=True,file=stack_log)
+ def progress(stage):write(a.output/f'progress_rank{rank}.json',dict(stage=stage,unix=time.time()))
+ progress('SETUP')
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical)]
  for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
@@ -92,12 +100,12 @@ def main(a):
   def profiled_call(*args,_original=original,_phase=phase,**kwargs):
    with nvtx_phase(_phase):return _original(*args,**kwargs)
   setattr(module,name,profiled_call)
- before=dict(counters['stats']);torch.cuda.profiler.start()
+ before=dict(counters['stats']);progress('PROFILER_START');torch.cuda.profiler.start();progress('CAPTURE_STARTED')
  try:
   with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
-  torch.cuda.synchronize();rt.h2d.synchronize()
+  progress('CAPTURE_GENERATION_RETURNED');torch.cuda.synchronize();rt.h2d.synchronize()
  finally:
-  torch.cuda.profiler.stop();h2d_module.copy_expert_to_stage=original_stage
+  progress('PROFILER_STOP');torch.cuda.profiler.stop();progress('PROFILER_STOPPED');h2d_module.copy_expert_to_stage=original_stage
   for module,name,original in diagnostic_hooks:setattr(module,name,original)
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
@@ -107,5 +115,6 @@ def main(a):
  write(a.output/f'communication_rank{rank}.json',dict(status='PASS',rank=rank,events=rt.profile_communication,metadata_calls=rt.metadata.calls,payload_calls=rt.transport.calls,forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes,scope='Decode BF16 token/rank payload bytes excluding self, protocol overhead and metadata. Per-event peer counts come from the executed layout.'))
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
+ progress('COMPLETE');faulthandler.cancel_dump_traceback_later();stack_log.close()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--case',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())

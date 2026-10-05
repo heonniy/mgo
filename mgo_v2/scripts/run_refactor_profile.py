@@ -5,6 +5,7 @@ import run_timing_stability as h
 from batch_comm_common import stop_idle_load,start_idle_load
 from prepare_refactor_arms import ARMS,groups_for
 from run_refactor_measure import publish
+from profile_process_cleanup import track,terminate
 P=Path(__file__).resolve().parents[1];ROOT=Path('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004');PACKET=P/'experiments/decode_prefetch_runtime_refactoring_20261004';h.ROOT=ROOT
 
 def main(a):
@@ -17,7 +18,7 @@ def main(a):
  case['unique_combine']=a.unique_combine
  label=f'{a.stage}_{a.arm}_{a.policy}_B{a.batch}_H{a.horizon}';out=ROOT/label;out.mkdir(exist_ok=False);h.write(out/'case.json',case)
  state=dict(world=world,physical_gpus=a.gpus,status='RUNNING',stage=label,case=case,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),primary_timing=False)
- stop_idle_load();proc=None
+ stop_idle_load();proc=None;descendants={}
  try:
   deadline=time.monotonic()+180
   while any(g['temperature_c']>=65 for g in h.snapshot()['gpus']) and time.monotonic()<deadline:time.sleep(5)
@@ -26,6 +27,7 @@ def main(a):
   with (out/'run.log').open('w') as log:
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(out/'status.json',state)
    while proc.poll() is None:
+    track(proc.pid,descendants)
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if time.time()-state['started_unix']>(1800 if a.horizon==8 else 7200):raise TimeoutError('bounded profiling run')
     h.safe(h.sample(proc.pid));time.sleep(10)
@@ -37,9 +39,11 @@ def main(a):
   state.update(status='FAIL',error=repr(exc));raise
  finally:
   if proc and proc.poll() is None:
+   track(proc.pid,descendants)
    os.killpg(proc.pid,signal.SIGTERM)
    try:proc.wait(timeout=15)
    except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
+  terminate(descendants)
   state['finished_unix']=time.time();h.write(out/'status.json',state);receipt=PACKET/(label+'.json');h.write(receipt,state);publish(f'{label}: {state["status"]}',[receipt])
   if not (ROOT/'STOP').exists():h.write(out/'resident_models.json',dict(processes=start_idle_load(),unix=time.time()))
 if __name__=='__main__':

@@ -1,0 +1,9 @@
+{
+  "status": "DIAGNOSTIC_STALL_INTERRUPTED",
+  "primary_timing": false,
+  "pid": 622720,
+  "elapsed_seconds": 676.8451192378998,
+  "evidence": "No capture receipts; rank worker 622906 CPU ticks 55454 then 55460 across observations while other workers continued consuming CPU; GPU0 observed idle while GPU1/4/5 waited. Does not identify exact blocked API.",
+  "external_stack": "py-spy denied by ptrace_scope=1; sudo requires password; no privilege or kernel setting changed",
+  "next_action": "Add internal faulthandler and capture progress to diagnostic worker before retry. Preserve all prior primary timing samples."
+}
