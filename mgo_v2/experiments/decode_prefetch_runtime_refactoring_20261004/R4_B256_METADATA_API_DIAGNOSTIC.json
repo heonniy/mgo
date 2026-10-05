@@ -1,0 +1,72 @@
+{
+  "scope": "Rank0 decode-only 3072 metadata ranges. CUDA API wall durations include waits, not DMA time. No causal proof of primary jitter. Fields are [call count, total milliseconds].",
+  "source": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_DEFERFLUSH_V3_OPT_PF_OVERLAP_LA_B256_H64/interval_analysis/rank0.sqlite",
+  "metadata_api": {
+    "cudaStreamSynchronize_v3020": [
+      9216,
+      17450.690896000106
+    ],
+    "cudaMemcpyAsync_v3020": [
+      18432,
+      220.16546500000064
+    ],
+    "cudaLaunchKernel_v7000": [
+      12288,
+      87.56719499999998
+    ],
+    "cudaEventRecord_v3020": [
+      9216,
+      39.71445699999988
+    ],
+    "cuLaunchKernelEx": [
+      3072,
+      26.675896000000034
+    ],
+    "cudaEventRecordWithFlags_v11010": [
+      3072,
+      11.437674000000017
+    ],
+    "cudaStreamWaitEvent_v3020": [
+      6144,
+      10.456225999999956
+    ],
+    "cudaStreamIsCapturing_v10000": [
+      15360,
+      8.928134999999978
+    ],
+    "cudaEventCreateWithFlags_v3020": [
+      3073,
+      6.946515000000002
+    ],
+    "cudaStreamGetCaptureInfo_v2_v11030": [
+      3072,
+      3.918373000000004
+    ],
+    "cudaEventDestroy_v3020": [
+      3072,
+      3.2936000000000054
+    ],
+    "cudaGetFuncBySymbol_v11000": [
+      3072,
+      2.3951000000000047
+    ]
+  },
+  "before_collective_api": {
+    "cudaStreamSynchronize_v3020": [
+      6144,
+      16308.234239000061
+    ],
+    "cudaMemcpyAsync_v3020": [
+      15360,
+      192.35097700000065
+    ],
+    "cudaLaunchKernel_v7000": [
+      12288,
+      87.56719499999998
+    ],
+    "cudaStreamIsCapturing_v10000": [
+      6144,
+      4.729395999999991
+    ]
+  }
+}
