@@ -1,10 +1,17 @@
 {
-  "status": "FAIL",
-  "stage": "M15_V1_OPT_NOPF_BARRIER",
-  "label": "M15_V1_OPT_NOPF_BARRIER_B128_H256",
+  "status": "PASS",
+  "stage": "R4_H64_V1_OPT_NOPF_BARRIER",
+  "label": "R4_H64_V1_OPT_NOPF_BARRIER_B128_H64",
   "group": {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
     "batch": 128,
-    "horizon": 256,
+    "horizon": 64,
     "paired": true,
     "runtime_arm": "V1_OPT_NOPF_BARRIER",
     "cases": [
@@ -13,7 +20,7 @@
         "policy": "BR",
         "P": 0,
         "trigger": "T2",
-        "horizon": 256,
+        "horizon": 64,
         "overlap": false,
         "partial_precision": "bf16",
         "runtime_arm": "V1_OPT_NOPF_BARRIER"
@@ -23,24 +30,24 @@
         "policy": "LA",
         "P": 0,
         "trigger": "T2",
-        "horizon": 256,
+        "horizon": 64,
         "overlap": false,
         "partial_precision": "bf16",
         "runtime_arm": "V1_OPT_NOPF_BARRIER"
       }
     ]
   },
-  "started_unix": 1791157846.5849721,
-  "source_sha": "1f271bebb1180a5dbd31a37ecd65f9966a37fc7f",
+  "started_unix": 1791161721.9771166,
+  "source_sha": "284fb66a795d6e0cf4f5312a503bb96e558a060f",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
       "examples/env_offload_worker.py": "a4a7850c9e05c99506bf518dab9c651d46685c0169826706489c9012a079e3b9",
       "examples/fetch_relaxed_worker.py": "d35ca8fa8785edd062a19361ce514367ad892d3fcbcfc579b023e1205481ed32",
-      "examples/la_physical_worker.py": "41465007d50cf7a92902a83383ec1826eb977cf1d9115e4731e78fe50e2c26f5",
+      "examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
       "examples/refactor_baseline_worker.py": "d6a576da07d90b6de6fc7b0f7092a159563fa6d2c87e904b165ab86cffb56d38",
       "examples/refactor_measure_worker.py": "1e45ed03bbb8ecfd793cae55ee6a14a62782f843df06d919fec987a5a52f4d27",
-      "examples/refactor_paired_worker.py": "a3bc04538ecb9dbb9e535c1a73a3831075b7773411b7cf2cd7cecfaf62f0f74c",
+      "examples/refactor_paired_worker.py": "fa158332405d82f3930d3500f337b809fec3e09842e1c459d100c09fc5cb5584",
       "mgo_v2/__init__.py": "2fbb9e985e66e628bfc977a41df92df0bb089228f7646d0a534c3bf46e0205ef",
       "mgo_v2/active_peer.py": "a33334b2f2b55a37d5b53e9fa8178c53ccea80fc681297066567b1373a7ddfa3",
       "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
@@ -51,12 +58,12 @@
       "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
       "mgo_v2/compact_metadata.py": "bdd1697f56f4a85fd2045d98b20428c0c1b516474c9ca54a285b225a0d9545c4",
       "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
-      "mgo_v2/controller.py": "dcd4d1e9fc040fa547ec68187c0363bf63be248d1c5fe752c8e96746cdce18c4",
+      "mgo_v2/controller.py": "ef8f68fd94575b91ad5e7cf352fba43f8780d35a57e354f4c90a183ccfba49ff",
       "mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
       "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
       "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
       "mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
-      "mgo_v2/decode_runtime.py": "b41e7a091d56911fc21e96826aa2f149f66b872a90510e79f7f91b8d2defc570",
+      "mgo_v2/decode_runtime.py": "26997afb18e61b218f7195f35a2b4b7ed8faeaf7b374d31b059e4bcb09e9ec1e",
       "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
       "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
       "mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
@@ -77,40 +84,41 @@
       "mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
       "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
       "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
-      "scripts/adaptive_timing.py": "f5f8fe3bfbacd06fdc9037f2c17dab9421dd6aebc634ccfbdf01a19246f10f2f",
+      "scripts/adaptive_timing.py": "7b63e4135e7c29b8740112ce26677c136f0c20d6e7d64d6d5a7f651514f4b93f",
       "scripts/br_carep_cpu.py": "b24c51f8e7189fe6385faa78af5ad64b4d208e45f6434f83a7223757dec65b8f",
       "scripts/env_offload_layout.py": "517ae35d176066f2fc528e3639bc9fa96f6477e6b1c10a7f912de78203334607",
-      "scripts/env_offload_policy.py": "6d1cf45be11a056464727477c9f354985f4279851e13c664ff549b28bc4fd66b",
+      "scripts/env_offload_policy.py": "1c824d2f3b333590052501a670c636e6f1355167f20264dd726ec3a8bd5a3746",
       "scripts/env_offload_tensors.py": "529deabb0f689b285e4125227561b14a605cac42ccf3639bd4ef2e76a1ad2279",
-      "scripts/la_placement.py": "c06242c13f09f4727070893ab98947f1869853c7de09ecdc5454dccbfce6b940",
+      "scripts/la_placement.py": "2904437e22cf3d0557158427ecbdc228d8e7fd95c0527ef2d13fe5a431c2f4fe",
       "scripts/old_ca_fanout_policy.py": "ef0492d0f403fad7dca41b70b5916a70ac3b28ff01c7ff962b30ca6fc2724ffc",
       "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510"
     },
     "inputs": {
-      "selected.npy": "b314bac57acb82e114d0fb6a9de54e841ef58ef7b21770c149c9f7787e2fac96",
-      "weights.npy": "cc74a68e0dca60e52b208dc98733a0406b3c864f51c78ee7ab57f0a129f26847",
-      "offsets.npy": "85db82c3a95b3359bcc135fdd709839db58288e7260c93f17be00751cdf1cb49",
-      "prefill_origins.npy": "376c5a787245cb9350e7deb71ac34d2dde90a7e8dbf55abf30b362aecac68ad1",
-      "decode_origins.npy": "8a1ecb055201d1579064881f1a8e536d4f31a0bb8b2bcc1d57b2814159db5919",
-      "gates.npy": "2ba24c2979e562e0abc4708f627d74bf5e0ad179836b725446946a7d677c6e4d",
-      "teacher.npy": "e50bd18153efb61433c34314665489bf31f3c967794056ccb21f4f11e2c1bb7b",
-      "requests.json": "a621397ab67c5c644b08d70dd0f39a45838a1400eaecc44fab241f264be4cc41"
+      "selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+      "weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+      "offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+      "prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+      "decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+      "gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+      "teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+      "requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c"
     },
     "environment": {
-      "CUDA_VISIBLE_DEVICES": "0,1,2,3,4,5,6,7",
+      "CUDA_VISIBLE_DEVICES": "0,1,4,5",
       "OMP_NUM_THREADS": "2",
       "MKL_NUM_THREADS": "1",
       "OPENBLAS_NUM_THREADS": "1",
       "TORCHINDUCTOR_COMPILE_THREADS": "2",
-      "NCCL_CUMEM_ENABLE": "0"
+      "NCCL_CUMEM_ENABLE": "0",
+      "MGO_V2_PHYSICAL_GPUS": "0,1,4,5"
     },
     "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
     "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
-    "input_receipt_sha256": "10d67a7e8864faac5e2964f55676cfbbba310d70cec3073197791e4335e73160",
+    "input_receipt_sha256": "0559a6ff1e9cbd24e70ad551fdae7cec342a0e53f688204a1b9dc234146c9c8b",
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 392016,
+  "pid": 439387,
   "completed": [
     "BR_r1",
     "LA_r1",
@@ -119,7 +127,6 @@
     "BR_r3",
     "LA_r3"
   ],
-  "error": "RuntimeError('owner STOP')",
-  "exit_code": 1,
-  "finished_unix": 1791161494.2136889
+  "exit_code": 0,
+  "finished_unix": 1791162932.810182
 }
