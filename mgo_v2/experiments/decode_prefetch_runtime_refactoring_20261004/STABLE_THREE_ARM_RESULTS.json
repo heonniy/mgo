@@ -1,0 +1,1080 @@
+{
+  "world": 4,
+  "horizon": 64,
+  "status": "TIMING_CANDIDATE",
+  "winner": "V3_OPT_PF_OVERLAP",
+  "improvement_supported": false,
+  "rows": [
+    {
+      "arm": "V1_OPT_NOPF_BARRIER",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.005129920048088432,
+                "median": 0.005129717129207234,
+                "CI95": [
+                  -0.002976678716326786,
+                  0.013170996906639143
+                ],
+                "CI_half_width": 0.008073837811482965,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.0057651350140566215,
+                  0.004494299244357847
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.004662520613703092,
+                "median": 0.004661372311774492,
+                "CI95": [
+                  -0.01473480568667429,
+                  0.023689054204995563
+                ],
+                "CI_half_width": 0.019211929945834927,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.006173290700103973,
+                  0.0031494539234450114
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.59900049585849,
+                    "median": 100.59900049585849,
+                    "min": 100.50228290259838,
+                    "max": 100.6957180891186,
+                    "range_relative": 0.0019228340795312603,
+                    "mean_CI95": [
+                      99.37008695428368,
+                      101.8279140374333
+                    ],
+                    "relative_CI_half_width": 0.012215961744325717,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4139681396484374,
+                    "median": 1.4139681396484374,
+                    "min": 1.411726318359375,
+                    "max": 1.4162099609375,
+                    "range_relative": 0.003170964360795259,
+                    "mean_CI95": [
+                      1.385483099367188,
+                      1.4424531799296867
+                    ],
+                    "relative_CI_half_width": 0.020145461190046156,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.59900049585849,
+                  "TPOT": 1.4139681396484374
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 100.08289462374523,
+                    "median": 100.08289462374523,
+                    "min": 100.05059556849301,
+                    "max": 100.11519367899746,
+                    "range_relative": 0.0006454460649574593,
+                    "mean_CI95": [
+                      99.67249621491817,
+                      100.4932930325723
+                    ],
+                    "relative_CI_half_width": 0.0041005849238266055,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4073737182617188,
+                    "median": 1.4073737182617188,
+                    "min": 1.4072801513671875,
+                    "max": 1.40746728515625,
+                    "range_relative": 0.00013296666452857026,
+                    "mean_CI95": [
+                      1.406184838143256,
+                      1.4085625983801815
+                    ],
+                    "relative_CI_half_width": 0.0008447508313081146,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 100.08289462374523,
+                  "TPOT": 1.4073737182617188
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 100.6957180891186,
+                "TPOT": 1.4162099609375
+              },
+              "LA": {
+                "E2E_wall": 100.11519367899746,
+                "TPOT": 1.40746728515625
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 100.05059556849301,
+                "TPOT": 1.4072801513671875
+              },
+              "BR": {
+                "E2E_wall": 100.50228290259838,
+                "TPOT": 1.411726318359375
+              }
+            }
+          ],
+          "LA_TPOT": 1.4073737182617188,
+          "BR_TPOT": 1.4139681396484374
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.01619713902016917,
+                "median": 0.01619690753934533,
+                "CI95": [
+                  0.007584495081838227,
+                  0.024735038423332356
+                ],
+                "CI_half_width": 0.008575271670747064,
+                "early_late_drift": 0.0,
+                "positive_supported": true,
+                "paired_gains": [
+                  0.015522027515112335,
+                  0.016871787563578322
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.016021144672411003,
+                "median": 0.016021144446164648,
+                "CI95": [
+                  0.015752997239764643,
+                  0.016289219051194292
+                ],
+                "CI_half_width": 0.00026811090571482454,
+                "early_late_drift": 0.0,
+                "positive_supported": true,
+                "paired_gains": [
+                  0.016042245231802865,
+                  0.01600004366052643
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 129.63670369191095,
+                    "median": 129.63670369191095,
+                    "min": 129.57097343169153,
+                    "max": 129.70243395213038,
+                    "range_relative": 0.0010140686757299335,
+                    "mean_CI95": [
+                      128.8015215481861,
+                      130.47188583563582
+                    ],
+                    "relative_CI_half_width": 0.006442482105297278,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7451068115234376,
+                    "median": 1.7451068115234376,
+                    "min": 1.744639404296875,
+                    "max": 1.74557421875,
+                    "range_relative": 0.0005356774994815837,
+                    "mean_CI95": [
+                      1.7391678396074606,
+                      1.7510457834394146
+                    ],
+                    "relative_CI_half_width": 0.003403213990547904,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 129.63670369191095,
+                  "TPOT": 1.7451068115234376
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 127.53694562846795,
+                    "median": 127.53694562846795,
+                    "min": 127.51412204001099,
+                    "max": 127.5597692169249,
+                    "range_relative": 0.0003579133614105308,
+                    "mean_CI95": [
+                      127.2469444407145,
+                      127.8269468162214
+                    ],
+                    "relative_CI_half_width": 0.0022738602239876656,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.717148193359375,
+                    "median": 1.717148193359375,
+                    "min": 1.71672509765625,
+                    "max": 1.7175712890625,
+                    "range_relative": 0.0004927888050211908,
+                    "mean_CI95": [
+                      1.7117722527323787,
+                      1.7225241339863715
+                    ],
+                    "relative_CI_half_width": 0.0031307377242025753,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 127.53694562846795,
+                  "TPOT": 1.717148193359375
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 129.57097343169153,
+                "TPOT": 1.74557421875
+              },
+              "LA": {
+                "E2E_wall": 127.5597692169249,
+                "TPOT": 1.7175712890625
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 127.51412204001099,
+                "TPOT": 1.71672509765625
+              },
+              "BR": {
+                "E2E_wall": 129.70243395213038,
+                "TPOT": 1.744639404296875
+              }
+            }
+          ],
+          "LA_TPOT": 1.717148193359375,
+          "BR_TPOT": 1.7451068115234376
+        }
+      },
+      "stable": true,
+      "positive_supported": false,
+      "score": 0.004662520613703092,
+      "mean_gain": 0.010341832643057047,
+      "dominated_by": [
+        "V3_OPT_PF_OVERLAP"
+      ],
+      "eligible": false
+    },
+    {
+      "arm": "V2_OPT_PF_BARRIER",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.013613158013802584,
+                "median": 0.013604711226236521,
+                "CI95": [
+                  -0.039642829034912674,
+                  0.06414109262246426
+                ],
+                "CI_half_width": 0.051891960828688466,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.009522595160681213,
+                  0.01768682729179183
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.01425041486939338,
+                "median": 0.014245216610611844,
+                "CI95": [
+                  -0.027276931833720708,
+                  0.054099031649970986
+                ],
+                "CI_half_width": 0.04068798174184585,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.011043905957706324,
+                  0.017446527263517364
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 104.06453062407672,
+                    "median": 104.06453062407672,
+                    "min": 103.92510974872857,
+                    "max": 104.20395149942487,
+                    "range_relative": 0.0026795080804581815,
+                    "mean_CI95": [
+                      102.29302043737502,
+                      105.83604081077843
+                    ],
+                    "relative_CI_half_width": 0.01702318913156991,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4676326293945312,
+                    "median": 1.4676326293945312,
+                    "min": 1.4662047119140624,
+                    "max": 1.469060546875,
+                    "range_relative": 0.0019458786236687324,
+                    "mean_CI95": [
+                      1.4494892175410106,
+                      1.4857760412480518
+                    ],
+                    "relative_CI_half_width": 0.012362366092259578,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 104.06453062407672,
+                  "TPOT": 1.4676326293945312
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 102.64819360384718,
+                    "median": 102.64819360384718,
+                    "min": 102.36091420613229,
+                    "max": 102.93547300156206,
+                    "range_relative": 0.005597359049952459,
+                    "mean_CI95": [
+                      98.9979627599322,
+                      106.29842444776216
+                    ],
+                    "relative_CI_half_width": 0.03556059503591867,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.4467213134765626,
+                    "median": 1.4467213134765626,
+                    "min": 1.4434305419921876,
+                    "max": 1.4500120849609375,
+                    "range_relative": 0.00454928181913215,
+                    "mean_CI95": [
+                      1.4049080972553876,
+                      1.4885345296977377
+                    ],
+                    "relative_CI_half_width": 0.02890205309873766,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 102.64819360384718,
+                  "TPOT": 1.4467213134765626
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 103.92510974872857,
+                "TPOT": 1.4662047119140624
+              },
+              "LA": {
+                "E2E_wall": 102.93547300156206,
+                "TPOT": 1.4500120849609375
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 102.36091420613229,
+                "TPOT": 1.4434305419921876
+              },
+              "BR": {
+                "E2E_wall": 104.20395149942487,
+                "TPOT": 1.469060546875
+              }
+            }
+          ],
+          "LA_TPOT": 1.4467213134765626,
+          "BR_TPOT": 1.4676326293945312
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.01812038240157554,
+                "median": 0.0181181492992738,
+                "CI95": [
+                  -0.008851545778741032,
+                  0.04437120853986409
+                ],
+                "CI_half_width": 0.026611377159302563,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.016024043223915707,
+                  0.020212255374631893
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.018110074397565512,
+                "median": 0.01810766878127862,
+                "CI95": [
+                  -0.009898899600440547,
+                  0.045342235365345096
+                ],
+                "CI_half_width": 0.02762056748289282,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.015934167784974584,
+                  0.020281169777582653
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 131.2821822827682,
+                    "median": 131.2821822827682,
+                    "min": 130.91876352205873,
+                    "max": 131.64560104347765,
+                    "range_relative": 0.005536452158095579,
+                    "mean_CI95": [
+                      126.66450910414497,
+                      135.8998554613914
+                    ],
+                    "relative_CI_half_width": 0.035173647317023014,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7697579345703125,
+                    "median": 1.7697579345703125,
+                    "min": 1.7655115966796875,
+                    "max": 1.7740042724609375,
+                    "range_relative": 0.004798778191838981,
+                    "mean_CI95": [
+                      1.7158030959520982,
+                      1.8237127731885268
+                    ],
+                    "relative_CI_half_width": 0.030487129095038746,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 131.2821822827682,
+                  "TPOT": 1.7697579345703125
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 128.9028310663998,
+                    "median": 128.9028310663998,
+                    "min": 128.82091559655964,
+                    "max": 128.98474653623998,
+                    "range_relative": 0.001270964635337963,
+                    "mean_CI95": [
+                      127.86199633553223,
+                      129.94366579726739
+                    ],
+                    "relative_CI_half_width": 0.008074568434664062,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.7377025146484375,
+                    "median": 1.7377025146484375,
+                    "min": 1.737379638671875,
+                    "max": 1.738025390625,
+                    "range_relative": 0.0003716124869945024,
+                    "mean_CI95": [
+                      1.7335999863857685,
+                      1.7418050429111065
+                    ],
+                    "relative_CI_half_width": 0.0023608921711774644,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 128.9028310663998,
+                  "TPOT": 1.7377025146484375
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 130.91876352205873,
+                "TPOT": 1.7655115966796875
+              },
+              "LA": {
+                "E2E_wall": 128.82091559655964,
+                "TPOT": 1.737379638671875
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 128.98474653623998,
+                "TPOT": 1.738025390625
+              },
+              "BR": {
+                "E2E_wall": 131.64560104347765,
+                "TPOT": 1.7740042724609375
+              }
+            }
+          ],
+          "LA_TPOT": 1.7377025146484375,
+          "BR_TPOT": 1.7697579345703125
+        }
+      },
+      "stable": true,
+      "positive_supported": false,
+      "score": 0.01425041486939338,
+      "mean_gain": 0.016180244633479446,
+      "dominated_by": [
+        "V1_OPT_NOPF_BARRIER",
+        "V3_OPT_PF_OVERLAP"
+      ],
+      "eligible": false
+    },
+    {
+      "arm": "V3_OPT_PF_OVERLAP",
+      "batches": {
+        "128": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.012654271612905554,
+                "median": 0.012653030726927694,
+                "CI95": [
+                  -0.007437261993791022,
+                  0.032345115531124624
+                ],
+                "CI_half_width": 0.019891188762457823,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.011087665440747907,
+                  0.014218396013107482
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.012430474808492797,
+                "median": 0.012429262851032019,
+                "CI95": [
+                  -0.007425357676966504,
+                  0.03189495911049989
+                ],
+                "CI_half_width": 0.019660158393733196,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.010882076379707284,
+                  0.013976449322356754
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 98.93281744793057,
+                    "median": 98.93281744793057,
+                    "min": 98.88682549539953,
+                    "max": 98.97880940046161,
+                    "range_relative": 0.0009297613010009703,
+                    "mean_CI95": [
+                      98.3484342828444,
+                      99.51720061301675
+                    ],
+                    "relative_CI_half_width": 0.005906868723249977,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.3875211181640625,
+                    "median": 1.3875211181640625,
+                    "min": 1.3868602294921875,
+                    "max": 1.3881820068359374,
+                    "range_relative": 0.0009526178206922632,
+                    "mean_CI95": [
+                      1.3791237313912517,
+                      1.3959185049368734
+                    ],
+                    "relative_CI_half_width": 0.00605207853262954,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 98.93281744793057,
+                  "TPOT": 1.3875211181640625
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 97.68094547465444,
+                    "median": 97.68094547465444,
+                    "min": 97.57148949149996,
+                    "max": 97.79040145780891,
+                    "range_relative": 0.0022410918039870234,
+                    "mean_CI95": [
+                      96.29017534306972,
+                      99.07171560623915
+                    ],
+                    "relative_CI_half_width": 0.014237885647263566,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.3702742309570313,
+                    "median": 1.3702742309570313,
+                    "min": 1.3687801513671876,
+                    "max": 1.371768310546875,
+                    "range_relative": 0.0021807015794206553,
+                    "mean_CI95": [
+                      1.3512901497960006,
+                      1.389258312118062
+                    ],
+                    "relative_CI_half_width": 0.013854220368554843,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 97.68094547465444,
+                  "TPOT": 1.3702742309570313
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 98.88682549539953,
+                "TPOT": 1.3868602294921875
+              },
+              "LA": {
+                "E2E_wall": 97.79040145780891,
+                "TPOT": 1.371768310546875
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 97.57148949149996,
+                "TPOT": 1.3687801513671876
+              },
+              "BR": {
+                "E2E_wall": 98.97880940046161,
+                "TPOT": 1.3881820068359374
+              }
+            }
+          ],
+          "LA_TPOT": 1.3702742309570313,
+          "BR_TPOT": 1.3875211181640625
+        },
+        "256": {
+          "gate": {
+            "baseline": "BR",
+            "candidate": "LA",
+            "status": "STABLE_PAIRED_GAIN",
+            "complete": true,
+            "unstable": false,
+            "target_repeats": 2,
+            "gain": {
+              "E2E_wall": {
+                "estimate": 0.013622983383941412,
+                "median": 0.013621051717410737,
+                "CI95": [
+                  -0.011495316081594043,
+                  0.03811752418444969
+                ],
+                "CI_half_width": 0.024806420133021867,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.011668948577043148,
+                  0.015573154857778326
+                ]
+              },
+              "TPOT": {
+                "estimate": 0.01328092855968932,
+                "median": 0.013279710313647664,
+                "CI95": [
+                  -0.006618378250859758,
+                  0.03278685648893043
+                ],
+                "CI_half_width": 0.019702617369895092,
+                "early_late_drift": 0.0,
+                "positive_supported": false,
+                "paired_gains": [
+                  0.01172918308394666,
+                  0.014830237543348668
+                ]
+              }
+            },
+            "absolute": {
+              "BR": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 124.9668141794391,
+                    "median": 124.9668141794391,
+                    "min": 124.6625198898837,
+                    "max": 125.2711084689945,
+                    "range_relative": 0.004870001552867728,
+                    "mean_CI95": [
+                      121.10038863623079,
+                      128.8332397226474
+                    ],
+                    "relative_CI_half_width": 0.03093961839866164,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.6716502075195312,
+                    "median": 1.6716502075195312,
+                    "min": 1.668025390625,
+                    "max": 1.6752750244140624,
+                    "range_relative": 0.004336812663589312,
+                    "mean_CI95": [
+                      1.625592541925656,
+                      1.7177078731134063
+                    ],
+                    "relative_CI_half_width": 0.027552214803489006,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 124.9668141794391,
+                  "TPOT": 1.6716502075195312
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              },
+              "LA": {
+                "status": "STABLE",
+                "target_repeats": 2,
+                "complete": true,
+                "unstable": false,
+                "summary": {
+                  "E2E_wall": {
+                    "n": 2,
+                    "mean": 123.26404072670266,
+                    "median": 123.26404072670266,
+                    "min": 123.20783935580403,
+                    "max": 123.3202420976013,
+                    "range_relative": 0.0009118859087743552,
+                    "mean_CI95": [
+                      122.54993460159827,
+                      123.97814685180705
+                    ],
+                    "relative_CI_half_width": 0.0057933045265625635,
+                    "early_late_drift": 0.0
+                  },
+                  "TPOT": {
+                    "n": 2,
+                    "mean": 1.6494455566406252,
+                    "median": 1.6494455566406252,
+                    "min": 1.6484608154296876,
+                    "max": 1.6504302978515626,
+                    "range_relative": 0.0011940269346544458,
+                    "mean_CI95": [
+                      1.636933233202083,
+                      1.6619578800791674
+                    ],
+                    "relative_CI_half_width": 0.007585775346247745,
+                    "early_late_drift": 0.0
+                  }
+                },
+                "estimate": {
+                  "E2E_wall": 123.26404072670266,
+                  "TPOT": 1.6494455566406252
+                },
+                "rule": "Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%."
+              }
+            },
+            "rule": "Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0."
+          },
+          "samples": [
+            {
+              "BR": {
+                "E2E_wall": 124.6625198898837,
+                "TPOT": 1.668025390625
+              },
+              "LA": {
+                "E2E_wall": 123.20783935580403,
+                "TPOT": 1.6484608154296876
+              }
+            },
+            {
+              "LA": {
+                "E2E_wall": 123.3202420976013,
+                "TPOT": 1.6504302978515626
+              },
+              "BR": {
+                "E2E_wall": 125.2711084689945,
+                "TPOT": 1.6752750244140624
+              }
+            }
+          ],
+          "LA_TPOT": 1.6494455566406252,
+          "BR_TPOT": 1.6716502075195312
+        }
+      },
+      "stable": true,
+      "positive_supported": false,
+      "score": 0.012430474808492797,
+      "mean_gain": 0.012855701684091059,
+      "dominated_by": [],
+      "eligible": true
+    }
+  ],
+  "selection_scope": "BF16 common-stack V1/V2/V3 only; final selection pending profiling and secondary CA",
+  "gain_estimator": "1 - exp(mean(log(TPOT_LA/TPOT_BR))); paired 95% t intervals; every valid sample retained",
+  "source_hashes": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/status.json": "4881dd80bf9ebacae383af0bd14e7a430626772f59d8824bb1cd014684571c73",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/result.json": "e0b6974cc65943986a9970535f184dff0e59f8e8d07c2737675d76b93ade324d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r1_measure_rank0.json": "9bdbdef4954e96380d3dc0c334da82a9b318cac01afd4d18df184f82456ad97d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r1_measure_rank1.json": "a398ebf12d5c66ec1d74445f90c1324bcd826220231ed3bc32e02ab4e4a6198e",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r1_measure_rank2.json": "2a1640d3b71f875d901eb74634cb7e5a73533e7e9f889581ba9ca20879f07734",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r1_measure_rank3.json": "6eabe618845c4e6b75490a02ec575b498273f0053d92b27e34bf0fc736f76dad",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r1_measure_rank0.json": "c03af40fdf7c33e1e7dd4f16dcdd775e6144ec66d46f126d705042213af5a564",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r1_measure_rank1.json": "8a47650bbb660871a2da9af428b340970bf1459cf46ec7a2e2da2975361c44f7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r1_measure_rank2.json": "2de3af8a36133b45c86629012731d438543f929fc64bb6d41ad289b1fd324f3c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r1_measure_rank3.json": "ca5e68543a2bb61587b360f1a3b717027d173a958471d52e915867a6af85b69a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r2_measure_rank0.json": "f75a53ae010d742c69fe6a1c8910f5c15f40c487ba26cda08b7c7da5695ea68c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r2_measure_rank1.json": "017ad956d6e9fa170e61950073afce8d169fb5d1e7ba456ae2f75fa7018cc8bc",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r2_measure_rank2.json": "dde7d3542a9c67006d4e2f581cc7853d6df8eab0312207a480678d781d4b8189",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/BR_r2_measure_rank3.json": "0eca8f09bf5ddaed85efe584b8e62a65cbd5fdcea70339619fca5ee85aebe5d7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r2_measure_rank0.json": "4cadd135cfed9db80f60cad9204354d8a1bd0282d1cba44182a44de562b104b0",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r2_measure_rank1.json": "c4cc5f630106952863b6fd5bdc84e9c7e9c3d82b89e5b954e31389f64eb0d856",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r2_measure_rank2.json": "1d958d09b15c1493aef19ee52605796ae49c7e444730cfe22bb5281bd3dc2c34",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B128_H64/LA_r2_measure_rank3.json": "2dc3dfdd35e75265926a46f38c7bb0300209e6720342ffed68f583b7090a5ee7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/status.json": "0e406d78fc591553efc7b159f639feed4b1ef3811ef01dc9e293c58a4db59fb6",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/result.json": "95505f33d846cb1d83a956790668a7e27ecef37a2cd148445254230ff80cdccc",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r1_measure_rank0.json": "bff3e349037f36604d161fc5e4339609d7ac00f7b3bdf1ae8b077ae3e88f3a4c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r1_measure_rank1.json": "6f81393f449a89aef8b6e71aec2f7e568a1421656e70fd98fefaf04aefa8afbc",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r1_measure_rank2.json": "414a9ceb927ed0ae7235f742a89f4f19a5c22957135764f66ec034f51b2b3b78",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r1_measure_rank3.json": "c60402fe0eeee579484b7c470be056cb35254e83bc04db768413e58da822bb6d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r1_measure_rank0.json": "46e4ff90d769f32701f4f4ec6c501b67c0fc70fe76b49559360a1b7fa1487b17",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r1_measure_rank1.json": "ae4282b63d0aee75f4695e55cddfc0a1e32b4a040414c9719afa289e31345827",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r1_measure_rank2.json": "2ea2de3e153f049c4f53ce369a691f16f243d763fcefc9aa2350f07e55aa4f49",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r1_measure_rank3.json": "9776919f5915fe583c9ee1296af75b36a48817cdaa7c97a257008d6c88874589",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r2_measure_rank0.json": "78a88d203eaad6a53a15f81c88ca8f20f8eccb285f2b68664f63612647febc6f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r2_measure_rank1.json": "36f14e051a7b51a347516b348945420e0c1901ef28f2a410d70ae8a6f30c6434",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r2_measure_rank2.json": "e6ad9c7ff23e7aa764a74ada616276c4a46eec031d0e08be93b13aac14064412",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/BR_r2_measure_rank3.json": "605a2c44b9d73b9438758c2466aeb63fe56f73d1f200db77719b4bdfcd2be139",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r2_measure_rank0.json": "876c16dd6abc6a21159e05c59e10b6b16ce0179a417d2bca09d1cdadf959d245",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r2_measure_rank1.json": "af31f24dad0fe881b0411b35fbdcf204e8e51bc7110fb1739f14b5d00df05d7a",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r2_measure_rank2.json": "32f9822216725302fd78791caa0d06c5cdf5a4cdbb2ec3e681a941d431b355c7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V1_OPT_NOPF_BARRIER_B256_H64/LA_r2_measure_rank3.json": "bd064ed0d74f2164d8b7d1de9b7180a5c7f73a6e054ef395c1eeee087d1722e9",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/status.json": "44dbdf6349ca8f016c4e9ba6d9580ea68195d1c49188138165892e00e3c5c6cd",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/result.json": "b74d0dfc16a991945a1a0a45f06c415ee3400a812ca96c8f7c50ae310bf5dc2c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r1_measure_rank0.json": "b9558249c95df62df6e15208a2f5a7e381f9bbbfaa8f47e92869c394a3656d16",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r1_measure_rank1.json": "ee010fb2de14dc97f513bdd7542f3a649cfa09a1822bb67880c32021f3d4178c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r1_measure_rank2.json": "ba88ba4b414af9c16720716b6be96e283d53792af90170b3dfe364c6330ba363",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r1_measure_rank3.json": "43c5b7b48e9f328a0149133c874e1edc8403bf64da193d3cc2ac5a8ce1fb94fd",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r1_measure_rank0.json": "86369d7c67666303e6f30e97942fb659d101d204d194686484c33203b3155379",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r1_measure_rank1.json": "eb78f97a8824b65c40411bd5f457b98dad1cca83050a9b55cefac2c399b2b5a3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r1_measure_rank2.json": "00257904eebd858def674703a4f90c5d6927f34a4f299ccd0eefc71b36a2d621",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r1_measure_rank3.json": "94fd535d188714d003cd27dbe812396cdb8a733cc8c02c2c73406b924f14a63d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r2_measure_rank0.json": "fdb341c9c4bba532c027514956d9013d19078d9c2eecc7c68e6edcdc5a60d0a3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r2_measure_rank1.json": "dfaa390db21ef49be07d0c575249055600c82562444465e83a9e3417b5277ad5",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r2_measure_rank2.json": "14e26597c3978653a5fbdc90684e91ff44ea61ea71da4a063b3e89ef331bc1af",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/BR_r2_measure_rank3.json": "745dd1d680caebc8f83a1b816bd01330ba07885c6d4127261390536a511f3d3b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r2_measure_rank0.json": "f8fb066e95e26052ae337c4e320f5e5a0dbef65ab47572cd63de540bc6a9bd20",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r2_measure_rank1.json": "f8fd4615286826290eff97865e860224e4d85bf1ebdbcb8af736d4e6ddcdae57",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r2_measure_rank2.json": "1abf051728fee1d7bab0226a91c9af6c897fe89fe036be238f61ab58036e5fdb",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B128_H64/LA_r2_measure_rank3.json": "1dcf721f2f321a9c282b72b81d226669ec1eb1e4fc9246e77c4f1914512025cb",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/status.json": "20290865af7878b1e713b8278698ef1a6d46cad214121157eccc48b273b15d36",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/result.json": "3609b4563f85923a508580ef8df39bae27a3f1c72649fc561e8f6d23ebf42097",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r1_measure_rank0.json": "50215439e3ba5e48ee665998aef4d07d0fd93932cc6efaab8999acd70fd252f2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r1_measure_rank1.json": "af28f8131ece14473645a7d6e530f727927eb7513295ca5968f4954db8fe2cc2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r1_measure_rank2.json": "c83ea4b81b6e2c09ca1e883bff7bbc35cc5bb5125310198ded34d446cf540701",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r1_measure_rank3.json": "39fcef98787cf1dcefc7be9517c19e013b69c7fb7b960a9945645fbc16123f6b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r1_measure_rank0.json": "0c89219debcba4ba2f750008d537cc62ed95f8ae79a40f04348587c6c7cf7c93",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r1_measure_rank1.json": "cb60ca1c87494191fb7f8f93e6bd6db908ff365f7829ba74ef2279c6b6a550b5",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r1_measure_rank2.json": "8048709fb2c15d70591b953b6d4ccb0a7386eec47fd73eeaaa91a1bbc263c741",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r1_measure_rank3.json": "9c064e1750794d8f8b32106022e9c2753ce185ff1209c1115270398974f8dbc0",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r2_measure_rank0.json": "565a16e881a2fb1a3a6c4f4e822996925aded7100687bcb715a077aec8debb7f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r2_measure_rank1.json": "487eb8bffb40d8218c25b47ace5c171ddc2bbad1e00507806f4877902553cadc",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r2_measure_rank2.json": "2f99f23fc8c1489c5548a6eee61aad9156ef6f2b52cd4c1689d9e2b5a01b489d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/BR_r2_measure_rank3.json": "fe59aa43cec84665cb5732c460b08b7fc6daf276739e4244916f48365c024817",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r2_measure_rank0.json": "fcf7a7f7789eabc127639a5653a33f7971866d7f8716c7bd3944bc82ad691c4b",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r2_measure_rank1.json": "7a1449005a00d7b1c35815d9006f4ef8ca8b88bf60d289640db670df2d39cba0",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r2_measure_rank2.json": "67e632855699cda55f336f53027daf84b5e161153a6cd1c0223d38e0611a32a6",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_FIXED_SEARCH_V2_OPT_PF_BARRIER_B256_H64/LA_r2_measure_rank3.json": "1a73fb1c200be90be3072566251301becaee98375bdb5a3994177c69953c54bf",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/status.json": "a40aa34f007fbadbcf7542d001809f58f26ea373be7134a6c73e6b9bda0c9988",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/result.json": "cd7e2e2e19a96fe7f0a82c0eb6f27c55affa25b8051970bccce162429f161773",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r1_measure_rank0.json": "1ab1a29e445795faf8f08d2a6c062bce257fc069e85f5b28b5bc40276cdbd071",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r1_measure_rank1.json": "d0f6d13fc1ffeaaab2f9b446266991c5d879b24154834e9f8b03124d632f1083",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r1_measure_rank2.json": "4776c0edc38a7dd9d9c70f577d616e58ea91e7523dd3e8cb1d13bc7336ffac83",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r1_measure_rank3.json": "36ce48a7abbf5c28d762c0d5f83a943ba3142c2174d202b2895da308ba5c477c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r1_measure_rank0.json": "1ce161016c0bdc97f08c884a6ebf96bf0d31ce145efb3fbeacf3bfee41321af2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r1_measure_rank1.json": "ac7b06bcef817e072d58fa70ec7af8447e18a8473a54e3c6f2f9c143513c88d4",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r1_measure_rank2.json": "ff9a64f33691e9fdfd8d2d67b9e899e6705eef08fe087bc63043fc53d0c3bc75",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r1_measure_rank3.json": "585384e71bb5ab8f1e83b03fff28562882fcb75473aea7dcf3193461c890a5d0",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r2_measure_rank0.json": "f21d1f8e723f4f431caf5779c0b1e59bbfd0c55d0d996141eff87c38e4189d19",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r2_measure_rank1.json": "7420ee91cde956940480c685ea7e35d8523d8458041a8be923357fc9224a83d7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r2_measure_rank2.json": "590d4388607004840ed58faeca0cec2ccfc0dfae440ce38cf24fa7c8bd0e931f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/BR_r2_measure_rank3.json": "3afcae0d6062f3876334da75f346c535e550c4f4b0938c7b99399aff6951aa8d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r2_measure_rank0.json": "523f385a9a9974fbbf5eb2d2cdb13b89c52ab61ce7fe22500613f5b858fb22fa",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r2_measure_rank1.json": "cbd89dc363e5d229fd18e379675ea7c6e99509344f921eee06127022dc264c5f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r2_measure_rank2.json": "0389e42dbbc8df20c1936902dd22318c029694d2d9e5e1525cf4934c8d1be2f2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64/LA_r2_measure_rank3.json": "651c8c4fd5f535e178973a10bb661db654641ecf0d435d4a659f97f1287461f7",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/status.json": "4f0c8ba1c599f7763e9031fac7acb0c6a4bb3deb85823f31cc85d0a10a516a15",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/result.json": "7ea5af8dd93bf41f82a46de43dece9fec57c8ff7dd6d3730260fe08bf529eec0",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r1_measure_rank0.json": "ac95f2c58298ac128f68c649c07b637dc7b800255e059a7411c564811d49672f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r1_measure_rank1.json": "7cc61895a25dd19d88ccf214fac701130730b386a644da978e8f0598ab933b1e",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r1_measure_rank2.json": "f9861d43ecfb6344d4e793c620ed6a41565a4a8cb4cf2d1c1ed5c2c0eec938f6",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r1_measure_rank3.json": "f02beb1fbc95e42ecda5d0cf371b5d3e4c6b8b87d00f9801e6ccd9aa395bfe2c",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r1_measure_rank0.json": "05941133d5cb164b3841841e808fd81f8b8433f6baf5e78cc6d4a3097b512328",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r1_measure_rank1.json": "9dd05caebe4439d84c4fa5a962fece578dd9545eb1317ec9ee727c7e93f735b1",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r1_measure_rank2.json": "82a4f790e62cac810cd7e8f8d006280028488e7f8559c290b7459fa46e871d34",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r1_measure_rank3.json": "75539f81bacc136d027eadc0901e0ff3fce5159f8943b1d68462e762f272cca5",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r2_measure_rank0.json": "4a5e95b9a6d4456befc59fe7cddebff02e6f5cc3d2ad239af10511cc19562754",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r2_measure_rank1.json": "117e8334838b2a7c678928ee2db352c7dd3c14f1cfa82861f8c4e352129942dd",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r2_measure_rank2.json": "7a3917957a87128e7d2b7835222f3d416375c8a5fb1ed91a33cc60a31767e688",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/BR_r2_measure_rank3.json": "17144ba60589bd7bd2bc4f260eef4228e23ffab4b0f527f3bb13b96b41e05f60",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r2_measure_rank0.json": "aa0f89bb0d2902fdc86ce5c26cba6dd7c6d4a062fbad5eaa70ad16e551eff0cf",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r2_measure_rank1.json": "834ad35cd44bf1ba4c37e2add792a91218418234a11e065a0acedf0f3a7be58d",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r2_measure_rank2.json": "bbbb612c6a8d218326b4019d9fc0e526fd3a846f4d2d62edb48fbdc91ac9b327",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64/LA_r2_measure_rank3.json": "6d50322a9a6485475cf302dc826c9e2b341d59de1ea78c9c341df368152e9c73"
+  },
+  "validated_rank_receipts": 96,
+  "common_stack_equivalence": "PASS",
+  "reused_paths": [
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B128_H64",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_H64_FIXED_TEAM_B256_H64"
+  ],
+  "selection_rule": "Existing frozen evaluator: maximize minimum paired LA gain across B128/B256 among stable, non-dominated arms. Reject arms with no-better absolute LA TPOT in either batch and >2% worse in at least one than another stable arm. No tuning after observing LA.",
+  "fixed_options": {
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true
+  },
+  "scope": "Optimal only among these three planned arms, at frozen BR-tuned P/trigger. Profiling and secondary CA/default adoption remain separate. Stable two-pair outcomes are not repeated for significance."
+}
