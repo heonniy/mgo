@@ -1,0 +1,818 @@
+{
+  "status": "DIAGNOSTIC_COMPLETE_ORACLE_BLOCKED",
+  "mechanism_gate": true,
+  "placement_causality": "NOT_ESTABLISHED",
+  "current_service_causal_support": {
+    "C30": {
+      "measured_BR_FCA_arrival_delta_ms_per_step": 153.40424490624997,
+      "predicted_current_expert_service_wait_delta_ms_per_step": 6.170589746975111,
+      "explained_delta_fraction": 0.0402243741739099,
+      "dominant_demonstrated": false
+    },
+    "C60": {
+      "measured_BR_FCA_arrival_delta_ms_per_step": 151.762007875,
+      "predicted_current_expert_service_wait_delta_ms_per_step": 6.207019947234585,
+      "explained_delta_fraction": 0.04089969574168422,
+      "dominant_demonstrated": false
+    }
+  },
+  "revised_model_run": false,
+  "stage_c_authorized": false,
+  "summary": [
+    {
+      "cache": "C30",
+      "policy": "BR",
+      "forward": {
+        "mean_rank_residency_ms_per_step": 16.1488360625,
+        "wire_ms_per_step": 1.5092067873518782,
+        "arrival_ms_per_step": 15.30087634375,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -0.6612470686018782,
+        "absolute_residual_ms_per_step": 0.6612470686018782,
+        "explained_inflation_fraction": 0.9553556492955672,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9846200983527763,
+        "host_gpu_arrival_spread_spearman": 0.9863420195991998
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 92.4492486875,
+        "wire_ms_per_step": 1.4889265284924094,
+        "arrival_ms_per_step": 91.5400083125,
+        "service_wait_ms_per_step": 2.686451006614959,
+        "signed_residual_ms_per_step": -0.5796861534924097,
+        "absolute_residual_ms_per_step": 0.5796861534924097,
+        "explained_inflation_fraction": 0.9936350633632703,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9881867358949951,
+        "host_gpu_arrival_spread_spearman": 0.9995127750839239
+      },
+      "expert": {
+        "tau_ms": 20.31980362445148,
+        "compiled_gpu_ms": 17.9700678125,
+        "compiled_host_call_ms": 606.7075330625,
+        "loop_host_ms": 989.7482561875,
+        "loop_gpu_span_ms": 982.509496375,
+        "loop_gpu_active_ms": 26.61841228125,
+        "ready_wait_host_ms": 0.52750375,
+        "slot_gpu_wait_upper_bound_ms": 0.5339126875,
+        "ready_select_without_wait_ms": 26.08376978125,
+        "gather_host_ms": 114.482119875,
+        "gather_gpu_ms": 2.5295085,
+        "weight_host_ms": 110.70164090625,
+        "weight_gpu_ms": 6.11883596875,
+        "record_use_host_ms": 62.0238505625,
+        "loop_other_host_ms": 69.22183825,
+        "pred_gpu_active_ms": 28.96814809320148,
+        "pred_loop_host_ms": 403.3605267494515,
+        "unexplained_host_budget_ms": 586.3877294380485,
+        "unexplained_gpu_active_ms": -2.349735811951481,
+        "compiled_gpu_exclusive_ms": 17.9700678125,
+        "ready_wait_exclusive_ms": 0.52750375,
+        "wrapper_exclusive_ms": 902.28261009375,
+        "loop_other_exclusive_ms": 68.96807453125,
+        "full_loop_span_ms": 989.7482561875,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 588.73746525,
+        "gpu_active_relative_error": 0.08827482973530454,
+        "host_loop_relative_error": 0.5924614928818446,
+        "exclusive_loop_prediction_ms": 992.0979919994514,
+        "exclusive_loop_relative_error": 0.0023740742125705405,
+        "gate25": true
+      }
+    },
+    {
+      "cache": "C30",
+      "policy": "FCA",
+      "forward": {
+        "mean_rank_residency_ms_per_step": 41.2112588125,
+        "wire_ms_per_step": 1.3625096201302602,
+        "arrival_ms_per_step": 40.98523153125,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -1.13648233888026,
+        "absolute_residual_ms_per_step": 1.1373612945100633,
+        "explained_inflation_fraction": 0.9715678980970478,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9734899983039312,
+        "host_gpu_arrival_spread_spearman": 0.9923677986504357
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 245.69993521875,
+        "wire_ms_per_step": 1.4023705183501463,
+        "arrival_ms_per_step": 244.94425321875,
+        "service_wait_ms_per_step": 8.85704075359007,
+        "signed_residual_ms_per_step": -0.6466885183501464,
+        "absolute_residual_ms_per_step": 0.6466885183501464,
+        "explained_inflation_fraction": 0.9973539974667154,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9900645553562702,
+        "host_gpu_arrival_spread_spearman": 0.9994405072734054
+      },
+      "expert": {
+        "tau_ms": 20.31980362445148,
+        "compiled_gpu_ms": 17.93415521875,
+        "compiled_host_call_ms": 607.8865691875,
+        "loop_host_ms": 987.20583265625,
+        "loop_gpu_span_ms": 980.0258215,
+        "loop_gpu_active_ms": 26.5501181875,
+        "ready_wait_host_ms": 0.08353912499999999,
+        "slot_gpu_wait_upper_bound_ms": 0.12735393750000001,
+        "ready_select_without_wait_ms": 26.3432721875,
+        "gather_host_ms": 113.18224459375,
+        "gather_gpu_ms": 2.50365396875,
+        "weight_host_ms": 110.6791931875,
+        "weight_gpu_ms": 6.112309,
+        "record_use_host_ms": 61.2109370625,
+        "loop_other_host_ms": 67.8200773125,
+        "pred_gpu_active_ms": 28.935766593201482,
+        "pred_loop_host_ms": 399.6390670932015,
+        "unexplained_host_budget_ms": 587.5667655630485,
+        "unexplained_gpu_active_ms": -2.385648405701481,
+        "compiled_gpu_exclusive_ms": 17.93415521875,
+        "ready_wait_exclusive_ms": 0.08353912499999999,
+        "wrapper_exclusive_ms": 901.58295265625,
+        "loop_other_exclusive_ms": 67.60518565625,
+        "full_loop_span_ms": 987.20583265625,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 589.95241396875,
+        "gpu_active_relative_error": 0.08985453054686071,
+        "host_loop_relative_error": 0.5951816187938206,
+        "exclusive_loop_prediction_ms": 989.5914810619514,
+        "exclusive_loop_relative_error": 0.002416566360109955,
+        "gate25": true
+      }
+    },
+    {
+      "cache": "C60",
+      "policy": "FCA",
+      "forward": {
+        "mean_rank_residency_ms_per_step": 35.79677109375,
+        "wire_ms_per_step": 1.39008624219497,
+        "arrival_ms_per_step": 35.49867003125,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -1.0919851796949702,
+        "absolute_residual_ms_per_step": 1.0947885189625572,
+        "explained_inflation_fraction": 0.9683255842899836,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9712657285627432,
+        "host_gpu_arrival_spread_spearman": 0.9936077955986572
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 251.6568014375,
+        "wire_ms_per_step": 1.4186416054088107,
+        "arrival_ms_per_step": 250.82209990625,
+        "service_wait_ms_per_step": 9.522548818299754,
+        "signed_residual_ms_per_step": -0.5839400741588097,
+        "absolute_residual_ms_per_step": 0.5839400741588097,
+        "explained_inflation_fraction": 0.997667429851301,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9910333701434106,
+        "host_gpu_arrival_spread_spearman": 0.9998491065070699
+      },
+      "expert": {
+        "tau_ms": 20.31980362445148,
+        "compiled_gpu_ms": 18.048469125,
+        "compiled_host_call_ms": 449.38784896875,
+        "loop_host_ms": 714.280372625,
+        "loop_gpu_span_ms": 707.33041628125,
+        "loop_gpu_active_ms": 26.66372990625,
+        "ready_wait_host_ms": 0.01663509375,
+        "slot_gpu_wait_upper_bound_ms": 0.026430625,
+        "ready_select_without_wait_ms": 16.10411365625,
+        "gather_host_ms": 77.41100615625,
+        "gather_gpu_ms": 2.5057031875,
+        "weight_host_ms": 78.02796009375,
+        "weight_gpu_ms": 6.10955759375,
+        "record_use_host_ms": 45.1927451875,
+        "loop_other_host_ms": 48.14006346875,
+        "pred_gpu_active_ms": 28.935064405701482,
+        "pred_loop_host_ms": 285.21232728070146,
+        "unexplained_host_budget_ms": 429.0680453442985,
+        "unexplained_gpu_active_ms": -2.271334499451481,
+        "compiled_gpu_exclusive_ms": 18.048469125,
+        "ready_wait_exclusive_ms": 0.01663509375,
+        "wrapper_exclusive_ms": 648.093461875,
+        "loop_other_exclusive_ms": 48.12180653125,
+        "full_loop_span_ms": 714.280372625,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 431.33937984375,
+        "gpu_active_relative_error": 0.08518442496370614,
+        "host_loop_relative_error": 0.6006997557100185,
+        "exclusive_loop_prediction_ms": 716.5517071244515,
+        "exclusive_loop_relative_error": 0.0031798920794984336,
+        "gate25": true
+      }
+    },
+    {
+      "cache": "C60",
+      "policy": "BR",
+      "forward": {
+        "mean_rank_residency_ms_per_step": 17.90520125,
+        "wire_ms_per_step": 1.5128338804836896,
+        "arrival_ms_per_step": 17.05911940625,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -0.6667520367336895,
+        "absolute_residual_ms_per_step": 0.6678124828007959,
+        "explained_inflation_fraction": 0.9596888167673575,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9858588100914745,
+        "host_gpu_arrival_spread_spearman": 0.9798027364280628
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 99.97033428125,
+        "wire_ms_per_step": 1.4910666291899894,
+        "arrival_ms_per_step": 99.06009203125,
+        "service_wait_ms_per_step": 3.315528871065169,
+        "signed_residual_ms_per_step": -0.5808243791899892,
+        "absolute_residual_ms_per_step": 0.5808243791899892,
+        "explained_inflation_fraction": 0.9941087843598537,
+        "gate80": true,
+        "arrival_residency_spearman": 0.9892114178802441,
+        "host_gpu_arrival_spread_spearman": 0.9997198297785764
+      },
+      "expert": {
+        "tau_ms": 20.31980362445148,
+        "compiled_gpu_ms": 18.25532978125,
+        "compiled_host_call_ms": 444.06279303125,
+        "loop_host_ms": 702.08733321875,
+        "loop_gpu_span_ms": 695.1586353125,
+        "loop_gpu_active_ms": 26.900195625,
+        "ready_wait_host_ms": 0.0,
+        "slot_gpu_wait_upper_bound_ms": 0.0,
+        "ready_select_without_wait_ms": 15.4967863125,
+        "gather_host_ms": 75.73940425,
+        "gather_gpu_ms": 2.5294865,
+        "weight_host_ms": 75.8418920625,
+        "weight_gpu_ms": 6.11537934375,
+        "record_use_host_ms": 44.229730625,
+        "loop_other_host_ms": 46.7167269375,
+        "pred_gpu_active_ms": 28.964669468201482,
+        "pred_loop_host_ms": 278.3443438119515,
+        "unexplained_host_budget_ms": 423.74298940679853,
+        "unexplained_gpu_active_ms": -2.064473843201481,
+        "compiled_gpu_exclusive_ms": 18.25532978125,
+        "ready_wait_exclusive_ms": 0.0,
+        "wrapper_exclusive_ms": 637.778537875,
+        "loop_other_exclusive_ms": 46.0534655625,
+        "full_loop_span_ms": 702.08733321875,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 425.80746325,
+        "gpu_active_relative_error": 0.07674568140622894,
+        "host_loop_relative_error": 0.603547406936015,
+        "exclusive_loop_prediction_ms": 704.1518070619514,
+        "exclusive_loop_relative_error": 0.0029404801162510024,
+        "gate25": true
+      }
+    }
+  ],
+  "policy_residual_invariance": {
+    "C30/forward": {
+      "relative_difference": 0.5294251218585629,
+      "within10": false
+    },
+    "C30/return": {
+      "relative_difference": 0.10926899649202566,
+      "within10": false
+    },
+    "C60/forward": {
+      "relative_difference": 0.48448405025822994,
+      "within10": false
+    },
+    "C60/return": {
+      "relative_difference": 0.005349914242081439,
+      "within10": true
+    }
+  },
+  "br_to_fca_deltas": {
+    "C30": {
+      "forward": {
+        "mean_rank_residency_ms_per_step": 25.06242275,
+        "wire_ms_per_step": -0.14669716722161796,
+        "arrival_ms_per_step": 25.684355187500003,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -0.47523527027838186,
+        "absolute_residual_ms_per_step": 0.4761142259081851
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 153.25068653124998,
+        "wire_ms_per_step": -0.0865560101422631,
+        "arrival_ms_per_step": 153.40424490624997,
+        "service_wait_ms_per_step": 6.170589746975111,
+        "signed_residual_ms_per_step": -0.0670023648577367,
+        "absolute_residual_ms_per_step": 0.0670023648577367
+      },
+      "expert": {
+        "tau_ms": 0.0,
+        "compiled_gpu_ms": -0.035912593750001776,
+        "compiled_host_call_ms": 1.179036124999925,
+        "loop_host_ms": -2.5424235312500514,
+        "loop_gpu_span_ms": -2.4836748750000197,
+        "loop_gpu_active_ms": -0.06829409374999784,
+        "ready_wait_host_ms": -0.44396462500000006,
+        "slot_gpu_wait_upper_bound_ms": -0.40655874999999997,
+        "ready_select_without_wait_ms": 0.2595024062500002,
+        "gather_host_ms": -1.2998752812499959,
+        "gather_gpu_ms": -0.025854531249999813,
+        "weight_host_ms": -0.0224477187500014,
+        "weight_gpu_ms": -0.0065269687500002505,
+        "record_use_host_ms": -0.8129135000000005,
+        "loop_other_host_ms": -1.4017609375000006,
+        "pred_gpu_active_ms": -0.03238149999999962,
+        "pred_loop_host_ms": -3.7214596562499764,
+        "unexplained_host_budget_ms": 1.1790361250000387,
+        "unexplained_gpu_active_ms": -0.03591259375,
+        "compiled_gpu_exclusive_ms": -0.035912593750001776,
+        "ready_wait_exclusive_ms": -0.44396462500000006,
+        "wrapper_exclusive_ms": -0.6996574375000364,
+        "loop_other_exclusive_ms": -1.362888874999996,
+        "full_loop_span_ms": -2.5424235312500514,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 1.2149487187499517,
+        "exclusive_loop_prediction_ms": -2.5065109375000247
+      }
+    },
+    "C60": {
+      "forward": {
+        "mean_rank_residency_ms_per_step": 17.891569843750002,
+        "wire_ms_per_step": -0.1227476382887196,
+        "arrival_ms_per_step": 18.439550625,
+        "service_wait_ms_per_step": 0.0,
+        "signed_residual_ms_per_step": -0.4252331429612807,
+        "absolute_residual_ms_per_step": 0.4269760361617614
+      },
+      "return": {
+        "mean_rank_residency_ms_per_step": 151.68646715625,
+        "wire_ms_per_step": -0.07242502378117877,
+        "arrival_ms_per_step": 151.762007875,
+        "service_wait_ms_per_step": 6.207019947234585,
+        "signed_residual_ms_per_step": -0.0031156949688204705,
+        "absolute_residual_ms_per_step": 0.0031156949688204705
+      },
+      "expert": {
+        "tau_ms": 0.0,
+        "compiled_gpu_ms": -0.20686065625000083,
+        "compiled_host_call_ms": 5.325055937499997,
+        "loop_host_ms": 12.193039406250023,
+        "loop_gpu_span_ms": 12.17178096875,
+        "loop_gpu_active_ms": -0.23646571874999722,
+        "ready_wait_host_ms": 0.01663509375,
+        "slot_gpu_wait_upper_bound_ms": 0.026430625,
+        "ready_select_without_wait_ms": 0.6073273437500006,
+        "gather_host_ms": 1.6716019062499896,
+        "gather_gpu_ms": -0.023783312499999987,
+        "weight_host_ms": 2.1860680312500023,
+        "weight_gpu_ms": -0.005821749999999959,
+        "record_use_host_ms": 0.9630145624999997,
+        "loop_other_host_ms": 1.4233365312500013,
+        "pred_gpu_active_ms": -0.029605062499999946,
+        "pred_loop_host_ms": 6.867983468749969,
+        "unexplained_host_budget_ms": 5.325055937499997,
+        "unexplained_gpu_active_ms": -0.20686065624999994,
+        "compiled_gpu_exclusive_ms": -0.20686065625000083,
+        "ready_wait_exclusive_ms": 0.01663509375,
+        "wrapper_exclusive_ms": 10.314924000000019,
+        "loop_other_exclusive_ms": 2.0683409687500003,
+        "full_loop_span_ms": 12.193039406250023,
+        "unexplained_ms": 0.0,
+        "compiled_host_without_gpu_ms": 5.5319165937499974,
+        "exclusive_loop_prediction_ms": 12.399900062500024
+      }
+    }
+  },
+  "clock_alignment": [
+    {
+      "cache": "C30",
+      "policy": "BR",
+      "rank": 0,
+      "slope": 1.0000272468162104,
+      "offset_ns": 5909473014276386.0,
+      "p50_anchor_residual_us": 0.327,
+      "p99_anchor_residual_us": 5.396880000000019,
+      "max_anchor_residual_us": 22.847,
+      "anchors": 44693,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "BR",
+      "rank": 1,
+      "slope": 1.0000272478784618,
+      "offset_ns": 5909472996935432.0,
+      "p50_anchor_residual_us": 0.294,
+      "p99_anchor_residual_us": 5.1782200000000085,
+      "max_anchor_residual_us": 16.933,
+      "anchors": 44283,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "BR",
+      "rank": 2,
+      "slope": 1.0000272491394433,
+      "offset_ns": 5909472875502117.0,
+      "p50_anchor_residual_us": 0.319,
+      "p99_anchor_residual_us": 5.124889999999992,
+      "max_anchor_residual_us": 58.85,
+      "anchors": 43638,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "BR",
+      "rank": 3,
+      "slope": 1.0000272484676338,
+      "offset_ns": 5909473560801499.0,
+      "p50_anchor_residual_us": 0.266,
+      "p99_anchor_residual_us": 2.8961499999999942,
+      "max_anchor_residual_us": 82.704,
+      "anchors": 43298,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "FCA",
+      "rank": 0,
+      "slope": 1.0000242925140221,
+      "offset_ns": 5909022709118375.0,
+      "p50_anchor_residual_us": 0.298,
+      "p99_anchor_residual_us": 5.371369999999973,
+      "max_anchor_residual_us": 92.725,
+      "anchors": 45110,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "FCA",
+      "rank": 1,
+      "slope": 1.0000242920731166,
+      "offset_ns": 5909022478629113.0,
+      "p50_anchor_residual_us": 0.289,
+      "p99_anchor_residual_us": 3.146900000000016,
+      "max_anchor_residual_us": 18.886,
+      "anchors": 44603,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "FCA",
+      "rank": 2,
+      "slope": 1.000024291279932,
+      "offset_ns": 5909022667847588.0,
+      "p50_anchor_residual_us": 0.309,
+      "p99_anchor_residual_us": 3.5002599999999946,
+      "max_anchor_residual_us": 54.763,
+      "anchors": 42759,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C30",
+      "policy": "FCA",
+      "rank": 3,
+      "slope": 1.0000242926989678,
+      "offset_ns": 5909022440674025.0,
+      "p50_anchor_residual_us": 0.261,
+      "p99_anchor_residual_us": 3.266720000000001,
+      "max_anchor_residual_us": 69.574,
+      "anchors": 43458,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "FCA",
+      "rank": 0,
+      "slope": 1.0000291860794241,
+      "offset_ns": 5909171267778637.0,
+      "p50_anchor_residual_us": 0.153,
+      "p99_anchor_residual_us": 4.392059999999998,
+      "max_anchor_residual_us": 372.809,
+      "anchors": 46898,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "FCA",
+      "rank": 1,
+      "slope": 1.0000291845004532,
+      "offset_ns": 5909171307136403.0,
+      "p50_anchor_residual_us": 0.133,
+      "p99_anchor_residual_us": 2.501699999999997,
+      "max_anchor_residual_us": 12.35,
+      "anchors": 46766,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "FCA",
+      "rank": 2,
+      "slope": 1.0000291830267947,
+      "offset_ns": 5909170326032516.0,
+      "p50_anchor_residual_us": 0.142,
+      "p99_anchor_residual_us": 3.0708800000000047,
+      "max_anchor_residual_us": 15.618,
+      "anchors": 39090,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "FCA",
+      "rank": 3,
+      "slope": 1.0000291848048994,
+      "offset_ns": 5909171543855430.0,
+      "p50_anchor_residual_us": 0.127,
+      "p99_anchor_residual_us": 2.77,
+      "max_anchor_residual_us": 42.234,
+      "anchors": 43158,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "BR",
+      "rank": 0,
+      "slope": 1.000028119438406,
+      "offset_ns": 5909317412415388.0,
+      "p50_anchor_residual_us": 0.143,
+      "p99_anchor_residual_us": 4.39393,
+      "max_anchor_residual_us": 27.595,
+      "anchors": 44708,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "BR",
+      "rank": 1,
+      "slope": 1.0000281179374786,
+      "offset_ns": 5909317063173973.0,
+      "p50_anchor_residual_us": 0.128,
+      "p99_anchor_residual_us": 2.5245199999999897,
+      "max_anchor_residual_us": 19.141,
+      "anchors": 44638,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "BR",
+      "rank": 2,
+      "slope": 1.000028116755194,
+      "offset_ns": 5909316300349667.0,
+      "p50_anchor_residual_us": 0.131,
+      "p99_anchor_residual_us": 2.6343600000000005,
+      "max_anchor_residual_us": 15.348,
+      "anchors": 43183,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    },
+    {
+      "cache": "C60",
+      "policy": "BR",
+      "rank": 3,
+      "slope": 1.0000281181382187,
+      "offset_ns": 5909317078078649.0,
+      "p50_anchor_residual_us": 0.132,
+      "p99_anchor_residual_us": 3.721,
+      "max_anchor_residual_us": 145.426,
+      "anchors": 43378,
+      "clock": "CUPTI Nsight relative timestamp mapped to shared CLOCK_MONOTONIC_RAW by matched NVTX/host-span midpoints; anchor error retained."
+    }
+  ],
+  "source_sha256": {
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank0.json": "2c5732822b5dd6e59c54a5186a4ed6ac5d8325711142225dd0862d5980d93cc9",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank0_analysis.json": "fdd02349852a193661ab06ccc64d45d88f9ef8533fa1ee3c837e782cb6f52685",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank0.json": "6e7de23395408bb44085d5c3a5543071ae3487caab04e21b8a93373d3376dbb2",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank0.json": "d2d66916f0593a83e71c749047bee4d07592bf25ce241fa69e5fd17d29ba7451",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank1.json": "a3e00b14d2ec6835565f865901b859eee39e6be4e5e5bea1dfe15e7f2c4bc66f",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank1_analysis.json": "54da1c982cab10051c772de6152db193b28f927aa5e432df50ab27d7df54de10",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank1.json": "da0fd5b596b05ce1240ae38d88a2fe53e0d224b5e9d1ecac559d2e22f71f48e1",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank1.json": "7b0295b990413abc387f14641265c3cac420edcb9eefbfb6d6c3ed1a1fcf7804",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank2.json": "61712057a4ab5436fa058ebead1cf3ded6e8132676038563286a1df16c0e65e1",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank2_analysis.json": "4f21aaa3a57a87f90b4acdefad91513a4f191369898fc68ba72b29a45625c67d",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank2.json": "c486caa55165ce8c3b7b463059445a2fe6882a8a0f702f650e5b9492e2b30323",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank2.json": "104080d88f3779bc5a5eca352d45f234e4c2b86545ea2ee2cf3032f23bdf0b21",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank3.json": "5ed6da26bdd087b58c2153f8072f1a23520d4c2ab25a13f73607a3a0d822ab3b",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank3_analysis.json": "aec59ec96f3210f63bdad0f99f089c835cd2417de1e4e2ab81034c92b5373660",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank3.json": "f1197e41c4855a542654e112f234b9736093c4afb67272d13eb1f9247f5d1d4d",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank3.json": "fe9fa94bc567da8248e565955bff47b01b1340b83631b4766205befeacf5d931",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank0.json": "656ec80905f7d84c4f88ccc1d8ff9dba7651ed6ac8c37bd6977079ad033678b4",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank0_analysis.json": "c4ff4beaa41ac4eea09311cb5b02e29c8c9454bb245709d7c96d6bd8720c7cf0",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank0.json": "51800d27c799d474f64ed3cc2fb35d4c5311c95ba8355e091fe28f04816cc7d6",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank0.json": "6057d5b3b11af6f8bd15fdb109f2c74b5a458bb677acc684f00e9297e8fe9857",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank1.json": "fbdec0b766d3ea7fd448fe3edd51eae5fb59c63fcb8d85bfca341a3b68eb0719",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank1_analysis.json": "f8e2e26bab990245a373b78fd0dd9370cb0b7ae37099e22d565b24811fa609a6",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank1.json": "b99dca27bb376e9cea3558726f91e5e8f9d4143b42c4138d663932b9f1b9317d",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank1.json": "e9f63c84bd329ff1df107ce35a0842b3c7f2c2e43aeb118b4d4549ef4ddf28b7",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank2.json": "8c98c34de7ffb1e4070c3a58194f210c8eb306fc93c62d18f5560afddde653d1",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank2_analysis.json": "3e19ffcee47c942e3a43357e7a69fe4cafcfe17000f84fa2946a02da808ec56f",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank2.json": "1f436f0c518f77d35d36405977fb108f1986f88da3189d8773bd5b5f25cd11a8",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank2.json": "3f465156a8cd8fd8ea1b0a5c9abe72fb1e88fc6401dfafd43690a0ffcaeb35f6",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank3.json": "3fa170fe839de16134409135d7a01f81159e704efa69de1313502ea0c725c1d7",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank3_analysis.json": "2e6b0727059dfdb1af9cfaf5b56beac73ba6eadf426f5b3820715d7cafb1b650",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank3.json": "5db8dc69bfd40f7bf59a3033a921c1fcf841ef3e1d331c74574d85bde7e03ec4",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C30/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank3.json": "d2202fe420cb154ca8ac7d03a3b7b933cdd3208c975af4c2c91f236005208e9b",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank0.json": "18341e431c1f15a714e2f177ef36b0d333d1575378f012e5ef32028232b7c756",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank0_analysis.json": "2226e8f4e7480d6e6f303650c790632e58a4a8cfbb12a7afebee4bf4a8e3b543",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank0.json": "cb99ced04f3fdfebbb12e96a9c2c47a94838e3c2284bcfe9f5993595c87bdaf3",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank0.json": "ec0a1f2460f12485d162522b8465293165619e58fd4592b5b6d1715331b562b4",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank1.json": "669e3428e5069c22be1e3ad9e95827e0d2970bfefd107d2e997584d7d239d94f",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank1_analysis.json": "250de52607ad596c776f055110548c18413ca1e9ac0c3c681cf44cfc02c7c1f2",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank1.json": "960f20eb1279bbd8c42f1ee95fdad69dc46ab17b96fb7ea96a39394337e510f0",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank1.json": "2044f0615f80959c2628d2d6146b54405b7545f21fd0856dbf3146e82a2e7dae",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank2.json": "f36c85fb0004e0369274c8aaafdb01abe0e891a9256e259ded0e29ce46c5da84",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank2_analysis.json": "bab536830ccae909e8c28dd2955860122511e6b42dc9e29be266be17c8f7f17a",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank2.json": "c2c704cfc0350bbad41a2036b93a21c2ae7584328a23dd7f7a660ea1b22e7600",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank2.json": "9de6207b31538cb8bfc73e6a3fa8d38489d45ec0d5ac155ca9695d5d6a46a688",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_host_rank3.json": "79ec0e1bcf5b5b439c90d10996e3f50774f842b531a9111b7e06a3577d99b0df",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/b2_rank3_analysis.json": "ef7a9e3fc96c5acdc7c9dbf45551672e141799facf69e6b4b6b99b439b45bcd6",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/communication_rank3.json": "2831a07a0028710f4e43cef7aedb73d7b1c2d5f72f49cb4339ca5844d0da2e54",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_FCA_B128_H8/rank3.json": "8a3018e38b68b0baf027a7ce88fa0c954939d78e6c8d9a841eb6f34eb806636b",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank0.json": "afd5de4358ccaaf02da5f0e2d48dfdc5b510c47f01f5247fa054ed30028d6fee",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank0_analysis.json": "ba0c58acc8e3f73fd07d6bcb8294373d7b923ebd095ce86bb9c2fc07dbe5e137",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank0.json": "7ad45296c7dd67138072b7e5f974a4cd36205a0b66ece0c21885729b41f0c1b8",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank0.json": "55e13deedff2c4910e3c365cdced50c31878d4941eb91f4046e75dc55388bfe0",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank1.json": "2c4351761def5eb1786a452171cb999fe8b1b36374892f4622e848b017415f99",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank1_analysis.json": "0838a05f0d5eed1043a51607271bf7fc8380747f0e0551827a918c6ea4d0c906",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank1.json": "548a39870236e27666ce61e0104cfd2fa58f977925ee751f243f659480a00956",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank1.json": "4e9ba14ecb1221c589450552017785749934e04dd5252a0c501227aa491f9055",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank2.json": "5cb03350c6877aec55c1606a15c2e2b900029e948f7506a19fae68d6db329f76",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank2_analysis.json": "378d8073faf3c55759257f422fa9013ade4f22636ac51c2bda13d09301535b31",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank2.json": "eaee74ca3390eeeab83413f12ecc1a6469f1d63c5b009393739bcd863bc6532e",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank2.json": "a3a1774f324d71d08be3535617e7ca30d9818a9b5a4b99e1a7b8f9b8820bb6fd",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_host_rank3.json": "9e989a5c7c36ddebc81bb59d7c35996e25dd78aa0c91a93700badefd36a09c02",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/b2_rank3_analysis.json": "1d48e4ff9fdc1a19b30d1ac9096d2139421b60e5411061f90a20cd50ae67faf6",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/communication_rank3.json": "ecfc2b639ba6629714781090e43693712ed6aa26e6e7ce6ae846ddfd4bcc75f1",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/C60/B2_SHARED_RETRY1_V3_OPT_PF_OVERLAP_BR_B128_H8/rank3.json": "3ec1d17e71a1a2ac31c9bfc958901cc194f027980b64b71220b949fcf628b82b",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b2/event_timeline.json": "ea439bc4c049bdc63f4baec5c062f592ae1ad6d0712d2481fd5e9ca8fd10212e"
+  },
+  "classification": [
+    {
+      "term": "compiled expert service / owner row-and-expert allocation",
+      "category": "A",
+      "evidence": "exact expert ownership and n_e; measured compiled GPU service compared with frozen tau",
+      "limitation": "Only this service term is predictable from the current Stage-A model."
+    },
+    {
+      "term": "slot wait host span",
+      "category": "B_UNRESOLVED_A_CANDIDATE",
+      "evidence": "measured waits refer to actual owner slots and exact cache parity",
+      "limitation": "Host wait combines page-to-pinned staging submission and scheduling; GPU wait on completion can be asynchronous. Cannot assert all duration is admission-controllable."
+    },
+    {
+      "term": "host expert wrapper / selection / kernel enqueue / other",
+      "category": "B_WITH_A_WORK_COUNT_COMPONENT",
+      "evidence": "measured host phase budget and BR/FCA deltas",
+      "limitation": "No independent intervention isolates Python scheduling/enqueue backpressure from deterministic owner-count effects."
+    },
+    {
+      "term": "wire/base collective service",
+      "category": "A_SMALL_AND_C_BASE",
+      "evidence": "frozen A1 intercept plus directed incident feature; no refit"
+    },
+    {
+      "term": "arrival skew explaining NCCL residency",
+      "category": "A_OR_B_DEPENDING_SOURCE",
+      "evidence": "measured aligned GPU start and host entry spreads",
+      "limitation": "Arrival agreement alone does not identify why the late rank is late."
+    },
+    {
+      "term": "pack / unpack / partial / combine",
+      "category": "B_OR_C_UNPROVEN",
+      "evidence": "separate actual GPU and host ranges retained",
+      "limitation": "Do not subtract a common constant without cross-policy invariance evidence."
+    },
+    {
+      "term": "owner-dependent number/shape of compiled host calls and wrappers",
+      "category": "A_CANDIDATE_WITH_B_VARIABILITY",
+      "evidence": "BR first4steps calibrate cost; last4steps BR/FCA validate rank-event totals within0.05\u201319.4%, but arrival-delta error is62.3% atC30 and23.8% atC60; old FCA deltas err72.8%/42.7%.",
+      "limitation": "Ownership controls work count; the coefficient depends on runtime regime/rank/scheduling. A dependable controllable-delta model is not yet validated."
+    },
+    {
+      "term": "owner-dependent number/shape of compiled host calls and wrappers",
+      "category": "A_CANDIDATE_WITH_B_VARIABILITY",
+      "evidence": "BR first4steps calibrate cost; last4steps BR/FCA validate rank-event totals within0.05\u201319.4%, but arrival-delta error is62.3% atC30 and23.8% atC60; old FCA deltas err72.8%/42.7%.",
+      "limitation": "Ownership controls work count; the coefficient depends on runtime regime/rank/scheduling. A dependable controllable-delta model is not yet validated."
+    }
+  ],
+  "limitations": [
+    "No timing exclusions or latency-selected tail events; prefix is fixed8steps.",
+    "B2 instrumentation changes host scheduling; no primary TPOT claim.",
+    "Host ready_wait measures submission blocking and wait insertion, not a direct isolated GPU DMA-stall duration.",
+    "Expert host budget and GPU-active accounting are distinct; adding them is forbidden.",
+    "Class-A dominance remains unproven; successful residency accounting is not sufficient for an oracle."
+  ],
+  "host_cost_predictability_probe": {
+    "path": "/home/hwlee/mgo-policy-regime/mgo_v2/experiments/critical_path_admission_followup_20261006/B2_HOST_COST_PREDICTABILITY.json",
+    "sha256": "3baf4007bc14ee25a6063455270c78c99c3db898dfff2400831745cae56b9f1f",
+    "scope": "Diagnostic work-count predictability and exploratory held-out delta rejection, not an accepted revised oracle model.",
+    "prefix_checks": [
+      {
+        "cache": "C30",
+        "policy": "BR",
+        "heldout_rank_events": 768,
+        "spearman": 0.728142754266958,
+        "aggregate_error": 0.003917736446947077,
+        "median_event_error": 0.049462327954943694
+      },
+      {
+        "cache": "C30",
+        "policy": "FCA",
+        "heldout_rank_events": 768,
+        "spearman": 0.838994097593685,
+        "aggregate_error": 0.0004904696908959306,
+        "median_event_error": 0.09057842453431184
+      },
+      {
+        "cache": "C60",
+        "policy": "BR",
+        "heldout_rank_events": 768,
+        "spearman": 0.7126898927729166,
+        "aggregate_error": 0.18643637767159646,
+        "median_event_error": 0.18073703999885588
+      },
+      {
+        "cache": "C60",
+        "policy": "FCA",
+        "heldout_rank_events": 768,
+        "spearman": 0.8633666106187788,
+        "aggregate_error": 0.19397750484168302,
+        "median_event_error": 0.19820004261794583
+      }
+    ],
+    "arrival_delta_checks": {
+      "C30": {
+        "cells": {
+          "BR": {
+            "predicted_wait_ms_per_step": 143.01403873815366,
+            "observed_wait_ms_per_step": 95.6287778125
+          },
+          "FCA": {
+            "predicted_wait_ms_per_step": 434.44201809437993,
+            "observed_wait_ms_per_step": 275.1925528125
+          }
+        },
+        "delta_fraction": 1.6229775708169771,
+        "delta_relative_error": 0.6229775708169771
+      },
+      "C60": {
+        "cells": {
+          "BR": {
+            "predicted_wait_ms_per_step": 106.41136499133617,
+            "observed_wait_ms_per_step": 112.402028125
+          },
+          "FCA": {
+            "predicted_wait_ms_per_step": 304.4096967577154,
+            "observed_wait_ms_per_step": 272.356262625
+          }
+        },
+        "delta_fraction": 1.2378436393716055,
+        "delta_relative_error": 0.23784363937160558
+      }
+    },
+    "old_delta_checks": [
+      {
+        "cache": "C30",
+        "policy": "OLD_CA",
+        "predicted_delta_ms_per_step": 165.7984270467758,
+        "observed_delta_ms_per_step": 100.394419671875,
+        "delta_spearman": 0.427728895555573,
+        "aggregate_delta_relative_error": 0.6514705457600589
+      },
+      {
+        "cache": "C30",
+        "policy": "FCA",
+        "predicted_delta_ms_per_step": 335.8366157338078,
+        "observed_delta_ms_per_step": 194.29403140624999,
+        "delta_spearman": 0.6442567746473115,
+        "aggregate_delta_relative_error": 0.7284968215601331
+      },
+      {
+        "cache": "C30",
+        "policy": "LA_CA",
+        "predicted_delta_ms_per_step": -28.186102949131516,
+        "observed_delta_ms_per_step": 15.4522106875,
+        "delta_spearman": 0.32537792479858724,
+        "aggregate_delta_relative_error": 2.8240822312843914
+      },
+      {
+        "cache": "C60",
+        "policy": "OLD_CA",
+        "predicted_delta_ms_per_step": 62.8474696943491,
+        "observed_delta_ms_per_step": 42.360387718750005,
+        "delta_spearman": 0.6436805210862614,
+        "aggregate_delta_relative_error": 0.48363773513175107
+      },
+      {
+        "cache": "C60",
+        "policy": "FCA",
+        "predicted_delta_ms_per_step": 222.29011445768793,
+        "observed_delta_ms_per_step": 155.76938831249998,
+        "delta_spearman": 0.7002471604439677,
+        "aggregate_delta_relative_error": 0.4270462050716667
+      },
+      {
+        "cache": "C60",
+        "policy": "LA_CA",
+        "predicted_delta_ms_per_step": -14.732533174934808,
+        "observed_delta_ms_per_step": -16.920732109375002,
+        "delta_spearman": 0.47751566527578626,
+        "aggregate_delta_relative_error": 0.12932058260220394
+      }
+    ]
+  },
+  "candidate_host_cost_probe_run": true
+}

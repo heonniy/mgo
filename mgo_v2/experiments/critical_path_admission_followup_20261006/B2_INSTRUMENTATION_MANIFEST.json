@@ -1,5 +1,5 @@
 {
-  "status": "PREPARED",
+  "status": "COMPLETE",
   "plan_commit": "0c2e29c22e7369ef79e2a26178618611778d37b1",
   "gpus": [
     0,
@@ -59,5 +59,13 @@
   "instrumentation": "NVTX and host timestamps only; no added CUDA timing events or synchronization. Existing untimed scheduler completion events unchanged.",
   "numerics": "Warmup without B2 hooks then capture with hooks; require exact frozen token/cache/route/quota parity, no compilation.",
   "resource_policy": "Stop only owned load workers; existing memory/temperature/foreign-process guards. GPU2/3/6/7 remain owner-disabled. Sequential GPU captures.",
-  "primary_timing": false
+  "primary_timing": false,
+  "source_code_sha256": {
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/b2_instrumentation.py": "ddb73b6801ceac3be5c8857b8510fbd725f61b01741f8517292459115101d5ee",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/analyze_b2_rank.py": "e459090b5f371cd5ff18a87d04cc86305f5dc436fd143ceef8f63d83c226450d",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/report_b2.py": "9d9874b4f209d7bcd07b708a731115c6a350ac7492307a2b95a4871ba62d24fd",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/b2_host_cost_check.py": "1a5c21fb339dbe091e69b7e971d54876480604a5bd3e983b83051c2c87c9aa0c",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/finalize_b2.py": "e0ede6b545b273e5e9d6cb1b34249907c728c5a0f65312fc3e550f37eac5bb27",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/examples/refactor_profile_worker.py": "9841b3845098a783ee802e2b00d592c20e4509c96391634ce0c81db4ba255557"
+  }
 }
