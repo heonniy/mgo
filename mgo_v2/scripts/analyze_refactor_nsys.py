@@ -105,7 +105,7 @@ def analyze(path,receipt):
  kinds={r['id']:r['label'] for r in db.execute('SELECT id,label FROM ENUM_CUDA_MEMCPY_OPER')}
  h2d=[];h2d_bytes=0;h2d_count=0;other_h2d=[];other_bytes=0;other_count=0
  for r in db.execute('SELECT start,end,copyKind,bytes FROM CUPTI_ACTIVITY_KIND_MEMCPY ORDER BY start,end'):
-  label=kinds[r['copyKind']].lower().replace(' ','')
+  label=kinds[r['copyKind']].lower().replace(' ','').replace('-','')
   if label not in ('htod','h2d','hosttodevice'):continue
   if r['end']<=window[0][0]:continue
   assert r['start']>=window[0][0],'H2D crosses synchronized prefill/decode boundary'

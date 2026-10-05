@@ -15,7 +15,7 @@ def main():
    'CREATE TABLE ENUM_CUDA_MEMCPY_OPER(id INTEGER,label TEXT)',
    'CREATE TABLE CUPTI_ACTIVITY_KIND_MEMCPY(start INTEGER,end INTEGER,copyKind INTEGER,bytes INTEGER)']:db.execute(sql)
   db.executemany('INSERT INTO StringIds VALUES (?,?)',[(1,'ncclDevKernel'),(2,'triton_expert')])
-  db.execute("INSERT INTO ENUM_CUDA_MEMCPY_OPER VALUES (1,'HtoD')")
+  db.execute("INSERT INTO ENUM_CUDA_MEMCPY_OPER VALUES (1,'Host-to-Device')")
   pid=1<<24;tid=pid+1
   phases=[('moe.metadata',1,9,3,7,1),('moe.forward_a2a',10,25,12,25,1),('moe.expert_compute',26,60,30,55,2),('moe.return_a2a',61,90,65,80,1)]
   for event in range(384):
