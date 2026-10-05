@@ -1,0 +1,33 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "FAIL",
+  "stage": "R4_FIXED_H2D_V2_OPT_PF_BARRIER_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": false,
+    "partial_precision": "bf16",
+    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "profile_cuda_flush_ms": 600000,
+    "async_metadata_inputs": true,
+    "fixed_staging_team": true,
+    "isolated_cpu_threads": true
+  },
+  "started_unix": 1791195690.1242158,
+  "source_sha": "0cc750d7bba5db9fe0a152639cace68913fce6a4",
+  "primary_timing": false,
+  "pid": 1028007,
+  "error": "RuntimeError('owner STOP')",
+  "finished_unix": 1791195892.9013276
+}
