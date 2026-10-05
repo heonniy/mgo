@@ -35,9 +35,11 @@ def start_idle_load():
  busy={line.split(',')[0].strip() for line in apps.splitlines()}
  (LOAD/'STOP').unlink(missing_ok=True)
  old=json.loads((LOAD/'processes.json').read_text());ps=[r for r in old if owned(r['pid'])]
+ restriction=LOAD/'owner_stopped_gpus.json'
+ stopped=set(json.loads(restriction.read_text())['gpus']) if restriction.exists() else set()
  for line in uuids.splitlines():
   g,uuid=[x.strip() for x in line.split(',')];g=int(g)
-  if uuid in busy or any(r['gpu']==g for r in ps):continue
+  if g in stopped or uuid in busy or any(r['gpu']==g for r in ps):continue
   env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(g),OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
   with (LOAD/f'gpu{g}.log').open('a') as f:
    p=subprocess.Popen([PYTHON,'-u',str(WORKER)],env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)

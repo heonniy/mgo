@@ -116,6 +116,10 @@ def main(a):
   def profiled_call(*args,_original=original,_phase=phase,**kwargs):
    with nvtx_phase(_phase):return _original(*args,**kwargs)
   setattr(module,name,profiled_call)
+ b2_recorder=b2_uninstall=None
+ if case.get('b2_instrumentation'):
+  from b2_instrumentation import install
+  b2_recorder,b2_uninstall=install(rt)
  before=dict(counters['stats']);progress('PROFILER_START');torch.cuda.profiler.start();progress('CAPTURE_STARTED')
  try:
   with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
@@ -123,6 +127,8 @@ def main(a):
  finally:
   progress('PROFILER_STOP');torch.cuda.profiler.stop();progress('PROFILER_STOPPED');h2d_module.copy_expert_to_stage=original_stage
   for module,name,original in diagnostic_hooks:setattr(module,name,original)
+  if b2_uninstall:b2_uninstall()
+  if b2_recorder:b2_recorder.write(a.output/f'b2_host_rank{rank}.json')
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
  assert len(rt.profile_communication)==48*horizon and rt.transport.calls==96*horizon

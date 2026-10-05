@@ -1,0 +1,63 @@
+{
+  "status": "PREPARED",
+  "plan_commit": "0c2e29c22e7369ef79e2a26178618611778d37b1",
+  "gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "prefix_events": [
+    48,
+    431
+  ],
+  "selection": "First8decode steps fixed before inspecting latency; no tail event expansion.",
+  "cells": [
+    [
+      "C30",
+      "BR"
+    ],
+    [
+      "C30",
+      "FCA"
+    ],
+    [
+      "C60",
+      "BR"
+    ],
+    [
+      "C60",
+      "FCA"
+    ]
+  ],
+  "source_sha256": {
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/input_receipt.json": "7424da1c54620541489411a41eb76dac4572ad2811d20b5282483e0e450cd717",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/BR_fetches.json": "0300894b699c36b1756b73b7ca366975cbab84e8b72a9730595ac4e6a49257a1",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/inputs_B128_H64/FCA_fetches.json": "6cb4609acb53067e4634a455b0bb1da121a04fe6092713a8257aeb38bc4e7b75",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/input_receipt.json": "7424da1c54620541489411a41eb76dac4572ad2811d20b5282483e0e450cd717",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/BR_fetches.json": "7eb304b99db40fd59bb9e9dc1c4475870c4c4763eb35b2ae95121ed0908d6190",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C60/inputs_B128_H64/FCA_fetches.json": "a07fc279a51ba5caa5a3b28904fd1b87bca88097a0760a380633248a925a7fe4"
+  },
+  "nsys": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+  "clock": "Host CLOCK_MONOTONIC_RAW; align CUPTI/NVTX to this shared monotonic axis using per-rank NVTX/host anchors and report calibration uncertainty. Never compare raw CUDA-event clocks.",
+  "instrumentation": "NVTX and host timestamps only; no added CUDA timing events or synchronization. Existing untimed scheduler completion events unchanged.",
+  "numerics": "Warmup without B2 hooks then capture with hooks; require exact frozen token/cache/route/quota parity, no compilation.",
+  "resource_policy": "Stop only owned load workers; existing memory/temperature/foreign-process guards. GPU2/3/6/7 remain owner-disabled. Sequential GPU captures.",
+  "primary_timing": false
+}
