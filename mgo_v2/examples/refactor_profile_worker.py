@@ -7,6 +7,7 @@ class ProfileRuntime(DecodeOffloadRuntime):
   if getattr(self,'capture',False) and self.index>=48:
    sent=list(map(int,event['send_counts']));received=list(map(int,event['recv_counts']))
    self.profile_communication.append(dict(event=self.index,send_token_rows=sent,recv_token_rows=received,
+    expert_rows=sum(len(g[1]) for g in event['groups']),mandatory_fetches=len(event['fetches']),
     active_remote_send_peers=sum(n>0 for r,n in enumerate(sent) if r!=self.rank),
     active_remote_recv_peers=sum(n>0 for r,n in enumerate(received) if r!=self.rank),
     forward_wire_bytes=(sum(sent)-sent[self.rank])*(2048*2+24),
