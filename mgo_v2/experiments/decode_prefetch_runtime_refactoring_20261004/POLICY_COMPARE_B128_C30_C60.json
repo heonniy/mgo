@@ -1,0 +1,61 @@
+{
+  "experiment": "R4_B128_C30_C60_POLICY_COMPARE",
+  "status": "PLANNED",
+  "runtime": {
+    "arm": "V3_OPT_PF_OVERLAP",
+    "reason": "Frozen timing candidate from STABLE_THREE_ARM_RESULTS.json; policy comparison must not switch runtime arms.",
+    "world": 4,
+    "physical_gpus": [0, 1, 4, 5],
+    "local_batch": 128,
+    "decode_horizon": 64,
+    "prefetch_slots_per_rank": 2,
+    "prefetch_trigger": "T2",
+    "overlap": true,
+    "partial_precision": "bf16",
+    "substitution": false,
+    "fused_forward_a2a": true,
+    "coalesced_return_a2a": true,
+    "balanced_mandatory_h2d_quota": true
+  },
+  "settings": [
+    {
+      "name": "C30_B128",
+      "cache_ratio": 0.30,
+      "main_slots_total": 1844,
+      "main_slots_per_rank": [461, 461, 461, 461]
+    },
+    {
+      "name": "C60_B128",
+      "cache_ratio": 0.60,
+      "main_slots_total": 3686,
+      "main_slots_per_rank": [922, 922, 921, 921]
+    }
+  ],
+  "policies": [
+    {"label": "BR", "adapter_id": 0, "role": "baseline"},
+    {"label": "OLD_CA", "adapter_id": 3, "role": "historical static token-rank fanout Hungarian CA"},
+    {"label": "FCA", "adapter_id": 5, "role": "dynamic packet-aware fanout CA"},
+    {"label": "LA_CA", "adapter_id": 6, "role": "lexicographic load-aware plus packet-aware joint policy"}
+  ],
+  "primary_metric": "decode_TPOT",
+  "gain_definition": "(TPOT_BR - TPOT_policy) / TPOT_BR",
+  "secondary_metrics": [
+    "E2E_wall",
+    "exposed_H2D",
+    "forward_A2A",
+    "return_A2A",
+    "expert_compute",
+    "controller_time",
+    "rank_imbalance",
+    "remote_token_rank_pairs",
+    "max_rank_incident_packets"
+  ],
+  "repeat_rule": "Use the existing stable paired timing rule; two repeats when both absolute timing differences are <=2%, otherwise one third repeat. Keep all samples.",
+  "fairness": [
+    "Same frozen requests/routes/weights/teacher tokens within each cache setting.",
+    "Same V3 runtime, P=2, T2, BF16 transport, NUMA/CPU affinity, eviction policy and NCCL settings for every policy.",
+    "Only cache capacity and admission policy may differ.",
+    "BR is the denominator for all policy gains within the same cache setting.",
+    "Do not include standalone LA or demand-locality CA(id=1) in this experiment."
+  ]
+}
