@@ -1,0 +1,74 @@
+{
+  "status": "DIAGNOSTIC_ABORT_RETRY_PLANNED",
+  "unix": 1791200686.5908468,
+  "retry": {
+    "C30/FCA": {
+      "stage": "POLICY_REGIME_PROFILE_C30_RETRY1",
+      "failed_capture": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64",
+      "reason": "All four progress records stalled at event 960; repeated watchdog samples show rank1 copy worker in CUDA event record and main in compiled kernel launch; other ranks wait on metadata collective. Technical supervisor issued cooperative STOP; not an owner cancellation. Primary timing remains valid. Fresh diagnostic attempt uses unchanged profiling options."
+    }
+  },
+  "failed_status": {
+    "environment": "env1",
+    "world": 4,
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "status": "FAIL",
+    "stage": "POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64",
+    "case": {
+      "label": "FCA",
+      "policy": "FCA",
+      "P": 2,
+      "trigger": "T2",
+      "horizon": 64,
+      "overlap": true,
+      "partial_precision": "bf16",
+      "runtime_arm": "V3_OPT_PF_OVERLAP",
+      "staging_backend": "torch",
+      "unique_combine": true,
+      "async_metadata_inputs": true,
+      "isolated_cpu_threads": true,
+      "fixed_staging_team": true,
+      "profile_cuda_flush_ms": 600000
+    },
+    "started_unix": 1791200137.5385342,
+    "source_sha": "ffbd7f442314d7b20da939e8e338959a9caf4985",
+    "primary_timing": false,
+    "pid": 1162128,
+    "error": "RuntimeError('owner STOP')",
+    "finished_unix": 1791200580.7150922
+  },
+  "progress": [
+    {
+      "stage": "CAPTURE",
+      "completed_events": 960,
+      "unix": 1791200405.2834587
+    },
+    {
+      "stage": "CAPTURE",
+      "completed_events": 960,
+      "unix": 1791200405.2757225
+    },
+    {
+      "stage": "CAPTURE",
+      "completed_events": 960,
+      "unix": 1791200405.2787075
+    },
+    {
+      "stage": "CAPTURE",
+      "completed_events": 960,
+      "unix": 1791200405.2839282
+    }
+  ],
+  "stack_sources": {
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64/stacks_rank3.jsonl": "bb254f779289da6137bedad73da7a28c99460eb32bba4e05bc32158b5807af71",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64/stacks_rank0.jsonl": "0931f975ef950165dacde432d279d2f8c80424871c91301425ea215d93a25bb2",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64/stacks_rank1.jsonl": "cdc71d895e56ab548d2bc7684281076271efd352ebc2ec23ad63739c3068f2ae",
+    "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_V3_OPT_PF_OVERLAP_FCA_B128_H64/stacks_rank2.jsonl": "a3a24399b1dda19b1f09be82e903cd64d385e8fb9b6206bde50b41107b100d4a"
+  },
+  "scope": "No failed capture is used as a timing or attribution result. No primary samples repeated or excluded. The profiler-associated stall is observed; its underlying driver/CUPTI cause is not established. Completed BR/OLD_CA captures are reused."
+}

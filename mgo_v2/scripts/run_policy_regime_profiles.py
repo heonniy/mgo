@@ -13,12 +13,12 @@ def main():
   for setting in ('C30','C60'):
    base=ROOT/setting;cases=json.loads((base/f'POLICY_REGIME_{setting}_B128_H64/cases.json').read_text())
    for case in cases:
-    policy=case['policy'];label=f'POLICY_REGIME_PROFILE_{setting}_V3_OPT_PF_OVERLAP_{policy}_B128_H64';out=base/label
+    policy=case['policy'];retry_file=ROOT/'profile_retries.json';retry=json.loads(retry_file.read_text()).get(setting+'/'+policy,{}) if retry_file.exists() else {};stage=retry.get('stage','POLICY_REGIME_PROFILE_'+setting);label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H64';out=base/label
     state['active']=label;h.write(ROOT/'profile_status.json',state)
     if (out/'status.json').exists():assert json.loads((out/'status.json').read_text())['status']=='PASS','repair explicitly before retrying failed capture'
     else:
      path=base/f'profile_case_{policy}.json';h.write(path,case)
-     cmd=[h.PYTHON,'-u',str(h.P/'scripts/run_refactor_profile.py'),'--environment',ENVIRONMENT,'--root',str(base),'--gpus','0','1','4','5','--stage','POLICY_REGIME_PROFILE_'+setting,'--horizon','64','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(path),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
+     cmd=[h.PYTHON,'-u',str(h.P/'scripts/run_refactor_profile.py'),'--environment',ENVIRONMENT,'--root',str(base),'--gpus','0','1','4','5','--stage',stage,'--horizon','64','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(path),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
      with (base/(label+'_driver.log')).open('w') as log:subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,check=True)
     state['completed'].append(str(out))
   state['status']='CAPTURES_COMPLETE'

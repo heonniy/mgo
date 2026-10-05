@@ -13,12 +13,12 @@ def main(a):
  os.environ['MGO_RESULT_BRANCH']='codex/policy-regime-20261005'
  with (ROOT/'followup.lock').open('a') as lock:
   fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-  stamp=identity(a.timing_pid)
-  assert stamp and b'run_policy_regime.py' in Path(f'/proc/{a.timing_pid}/cmdline').read_bytes()
-  state=dict(status='WAITING_FOR_TIMING_EXIT',timing_pid=a.timing_pid,timing_start_tick=stamp,started_unix=time.time())
+  stamp=None if a.resume else identity(a.timing_pid)
+  if not a.resume:assert stamp and b'run_policy_regime.py' in Path(f'/proc/{a.timing_pid}/cmdline').read_bytes()
+  state=dict(status='RESUMING_ATTRIBUTION' if a.resume else 'WAITING_FOR_TIMING_EXIT',timing_pid=a.timing_pid,timing_start_tick=stamp,started_unix=time.time())
   h.write(ROOT/'followup_status.json',state)
   try:
-   while identity(a.timing_pid)==stamp:
+   while not a.resume and identity(a.timing_pid)==stamp:
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if time.time()-state['started_unix']>12*3600:raise TimeoutError('timing driver still active after bounded wait')
     time.sleep(10)
@@ -35,4 +35,4 @@ def main(a):
    state['finished_unix']=time.time();h.write(ROOT/'followup_status.json',state)
    receipt=PACKET/'POLICY_REGIME_FOLLOWUP.json';h.write(receipt,state);publish('policy regime followup: '+state['status'],[receipt])
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--timing-pid',type=int,required=True);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--timing-pid',type=int);p.add_argument('--resume',action='store_true');main(p.parse_args())

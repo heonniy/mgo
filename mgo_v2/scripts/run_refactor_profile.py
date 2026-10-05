@@ -33,6 +33,10 @@ def main(a):
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(out/'status.json',state)
    while proc.poll() is None:
     track(proc.pid,descendants)
+    progress_files=[out/f'progress_rank{r}.json' for r in range(world)]
+    if all(p.exists() for p in progress_files):
+     progress=[json.loads(p.read_text()) for p in progress_files]
+     if all(p['stage']=='CAPTURE' for p in progress) and time.time()-max(p['unix'] for p in progress)>180:raise TimeoutError('all ranks made no captured decode progress for 180 seconds')
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if time.time()-state['started_unix']>(1800 if a.horizon==8 else 7200):raise TimeoutError('bounded profiling run')
     h.safe(h.sample(proc.pid));time.sleep(10)
