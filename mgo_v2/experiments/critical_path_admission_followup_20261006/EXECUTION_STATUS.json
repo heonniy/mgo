@@ -1,0 +1,86 @@
+{
+  "status": "MEASUREMENTS_COMPLETE",
+  "started_unix": 1791219302.5134463,
+  "plan_commit": "894ed896292d3ff628f3db2dbc34a04d45461393",
+  "initial_resources": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 52
+      },
+      {
+        "gpu": 1,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 51
+      },
+      {
+        "gpu": 4,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 53
+      },
+      {
+        "gpu": 5,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 43
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 52
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 40
+      }
+    ],
+    "host_available_bytes": 1981900566528,
+    "unix": 1791219306.1565595,
+    "foreign_pids": [],
+    "collection_seconds": 0.2749716155230999
+  },
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/examples/critical_microbench_worker.py",
+    "--inputs",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/inputs.json",
+    "--output",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/attempt1"
+  ],
+  "transport_env": {
+    "NCCL_CUMEM_ENABLE": "0",
+    "NCCL_DEBUG": "INFO",
+    "NCCL_DEBUG_SUBSYS": "INIT,GRAPH,P2P,SHM",
+    "NCCL_DEBUG_FILE": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/attempt1/nccl-%h-%p.log"
+  },
+  "source_sha": "ece91dcf8fbd7a041bf86664dd386e8838052dfa",
+  "pid": 1472339,
+  "transport_paths": [
+    "P2P/IPC"
+  ],
+  "finished_unix": 1791219348.6975124
+}
