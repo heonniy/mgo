@@ -1,7 +1,7 @@
 {
   "status": "PASS",
-  "stage": "R4_H64_V2_OPT_PF_BARRIER",
-  "label": "R4_H64_V2_OPT_PF_BARRIER_B256_H64",
+  "stage": "R4_H64_V3_OPT_PF_OVERLAP",
+  "label": "R4_H64_V3_OPT_PF_OVERLAP_B128_H64",
   "group": {
     "world": 4,
     "gpus": [
@@ -10,10 +10,10 @@
       4,
       5
     ],
-    "batch": 256,
+    "batch": 128,
     "horizon": 64,
     "paired": true,
-    "runtime_arm": "V2_OPT_PF_BARRIER",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
     "cases": [
       {
         "label": "BR",
@@ -21,9 +21,9 @@
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER"
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
       },
       {
         "label": "LA",
@@ -31,14 +31,14 @@
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
-        "overlap": false,
+        "overlap": true,
         "partial_precision": "bf16",
-        "runtime_arm": "V2_OPT_PF_BARRIER"
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
       }
     ]
   },
-  "started_unix": 1791165254.9196107,
-  "source_sha": "ab43e28ea24f05f5e8c1eb3bc115269baed0b64c",
+  "started_unix": 1791166644.071625,
+  "source_sha": "66c82382a28d7d7d3f61974fd8dfcd9c4fcb9eb0",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
@@ -94,14 +94,14 @@
       "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510"
     },
     "inputs": {
-      "selected.npy": "d8ed0b6d5ce714344614b4184453a4ca516c4ee930cb988cb87f2f4b3ad56c13",
-      "weights.npy": "3f2b2c0958b93d2cf63426d4b7088eb503e5d55e70fe07c931f0a4149dfc8d9b",
-      "offsets.npy": "b50a6081750591d7bf1b73775409f318897ee111147c187af2ce74c061473148",
-      "prefill_origins.npy": "e765868553d81a12d282211c960f100b45701ff02cc6c8a15eabf254cabf0768",
-      "decode_origins.npy": "766c229305de98cdb0eff6ab38037895928c903575d284f8cdbf6a7884e2a7cc",
-      "gates.npy": "c8b2624fc35366c2a86c14233940785dbeeeaf2e2e91e0a5607007dc8f3d41c7",
-      "teacher.npy": "bf53998938651dc1c7f6e879e36ae390bc6e66ebac8f4eba9ef26d4d8f72e39d",
-      "requests.json": "b13de21162e203c7720928530960f6194cf494f2eb3ecfd410eae6293697a524"
+      "selected.npy": "f79fbf2c3425dbe6541942f15bd6defdcfd1bca9d9c54db922b4857649eb03a8",
+      "weights.npy": "65ae4bcc76b960859470580ba66a6532963888c1892b44f332290f99cc41fe24",
+      "offsets.npy": "ae2dd0dc3258ad9a1d882652808a0f90352f55d903ba27af8347cb3a9f3ab8cc",
+      "prefill_origins.npy": "93e3fdf479a43420f7e32078264d16e8754469a9378b8c03ef22ca88c3e6a353",
+      "decode_origins.npy": "7065f3e9ec3113f2a1fa869160e99ce6a6f5168df6fb7df5000960a80804175c",
+      "gates.npy": "21c2d933e77d27b991db2a7e06b45610360306d703cac1cb69603b4558c4c686",
+      "teacher.npy": "af32fee1e61f9f60ff004f1c685e858f0112f7175e5e55dc92fc98aef9757140",
+      "requests.json": "32ccf6a548242d61fe6f590403ee21e88c2d46c4d43db2051c4fe51d3969853c"
     },
     "environment": {
       "CUDA_VISIBLE_DEVICES": "0,1,4,5",
@@ -114,11 +114,11 @@
     },
     "affinity_sha256": "e78cd22483ca21dd2deb01510161d99408ecb0e6c69dbdd1195ffe579ec98ab8",
     "predictor_sha256": "f36eed131dbe35ee1ca7e4f47cd09df004d6a540e6dd1559323939a49e4df204",
-    "input_receipt_sha256": "2fbf52972598445bd225af8ae2e8d3e049c12e6c0b35cc13934aabbf811c2aad",
+    "input_receipt_sha256": "0559a6ff1e9cbd24e70ad551fdae7cec342a0e53f688204a1b9dc234146c9c8b",
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 481186,
+  "pid": 494828,
   "completed": [
     "BR_r1",
     "LA_r1",
@@ -128,5 +128,5 @@
     "LA_r3"
   ],
   "exit_code": 0,
-  "finished_unix": 1791166616.0476325
+  "finished_unix": 1791167605.828372
 }
