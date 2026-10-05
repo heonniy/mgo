@@ -44,6 +44,9 @@ def main(a):
   if case.get('expert_diagnostics',False):
    from refactor_expert_diagnostics import install
    uninstall=install(rt,diag)
+  elif case.get('kernel_diagnostics',False):
+   from refactor_expert_diagnostics import install_kernel_only
+   uninstall=install_kernel_only(rt,diag)
   write(a.output/f'progress_rank{rank}.json',dict(stage='DIAGNOSTIC',repeat=repeat))
   before=dict(counters['stats']);u0=resource.getrusage(resource.RUSAGE_SELF);diag.start()
   try:

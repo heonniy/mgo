@@ -1,0 +1,2318 @@
+{
+  "status": "PASS",
+  "primary_timing": false,
+  "launcher_status": "PASS",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "expert_diagnostics": true
+  },
+  "ranks": {
+    "0": {
+      "repeats": [
+        {
+          "generation_wall_s": 101.707765454,
+          "generation_cpu_s": 96.723202718,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 1.1264684019999998,
+              "cpu_s": 0.9117615210000001,
+              "calls": 86630,
+              "non_cpu_wall_s": 0.21470688099999968
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 1.7954309239999993,
+              "cpu_s": 1.7812782299999999,
+              "calls": 4642,
+              "non_cpu_wall_s": 0.01415269399999941
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000339238,
+              "cpu_s": 0.00028790900000000004,
+              "calls": 49,
+              "non_cpu_wall_s": 5.132899999999997e-05
+            },
+            "main/generation": {
+              "wall_s": 14.065837792,
+              "cpu_s": 14.062061527,
+              "calls": 1,
+              "non_cpu_wall_s": 0.0037762650000008335
+            },
+            "main/moe.combine": {
+              "wall_s": 0.900702161,
+              "cpu_s": 0.900622131,
+              "calls": 48,
+              "non_cpu_wall_s": 8.00300000000087e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.333097983000004,
+              "cpu_s": 11.305925982,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.02717200100000383
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5290851079999997,
+              "cpu_s": 0.44329310600000016,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.08579200199999959
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.022346272,
+              "cpu_s": 0.022212272,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001339999999999987
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.807925938,
+              "cpu_s": 4.2640161060000015,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.4560901680000016
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.900700118,
+              "cpu_s": 0.906355284,
+              "calls": 48,
+              "non_cpu_wall_s": -0.005655165999999934
+            },
+            "main/moe.metadata": {
+              "wall_s": 7.1821691770000005,
+              "cpu_s": 7.1702359750000015,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.011933201999998921
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 1.5066874879999996,
+              "cpu_s": 0.06895914700000001,
+              "calls": 1643,
+              "non_cpu_wall_s": 1.4377283409999997
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.161568356,
+              "cpu_s": 0.14372426500000002,
+              "calls": 26529,
+              "non_cpu_wall_s": 0.01784409099999998
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 4.941400205,
+              "cpu_s": 4.357025392999999,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.584374812000001
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 33.524307623999995,
+              "cpu_s": 32.397541398000016,
+              "calls": 81986,
+              "non_cpu_wall_s": 1.1267662259999796
+            },
+            "main/expert.ready_select": {
+              "wall_s": 1.0013271849999994,
+              "cpu_s": 1.002253484,
+              "calls": 85058,
+              "non_cpu_wall_s": -0.0009262990000005189
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 4.204582475000001,
+              "cpu_s": 3.130950484000001,
+              "calls": 81986,
+              "non_cpu_wall_s": 1.0736319910000005
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.6722347250000005,
+              "cpu_s": 2.648310723999999,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.02392400100000147
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.7507029480000003,
+              "cpu_s": 1.4927868880000001,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.2579160600000001
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 2.3408990540000008,
+              "cpu_s": 2.2062771019999996,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.13462195200000115
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.9994525199999998,
+              "cpu_s": 0.711865062,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.28758745799999985
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 3.4344981280000013,
+              "cpu_s": 3.34595015,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08854797800000114
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.913513262,
+              "cpu_s": 2.8921494820000007,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.021363779999999277
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.5874997419999998,
+              "cpu_s": 0.552293659,
+              "calls": 86167,
+              "non_cpu_wall_s": 0.03520608299999972
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.001170007,
+              "cpu_s": 0.001099956,
+              "calls": 121,
+              "non_cpu_wall_s": 7.005100000000001e-05
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.003818622,
+              "cpu_s": 0.003965481,
+              "calls": 121,
+              "non_cpu_wall_s": -0.00014685900000000005
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 1.0069122409999998,
+              "cpu_s": 0.40018386799999994,
+              "calls": 29358,
+              "non_cpu_wall_s": 0.6067283729999998
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.2935650309999998,
+              "cpu_s": 0.47003425400000004,
+              "calls": 29356,
+              "non_cpu_wall_s": 0.8235307769999998
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 1.06467682,
+              "cpu_s": 0.587819954,
+              "calls": 56868,
+              "non_cpu_wall_s": 0.4768568660000001
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 36.69718620400001,
+              "cpu_s": 29.896231382999993,
+              "calls": 29358,
+              "non_cpu_wall_s": 6.800954821000019
+            }
+          },
+          "gc_wall_s": 0.942257901,
+          "gc_events": 3069
+        },
+        {
+          "generation_wall_s": 100.886543359,
+          "generation_cpu_s": 94.745541367,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.9120937609999997,
+              "cpu_s": 0.8016744389999998,
+              "calls": 86630,
+              "non_cpu_wall_s": 0.11041932199999993
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 1.6245628600000002,
+              "cpu_s": 1.6136284449999998,
+              "calls": 4642,
+              "non_cpu_wall_s": 0.010934415000000364
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.00035747999999999997,
+              "cpu_s": 0.000305328,
+              "calls": 49,
+              "non_cpu_wall_s": 5.215199999999997e-05
+            },
+            "main/generation": {
+              "wall_s": 15.119797474,
+              "cpu_s": 14.946733672,
+              "calls": 1,
+              "non_cpu_wall_s": 0.1730638019999997
+            },
+            "main/moe.combine": {
+              "wall_s": 0.976124222,
+              "cpu_s": 0.975909557,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00021466500000000277
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.179558260999995,
+              "cpu_s": 11.158601812,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.020956448999994493
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.47652840199999996,
+              "cpu_s": 0.420024851,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.056503550999999985
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.02191895,
+              "cpu_s": 0.021792124,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012682600000000002
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.5260304460000005,
+              "cpu_s": 3.956797552,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.43076710599999934
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.877919327,
+              "cpu_s": 0.882797072,
+              "calls": 48,
+              "non_cpu_wall_s": -0.004877745000000044
+            },
+            "main/moe.metadata": {
+              "wall_s": 9.92127091,
+              "cpu_s": 9.906763785,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.014507124999999732
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.213633489,
+              "cpu_s": 0.09221552400000001,
+              "calls": 2452,
+              "non_cpu_wall_s": 2.1214179649999996
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.170177874,
+              "cpu_s": 0.15315492899999997,
+              "calls": 26145,
+              "non_cpu_wall_s": 0.01702294500000004
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 4.793361465000002,
+              "cpu_s": 4.031939823,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.761421642000002
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 30.274567377999993,
+              "cpu_s": 28.902727519000003,
+              "calls": 81986,
+              "non_cpu_wall_s": 1.3718398589999907
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.97266209,
+              "cpu_s": 0.9807477219999999,
+              "calls": 85058,
+              "non_cpu_wall_s": -0.008085631999999898
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 4.010845383000002,
+              "cpu_s": 2.909564465,
+              "calls": 81986,
+              "non_cpu_wall_s": 1.1012809180000023
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.3741527799999997,
+              "cpu_s": 2.358841559000001,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.01531122099999882
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.7948727380000002,
+              "cpu_s": 1.410867914,
+              "calls": 81986,
+              "non_cpu_wall_s": 0.38400482400000024
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.8525366989999998,
+              "cpu_s": 1.7423671779999994,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.11016952100000044
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.659704408,
+              "cpu_s": 0.5255876339999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1341167740000001
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 3.315520827,
+              "cpu_s": 3.2342553069999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08126552000000009
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.1910991390000003,
+              "cpu_s": 3.1307943909999993,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06030474800000096
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.5917218249999999,
+              "cpu_s": 0.551360086,
+              "calls": 100308,
+              "non_cpu_wall_s": 0.04036173899999995
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.0071968959999999995,
+              "cpu_s": 0.006652330999999998,
+              "calls": 930,
+              "non_cpu_wall_s": 0.0005445650000000012
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.028328274999999993,
+              "cpu_s": 0.029436347999999998,
+              "calls": 930,
+              "non_cpu_wall_s": -0.0011080730000000046
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 0.9828983250000002,
+              "cpu_s": 0.39747270999999995,
+              "calls": 29358,
+              "non_cpu_wall_s": 0.5854256150000002
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.0133057690000002,
+              "cpu_s": 0.41623270799999995,
+              "calls": 29356,
+              "non_cpu_wall_s": 0.5970730610000003
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 1.141567932,
+              "cpu_s": 0.5962516149999999,
+              "calls": 56868,
+              "non_cpu_wall_s": 0.5453163170000002
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 43.18657786,
+              "cpu_s": 37.310149571,
+              "calls": 29358,
+              "non_cpu_wall_s": 5.876428289000003
+            }
+          },
+          "gc_wall_s": 0.981953243,
+          "gc_events": 3066
+        }
+      ],
+      "delta_second_minus_first": {
+        "generation_wall_s": -0.821222094999996,
+        "generation_cpu_s": -1.9776613509999947,
+        "gc_wall_s": 0.03969534200000002,
+        "phases": {
+          "main/expert.weight_multiply": {
+            "wall_s": 0.04416978999999999,
+            "cpu_s": -0.08191897400000014,
+            "calls": 0,
+            "non_cpu_wall_s": 0.12608876400000013
+          },
+          "main/moe.h2d_global_barrier": {
+            "wall_s": -0.022780791000000078,
+            "cpu_s": -0.023558211999999967,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0007774209999998893
+          },
+          "staging/cuda.Stream.wait_event": {
+            "wall_s": 0.07689111199999998,
+            "cpu_s": 0.008431660999999924,
+            "calls": 0,
+            "non_cpu_wall_s": 0.06845945100000006
+          },
+          "main/cuda.Stream.wait_event": {
+            "wall_s": 0.006026889,
+            "cpu_s": 0.005552374999999998,
+            "calls": 809,
+            "non_cpu_wall_s": 0.0004745140000000012
+          },
+          "main/cuda.Event.synchronize": {
+            "wall_s": -0.1708680639999991,
+            "cpu_s": -0.16764978500000005,
+            "calls": 0,
+            "non_cpu_wall_s": -0.003218278999999047
+          },
+          "main/expert.slot_use": {
+            "wall_s": -0.29808194500000074,
+            "cpu_s": -0.2894691649999981,
+            "calls": 0,
+            "non_cpu_wall_s": -0.008612780000002651
+          },
+          "main/moe.forward_a2a": {
+            "wall_s": -0.4883623550000009,
+            "cpu_s": -0.4639099240000002,
+            "calls": 0,
+            "non_cpu_wall_s": -0.02445243100000072
+          },
+          "main/moe.combine": {
+            "wall_s": 0.07542206100000004,
+            "cpu_s": 0.07528742600000005,
+            "calls": 0,
+            "non_cpu_wall_s": 0.00013463499999999406
+          },
+          "main/moe.return_a2a": {
+            "wall_s": 0.27758587700000037,
+            "cpu_s": 0.23864490899999868,
+            "calls": 0,
+            "non_cpu_wall_s": 0.038940968000001686
+          },
+          "main/generation": {
+            "wall_s": 1.0539596820000003,
+            "cpu_s": 0.8846721450000015,
+            "calls": 0,
+            "non_cpu_wall_s": 0.16928753699999888
+          },
+          "staging/moe.host_staging": {
+            "wall_s": 6.489391655999988,
+            "cpu_s": 7.413918188000004,
+            "calls": 0,
+            "non_cpu_wall_s": -0.9245265320000158
+          },
+          "main/moe.current_controller": {
+            "wall_s": -0.15353972200000854,
+            "cpu_s": -0.1473241699999992,
+            "calls": 0,
+            "non_cpu_wall_s": -0.006215552000009339
+          },
+          "staging/cuda.Event.record": {
+            "wall_s": -0.02401391599999958,
+            "cpu_s": -0.0027111579999999913,
+            "calls": 0,
+            "non_cpu_wall_s": -0.02130275799999959
+          },
+          "main/cuda.Stream.synchronize": {
+            "wall_s": 1.8241999999999965e-05,
+            "cpu_s": 1.7418999999999963e-05,
+            "calls": 0,
+            "non_cpu_wall_s": 8.230000000000021e-07
+          },
+          "main/moe.forward_complete": {
+            "wall_s": -0.3397481119999999,
+            "cpu_s": -0.18627742800000013,
+            "calls": 0,
+            "non_cpu_wall_s": -0.15347068399999975
+          },
+          "main/scheduler.wait_for_slot": {
+            "wall_s": 0.024509652999999992,
+            "cpu_s": 0.025470866999999998,
+            "calls": 809,
+            "non_cpu_wall_s": -0.0009612140000000045
+          },
+          "staging/cuda.Event.synchronize": {
+            "wall_s": -0.2802592619999995,
+            "cpu_s": -0.05380154600000009,
+            "calls": 0,
+            "non_cpu_wall_s": -0.22645771599999942
+          },
+          "main/moe.expert_compute": {
+            "wall_s": -0.2818954919999994,
+            "cpu_s": -0.30721855400000164,
+            "calls": 0,
+            "non_cpu_wall_s": 0.025323062000002228
+          },
+          "main/cuda.Event.record": {
+            "wall_s": -0.21437464100000003,
+            "cpu_s": -0.11008708200000028,
+            "calls": 0,
+            "non_cpu_wall_s": -0.10428755899999975
+          },
+          "main/expert.input_and_weight_views": {
+            "wall_s": -0.14803873999999784,
+            "cpu_s": -0.3250855699999988,
+            "calls": 0,
+            "non_cpu_wall_s": 0.177046830000001
+          },
+          "main/moe.demand_h2d": {
+            "wall_s": -0.05255670599999979,
+            "cpu_s": -0.023268255000000182,
+            "calls": 0,
+            "non_cpu_wall_s": -0.029288450999999605
+          },
+          "main/moe.dispatch": {
+            "wall_s": -0.0004273220000000008,
+            "cpu_s": -0.00042014800000000213,
+            "calls": 0,
+            "non_cpu_wall_s": -7.1739999999986814e-06
+          },
+          "main/scheduler._submitted": {
+            "wall_s": 0.7069460010000002,
+            "cpu_s": 0.023256376999999995,
+            "calls": 809,
+            "non_cpu_wall_s": 0.6836896239999999
+          },
+          "main/expert.routing_weight_lookup": {
+            "wall_s": -0.19373709199999922,
+            "cpu_s": -0.221386019000001,
+            "calls": 0,
+            "non_cpu_wall_s": 0.027648927000001766
+          },
+          "main/moe.metadata": {
+            "wall_s": 2.739101733,
+            "cpu_s": 2.7365278099999992,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0025739230000008106
+          },
+          "main/cuda.Event.query": {
+            "wall_s": 0.00860951800000001,
+            "cpu_s": 0.00943066399999995,
+            "calls": -384,
+            "non_cpu_wall_s": -0.0008211459999999393
+          },
+          "main/moe.prefetch_controller": {
+            "wall_s": -0.11897730100000148,
+            "cpu_s": -0.11169484300000043,
+            "calls": 0,
+            "non_cpu_wall_s": -0.007282458000001046
+          },
+          "main/scheduler.ready": {
+            "wall_s": 0.004222083000000154,
+            "cpu_s": -0.0009335730000000764,
+            "calls": 14141,
+            "non_cpu_wall_s": 0.0051556560000002305
+          },
+          "main/expert.kernel_call": {
+            "wall_s": -3.2497402460000018,
+            "cpu_s": -3.494813879000013,
+            "calls": 0,
+            "non_cpu_wall_s": 0.24507363300001117
+          },
+          "main/expert.ready_select": {
+            "wall_s": -0.028665094999999363,
+            "cpu_s": -0.021505761999999984,
+            "calls": 0,
+            "non_cpu_wall_s": -0.007159332999999379
+          }
+        }
+      },
+      "logical_work_identical": true,
+      "scheduler_identical": true
+    },
+    "1": {
+      "repeats": [
+        {
+          "generation_wall_s": 101.707673883,
+          "generation_cpu_s": 95.012786511,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.7182567820000003,
+              "cpu_s": 0.6447032649999999,
+              "calls": 86358,
+              "non_cpu_wall_s": 0.07355351700000046
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 2.320394755000001,
+              "cpu_s": 2.3067921379999987,
+              "calls": 4637,
+              "non_cpu_wall_s": 0.013602617000002315
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000496564,
+              "cpu_s": 0.000419298,
+              "calls": 49,
+              "non_cpu_wall_s": 7.726599999999999e-05
+            },
+            "main/generation": {
+              "wall_s": 14.584506564,
+              "cpu_s": 14.362250554,
+              "calls": 1,
+              "non_cpu_wall_s": 0.22225601000000061
+            },
+            "main/moe.combine": {
+              "wall_s": 0.922330909,
+              "cpu_s": 0.922240941,
+              "calls": 48,
+              "non_cpu_wall_s": 8.996800000005134e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.398680826,
+              "cpu_s": 11.382245103999999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.016435722000000652
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.41960032399999997,
+              "cpu_s": 0.37776018000000006,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.04184014399999991
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.021211605,
+              "cpu_s": 0.021088632,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012297300000000191
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.4271485960000017,
+              "cpu_s": 3.787647936,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.3604993399999983
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.142947719,
+              "cpu_s": 0.147834998,
+              "calls": 48,
+              "non_cpu_wall_s": -0.004887278999999994
+            },
+            "main/moe.metadata": {
+              "wall_s": 19.834026201999997,
+              "cpu_s": 19.822297777999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01172842400000107
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.592177868000001,
+              "cpu_s": 0.05844200000000002,
+              "calls": 2139,
+              "non_cpu_wall_s": 2.5337358680000013
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.146405572,
+              "cpu_s": 0.13171768599999997,
+              "calls": 25549,
+              "non_cpu_wall_s": 0.014687886000000039
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.005765906000000001,
+              "cpu_s": 0.005333099999999999,
+              "calls": 622,
+              "non_cpu_wall_s": 0.0004328060000000026
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 3.8397503080000015,
+              "cpu_s": 3.134078124000001,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.7056721840000004
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 25.63782999,
+              "cpu_s": 23.817352022999994,
+              "calls": 81719,
+              "non_cpu_wall_s": 1.8204779670000057
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.8211991889999998,
+              "cpu_s": 0.8291630380000002,
+              "calls": 84791,
+              "non_cpu_wall_s": -0.007963849000000467
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 3.2993842140000003,
+              "cpu_s": 2.3952369059999996,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.9041473080000006
+            },
+            "main/expert.slot_use": {
+              "wall_s": 1.9611841449999996,
+              "cpu_s": 1.949026994,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.012157150999999589
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.5691054700000002,
+              "cpu_s": 1.189204809,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.3799006610000002
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.259229607,
+              "cpu_s": 1.173182546,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08604706099999992
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.36217764,
+              "cpu_s": 0.316994558,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.04518308200000004
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.8198849609999996,
+              "cpu_s": 2.76391482,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05597014099999953
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.0879547730000008,
+              "cpu_s": 2.993831489,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.09412328400000058
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.49491854700000004,
+              "cpu_s": 0.4581469229999998,
+              "calls": 99176,
+              "non_cpu_wall_s": 0.036771624000000225
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.021104847000000003,
+              "cpu_s": 0.021880670999999994,
+              "calls": 622,
+              "non_cpu_wall_s": -0.0007758239999999909
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 0.8408422130000003,
+              "cpu_s": 0.396443377,
+              "calls": 28595,
+              "non_cpu_wall_s": 0.4443988360000003
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 0.7701764320000004,
+              "cpu_s": 0.37774516799999996,
+              "calls": 28593,
+              "non_cpu_wall_s": 0.39243126400000045
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 0.971278831,
+              "cpu_s": 0.613714488,
+              "calls": 55340,
+              "non_cpu_wall_s": 0.35756434300000006
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 42.270649387999995,
+              "cpu_s": 37.449574940999995,
+              "calls": 28595,
+              "non_cpu_wall_s": 4.821074447000001
+            }
+          },
+          "gc_wall_s": 0.935017349,
+          "gc_events": 3141
+        },
+        {
+          "generation_wall_s": 100.886488713,
+          "generation_cpu_s": 90.759673841,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.7702432699999998,
+              "cpu_s": 0.6987545619999999,
+              "calls": 86358,
+              "non_cpu_wall_s": 0.07148870799999996
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 1.6850519610000003,
+              "cpu_s": 1.6724537829999997,
+              "calls": 4637,
+              "non_cpu_wall_s": 0.012598178000000626
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000552384,
+              "cpu_s": 0.00045824500000000003,
+              "calls": 49,
+              "non_cpu_wall_s": 9.413899999999992e-05
+            },
+            "main/generation": {
+              "wall_s": 15.0492663,
+              "cpu_s": 14.640975802,
+              "calls": 1,
+              "non_cpu_wall_s": 0.4082904979999995
+            },
+            "main/moe.combine": {
+              "wall_s": 0.93861575,
+              "cpu_s": 0.938528692,
+              "calls": 48,
+              "non_cpu_wall_s": 8.705799999997321e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.709580541000001,
+              "cpu_s": 11.689971199999997,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01960934100000422
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.6584283280000002,
+              "cpu_s": 0.44661584499999996,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.21181248300000022
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.020480058,
+              "cpu_s": 0.020358689,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012136899999999964
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.888224786000002,
+              "cpu_s": 4.295641415999999,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.4074166299999966
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.146493972,
+              "cpu_s": 0.15181412,
+              "calls": 48,
+              "non_cpu_wall_s": -0.005320147999999997
+            },
+            "main/moe.metadata": {
+              "wall_s": 12.603788472,
+              "cpu_s": 12.588960893,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.014827579000000313
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.7787922279999995,
+              "cpu_s": 0.05989454900000001,
+              "calls": 2204,
+              "non_cpu_wall_s": 2.7188976789999995
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.15382222199999998,
+              "cpu_s": 0.13844102499999997,
+              "calls": 25261,
+              "non_cpu_wall_s": 0.015381197000000013
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.010681155000000003,
+              "cpu_s": 0.009970127000000002,
+              "calls": 687,
+              "non_cpu_wall_s": 0.0007110280000000007
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 4.220221651,
+              "cpu_s": 3.224755967999999,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.9954656830000013
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 29.536739102,
+              "cpu_s": 25.414225704000003,
+              "calls": 81719,
+              "non_cpu_wall_s": 4.122513397999995
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.8645559620000002,
+              "cpu_s": 0.874534842,
+              "calls": 84791,
+              "non_cpu_wall_s": -0.009978879999999801
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 3.50745803,
+              "cpu_s": 2.5068056219999995,
+              "calls": 81719,
+              "non_cpu_wall_s": 1.0006524080000005
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.2633606290000006,
+              "cpu_s": 2.166200640000001,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.09715998899999967
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.7962160200000006,
+              "cpu_s": 1.250638022,
+              "calls": 81719,
+              "non_cpu_wall_s": 0.5455779980000006
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.2641066220000001,
+              "cpu_s": 1.196776769,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06732985300000016
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.334027645,
+              "cpu_s": 0.299613269,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03441437599999997
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.8506300420000006,
+              "cpu_s": 2.812959049999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03767099200000157
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.2764921440000006,
+              "cpu_s": 3.139324202,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1371679420000005
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.524030645,
+              "cpu_s": 0.4849525330000001,
+              "calls": 101883,
+              "non_cpu_wall_s": 0.03907811199999989
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.034628794000000004,
+              "cpu_s": 0.03604827200000001,
+              "calls": 687,
+              "non_cpu_wall_s": -0.0014194780000000087
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 1.2187224479999998,
+              "cpu_s": 0.6490711209999998,
+              "calls": 28595,
+              "non_cpu_wall_s": 0.5696513270000001
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.676605879,
+              "cpu_s": 0.7500075259999996,
+              "calls": 28593,
+              "non_cpu_wall_s": 0.9265983530000004
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 2.173863881,
+              "cpu_s": 1.21588323,
+              "calls": 55340,
+              "non_cpu_wall_s": 0.957980651
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 41.92559837100002,
+              "cpu_s": 36.061432075999996,
+              "calls": 28595,
+              "non_cpu_wall_s": 5.864166295000025
+            }
+          },
+          "gc_wall_s": 0.969078825,
+          "gc_events": 3139
+        }
+      ],
+      "delta_second_minus_first": {
+        "generation_wall_s": -0.8211851699999926,
+        "generation_cpu_s": -4.253112670000007,
+        "gc_wall_s": 0.03406147599999998,
+        "phases": {
+          "main/expert.weight_multiply": {
+            "wall_s": 0.22711055000000036,
+            "cpu_s": 0.06143321299999993,
+            "calls": 0,
+            "non_cpu_wall_s": 0.16567733700000042
+          },
+          "main/moe.h2d_global_barrier": {
+            "wall_s": 0.003546252999999999,
+            "cpu_s": 0.003979122000000002,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0004328690000000024
+          },
+          "staging/cuda.Stream.wait_event": {
+            "wall_s": 1.20258505,
+            "cpu_s": 0.602168742,
+            "calls": 0,
+            "non_cpu_wall_s": 0.6004163079999999
+          },
+          "main/cuda.Stream.wait_event": {
+            "wall_s": 0.004915249000000002,
+            "cpu_s": 0.004637027000000004,
+            "calls": 65,
+            "non_cpu_wall_s": 0.0002782219999999981
+          },
+          "main/cuda.Event.synchronize": {
+            "wall_s": -0.6353427940000007,
+            "cpu_s": -0.634338354999999,
+            "calls": 0,
+            "non_cpu_wall_s": -0.001004439000001689
+          },
+          "main/expert.slot_use": {
+            "wall_s": 0.30217648400000097,
+            "cpu_s": 0.2171736460000009,
+            "calls": 0,
+            "non_cpu_wall_s": 0.08500283800000008
+          },
+          "main/moe.forward_a2a": {
+            "wall_s": 0.004877015000000151,
+            "cpu_s": 0.023594222999999914,
+            "calls": 0,
+            "non_cpu_wall_s": -0.018717207999999763
+          },
+          "main/moe.combine": {
+            "wall_s": 0.01628484099999994,
+            "cpu_s": 0.016287751000000017,
+            "calls": 0,
+            "non_cpu_wall_s": -2.910000000078128e-06
+          },
+          "main/moe.return_a2a": {
+            "wall_s": 0.1885373709999998,
+            "cpu_s": 0.14549271299999988,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0430446579999999
+          },
+          "main/generation": {
+            "wall_s": 0.46475973599999953,
+            "cpu_s": 0.27872524800000065,
+            "calls": 0,
+            "non_cpu_wall_s": 0.1860344879999989
+          },
+          "staging/moe.host_staging": {
+            "wall_s": -0.34505101699997454,
+            "cpu_s": -1.388142864999999,
+            "calls": 0,
+            "non_cpu_wall_s": 1.0430918480000244
+          },
+          "main/moe.current_controller": {
+            "wall_s": 0.31089971500000146,
+            "cpu_s": 0.3077260959999979,
+            "calls": 0,
+            "non_cpu_wall_s": 0.003173619000003569
+          },
+          "staging/cuda.Event.record": {
+            "wall_s": 0.37788023499999956,
+            "cpu_s": 0.25262774399999977,
+            "calls": 0,
+            "non_cpu_wall_s": 0.1252524909999998
+          },
+          "main/cuda.Stream.synchronize": {
+            "wall_s": 5.5819999999999937e-05,
+            "cpu_s": 3.8947000000000005e-05,
+            "calls": 0,
+            "non_cpu_wall_s": 1.687299999999993e-05
+          },
+          "main/moe.forward_complete": {
+            "wall_s": -0.02814999500000004,
+            "cpu_s": -0.017381288999999966,
+            "calls": 0,
+            "non_cpu_wall_s": -0.010768706000000072
+          },
+          "main/scheduler.wait_for_slot": {
+            "wall_s": 0.013523947000000001,
+            "cpu_s": 0.01416760100000002,
+            "calls": 65,
+            "non_cpu_wall_s": -0.0006436540000000178
+          },
+          "staging/cuda.Event.synchronize": {
+            "wall_s": 0.9064294469999996,
+            "cpu_s": 0.3722623579999997,
+            "calls": 0,
+            "non_cpu_wall_s": 0.5341670889999999
+          },
+          "main/moe.expert_compute": {
+            "wall_s": 0.46107619000000044,
+            "cpu_s": 0.5079934799999988,
+            "calls": 0,
+            "non_cpu_wall_s": -0.046917289999998335
+          },
+          "main/cuda.Event.record": {
+            "wall_s": 0.0519864879999995,
+            "cpu_s": 0.054051297,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0020648090000005004
+          },
+          "main/expert.input_and_weight_views": {
+            "wall_s": 0.38047134299999863,
+            "cpu_s": 0.09067784399999779,
+            "calls": 0,
+            "non_cpu_wall_s": 0.28979349900000084
+          },
+          "main/moe.demand_h2d": {
+            "wall_s": 0.2388280040000002,
+            "cpu_s": 0.0688556649999999,
+            "calls": 0,
+            "non_cpu_wall_s": 0.1699723390000003
+          },
+          "main/moe.dispatch": {
+            "wall_s": -0.0007315470000000025,
+            "cpu_s": -0.0007299430000000003,
+            "calls": 0,
+            "non_cpu_wall_s": -1.6040000000022703e-06
+          },
+          "main/scheduler._submitted": {
+            "wall_s": 0.1866143599999983,
+            "cpu_s": 0.0014525489999999905,
+            "calls": 65,
+            "non_cpu_wall_s": 0.18516181099999818
+          },
+          "main/expert.routing_weight_lookup": {
+            "wall_s": 0.20807381599999974,
+            "cpu_s": 0.11156871599999985,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0965050999999999
+          },
+          "main/moe.metadata": {
+            "wall_s": -7.230237729999997,
+            "cpu_s": -7.233336884999996,
+            "calls": 0,
+            "non_cpu_wall_s": 0.003099154999999243
+          },
+          "main/cuda.Event.query": {
+            "wall_s": 0.007416649999999969,
+            "cpu_s": 0.006723338999999995,
+            "calls": -288,
+            "non_cpu_wall_s": 0.0006933109999999743
+          },
+          "main/moe.prefetch_controller": {
+            "wall_s": 0.03074508100000095,
+            "cpu_s": 0.04904422999999891,
+            "calls": 0,
+            "non_cpu_wall_s": -0.01829914899999796
+          },
+          "main/scheduler.ready": {
+            "wall_s": 0.02911209799999992,
+            "cpu_s": 0.026805610000000257,
+            "calls": 2707,
+            "non_cpu_wall_s": 0.0023064879999996624
+          },
+          "main/expert.kernel_call": {
+            "wall_s": 3.8989091119999983,
+            "cpu_s": 1.5968736810000088,
+            "calls": 0,
+            "non_cpu_wall_s": 2.3020354309999895
+          },
+          "main/expert.ready_select": {
+            "wall_s": 0.043356773000000404,
+            "cpu_s": 0.04537180399999974,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0020150309999993343
+          }
+        }
+      },
+      "logical_work_identical": true,
+      "scheduler_identical": true
+    },
+    "2": {
+      "repeats": [
+        {
+          "generation_wall_s": 101.707545373,
+          "generation_cpu_s": 91.532039539,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.7701932770000001,
+              "cpu_s": 0.699188498,
+              "calls": 85337,
+              "non_cpu_wall_s": 0.07100477900000002
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 2.4405730160000005,
+              "cpu_s": 2.4260397720000006,
+              "calls": 4625,
+              "non_cpu_wall_s": 0.01453324399999989
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000475601,
+              "cpu_s": 0.000397645,
+              "calls": 49,
+              "non_cpu_wall_s": 7.795599999999996e-05
+            },
+            "main/generation": {
+              "wall_s": 14.790484206,
+              "cpu_s": 14.374988056,
+              "calls": 1,
+              "non_cpu_wall_s": 0.41549615000000095
+            },
+            "main/moe.combine": {
+              "wall_s": 0.90805964,
+              "cpu_s": 0.907970504,
+              "calls": 48,
+              "non_cpu_wall_s": 8.913599999993416e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.074348380000002,
+              "cpu_s": 11.049273474000003,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.02507490599999862
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.6562124319999998,
+              "cpu_s": 0.4449701569999999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.21124227499999987
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.023948544,
+              "cpu_s": 0.023808103,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001404409999999981
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.5832513870000007,
+              "cpu_s": 4.004322901999998,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.42107151499999773
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.396774315,
+              "cpu_s": 0.402857642,
+              "calls": 48,
+              "non_cpu_wall_s": -0.006083327000000027
+            },
+            "main/moe.metadata": {
+              "wall_s": 13.210563009,
+              "cpu_s": 13.195214366,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.015348642999999385
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.478890404999999,
+              "cpu_s": 0.06663107700000002,
+              "calls": 2169,
+              "non_cpu_wall_s": 2.4122593279999993
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.15508553899999997,
+              "cpu_s": 0.139969772,
+              "calls": 24567,
+              "non_cpu_wall_s": 0.015115766999999974
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.011675594999999997,
+              "cpu_s": 0.010880552000000005,
+              "calls": 664,
+              "non_cpu_wall_s": 0.0007950429999999918
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 4.5513672230000015,
+              "cpu_s": 3.34922732,
+              "calls": 80710,
+              "non_cpu_wall_s": 1.2021399030000017
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 29.433525737000007,
+              "cpu_s": 25.46697503300001,
+              "calls": 80710,
+              "non_cpu_wall_s": 3.966550703999996
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.8726599770000005,
+              "cpu_s": 0.8806792050000001,
+              "calls": 83782,
+              "non_cpu_wall_s": -0.008019227999999545
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 3.855573215,
+              "cpu_s": 2.5873637350000007,
+              "calls": 80710,
+              "non_cpu_wall_s": 1.2682094799999994
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.3116439119999996,
+              "cpu_s": 2.208049166,
+              "calls": 80710,
+              "non_cpu_wall_s": 0.10359474599999974
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.8219799480000003,
+              "cpu_s": 1.279597415,
+              "calls": 80710,
+              "non_cpu_wall_s": 0.5423825330000003
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.3187486199999998,
+              "cpu_s": 1.2316751639999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.08707345599999994
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.35790401099999986,
+              "cpu_s": 0.31590967999999997,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.041994330999999885
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.8901129070000002,
+              "cpu_s": 2.8504146780000004,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03969822899999986
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.2362444380000013,
+              "cpu_s": 3.093178217,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.1430662210000011
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.5206878909999998,
+              "cpu_s": 0.4844058739999999,
+              "calls": 96890,
+              "non_cpu_wall_s": 0.03628201699999989
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.036562148000000017,
+              "cpu_s": 0.038051532,
+              "calls": 664,
+              "non_cpu_wall_s": -0.0014893839999999825
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 1.3204690490000006,
+              "cpu_s": 0.6926044430000002,
+              "calls": 27798,
+              "non_cpu_wall_s": 0.6278646060000004
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.7574995050000002,
+              "cpu_s": 0.8002365359999997,
+              "calls": 27796,
+              "non_cpu_wall_s": 0.9572629690000005
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 2.2819819419999994,
+              "cpu_s": 1.2477027589999998,
+              "calls": 53750,
+              "non_cpu_wall_s": 1.0342791829999995
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 41.280683961,
+              "cpu_s": 35.258179088999995,
+              "calls": 27798,
+              "non_cpu_wall_s": 6.022504872000006
+            }
+          },
+          "gc_wall_s": 0.910490034,
+          "gc_events": 3079
+        },
+        {
+          "generation_wall_s": 100.886319101,
+          "generation_cpu_s": 91.070296356,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.7524133989999998,
+              "cpu_s": 0.683925464,
+              "calls": 85337,
+              "non_cpu_wall_s": 0.06848793499999983
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 2.315740467,
+              "cpu_s": 2.3084191080000003,
+              "calls": 4625,
+              "non_cpu_wall_s": 0.007321358999999639
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000492617,
+              "cpu_s": 0.000412144,
+              "calls": 49,
+              "non_cpu_wall_s": 8.047300000000001e-05
+            },
+            "main/generation": {
+              "wall_s": 15.056795503,
+              "cpu_s": 14.63465662,
+              "calls": 1,
+              "non_cpu_wall_s": 0.4221388830000006
+            },
+            "main/moe.combine": {
+              "wall_s": 0.929460492,
+              "cpu_s": 0.929313633,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00014685899999999918
+            },
+            "main/moe.current_controller": {
+              "wall_s": 11.254563478999998,
+              "cpu_s": 11.237180180999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.01738329800000038
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.6506617660000001,
+              "cpu_s": 0.4431524809999999,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.20750928500000027
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.02362277,
+              "cpu_s": 0.023494561,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00012820900000000066
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.5897969129999994,
+              "cpu_s": 4.000110026000001,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.4103131130000013
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.365591184,
+              "cpu_s": 0.369823514,
+              "calls": 48,
+              "non_cpu_wall_s": -0.004232330000000006
+            },
+            "main/moe.metadata": {
+              "wall_s": 12.695965454999994,
+              "cpu_s": 12.679576125,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.016389329999993762
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.592272386000001,
+              "cpu_s": 0.055443869,
+              "calls": 2230,
+              "non_cpu_wall_s": 2.5368285170000013
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.15575621800000003,
+              "cpu_s": 0.14073803799999998,
+              "calls": 24505,
+              "non_cpu_wall_s": 0.015018180000000048
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.010530814999999999,
+              "cpu_s": 0.010049600000000002,
+              "calls": 725,
+              "non_cpu_wall_s": 0.00048121499999999665
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 4.332013486000001,
+              "cpu_s": 3.282403844999999,
+              "calls": 80710,
+              "non_cpu_wall_s": 1.0496096410000022
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 29.057756214,
+              "cpu_s": 25.271374090000002,
+              "calls": 80710,
+              "non_cpu_wall_s": 3.7863821239999993
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.8724145430000002,
+              "cpu_s": 0.8814158620000002,
+              "calls": 83782,
+              "non_cpu_wall_s": -0.009001319000000008
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 3.650241706,
+              "cpu_s": 2.539564487,
+              "calls": 80710,
+              "non_cpu_wall_s": 1.1106772190000003
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.311645251,
+              "cpu_s": 2.192276933,
+              "calls": 80710,
+              "non_cpu_wall_s": 0.1193683179999998
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.8597571530000006,
+              "cpu_s": 1.288331165,
+              "calls": 80710,
+              "non_cpu_wall_s": 0.5714259880000006
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.294404732,
+              "cpu_s": 1.225430148,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.068974584
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3379700899999999,
+              "cpu_s": 0.30614241100000006,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03182767899999983
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.887827496999999,
+              "cpu_s": 2.847619539,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.04020795799999899
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 3.3334332049999995,
+              "cpu_s": 3.2000436619999992,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.13338954300000028
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.5191741659999999,
+              "cpu_s": 0.481975755,
+              "calls": 98253,
+              "non_cpu_wall_s": 0.037198410999999876
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.036017593999999986,
+              "cpu_s": 0.037423094999999997,
+              "calls": 725,
+              "non_cpu_wall_s": -0.0014055010000000104
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 1.3790123800000003,
+              "cpu_s": 0.694952069,
+              "calls": 27798,
+              "non_cpu_wall_s": 0.6840603110000003
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.893974375,
+              "cpu_s": 0.826340513,
+              "calls": 27796,
+              "non_cpu_wall_s": 1.067633862
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 2.018505535,
+              "cpu_s": 1.1494572920000001,
+              "calls": 53750,
+              "non_cpu_wall_s": 0.8690482429999999
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 41.520375619,
+              "cpu_s": 35.716232487000006,
+              "calls": 27798,
+              "non_cpu_wall_s": 5.804143131999993
+            }
+          },
+          "gc_wall_s": 0.950655409,
+          "gc_events": 3080
+        }
+      ],
+      "delta_second_minus_first": {
+        "generation_wall_s": -0.8212262720000041,
+        "generation_cpu_s": -0.46174318299999584,
+        "gc_wall_s": 0.04016537500000006,
+        "phases": {
+          "main/expert.weight_multiply": {
+            "wall_s": 0.03777720500000026,
+            "cpu_s": 0.008733749999999985,
+            "calls": 0,
+            "non_cpu_wall_s": 0.029043455000000273
+          },
+          "main/moe.h2d_global_barrier": {
+            "wall_s": -0.031183130999999975,
+            "cpu_s": -0.033034127999999996,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0018509970000000209
+          },
+          "staging/cuda.Stream.wait_event": {
+            "wall_s": -0.2634764069999993,
+            "cpu_s": -0.0982454669999997,
+            "calls": 0,
+            "non_cpu_wall_s": -0.1652309399999996
+          },
+          "main/cuda.Stream.wait_event": {
+            "wall_s": -0.001144779999999998,
+            "cpu_s": -0.0008309520000000029,
+            "calls": 61,
+            "non_cpu_wall_s": -0.00031382799999999517
+          },
+          "main/cuda.Event.synchronize": {
+            "wall_s": -0.12483254900000063,
+            "cpu_s": -0.11762066400000037,
+            "calls": 0,
+            "non_cpu_wall_s": -0.007211885000000251
+          },
+          "main/expert.slot_use": {
+            "wall_s": 1.3390000002111435e-06,
+            "cpu_s": -0.015772232999999858,
+            "calls": 0,
+            "non_cpu_wall_s": 0.01577357200000007
+          },
+          "main/moe.forward_a2a": {
+            "wall_s": -0.024343887999999758,
+            "cpu_s": -0.006245015999999826,
+            "calls": 0,
+            "non_cpu_wall_s": -0.018098871999999933
+          },
+          "main/moe.combine": {
+            "wall_s": 0.02140085200000008,
+            "cpu_s": 0.021343129000000016,
+            "calls": 0,
+            "non_cpu_wall_s": 5.772300000006503e-05
+          },
+          "main/moe.return_a2a": {
+            "wall_s": 0.09718876699999823,
+            "cpu_s": 0.10686544499999906,
+            "calls": 0,
+            "non_cpu_wall_s": -0.009676678000000827
+          },
+          "main/generation": {
+            "wall_s": 0.26631129699999967,
+            "cpu_s": 0.25966856400000005,
+            "calls": 0,
+            "non_cpu_wall_s": 0.006642732999999623
+          },
+          "staging/moe.host_staging": {
+            "wall_s": 0.23969165799999814,
+            "cpu_s": 0.4580533980000112,
+            "calls": 0,
+            "non_cpu_wall_s": -0.21836174000001307
+          },
+          "main/moe.current_controller": {
+            "wall_s": 0.18021509899999621,
+            "cpu_s": 0.18790670699999446,
+            "calls": 0,
+            "non_cpu_wall_s": -0.00769160799999824
+          },
+          "staging/cuda.Event.record": {
+            "wall_s": 0.05854333099999964,
+            "cpu_s": 0.002347625999999714,
+            "calls": 0,
+            "non_cpu_wall_s": 0.05619570499999993
+          },
+          "main/cuda.Stream.synchronize": {
+            "wall_s": 1.7016000000000015e-05,
+            "cpu_s": 1.4498999999999957e-05,
+            "calls": 0,
+            "non_cpu_wall_s": 2.5170000000000574e-06
+          },
+          "main/moe.forward_complete": {
+            "wall_s": -0.019933920999999966,
+            "cpu_s": -0.009767268999999912,
+            "calls": 0,
+            "non_cpu_wall_s": -0.010166652000000054
+          },
+          "main/scheduler.wait_for_slot": {
+            "wall_s": -0.0005445540000000304,
+            "cpu_s": -0.0006284370000000025,
+            "calls": 61,
+            "non_cpu_wall_s": 8.388299999997212e-05
+          },
+          "staging/cuda.Event.synchronize": {
+            "wall_s": 0.1364748699999998,
+            "cpu_s": 0.026103977000000333,
+            "calls": 0,
+            "non_cpu_wall_s": 0.11037089299999958
+          },
+          "main/moe.expert_compute": {
+            "wall_s": 0.0065455259999986914,
+            "cpu_s": -0.004212875999997756,
+            "calls": 0,
+            "non_cpu_wall_s": 0.010758401999996448
+          },
+          "main/cuda.Event.record": {
+            "wall_s": -0.01777987800000025,
+            "cpu_s": -0.015263034000000064,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0025168440000001846
+          },
+          "main/expert.input_and_weight_views": {
+            "wall_s": -0.2193537370000005,
+            "cpu_s": -0.06682347500000096,
+            "calls": 0,
+            "non_cpu_wall_s": -0.15253026199999953
+          },
+          "main/moe.demand_h2d": {
+            "wall_s": -0.005550665999999649,
+            "cpu_s": -0.0018176760000000458,
+            "calls": 0,
+            "non_cpu_wall_s": -0.003732989999999603
+          },
+          "main/moe.dispatch": {
+            "wall_s": -0.0003257739999999974,
+            "cpu_s": -0.000313542,
+            "calls": 0,
+            "non_cpu_wall_s": -1.223199999999744e-05
+          },
+          "main/scheduler._submitted": {
+            "wall_s": 0.11338198100000207,
+            "cpu_s": -0.011187208000000025,
+            "calls": 61,
+            "non_cpu_wall_s": 0.12456918900000202
+          },
+          "main/expert.routing_weight_lookup": {
+            "wall_s": -0.20533150900000008,
+            "cpu_s": -0.047799248000000905,
+            "calls": 0,
+            "non_cpu_wall_s": -0.15753226099999917
+          },
+          "main/moe.metadata": {
+            "wall_s": -0.5145975540000052,
+            "cpu_s": -0.5156382409999996,
+            "calls": 0,
+            "non_cpu_wall_s": 0.001040686999994378
+          },
+          "main/cuda.Event.query": {
+            "wall_s": 0.0006706790000000629,
+            "cpu_s": 0.0007682659999999897,
+            "calls": -62,
+            "non_cpu_wall_s": -9.758699999992682e-05
+          },
+          "main/moe.prefetch_controller": {
+            "wall_s": -0.0022854100000011535,
+            "cpu_s": -0.0027951390000002796,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0005097289999991261
+          },
+          "main/scheduler.ready": {
+            "wall_s": -0.0015137249999999103,
+            "cpu_s": -0.0024301189999998973,
+            "calls": 1363,
+            "non_cpu_wall_s": 0.000916393999999987
+          },
+          "main/expert.kernel_call": {
+            "wall_s": -0.375769523000006,
+            "cpu_s": -0.1956009430000094,
+            "calls": 0,
+            "non_cpu_wall_s": -0.18016857999999658
+          },
+          "main/expert.ready_select": {
+            "wall_s": -0.0002454340000003219,
+            "cpu_s": 0.0007366570000001404,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0009820910000004623
+          }
+        }
+      },
+      "logical_work_identical": true,
+      "scheduler_identical": true
+    },
+    "3": {
+      "repeats": [
+        {
+          "generation_wall_s": 101.7074543,
+          "generation_cpu_s": 96.344909801,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.6714424279999999,
+              "cpu_s": 0.5985119070000002,
+              "calls": 84423,
+              "non_cpu_wall_s": 0.07293052099999964
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 3.665610999999999,
+              "cpu_s": 3.6415704439999983,
+              "calls": 4611,
+              "non_cpu_wall_s": 0.024040556000000546
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000532555,
+              "cpu_s": 0.000451654,
+              "calls": 49,
+              "non_cpu_wall_s": 8.090099999999998e-05
+            },
+            "main/generation": {
+              "wall_s": 13.983770577,
+              "cpu_s": 13.895822559,
+              "calls": 1,
+              "non_cpu_wall_s": 0.08794801799999874
+            },
+            "main/moe.combine": {
+              "wall_s": 0.926294716,
+              "cpu_s": 0.926210078,
+              "calls": 48,
+              "non_cpu_wall_s": 8.463800000002575e-05
+            },
+            "main/moe.current_controller": {
+              "wall_s": 10.289503331999997,
+              "cpu_s": 10.272135879,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.017367452999996758
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.3605844300000001,
+              "cpu_s": 0.3395066909999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.021077739000000317
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.018059143,
+              "cpu_s": 0.017938086,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001210570000000008
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.1084829059999994,
+              "cpu_s": 3.4482211110000005,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.33973820500000107
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.342219845,
+              "cpu_s": 0.345109536,
+              "calls": 48,
+              "non_cpu_wall_s": -0.002889690999999972
+            },
+            "main/moe.metadata": {
+              "wall_s": 23.912471693000004,
+              "cpu_s": 23.901578549,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.010893144000004185
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.2493634830000007,
+              "cpu_s": 0.03940360499999999,
+              "calls": 1760,
+              "non_cpu_wall_s": 2.2099598780000007
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.13653404299999997,
+              "cpu_s": 0.12309552400000001,
+              "calls": 24354,
+              "non_cpu_wall_s": 0.013438518999999954
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 3.509894434999999,
+              "cpu_s": 2.9922713690000005,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.5176230659999987
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 23.956055312,
+              "cpu_s": 22.57433149299999,
+              "calls": 79810,
+              "non_cpu_wall_s": 1.3817238190000118
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.7496786939999998,
+              "cpu_s": 0.7543266949999999,
+              "calls": 82882,
+              "non_cpu_wall_s": -0.004648001000000179
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 2.988863978,
+              "cpu_s": 2.24329161,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.7455723679999999
+            },
+            "main/expert.slot_use": {
+              "wall_s": 1.8444143999999998,
+              "cpu_s": 1.844742449,
+              "calls": 79810,
+              "non_cpu_wall_s": -0.00032804900000016346
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.4675451280000007,
+              "cpu_s": 1.1638157630000001,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.3037293650000006
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.1868726660000004,
+              "cpu_s": 1.11728937,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06958329600000046
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.34565200100000015,
+              "cpu_s": 0.30907371299999986,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.03657828800000029
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.769622597000001,
+              "cpu_s": 2.6701161829999998,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.09950641400000126
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.7677855979999992,
+              "cpu_s": 2.701227649999999,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.06655794800000026
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.44653714199999994,
+              "cpu_s": 0.41507356900000003,
+              "calls": 90287,
+              "non_cpu_wall_s": 0.03146357299999991
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.0019931000000000003,
+              "cpu_s": 0.001850783,
+              "calls": 269,
+              "non_cpu_wall_s": 0.0001423170000000003
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.007669098,
+              "cpu_s": 0.007943531,
+              "calls": 269,
+              "non_cpu_wall_s": -0.00027443300000000014
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 0.7503318490000004,
+              "cpu_s": 0.29420523299999995,
+              "calls": 27051,
+              "non_cpu_wall_s": 0.45612661600000043
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 0.6233940269999998,
+              "cpu_s": 0.26859381099999996,
+              "calls": 27049,
+              "non_cpu_wall_s": 0.35480021599999984
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 0.8007795890000001,
+              "cpu_s": 0.4492556679999998,
+              "calls": 52256,
+              "non_cpu_wall_s": 0.35152392100000035
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 38.888676186000005,
+              "cpu_s": 35.22450812,
+              "calls": 27051,
+              "non_cpu_wall_s": 3.664168066000002
+            }
+          },
+          "gc_wall_s": 0.924872895,
+          "gc_events": 3078
+        },
+        {
+          "generation_wall_s": 100.886344777,
+          "generation_cpu_s": 92.479898058,
+          "phases": {
+            "main/cuda.Event.record": {
+              "wall_s": 0.6939966709999998,
+              "cpu_s": 0.629195686,
+              "calls": 84423,
+              "non_cpu_wall_s": 0.06480098499999987
+            },
+            "main/cuda.Event.synchronize": {
+              "wall_s": 4.297621147999999,
+              "cpu_s": 4.2387541120000005,
+              "calls": 4611,
+              "non_cpu_wall_s": 0.05886703599999876
+            },
+            "main/cuda.Stream.synchronize": {
+              "wall_s": 0.000492775,
+              "cpu_s": 0.000420157,
+              "calls": 49,
+              "non_cpu_wall_s": 7.261799999999999e-05
+            },
+            "main/generation": {
+              "wall_s": 12.986576892,
+              "cpu_s": 12.751874936,
+              "calls": 1,
+              "non_cpu_wall_s": 0.23470195600000032
+            },
+            "main/moe.combine": {
+              "wall_s": 0.929607351,
+              "cpu_s": 0.929432079,
+              "calls": 48,
+              "non_cpu_wall_s": 0.0001752720000000041
+            },
+            "main/moe.current_controller": {
+              "wall_s": 10.238182022999998,
+              "cpu_s": 10.216095719999995,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.022086303000003582
+            },
+            "main/moe.demand_h2d": {
+              "wall_s": 0.5116871589999998,
+              "cpu_s": 0.3629206710000002,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.14876648799999964
+            },
+            "main/moe.dispatch": {
+              "wall_s": 0.017876614,
+              "cpu_s": 0.017741553,
+              "calls": 48,
+              "non_cpu_wall_s": 0.00013506099999999882
+            },
+            "main/moe.expert_compute": {
+              "wall_s": 3.281855631000001,
+              "cpu_s": 3.648330409999998,
+              "calls": 3120,
+              "non_cpu_wall_s": -0.36647477899999714
+            },
+            "main/moe.h2d_global_barrier": {
+              "wall_s": 0.473597263,
+              "cpu_s": 0.476161391,
+              "calls": 48,
+              "non_cpu_wall_s": -0.002564127999999999
+            },
+            "main/moe.metadata": {
+              "wall_s": 19.255366589999998,
+              "cpu_s": 19.233799347999998,
+              "calls": 3120,
+              "non_cpu_wall_s": 0.02156724199999971
+            },
+            "main/scheduler._submitted": {
+              "wall_s": 2.3272880969999994,
+              "cpu_s": 0.04098715899999999,
+              "calls": 1883,
+              "non_cpu_wall_s": 2.2863009379999992
+            },
+            "main/cuda.Event.query": {
+              "wall_s": 0.139146351,
+              "cpu_s": 0.12543832700000002,
+              "calls": 23999,
+              "non_cpu_wall_s": 0.013708023999999985
+            },
+            "main/expert.input_and_weight_views": {
+              "wall_s": 3.8964458499999997,
+              "cpu_s": 3.063967794,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.8324780559999998
+            },
+            "main/expert.kernel_call": {
+              "wall_s": 26.658603230000004,
+              "cpu_s": 23.453624717999997,
+              "calls": 79810,
+              "non_cpu_wall_s": 3.2049785120000074
+            },
+            "main/expert.ready_select": {
+              "wall_s": 0.7737480009999999,
+              "cpu_s": 0.778938621,
+              "calls": 82882,
+              "non_cpu_wall_s": -0.005190620000000146
+            },
+            "main/expert.routing_weight_lookup": {
+              "wall_s": 3.324918304,
+              "cpu_s": 2.343814062,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.9811042420000002
+            },
+            "main/expert.slot_use": {
+              "wall_s": 2.06262844,
+              "cpu_s": 1.9972620929999996,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.06536634700000055
+            },
+            "main/expert.weight_multiply": {
+              "wall_s": 1.7033039289999998,
+              "cpu_s": 1.2277749930000001,
+              "calls": 79810,
+              "non_cpu_wall_s": 0.4755289359999997
+            },
+            "main/moe.forward_a2a": {
+              "wall_s": 1.173560464,
+              "cpu_s": 1.0863151569999998,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.0872453070000001
+            },
+            "main/moe.forward_complete": {
+              "wall_s": 0.3730198829999999,
+              "cpu_s": 0.31696042899999993,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.05605945399999995
+            },
+            "main/moe.prefetch_controller": {
+              "wall_s": 2.630447116000001,
+              "cpu_s": 2.538107492,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.09233962400000095
+            },
+            "main/moe.return_a2a": {
+              "wall_s": 2.6604642590000003,
+              "cpu_s": 2.5585194479999998,
+              "calls": 3072,
+              "non_cpu_wall_s": 0.10194481100000052
+            },
+            "main/scheduler.ready": {
+              "wall_s": 0.45313365299999997,
+              "cpu_s": 0.420396834,
+              "calls": 90732,
+              "non_cpu_wall_s": 0.03273681899999997
+            },
+            "main/cuda.Stream.wait_event": {
+              "wall_s": 0.0058546419999999984,
+              "cpu_s": 0.005517006000000001,
+              "calls": 392,
+              "non_cpu_wall_s": 0.00033763599999999706
+            },
+            "main/scheduler.wait_for_slot": {
+              "wall_s": 0.016922441000000003,
+              "cpu_s": 0.017547861999999997,
+              "calls": 392,
+              "non_cpu_wall_s": -0.0006254209999999941
+            },
+            "staging/cuda.Event.record": {
+              "wall_s": 1.30175517,
+              "cpu_s": 0.592189083,
+              "calls": 27051,
+              "non_cpu_wall_s": 0.7095660870000001
+            },
+            "staging/cuda.Event.synchronize": {
+              "wall_s": 1.5334257009999996,
+              "cpu_s": 0.6329668319999999,
+              "calls": 27049,
+              "non_cpu_wall_s": 0.9004588689999997
+            },
+            "staging/cuda.Stream.wait_event": {
+              "wall_s": 2.193183663,
+              "cpu_s": 1.031679403,
+              "calls": 52256,
+              "non_cpu_wall_s": 1.16150426
+            },
+            "staging/moe.host_staging": {
+              "wall_s": 38.23353240000001,
+              "cpu_s": 34.256932912,
+              "calls": 27051,
+              "non_cpu_wall_s": 3.976599488000005
+            }
+          },
+          "gc_wall_s": 0.93477968,
+          "gc_events": 3078
+        }
+      ],
+      "delta_second_minus_first": {
+        "generation_wall_s": -0.8211095229999898,
+        "generation_cpu_s": -3.8650117429999966,
+        "gc_wall_s": 0.009906784999999974,
+        "phases": {
+          "main/expert.weight_multiply": {
+            "wall_s": 0.23575880099999913,
+            "cpu_s": 0.06395923000000003,
+            "calls": 0,
+            "non_cpu_wall_s": 0.1717995709999991
+          },
+          "main/moe.h2d_global_barrier": {
+            "wall_s": 0.13137741799999997,
+            "cpu_s": 0.131051855,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0003255629999999732
+          },
+          "staging/cuda.Stream.wait_event": {
+            "wall_s": 1.3924040739999999,
+            "cpu_s": 0.5824237350000003,
+            "calls": 0,
+            "non_cpu_wall_s": 0.8099803389999998
+          },
+          "main/cuda.Stream.wait_event": {
+            "wall_s": 0.003861541999999998,
+            "cpu_s": 0.0036662230000000014,
+            "calls": 123,
+            "non_cpu_wall_s": 0.00019531899999999675
+          },
+          "main/cuda.Event.synchronize": {
+            "wall_s": 0.6320101480000004,
+            "cpu_s": 0.5971836680000022,
+            "calls": 0,
+            "non_cpu_wall_s": 0.03482647999999822
+          },
+          "main/expert.slot_use": {
+            "wall_s": 0.21821404000000033,
+            "cpu_s": 0.15251964399999962,
+            "calls": 0,
+            "non_cpu_wall_s": 0.06569439600000071
+          },
+          "main/moe.forward_a2a": {
+            "wall_s": -0.013312202000000495,
+            "cpu_s": -0.03097421300000014,
+            "calls": 0,
+            "non_cpu_wall_s": 0.017662010999999644
+          },
+          "main/moe.combine": {
+            "wall_s": 0.003312635000000008,
+            "cpu_s": 0.00322200100000003,
+            "calls": 0,
+            "non_cpu_wall_s": 9.063399999997834e-05
+          },
+          "main/moe.return_a2a": {
+            "wall_s": -0.10732133899999896,
+            "cpu_s": -0.14270820199999923,
+            "calls": 0,
+            "non_cpu_wall_s": 0.03538686300000027
+          },
+          "main/generation": {
+            "wall_s": -0.9971936849999992,
+            "cpu_s": -1.1439476230000007,
+            "calls": 0,
+            "non_cpu_wall_s": 0.14675393800000158
+          },
+          "staging/moe.host_staging": {
+            "wall_s": -0.6551437859999965,
+            "cpu_s": -0.9675752079999995,
+            "calls": 0,
+            "non_cpu_wall_s": 0.31243142200000307
+          },
+          "main/moe.current_controller": {
+            "wall_s": -0.05132130899999865,
+            "cpu_s": -0.056040159000005474,
+            "calls": 0,
+            "non_cpu_wall_s": 0.0047188500000068245
+          },
+          "staging/cuda.Event.record": {
+            "wall_s": 0.5514233209999997,
+            "cpu_s": 0.29798385,
+            "calls": 0,
+            "non_cpu_wall_s": 0.2534394709999997
+          },
+          "main/cuda.Stream.synchronize": {
+            "wall_s": -3.978e-05,
+            "cpu_s": -3.1497000000000014e-05,
+            "calls": 0,
+            "non_cpu_wall_s": -8.282999999999988e-06
+          },
+          "main/moe.forward_complete": {
+            "wall_s": 0.027367881999999732,
+            "cpu_s": 0.007886716000000071,
+            "calls": 0,
+            "non_cpu_wall_s": 0.01948116599999966
+          },
+          "main/scheduler.wait_for_slot": {
+            "wall_s": 0.009253343000000004,
+            "cpu_s": 0.009604330999999997,
+            "calls": 123,
+            "non_cpu_wall_s": -0.0003509879999999939
+          },
+          "staging/cuda.Event.synchronize": {
+            "wall_s": 0.9100316739999998,
+            "cpu_s": 0.36437302099999996,
+            "calls": 0,
+            "non_cpu_wall_s": 0.5456586529999998
+          },
+          "main/moe.expert_compute": {
+            "wall_s": 0.17337272500000145,
+            "cpu_s": 0.20010929899999752,
+            "calls": 0,
+            "non_cpu_wall_s": -0.02673657399999607
+          },
+          "main/cuda.Event.record": {
+            "wall_s": 0.022554242999999974,
+            "cpu_s": 0.030683778999999745,
+            "calls": 0,
+            "non_cpu_wall_s": -0.00812953599999977
+          },
+          "main/expert.input_and_weight_views": {
+            "wall_s": 0.38655141500000045,
+            "cpu_s": 0.0716964249999994,
+            "calls": 0,
+            "non_cpu_wall_s": 0.31485499000000106
+          },
+          "main/moe.demand_h2d": {
+            "wall_s": 0.1511027289999997,
+            "cpu_s": 0.02341398000000039,
+            "calls": 0,
+            "non_cpu_wall_s": 0.12768874899999932
+          },
+          "main/moe.dispatch": {
+            "wall_s": -0.00018252900000000072,
+            "cpu_s": -0.00019653299999999874,
+            "calls": 0,
+            "non_cpu_wall_s": 1.4003999999998018e-05
+          },
+          "main/scheduler._submitted": {
+            "wall_s": 0.07792461399999873,
+            "cpu_s": 0.001583554000000001,
+            "calls": 123,
+            "non_cpu_wall_s": 0.07634105999999852
+          },
+          "main/expert.routing_weight_lookup": {
+            "wall_s": 0.3360543260000002,
+            "cpu_s": 0.10052245199999987,
+            "calls": 0,
+            "non_cpu_wall_s": 0.2355318740000003
+          },
+          "main/moe.metadata": {
+            "wall_s": -4.657105103000006,
+            "cpu_s": -4.667779201000002,
+            "calls": 0,
+            "non_cpu_wall_s": 0.010674097999995524
+          },
+          "main/cuda.Event.query": {
+            "wall_s": 0.0026123080000000354,
+            "cpu_s": 0.0023428030000000044,
+            "calls": -355,
+            "non_cpu_wall_s": 0.00026950500000003097
+          },
+          "main/moe.prefetch_controller": {
+            "wall_s": -0.1391754810000001,
+            "cpu_s": -0.1320086909999998,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0071667900000003115
+          },
+          "main/scheduler.ready": {
+            "wall_s": 0.006596511000000027,
+            "cpu_s": 0.005323264999999966,
+            "calls": 445,
+            "non_cpu_wall_s": 0.0012732460000000612
+          },
+          "main/expert.kernel_call": {
+            "wall_s": 2.702547918000004,
+            "cpu_s": 0.8792932250000085,
+            "calls": 0,
+            "non_cpu_wall_s": 1.8232546929999955
+          },
+          "main/expert.ready_select": {
+            "wall_s": 0.024069307000000095,
+            "cpu_s": 0.02461192600000006,
+            "calls": 0,
+            "non_cpu_wall_s": -0.0005426189999999664
+          }
+        }
+      },
+      "logical_work_identical": true,
+      "scheduler_identical": true
+    }
+  },
+  "diagnostic_metrics": [
+    {
+      "E2E_wall": 101.66848389338702,
+      "TPOT": 1.4129517822265625
+    },
+    {
+      "E2E_wall": 100.85271557047963,
+      "TPOT": 1.3975714111328126
+    }
+  ],
+  "source_sha256": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank0.json": "34d0ad1689746d5711602f0a6e175d8e1edc5d924c7b14abe923181a68426edf",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank1.json": "524b5caeecb32ae6be278a00bdb625ab70e89e43b665f3eedc6407e8ad9808c2",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank2.json": "8074c51730d6cbc65cadeb3521c508e374bd89e5aff1a855a52b71bff25f8085",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r1_rank3.json": "8d306093a4dc69320a9a2d6b155e7d6a401e26f7cd042d637074a2d0cd304dfb",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank0.json": "5840e1438bbe21b85717c0b76ac54048a643c65bbf15527f4278129e8551bfb3",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank1.json": "3d9e3db7b38859d0f9d051ba4e9f02cf3b4ee6845fd3c9b812cf3b5dd9934ee4",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank2.json": "d8e483ba02465c847bb4dd388ffe24b80b77f9d7047977bc789b32747278a973",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_EXPERT_VARIATION_V3_OPT_PF_OVERLAP_LA_B128_H64/diagnostic_r2_rank3.json": "064f0d930190264e800ef41237d5658c1729814e137a4219ba8cc1f27dde9718"
+  },
+  "interpretation": "Two same-policy instrumented generations only. Main exclusive phase totals reconcile to generation wall time; staging overlaps main and is separate. GC is already inside phase durations. non_cpu_wall includes blocking, GIL and scheduling; CPU includes spin waits. Phase deltas are attribution, not a proven root cause or primary performance/gain estimate. No samples excluded."
+}

@@ -56,3 +56,12 @@ def install(rt,diag):
     def uninstall():
         for action in reversed(restore):action()
     return uninstall
+
+
+def install_kernel_only(rt,diag):
+    """One wrapper around the unchanged compiled callable; no copied loop."""
+    original=rt.kernel
+    def call(*args,**kwargs):
+        with diag.phase('expert.kernel_call'):return original(*args,**kwargs)
+    rt.kernel=call
+    return lambda:setattr(rt,'kernel',original)

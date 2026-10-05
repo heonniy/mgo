@@ -44,3 +44,18 @@ drain to reconcile all recorded main-thread intervals. No primary code change.
 CPU regression checks passed for traversal, return positions, BF16 arithmetic,
 nested labels and complete hook restoration. Physical diagnostic outputs must
 match the uninstrumented full-model warmup with no recompilation.
+
+## Reduce observer effects after expert subdivision
+
+R4_EXPERT_VARIATION completed with validated outputs, but TPOT differed only
+~1.1%, so it did not reproduce the large variance. Do not claim stabilization.
+The copied diagnostic loop also retains named input/weight temporaries longer
+than the original expression; although numerically validated, allocator and
+execution-timing effects cannot be excluded. Its many timing ranges perturb
+host dispatch. Preserve these limitations when interpreting phase totals.
+
+Next `--kernel-diagnostics` leaves the original expert loop and tensor
+lifetimes untouched and only wraps the compiled kernel callable with one host
+interval. Retain the original coarse phase/staging/GC accounting. Two LA/B128
+runs, same frozen conditions. Use the narrower instrumentation to test whether
+large expert-phase variance is inside the compiled callable or outside it.
