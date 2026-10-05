@@ -39,13 +39,13 @@ def main():
  state=dict(status='RUNNING',completed=[],started_unix=time.time())
  try:
   for cache,policy in [('C30','BR'),('C30','FCA'),('C60','FCA'),('C60','BR')]:
-   base=B2/cache;label=f'B2_V3_OPT_PF_OVERLAP_{policy}_B128_H8';out=base/label
+   base=B2/cache;stage='B2' if (cache,policy)==('C30','BR') else 'B2_SHARED_RETRY1';label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H8';out=base/label
    if (out/'status.json').exists():assert json.loads((out/'status.json').read_text())['status']=='PASS','preserve failed attempt for explicit recovery'
    else:
-    case=json.loads((OLD/cache/f'profile_case_{policy}.json').read_text());case.update(horizon=8,b2_instrumentation=True)
+    case=json.loads((OLD/cache/f'profile_case_{policy}.json').read_text());case.update(horizon=8,b2_instrumentation=True,b2_allow_other_gpu_jobs=True)
     casepath=base/f'case_{policy}.json';write(casepath,case)
     state['active']=cache+'/'+policy;write(B2/'status.json',state)
-    cmd=[h.PYTHON,'-u',str(P/'scripts/run_refactor_profile.py'),'--environment','env1','--root',str(base),'--gpus','0','1','4','5','--stage','B2','--horizon','8','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(casepath),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
+    cmd=[h.PYTHON,'-u',str(P/'scripts/run_refactor_profile.py'),'--environment','env1','--root',str(base),'--gpus','0','1','4','5','--stage',stage,'--horizon','8','--arm','V3_OPT_PF_OVERLAP','--batch','128','--policy',policy,'--case-override',str(casepath),'--staging-backend','torch','--unique-combine','--async-metadata-inputs','--fixed-staging-team','--cuda-flush-ms','600000','--defer-idle-restore']
     with (base/f'{label}_driver.log').open('w') as log:subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,check=True)
    state['completed'].append(str(out));write(B2/'status.json',state)
   state['status']='CAPTURES_COMPLETE'
