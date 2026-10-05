@@ -1,0 +1,53 @@
+{
+  "scope": "R4 frozen decode64, P2 per rank/T2, BR/LA. Logical expert-fetch counts, not token misses. Baseline P0 CPU proof versus physically validated P2 counters. Precision is next-layer use, not readiness before use. Physical total copies from first validated fixed-team generation; includes speculative work and excludes prefill.",
+  "rows": [
+    {
+      "batch": 128,
+      "policy": "BR",
+      "prefetch_issued": 24064,
+      "useful": 18909,
+      "precision": 0.7857795877659575,
+      "baseline_decode_misses": 101571,
+      "remaining_decode_misses": 82659,
+      "miss_reduction": 0.18619487845940277,
+      "actual_decode_copies": 106723,
+      "total_copy_increase": 0.05072313947878824
+    },
+    {
+      "batch": 128,
+      "policy": "LA",
+      "prefetch_issued": 24064,
+      "useful": 18891,
+      "precision": 0.7850315824468085,
+      "baseline_decode_misses": 101608,
+      "remaining_decode_misses": 82703,
+      "miss_reduction": 0.18605818439492952,
+      "actual_decode_copies": 106767,
+      "total_copy_increase": 0.05077356113691835
+    },
+    {
+      "batch": 256,
+      "policy": "BR",
+      "prefetch_issued": 24064,
+      "useful": 20385,
+      "precision": 0.8471160239361702,
+      "baseline_decode_misses": 114760,
+      "remaining_decode_misses": 94330,
+      "miss_reduction": 0.17802370163820147,
+      "actual_decode_copies": 118393,
+      "total_copy_increase": 0.03165737190658766
+    },
+    {
+      "batch": 256,
+      "policy": "LA",
+      "prefetch_issued": 24064,
+      "useful": 20380,
+      "precision": 0.846908244680851,
+      "baseline_decode_misses": 114736,
+      "remaining_decode_misses": 94374,
+      "miss_reduction": 0.17746827499651374,
+      "actual_decode_copies": 118438,
+      "total_copy_increase": 0.03226537442476642
+    }
+  ]
+}
