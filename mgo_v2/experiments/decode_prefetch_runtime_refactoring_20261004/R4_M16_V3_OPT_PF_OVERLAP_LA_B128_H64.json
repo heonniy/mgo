@@ -1,0 +1,199 @@
+{
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "PASS",
+  "stage": "R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64",
+  "case": {
+    "label": "LA",
+    "policy": "LA",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP"
+  },
+  "started_unix": 1791168510.471787,
+  "source_sha": "1eff3c401071e1d1fd55397c89f53a77d72f514a",
+  "primary_timing": false,
+  "pid": 520735,
+  "ranks": [
+    {
+      "status": "PASS",
+      "rank": 0,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/copy_trace_rank0.json",
+      "copy_trace_sha256": "daeec2b10556b6bf04f9c876b54b60030ab70c0efd2b05265dac8833b435f025",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 29358,
+        "bytes": 277056847872,
+        "background_copies": 6016,
+        "urgent_copies": 23342,
+        "canceled": 0,
+        "escalated": 4730,
+        "restaged": 0
+      },
+      "decode_expert_copies": 27836,
+      "decode_expert_bytes": 262693453824,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20504986624
+    },
+    {
+      "status": "PASS",
+      "rank": 1,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/copy_trace_rank1.json",
+      "copy_trace_sha256": "e0b60eb92cdea46a6daae2a835c0f91db384d34196cb12b8fbc8c55354f0eb4b",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 28595,
+        "bytes": 269856276480,
+        "background_copies": 6016,
+        "urgent_copies": 22579,
+        "canceled": 0,
+        "escalated": 4687,
+        "restaged": 0
+      },
+      "decode_expert_copies": 27078,
+      "decode_expert_bytes": 255540068352,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 21794346496
+    },
+    {
+      "status": "PASS",
+      "rank": 2,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/copy_trace_rank2.json",
+      "copy_trace_sha256": "2a23a0a05ad2e2cc37d9bd3b31255fb44a74c8dc914185db4247510c97f60c98",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 27798,
+        "bytes": 262334840832,
+        "background_copies": 6016,
+        "urgent_copies": 21782,
+        "canceled": 0,
+        "escalated": 4742,
+        "restaged": 0
+      },
+      "decode_expert_copies": 26293,
+      "decode_expert_bytes": 248131878912,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20488276992
+    },
+    {
+      "status": "PASS",
+      "rank": 3,
+      "purpose": "instrumented diagnostic; not primary timing",
+      "copy_trace_path": "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/copy_trace_rank3.json",
+      "copy_trace_sha256": "641f69bf49d397155a58fd07e3f2b45453383c13de4a837a25263708841578b3",
+      "case": {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP"
+      },
+      "no_compile_in_capture": true,
+      "scheduler_metrics": {
+        "copies": 27051,
+        "bytes": 255285264384,
+        "background_copies": 6016,
+        "urgent_copies": 21035,
+        "canceled": 0,
+        "escalated": 4732,
+        "restaged": 0
+      },
+      "decode_expert_copies": 25560,
+      "decode_expert_bytes": 241214423040,
+      "controller_counters": {
+        "issued": 24064,
+        "useful": 18891,
+        "wasted": 5173,
+        "promotions": 18891,
+        "promotion_evictions": 18891,
+        "promotion_victim_reloads": 14474,
+        "mandatory": 88738,
+        "quota_violations": 0
+      },
+      "transport_calls": 6144,
+      "peak_gpu_bytes": 20488422400
+    }
+  ],
+  "reports": [
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank0.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank1.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank2.nsys-rep",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/profile_rank3.nsys-rep"
+  ],
+  "interpretation": "capture only; actual kernel/copy interval analysis still required",
+  "finished_unix": 1791168923.3873575
+}
