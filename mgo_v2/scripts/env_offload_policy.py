@@ -58,7 +58,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
     if policy==4:
-        assert world==8 and not substitution
+        assert 1<=world<=8 and not substitution
         assignment=load_assignment(demand,misses,owner,layer)
     elif policy==3:
         assert not substitution

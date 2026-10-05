@@ -1,0 +1,72 @@
+[
+  {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 128,
+    "horizon": 64,
+    "paired": true,
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      }
+    ]
+  },
+  {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 256,
+    "horizon": 64,
+    "paired": true,
+    "runtime_arm": "V1_OPT_NOPF_BARRIER",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 0,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": false,
+        "partial_precision": "bf16",
+        "runtime_arm": "V1_OPT_NOPF_BARRIER"
+      }
+    ]
+  }
+]

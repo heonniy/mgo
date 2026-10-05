@@ -1,4 +1,4 @@
-from adaptive_timing import single_decision,paired_decision,tuning_decision,optimistic_relative_ci
+from adaptive_timing import single_decision,legacy_paired_decision as paired_decision,tuning_decision,optimistic_relative_ci
 
 def rows(v):return [dict(E2E_wall=x*10,TPOT=x) for x in v]
 def main():

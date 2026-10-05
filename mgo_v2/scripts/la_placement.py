@@ -1,4 +1,4 @@
-"""Side-effect-free R8 LA placement, matching the calibrated CPU oracle."""
+"""Side-effect-free LA placement for up to eight ranks, matching the calibrated CPU oracle."""
 import numpy as np
 from numba import njit
 WORLD=8
@@ -26,7 +26,7 @@ def second_owner(mask, first):
 
 @njit(cache=True)
 def estimate_loads(demand, owner, layer):
-    loads=np.zeros(WORLD,np.int64)
+    loads=np.zeros(demand.shape[1],np.int64)
     totals=demand.sum(1)
     order=np.argsort(-totals)
     base=layer*EXPERTS
@@ -55,10 +55,11 @@ def estimate_loads(demand, owner, layer):
 @njit(cache=True)
 def load_assignment(demand, misses, owner, layer):
     """Balanced miss-count quota, greedy min-max execution-load placement."""
+    world=demand.shape[1]
     m=len(misses)
-    quota=np.empty(WORLD,np.int64)
-    for r in range(WORLD):
-        quota[r]=m//WORLD+(r<m%WORLD)
+    quota=np.empty(world,np.int64)
+    for r in range(world):
+        quota[r]=m//world+(r<m%world)
     remaining=quota.copy()
     loads=estimate_loads(demand,owner,layer)
     totals=np.empty(m,np.int64)
@@ -74,11 +75,11 @@ def load_assignment(demand, misses, owner, layer):
         best_max=2**60
         best_dst_load=2**60
         best_local=-1
-        for r in range(WORLD):
+        for r in range(world):
             if remaining[r]<=0:
                 continue
             mx=0
-            for rr in range(WORLD):
+            for rr in range(world):
                 v=loads[rr]+(total if rr==r else 0)
                 if v>mx: mx=v
             dstload=loads[r]+total

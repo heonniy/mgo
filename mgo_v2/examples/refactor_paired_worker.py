@@ -4,11 +4,11 @@ from adaptive_timing import paired_decision
 from mgo_v2.selected_runtime import create_explicit_runtime
 
 def main(a):
- rank=int(os.environ['RANK']);a.output.mkdir(parents=True,exist_ok=True)
- cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(rank)]
+ rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);physical=int(os.environ.get('MGO_V2_PHYSICAL_GPUS','0,1,2,3,4,5,6,7').split(',')[rank]);a.output.mkdir(parents=True,exist_ok=True)
+ cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical)]
  for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
- source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//8+(r<3686%8) for r in range(8)];a.comm_mode='current';a.phase='COUNTERS'
+ source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//world+(r<3686%world) for r in range(world)];a.comm_mode='current';a.phase='COUNTERS'
  cases=json.loads(a.cases.read_text());candidates=[c for c in cases if not c.get('baseline')];assert len(candidates)==2
  for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm']:assert candidates[0].get(key)==candidates[1].get(key)
  baseline,candidate=[c['policy'] for c in candidates];assert baseline!=candidate;horizon=candidates[0]['horizon'];assert all(c['horizon']==horizon for c in candidates)
@@ -34,7 +34,7 @@ def main(a):
   warm_tokens[policy]=tokens.copy();numeric[policy]=dict(actual_argmax_hash=row['argmax_hash'],partial_precision=a.partial_precision,legacy_comparison='not collected: owner BF16-only amendment')
   write(a.output/f'{policy}_validation_rank{rank}.json',dict(status='PASS',rank=rank,case=by_policy[policy],numerical_comparison=numeric[policy],finite_logits=True,physical_arena_count=1,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  pairs=[]
- for repeat in range(1,8):
+ for repeat in range(1,4):
   if len(pairs)>=2 and repeat>paired_decision(pairs,baseline,candidate)['target_repeats']:break
   pair={};order=[baseline,candidate] if repeat%2 else [candidate,baseline]
   for policy in order:
@@ -54,7 +54,7 @@ def main(a):
    assert before==dict(counters['stats']) and np.array_equal(tokens,warm_tokens[policy]);validate(rt,row,proofs[policy],rank)
    row.update(status='PASS',rank=rank,case=case,repeat=repeat,paired_order=order,numerical_comparison=numeric[policy],no_compile_in_measure=True,process_usage_delta=process_delta,thread_usage_delta=thread_delta,affinity=cpus,scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters),physical_arena_count=1,peak_gpu_bytes=torch.cuda.max_memory_allocated())
    write(a.output/f'{key}_measure_rank{rank}.json',row);dist.barrier()
-   pair[policy]={k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(8)) for k in ['E2E_wall','TPOT']}
+   pair[policy]={k:max(json.loads((a.output/f'{key}_measure_rank{r}.json').read_text())[k] for r in range(world)) for k in ['E2E_wall','TPOT']}
   pairs.append(pair)
   if rank==0:write(a.output/'phase.json',dict(stage='PAIR_COMPLETE',repeat=repeat,order=order,pairs=pairs))
  decision=paired_decision(pairs,baseline,candidate);assert decision['complete'];rt.close()

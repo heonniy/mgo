@@ -6,7 +6,7 @@ import gc
 
 class LiveRuntime(Runtime):
  def __init__(self,a,model,backing,experts):
-  self.args=a;self.rank=dist.get_rank();self.world=8;self.experts=experts;self.cpu_backing=backing
+  self.args=a;self.rank=dist.get_rank();self.world=dist.get_world_size();self.experts=experts;self.cpu_backing=backing
   self.cap=a.capacities[self.rank];self.execution_order='fetch-barrier';self.schedule_mode='live'
   self.cache=torch.empty((self.cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
@@ -17,7 +17,7 @@ class LiveRuntime(Runtime):
   assert hashlib.sha256((a.inputs/(a.policy+'_fetches.json')).read_bytes()).hexdigest()==self.proof['fetches_sha256']
   self.ranges=[]
   for org in [self.arrays['prefill_origins'],self.arrays['decode_origins']]:
-   counts=np.bincount(org,minlength=8);offsets=np.r_[0,np.cumsum(counts)];self.ranges.append((int(offsets[self.rank]),int(offsets[self.rank+1])))
+   counts=np.bincount(org,minlength=self.world);offsets=np.r_[0,np.cumsum(counts)];self.ranges.append((int(offsets[self.rank]),int(offsets[self.rank+1])))
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True);self.reset()
   for layer,block in enumerate(model.model.layers):block.mlp.forward=types.MethodType(self.forward_for(layer),block.mlp)
  def reset(self):
@@ -44,7 +44,7 @@ class LiveRuntime(Runtime):
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata_exchange'):g=gather_global_routes(layer,selected,weights,probs);r=g.routes
   with nvtx_phase('moe.rank_decision'):
-   targets,effective,masses,lengths,destinations,fetches,row=self.policy.apply(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,self.arrays['gates'][self.index],np.zeros((128,8),np.int32))
+   targets,effective,masses,lengths,destinations,fetches,row=self.policy.apply(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,self.arrays['gates'][self.index],np.zeros((128,self.world),np.int32))
    assert [list(f) for f in fetches]==self.reference[self.index],(self.args.policy,self.index,'CPU fetch mismatch')
    self.current_global_fetch_count=len(fetches)
    e=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)

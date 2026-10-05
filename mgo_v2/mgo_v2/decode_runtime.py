@@ -24,7 +24,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache)
-  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//8)
+  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world)
  def stage_frozen_inputs(self,horizon):
   # Benchmark input delivery is common across strategies and outside timing.
   # Only the current event is exposed to the runtime; prediction never reads
@@ -76,7 +76,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   if getattr(self.args,'debug_plan',False):
    payload=(fetches,self.policy.owner,self.policy.slots,self.arena.main_physical,self.arena.prefetch_physical)
    digest=np.frombuffer(hashlib.sha256(pickle.dumps(payload,protocol=4)).digest(),np.uint8).copy()
-   tensor=torch.tensor(digest,device='cuda');all_hashes=torch.empty((8,32),dtype=torch.uint8,device='cuda')
+   tensor=torch.tensor(digest,device='cuda');all_hashes=torch.empty((self.world,32),dtype=torch.uint8,device='cuda')
    dist.all_gather_into_tensor(all_hashes.view(-1),tensor);assert bool((all_hashes==all_hashes[0]).all())
    self.debug_plan_checks+=1
   if self.args.phase!='MEASURE' and self.index%768==0:print(f'{self.args.policy} event={self.index} split_controller',flush=True)

@@ -20,13 +20,14 @@ def publish(message,paths):
   if subprocess.run(['git','push','origin','HEAD:refactoring'],cwd=P.parent).returncode:h.write(ROOT/'publication_pending.json',dict(message=message,unix=time.time()))
 
 def run(stage,group):
+ world=group.get('world',8);gpus=group.get('gpus',list(range(world)));assert len(gpus)==world
  label=f'{stage}_B{group["batch"]}_H{group["horizon"]}';out=ROOT/label
  if (out/'status.json').exists():
   saved=json.loads((out/'status.json').read_text());assert saved['status']=='PASS','use a new attempt label after repair';return saved
  out.mkdir(exist_ok=True);h.write(out/'cases.json',group['cases']);receipt=PACKET/(label+'.json')
  state=dict(status='RUNNING',stage=stage,label=label,group=group,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),monitor='boundaries only; file polling during MEASURE')
- h.safe(h.sample(),True);env=h.env_for('env1');cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
- cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=8',str(P/('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py')),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
+ h.safe(h.sample(),True);env=h.env_for('env1');env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
+ cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py')),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
   from refactor_fingerprint import capture
   state['common_stack']=capture(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}',env)
@@ -39,13 +40,13 @@ def run(stage,group):
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if active is not None:
      files=list(out.glob(f'{active}_measure_rank*.json'))
-     if len(files)==8:
-      rows=[json.loads((out/f'{active}_measure_rank{r}.json').read_text()) for r in range(8)];record=PACKET/f'{label}_{active}.json';h.write(record,dict(status='PASS',source_sha=state['source_sha'],ranks=rows));publish(f'{stage}: {label} {active} clean physical sample',[record])
+     if len(files)==world:
+      rows=[json.loads((out/f'{active}_measure_rank{r}.json').read_text()) for r in range(world)];record=PACKET/f'{label}_{active}.json';h.write(record,dict(status='PASS',source_sha=state['source_sha'],ranks=rows));publish(f'{stage}: {label} {active} clean physical sample',[record])
       state.setdefault('completed',[]).append(active);active=None;h.write(out/'status.json',state)
     else:
      boundary=json.loads((out/'boundary.json').read_text()) if (out/'boundary.json').exists() else None
      if boundary and boundary['key'] not in released:
-      key=boundary['key'];assert len(list(out.glob(f'{key}_ready_rank*.json')))==8
+      key=boundary['key'];assert len(list(out.glob(f'{key}_ready_rank*.json')))==world
       sample=h.sample(proc.pid);h.safe(sample);state.setdefault('boundaries',[]).append(dict(key=key,sample=sample,diagnostics=boundary_diagnostics()));h.write(out/'status.json',state)
       h.write(PACKET/'status.json',dict(status='RUNNING',stage=stage,label=label,active=boundary,started_unix=state['started_unix'],pid=proc.pid))
       (out/f'{key}_GO').touch();released.add(key);active=key
@@ -59,7 +60,7 @@ def run(stage,group):
    for key in released:
     record=PACKET/f'{label}_{key}.json'
     if not record.exists():
-     rows=[json.loads((out/f'{key}_measure_rank{r}.json').read_text()) for r in range(8)];h.write(record,dict(status='PASS',source_sha=state['source_sha'],ranks=rows));publish(f'{stage}: {label} {key} clean physical sample',[record])
+     rows=[json.loads((out/f'{key}_measure_rank{r}.json').read_text()) for r in range(world)];h.write(record,dict(status='PASS',source_sha=state['source_sha'],ranks=rows));publish(f'{stage}: {label} {key} clean physical sample',[record])
   except BaseException as exc:
    state.update(status='FAIL',error=repr(exc))
    if proc.poll() is None:
@@ -74,6 +75,8 @@ def run(stage,group):
  return state
 
 def main(a):
+ global ROOT
+ ROOT=a.root;ROOT.mkdir(parents=True,exist_ok=True);h.ROOT=ROOT
  assert subprocess.check_output(['git','branch','--show-current'],cwd=P.parent,text=True).strip()=='refactoring'
  groups=json.loads(a.config.read_text());stop_idle_load()
  try:
@@ -85,4 +88,4 @@ def main(a):
  finally:
   if not (ROOT/'STOP').exists():h.write(ROOT/(a.stage+'_resident_models.json'),dict(processes=start_idle_load(),unix=time.time()))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--stage',required=True);p.add_argument('--config',type=Path,required=True);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--stage',required=True);p.add_argument('--config',type=Path,required=True);main(p.parse_args())

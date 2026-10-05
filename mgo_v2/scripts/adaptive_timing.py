@@ -21,7 +21,7 @@ def single_decision(rows):
  status='EXTEND_JITTER' if not complete and target>=5 else 'THIRD_REQUIRED' if not complete else 'UNRESOLVED_JITTER' if unstable else 'STABLE_JITTER_ESTIMATE' if n>=5 else 'STABLE'
  estimate={k:(s['mean'] if n!=3 else s['median']) for k,s in summary.items()}
  return dict(status=status,target_repeats=target,complete=complete,unstable=unstable,summary=summary,estimate=estimate,rule='2/3 baseline; noisy cells extend to 5, then at most 7. At n>=5 require mean CI95 half-width <=2% and early/late mean drift <=5%. No sample deletion.')
-def paired_decision(pairs,baseline="BR",candidate="LA"):
+def legacy_paired_decision(pairs,baseline="BR",candidate="LA"):
  n=len(pairs);assert 2<=n<=7
  single={p:single_decision([r[p] for r in pairs]) for p in (baseline,candidate)};gain={}
  for k in KEYS:
@@ -57,4 +57,21 @@ def tuning_decision(rows):
  # At every permitted endpoint, at least one required metric cannot meet 2%.
  if all(any(value>.02+1e-12 for value in bymetric.values()) for bymetric in bounds.values()):
   d.update(status='UNRESOLVED_JITTER_FUTILITY',complete=True,unstable=True,target_repeats=n,optimistic_future_relative_CI_halfwidth=bounds,rule='BR tuning only: retain at least three samples. Stop as ineligible when even optimally chosen future values cannot satisfy the unchanged 2% CI halfwidth limit at either five or seven samples. No samples discarded. Paired BR/LA rules unchanged.')
+ return d
+
+
+def paired_decision(pairs,baseline="BR",candidate="LA"):
+ """Owner repeat cap: stable first two stop; at most one third pair."""
+ n=len(pairs)
+ assert 2<=n<=3, 'new paired measurements are capped at three pairs'
+ d=legacy_paired_decision(pairs,baseline,candidate)
+ spread=max(s['range_relative'] for policy in d['absolute'].values() for s in policy['summary'].values())
+ # At two samples the owner explicitly forbids repeating a stable condition.
+ complete=n==3 or spread<=.02
+ gain_spread=max(max(g['paired_gains'])-min(g['paired_gains']) for g in d['gain'].values())
+ unstable=complete and (spread>(.02 if n==2 else .05) or gain_spread>.02)
+ for policy in d['absolute'].values():
+  local_spread=max(s['range_relative'] for s in policy['summary'].values())
+  policy.update(target_repeats=2 if local_spread<=.02 and n==2 else 3,complete=complete,unstable=complete and local_spread>(.02 if n==2 else .05),rule='Owner cap: stop at two when both metric differences <=2%; otherwise at most three; three-sample full spread must be <=5%.')
+ d.update(status='UNRESOLVED_JITTER' if unstable else 'STABLE_PAIRED_GAIN' if complete else 'THIRD_REQUIRED',complete=complete,unstable=unstable,target_repeats=2 if n==2 and complete else 3,rule='Owner repeat amendment: both policies E2E/TPOT differences <=2% stop at two, regardless of CI width; otherwise exactly one third pair, no five/seven or rerun. At three require absolute spread <=5% and paired-gain range <=2 percentage points. Retain all samples and CI; positive claim requires CI lower bound >0.')
  return d
