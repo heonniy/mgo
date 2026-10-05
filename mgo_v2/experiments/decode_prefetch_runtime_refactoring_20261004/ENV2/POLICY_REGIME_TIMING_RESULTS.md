@@ -17,6 +17,6 @@ All eight conditions stopped after two clean repetitions. No exclusions or third
 
 OLD_CA and FCA are slower than BR in both cache groups. LA_CA has small positive TPOT point estimates (+0.638% C30, +0.374% C60), but both paired 95% intervals include zero. The current repetitions therefore do not establish positive LA_CA gains. Stability of repeated absolute timing is distinct from certainty in a small paired gain.
 
-Separate Env2 mechanism captures are in progress. Do not substitute instrumented timings for the primary values above. All primary raw observations, paired intervals, and rank receipt hashes are retained in `POLICY_REGIME_TIMING_RESULTS.json`; actual copy-count reconciliation is in `POLICY_REGIME_WORKLOAD.json`.
+Separate Env2 mechanism captures and all rank-level reconciliations are complete; see `../POLICY_REGIME_FINAL_RESULTS.md`. Do not substitute instrumented timings for the primary values above. All primary raw observations, paired intervals, and rank receipt hashes are retained in `POLICY_REGIME_TIMING_RESULTS.json`; actual copy-count reconciliation is in `POLICY_REGIME_WORKLOAD.json`.
 
 Env1 preceded Env2 without transport-order counterbalancing. Absolute cross-environment differences may include temporal host drift and are not an isolated transport-cost estimate.

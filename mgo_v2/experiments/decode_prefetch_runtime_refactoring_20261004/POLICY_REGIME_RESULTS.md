@@ -37,6 +37,6 @@ The table shows rank-mean, separately instrumented milliseconds per step, except
 | C60 | LA_CA | 4,135,287 | 84.910 | 79.355 | 41.723 | 109.617 | 38.939 |
 
 
-Historical same-host Env2 has now started after successful attribution: NCCL_CUMEM_ENABLE=0, NCCL_P2P_DISABLE=1, NCCL_IB_DISABLE=1, inherited NCCL overrides cleared. Require observed SHM channels before timing. This is not a claim about physically NVLink-free hardware.
+Historical same-host Env2 is complete, including separate mechanism attribution; see `POLICY_REGIME_FINAL_RESULTS.md`. Its settings were: NCCL_CUMEM_ENABLE=0, NCCL_P2P_DISABLE=1, NCCL_IB_DISABLE=1, inherited NCCL overrides cleared. Require observed SHM channels before timing. This is not a claim about physically NVLink-free hardware.
 
 Sources: `POLICY_REGIME_TIMING_RESULTS.json` contains every raw timing, paired gates, and input receipt hashes. `POLICY_REGIME_WORKLOAD.json` reconciles actual physical decode copy counts.

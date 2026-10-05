@@ -41,6 +41,19 @@ def build():
         evidence[environment] = dict(timing=timing, mechanism=mechanism,
                                      workload=workload, transport=transports)
 
+    decisions = []
+    for environment, data in evidence.items():
+        for cell in data['timing']['rows']:
+            ps = cell['policies']
+            supported = [p for p in POLICIES[1:]
+                         if ps[p]['paired_gate']['gain']['TPOT']['positive_supported']]
+            fastest = min(POLICIES, key=lambda p: ps[p]['metrics']['TPOT']['value'])
+            e2e = min(POLICIES, key=lambda p: ps[p]['metrics']['E2E_wall']['value'])
+            decisions.append(f"{environment}/{cell['setting']}: lowest TPOT point estimate "
+                             f"{fastest} ({100*ps[fastest]['TPOT_gain']:+.3f}% vs BR); "
+                             f"lowest mean E2E {e2e}; supported positive TPOT gains: "
+                             f"{', '.join(supported) if supported else 'none'}.")
+
     lines = [
         '# Policy regime results: Env1 and historical Env2', '',
         'R4 GPUs 0/1/4/5; local B128; frozen decode64; BF16; V3 P2/T2; '
@@ -59,6 +72,22 @@ def build():
         'remain in the timing JSON. A slow observation alone is not a reason '
         'to remove it. A positive point estimate is not proof of a gain; '
         'paired uncertainty is reported separately.', '',
+        '## Outcome', '',
+        *[text + '\n' for text in decisions],
+        'The small LA_CA TPOT point estimates are not established improvements. '
+        'BR has the lowest mean E2E in all four groups. OLD_CA and FCA have worse '
+        'observed mean TPOT in both cache regimes and both environments.', '',
+        'FCA reduces remote packets by 29.1% at C30 and 21.3% at C60, with identical '
+        'packet counts across environments. However, both forward and return NCCL '
+        'residency increase, and eventwise maximum expert GPU time increases even '
+        'though rank-mean expert kernel time stays similar. This fails the physical '
+        'communication-benefit gate. The observations support an imbalance/waiting '
+        'explanation; they do not isolate a sole cause or measure pure wire latency. '
+        'The slower FCA primary results are not explained by an observed increase '
+        'in mean controller CPU time in these separate captures.', '',
+        'No single-sample selection, noise exclusion, or extra timing repetition '
+        'was used to amplify a gain. All 16 conditions stopped at two stable repeats.', '',
+        '## Primary timing', '',
         '| Environment | Cache | Policy | TPOT s [range] | E2E s [range] | TPOT gain | Paired gain 95% interval |',
         '|---|---|---|---:|---:|---:|---:|',
     ]
