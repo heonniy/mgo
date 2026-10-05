@@ -1,0 +1,113 @@
+{
+  "status": "FROZEN_BEFORE_VALIDATION",
+  "plan_commit": "5d9d2b2ae1a740ffbad1288a2e67a08c7f814446",
+  "transport": {
+    "4120": {
+      "features": [
+        "intercept",
+        "max_incident_packets"
+      ],
+      "coefficients_ms": [
+        0.01334829347707916,
+        2.5210030455682773e-05
+      ],
+      "a1_training_ids": [
+        "V1389_BALANCED",
+        "V1389_PAIR_HOT",
+        "V1389_DEST_HOT",
+        "V1389_SRC_HOT",
+        "V1432_BALANCED",
+        "V1432_PAIR_HOT",
+        "V1432_DEST_HOT",
+        "V1432_SRC_HOT",
+        "V1528_BALANCED",
+        "V1528_PAIR_HOT",
+        "V1528_DEST_HOT",
+        "V1528_SRC_HOT"
+      ],
+      "calibration_median_absolute_relative_error": 0.0421545271767326,
+      "observed_total_range": [
+        1389,
+        1528
+      ],
+      "max_incident_range": [
+        695,
+        1528
+      ]
+    },
+    "4096": {
+      "features": [
+        "intercept",
+        "max_incident_packets"
+      ],
+      "coefficients_ms": [
+        0.020343551656910912,
+        1.4874722485351956e-05
+      ],
+      "a1_training_ids": [
+        "V1389_BALANCED",
+        "V1389_PAIR_HOT",
+        "V1389_DEST_HOT",
+        "V1389_SRC_HOT",
+        "V1432_BALANCED",
+        "V1432_PAIR_HOT",
+        "V1432_DEST_HOT",
+        "V1432_SRC_HOT",
+        "V1528_BALANCED",
+        "V1528_PAIR_HOT",
+        "V1528_DEST_HOT",
+        "V1528_SRC_HOT"
+      ],
+      "calibration_median_absolute_relative_error": 0.012007459457971114,
+      "observed_total_range": [
+        1389,
+        1528
+      ],
+      "max_incident_range": [
+        695,
+        1528
+      ]
+    }
+  },
+  "tau": {
+    "rows": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "ms": [
+      0.020047999918460846,
+      0.020207999274134636,
+      0.020231999456882477,
+      0.020175999961793423,
+      0.020239999517798424,
+      0.020456000231206417,
+      0.020816000178456306,
+      0.021215999498963356,
+      0.022512000054121017,
+      0.02684800000861287
+    ],
+    "interpolation": "linear in rows; no extrapolation above512; tau(0)=0",
+    "source": "median of four rank medians, stable primary power ladder only; unstable supplemental n18 not used"
+  },
+  "row_only_ms_per_row": 7.10631627529512e-05,
+  "arrival_slope_a2": 0.999268394474981,
+  "layer_formula": "F(S)+max(sum_e tau(n_e))+R(S.T)",
+  "return_residency_formula": "R(S.T)+max(ready)-ready[r]",
+  "arrival_coefficient_used": 1.0,
+  "source_sha256": {
+    "/home/hwlee/mgo-policy-regime/mgo_v2/experiments/critical_path_admission_followup_20261006/A2A_SPLIT_RESULTS.json": "8105219fabb1098f79fb4e998962ebdbe99af3bba7d209384242c045daa16558",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/experiments/critical_path_admission_followup_20261006/EXPERT_TAU_RESULTS.json": "5ec8f61c3f1ca08fb39cc7fd74896e9aef4d29f24f5c765cf526f515f3472e39",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/experiments/critical_path_admission_followup_20261006/MICROBENCH_RESULTS.json": "cc886153df392713eafd106b8dcf0db8c26688b723361081c0d0c1fbe3e22ef8"
+  },
+  "ordering_rule": "within each cache: BR and LA_CA within2% of their pair mean; both below OLD_CA, OLD_CA below FCA",
+  "gate_scope": "all eight held-out cells must meet expert/layer correlations and phase aggregate errors; no TPOT-fitting; aggregate and per-cell decisions retained",
+  "observed_critical_target": "max over ranks of rank-local elapsed from first forward NCCL kernel start to last return NCCL kernel end for the SAME causal event. Contains unmodeled host/H2D/pack gaps; not a sum of phase maxima and not primary TPOT."
+}
