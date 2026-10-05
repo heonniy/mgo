@@ -1,0 +1,80 @@
+[
+  {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 128,
+    "horizon": 64,
+    "paired": true,
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true
+      }
+    ]
+  },
+  {
+    "world": 4,
+    "gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "batch": 256,
+    "horizon": 64,
+    "paired": true,
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "cases": [
+      {
+        "label": "BR",
+        "policy": "BR",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true
+      },
+      {
+        "label": "LA",
+        "policy": "LA",
+        "P": 2,
+        "trigger": "T2",
+        "horizon": 64,
+        "overlap": true,
+        "partial_precision": "bf16",
+        "runtime_arm": "V3_OPT_PF_OVERLAP",
+        "staging_backend": "torch",
+        "unique_combine": true
+      }
+    ]
+  }
+]

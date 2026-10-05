@@ -67,6 +67,7 @@ def main(a):
  source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//world+(r<3686%world) for r in range(world)];a.comm_mode='current'
  case=json.loads(a.case.read_text());horizon=case['horizon'];assert horizon in (8,64,256) and case['partial_precision']=='bf16'
  a.staging_backend=case.get('staging_backend','torch');assert a.staging_backend in ('torch','memmove')
+ a.unique_combine=case.get('unique_combine',False);assert type(a.unique_combine) is bool
  a.policy=case['policy'];a.arena_budget=case['P'];a.trigger=case['trigger'];a.partial_precision='bf16';a.streaming=case['overlap'];a.ready_first=a.streaming;a.physical_prefetch=True;a.fused=True;a.debug_plan=False;a.phase='COUNTERS'
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')

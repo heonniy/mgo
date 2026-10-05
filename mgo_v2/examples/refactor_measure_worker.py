@@ -14,6 +14,8 @@ def validate(rt,row,proof,rank):
   assert rt.controller.counters==proof['counters']
   assert rt.h2d.metrics['copies']+rt.h2d.metrics['canceled']==proof['max_copy_counts'][rank]
   assert rt.transport.calls==proof['horizon']*48*2
+  if getattr(rt.args,'unique_combine',False):assert rt.unique_combine_layers==proof['horizon']*48
+  row['unique_combine_layers']=rt.unique_combine_layers
  else:
   assert array_hash(rt.keys)==proof['rank_state_hashes'][rank]
   assert rt.actual_h2d_bytes==proof['H2D_bytes'][rank]

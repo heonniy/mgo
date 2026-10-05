@@ -10,7 +10,7 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=[3686//world+(r<3686%world) for r in range(world)];a.comm_mode='current';a.phase='COUNTERS'
  cases=json.loads(a.cases.read_text());candidates=[c for c in cases if not c.get('baseline')];assert len(candidates)==2
- for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm','staging_backend']:assert candidates[0].get(key)==candidates[1].get(key)
+ for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm','staging_backend','unique_combine']:assert candidates[0].get(key)==candidates[1].get(key)
  baseline,candidate=[c['policy'] for c in candidates];assert baseline!=candidate;horizon=candidates[0]['horizon'];assert all(c['horizon']==horizon for c in candidates)
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')

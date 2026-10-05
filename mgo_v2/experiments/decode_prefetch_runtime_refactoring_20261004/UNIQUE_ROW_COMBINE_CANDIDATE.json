@@ -1,5 +1,5 @@
 {
-  "status": "EVIDENCE_REVIEWED_IMPLEMENTATION_PENDING",
+  "status": "IMPLEMENTED_GPU_UNIT_PARITY_PASS",
   "source": "R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank0.sqlite",
   "backend": "torch staging",
   "observed_kernel_counts": {
@@ -26,5 +26,9 @@
     "Preserve two payload A2As and no extra model/pinned memory.",
     "Validate full frozen64 warmup then at most two stable or three total paired repetitions per batch."
   ],
-  "no_gain_claim": true
+  "no_gain_claim": true,
+  "staging_backend": "torch",
+  "staging_reason": "Isolate accumulation change from unsuccessful native staging candidate; same backend as original profile.",
+  "validation": "UNIQUE_COMBINE_GPU_TEST.json: 17 bitwise BF16 GPU checks, duplicate-row fallback, empty peer and unequal counts.",
+  "physical_validation": "Pending full64 warmups and bounded paired measurements for B128/B256."
 }

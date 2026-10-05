@@ -41,6 +41,9 @@ def selected_options(selection_path=None, arm=None):
     if 'staging_backend' in selection:
         if selection['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown selected staging backend')
         options['staging_backend']=selection['staging_backend']
+    if 'unique_combine' in selection:
+        if type(selection['unique_combine']) is not bool:raise ValueError('Invalid unique combine flag')
+        options['unique_combine']=selection['unique_combine']
     return options
 
 
@@ -55,6 +58,8 @@ def create_explicit_runtime(args, model, backing, experts, case):
     """Construct an explicit experimental arm using the default's same path."""
     options = arm_options(case['runtime_arm'], case['P'], case['trigger'])
     options['staging_backend']=case.get('staging_backend','torch')
+    options['unique_combine']=case.get('unique_combine',False)
+    if type(options['unique_combine']) is not bool:raise ValueError('Invalid unique combine flag')
     if options['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown staging backend')
     if case['partial_precision'] != 'bf16' or case['overlap'] != options['streaming']:
         raise ValueError('Case disagrees with the common BF16 runtime arm')
