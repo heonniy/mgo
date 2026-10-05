@@ -5,5 +5,63 @@
   "deb_sha256": "c7cfe27e2250eb91e1a67e7feb5f2c490c7f598e3b3a3d047aff000bc49f9d6b",
   "device_event_trace": false,
   "reason": "Two 2024.6 FCA captures stalled at different events. Tool-associated failure is observed, not a proven CUDA root cause. Isolated official NVIDIA package; no host installation or runtime change. All attribution cells use common new version; old successful captures retained as historical diagnostics. Primary timing never rerun.",
-  "unix": 1791201500.5112119
+  "unix": 1791201500.5112119,
+  "first_recovery_validation": {
+    "capture": "/home/hwlee/mgo-results/policy_regime_20261005/C30/POLICY_REGIME_PROFILE_C30_NSYS2025_V3_OPT_PF_OVERLAP_FCA_B128_H64",
+    "status": "PASS",
+    "ranks": 4,
+    "decode_events_per_rank": 3072,
+    "summary_sha256": "d7c035a8e0a0ab57ce5b0e3f5048f4bc16989f26a79e8cfb05a739cdee5f5536",
+    "rank_validation": [
+      {
+        "status": "PASS",
+        "decode_events": 3072,
+        "H2D": {
+          "count": 55940,
+          "bytes": 527916072960,
+          "total_union_ms": 11028.244356,
+          "overlap_comm_expert_ms": 717.493788,
+          "outside_comm_expert_ms": 10310.750568,
+          "hidden_ratio": 0.06505965635497023
+        }
+      },
+      {
+        "status": "PASS",
+        "decode_events": 3072,
+        "H2D": {
+          "count": 55165,
+          "bytes": 520602255360,
+          "total_union_ms": 10864.326807,
+          "overlap_comm_expert_ms": 749.283061,
+          "outside_comm_expert_ms": 10115.043746,
+          "hidden_ratio": 0.06896727927194063
+        }
+      },
+      {
+        "status": "PASS",
+        "decode_events": 3072,
+        "H2D": {
+          "count": 54383,
+          "bytes": 513222377472,
+          "total_union_ms": 10826.629906,
+          "overlap_comm_expert_ms": 846.521939,
+          "outside_comm_expert_ms": 9980.107967,
+          "hidden_ratio": 0.07818886822120583
+        }
+      },
+      {
+        "status": "PASS",
+        "decode_events": 3072,
+        "H2D": {
+          "count": 53638,
+          "bytes": 506191675392,
+          "total_union_ms": 10508.513371,
+          "overlap_comm_expert_ms": 1102.835442,
+          "outside_comm_expert_ms": 9405.677929,
+          "hidden_ratio": 0.10494685623595996
+        }
+      }
+    ],
+    "interpretation": "Full horizon and all four actual DMA count/byte reconciliations passed. This validates the replacement profiler on this capture; it does not prove the original underlying deadlock cause or performance benefit."
+  }
 }
