@@ -1,0 +1,30 @@
+{
+  "status": "EVIDENCE_REVIEWED_IMPLEMENTATION_PENDING",
+  "source": "R4_M16_V3_OPT_PF_OVERLAP_LA_B128_H64/interval_analysis/rank0.sqlite",
+  "backend": "torch staging",
+  "observed_kernel_counts": {
+    "DeviceRadixSortSingleTileKernel": {
+      "total": 102901,
+      "contained_in_return_CPU_range": 89392
+    },
+    "indexing_backward_kernel": {
+      "total": 100234,
+      "contained_in_return_CPU_range": 89387
+    },
+    "_assert_async_cuda_kernel": {
+      "total": 212948,
+      "contained_in_return_CPU_range": 178932
+    }
+  },
+  "attribution_limit": "Temporal containment in 3072 moe.return_a2a CPU ranges, not causal API correlation; outside intervals include async tails and other phases. Instrumented diagnostic only.",
+  "code_path": "coalesced_return.combine_rank_partials invokes deterministic index_add_ per expert and per source-rank segment",
+  "candidate": "Optional fused unique-row BF16 gather-add-store for rank partial and source combine; preserve expert and source-rank loop order. Shared BR/LA implementation.",
+  "required_guards": [
+    "Prove unique destination rows within each expert group and each peer send segment using CPU layout before enabling fast path.",
+    "Retain deterministic index_add_ fallback for unvalidated or duplicate-row layouts.",
+    "Compare BF16 output bits against existing deterministic accumulation including repeated destinations across successive groups, empty peer segments and uneven counts.",
+    "Preserve two payload A2As and no extra model/pinned memory.",
+    "Validate full frozen64 warmup then at most two stable or three total paired repetitions per batch."
+  ],
+  "no_gain_claim": true
+}
