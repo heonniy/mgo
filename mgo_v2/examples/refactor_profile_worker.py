@@ -62,10 +62,8 @@ class ProfileRuntime(DecodeOffloadRuntime):
 
 def main(a):
  rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);physical=int(os.environ.get('MGO_V2_PHYSICAL_GPUS','0,1,2,3,4,5,6,7').split(',')[rank]);a.output.mkdir(parents=True,exist_ok=True)
- import faulthandler
- stack_log=(a.output/f'stacks_rank{rank}.log').open('w')
- faulthandler.enable(file=stack_log)
- faulthandler.dump_traceback_later(120,repeat=True,file=stack_log)
+ from profile_watchdog import start_watchdog
+ stop_watchdog=start_watchdog(a.output/f'stacks_rank{rank}.jsonl')
  def progress(stage):write(a.output/f'progress_rank{rank}.json',dict(stage=stage,unix=time.time()))
  progress('SETUP')
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical)]
@@ -115,6 +113,6 @@ def main(a):
  write(a.output/f'communication_rank{rank}.json',dict(status='PASS',rank=rank,events=rt.profile_communication,metadata_calls=rt.metadata.calls,payload_calls=rt.transport.calls,forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes,scope='Decode BF16 token/rank payload bytes excluding self, protocol overhead and metadata. Per-event peer counts come from the executed layout.'))
  write(a.output/f'rank{rank}.json',dict(status='PASS',rank=rank,purpose='instrumented diagnostic; not primary timing',copy_trace_path=str(trace_path),copy_trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),case=case,no_compile_in_capture=True,scheduler_metrics=rt.h2d.metrics,decode_expert_copies=rt.h2d.metrics['copies']-rt.profile_prefill_metrics['copies'],decode_expert_bytes=rt.h2d.metrics['bytes']-rt.profile_prefill_metrics['bytes'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls,peak_gpu_bytes=torch.cuda.max_memory_allocated()))
  rt.close();dist.barrier();dist.destroy_process_group()
- progress('COMPLETE');faulthandler.cancel_dump_traceback_later();stack_log.close()
+ progress('COMPLETE');stop_watchdog.set()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--case',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())

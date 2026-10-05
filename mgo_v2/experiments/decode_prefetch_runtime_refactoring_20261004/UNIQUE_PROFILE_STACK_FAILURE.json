@@ -1,0 +1,13 @@
+{
+  "status": "DIAGNOSTIC_FAILURE",
+  "exit_code": 139,
+  "primary_timing": false,
+  "observation": "Asynchronous faulthandler dump was truncated inside torch.compile synthetic interpreter trampoline; all ranks still reported SETUP before profiler.start. This does not establish a runtime arithmetic error.",
+  "cause": "Unproven; suspected interaction with asynchronous stack walking.",
+  "change": "Replace asynchronous C-level traceback walker with cooperative Python top-frame snapshots, stopping at synthetic trampoline frames. Preserve stage progress and detached-child cleanup.",
+  "sources": {
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_DIAG_V3_OPT_PF_OVERLAP_LA_B256_H64/run.log": "8d35099d7e16343d60195bb7374af721322e5cd6cfd52e9c90e7a21f5e9e1861",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_DIAG_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank0.log": "4b10f46c43bf1efd2fc2d22373d27f3235465396752d692a0b42893e713dd12f",
+    "/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/R4_H64/R4_M16_UNIQUE_DIAG_V3_OPT_PF_OVERLAP_LA_B256_H64/stacks_rank3.log": "8cc631e02b2ab2cdd272b34b87cb99ba6f1d81c9521faa5902a9d6291b3f500f"
+  }
+}
