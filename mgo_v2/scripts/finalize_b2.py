@@ -8,6 +8,7 @@ from critical_stage_b import sha
 def main():
  result=json.loads((PACKET/'B2_PLACEMENT_CAUSALITY.json').read_text());check=json.loads((PACKET/'B2_HOST_COST_PREDICTABILITY.json').read_text());root=ROOT/'b2';state=json.loads((root/'status.json').read_text());assert state['status']=='CAPTURES_COMPLETE' and len(state['completed'])==4
  result['host_cost_predictability_probe']=dict(path=str(PACKET/'B2_HOST_COST_PREDICTABILITY.json'),sha256=sha(PACKET/'B2_HOST_COST_PREDICTABILITY.json'),scope='Diagnostic work-count predictability and exploratory held-out delta rejection, not an accepted revised oracle model.',prefix_checks=check['prefix_heldout'],arrival_delta_checks=check['heldout_host_count_arrival_support'],old_delta_checks=check['old_capture_exploratory_delta'])
+ result['classification']=[x for x in result['classification'] if x['term']!='owner-dependent number/shape of compiled host calls and wrappers']
  result['classification'].append(dict(term='owner-dependent number/shape of compiled host calls and wrappers',category='A_CANDIDATE_WITH_B_VARIABILITY',evidence='BR first4steps calibrate cost; last4steps BR/FCA validate rank-event totals within0.05–19.4%, but arrival-delta error is62.3% atC30 and23.8% atC60; old FCA deltas err72.8%/42.7%.',limitation='Ownership controls work count; the coefficient depends on runtime regime/rank/scheduling. A dependable controllable-delta model is not yet validated.'))
  result['candidate_host_cost_probe_run']=True
  for term in result['classification']:
