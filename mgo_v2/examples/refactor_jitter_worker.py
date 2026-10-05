@@ -35,11 +35,11 @@ def main(a):
  schedule=[original_switch,.001,.001,original_switch] if case.get('gil_switch_abba') else [original_switch]*(4 if case.get('thread_affinity_abba') else 2)
  for repeat,switch_interval in enumerate(schedule,1):
   sys.setswitchinterval(switch_interval)
+  rt.reset();a.phase='MEASURE';torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
   placement=None
   if case.get('thread_affinity_abba'):
    from refactor_thread_affinity import configure
    placement=configure(cpus,rt.h2d.thread.native_id,repeat in (2,3))
-  rt.reset();a.phase='MEASURE';torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
   diag=HostDiagnostics(lambda:rt.index)
   @contextmanager
   def phase(name):

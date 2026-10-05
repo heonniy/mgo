@@ -91,3 +91,8 @@ process changes, no new buffers. Restore the original rank mask for the last
 generation. Keep default Python switch interval. Two samples each, B128 first.
 This tests migration/shared-core contention within a rank, not physical NUMA
 placement (the guest does not expose it). Record actual masks in every sample.
+
+Affinity setup audit caught that runtime reset replaces the staging thread.
+The first affinity launch was terminated during warmup before any measurements;
+it is an infrastructure FAIL, not a timing sample. Apply masks after reset
+to the live thread and record its actual affinity. Relaunch as V2.
