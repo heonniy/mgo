@@ -106,3 +106,19 @@ jitter. Preserve V2's completed baseline and affinity_midrun_audit.json.
 V3 gives staging plus its lazy copy helper two dedicated CPUs (indices1:3),
 main one CPU (index0), existing helpers the remaining21 CPUs. Main/staging
 masks remain disjoint. Validate live masks during the isolated diagnostic.
+
+### V3 outcome and clean validation
+
+All four generations passed frozen workload and output validation. Original
+TPOT 1.22180/1.42387s (15.28%); isolated TPOT 1.43599/1.39407s (2.96%).
+Actual native masks confirm two staging threads share two dedicated CPUs.
+This is only a candidate for stabilization: the original measurements bracket
+a longer time interval, and time/order effects remain confounded with masks.
+Do not claim causality or acceleration (the isolated samples were slower).
+
+Next use the existing uninstrumented BR/LA paired harness on B128/B256, with
+identical isolated masks for both policies. Apply masks after every runtime
+reset, including warmups. Two stable pairs stop; at most one third as already
+authorized. No phase hooks and no process/GPU scans during MEASURE. Record
+actual thread masks and include the helper source in the common fingerprint.
+No default change: isolated_cpu_threads is explicit in both case records.
