@@ -52,7 +52,7 @@ def state(label):
 
 
 def main(a):
-    assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery]) <= 1
+    assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery, a.cleanup_recovery, a.llama_small_confirmation]) <= 1
     queue = jobs(a.after, a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery)
     if a.cleanup_recovery:
         assert not any([a.recovery,a.deepspeed_confirmation,a.deepspeed_large_confirmation,a.llama_recovery])
@@ -65,11 +65,14 @@ def main(a):
             ('deepspeed_B16_L256_affinity2', 'DeepSpeed-ZeRO-Inference', 'deepspeed', SMALL, 'base-env', 4, False, None),
             ('deepspeed_B64_L512_confirmation2', 'DeepSpeed-ZeRO-Inference', 'deepspeed', LARGE, 'base-env', 4, False, None),
         ]
+    if a.llama_small_confirmation:
+        queue = [('llama_B16_L256_confirmation1', 'llama.cpp-layer', 'llama', SMALL, 'base-env', 1, False, None)]
     if a.dry_run:
         print(json.dumps(queue, indent=2))
         return
     assert not a.output.exists(), 'preserve the previous queue receipt'
     receipt = dict(status='WAITING', after=a.after, jobs=[], started=time.time())
+    if a.after_queue:receipt['after_queue']=str(a.after_queue)
 
     def save():
         temp = a.output.with_suffix('.tmp')
@@ -131,4 +134,5 @@ if __name__ == '__main__':
     p.add_argument('--llama-recovery', action='store_true')
     p.add_argument('--cleanup-recovery', action='store_true')
     p.add_argument('--after-queue', type=Path)
+    p.add_argument('--llama-small-confirmation', action='store_true')
     main(p.parse_args())
