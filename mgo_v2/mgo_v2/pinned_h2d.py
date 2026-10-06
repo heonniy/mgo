@@ -259,6 +259,21 @@ class PriorityH2DScheduler:
             if self.tickets.get(slot) is not t or not t.valid:return False
             if complete and t.state.state=='INFLIGHT':t.state.complete()
             return t.state.state=='READY'
+    def ready_many(self,slots):
+        # One critical section for a consistent ticket snapshot and completion
+        # updates. query() is nonblocking; no wait occurs under this lock.
+        with self.cv:
+            self._check();mask=[]
+            for slot in slots:
+                t=self.tickets.get(slot)
+                if t is None or not t.valid:mask.append(False);continue
+                if t.state.state=='INFLIGHT' and t.submitted and t.done.query():t.state.complete()
+                mask.append(t.state.state=='READY')
+            return mask
+    def record_slots_use(self,slots):
+        event=torch.cuda.Event();event.record(torch.cuda.current_stream(device=self.device))
+        with self.cv:
+            for slot in slots:self.compute_done[slot]=event
     def wait_for_slot(self,slot):
         t=self.tickets[slot];self._submitted(t)
         torch.cuda.current_stream(device=self.device).wait_event(t.done)

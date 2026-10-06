@@ -100,6 +100,8 @@ class DecodeOffloadRuntime(LiveRuntime):
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
  def compute(self,packet,e,layer):
   if self.index<48 or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
+  grouped=getattr(self,'grouped_executor',None)
+  if grouped is not None:return grouped.compute(self,packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
   groups=e['groups'];parts=[None]*len(groups)
   for i in expert_order(groups,self.h2d,getattr(self.args,'ready_first',False),self.ready_metrics):
