@@ -1,0 +1,1 @@
+First primary passes manifest coverage, raw-clock identities, Near policy, finite logits, no timed compilation, empty expert-cache start and1843 physical slots. Pinned CPU backing54GiB/rank. TTFT29.157805079s, TPOT1.438853317s, E2E119.805564050s. Remaining two repeats pending; no stability claim. Prior large attempt failed preflight without launching a model.
