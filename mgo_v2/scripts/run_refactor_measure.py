@@ -26,9 +26,19 @@ def run(stage,group):
   saved=json.loads((out/'status.json').read_text());assert saved['status']=='PASS','use a new attempt label after repair';return saved
  out.mkdir(exist_ok=True);h.write(out/'cases.json',group['cases']);receipt=PACKET/(label+'.json')
  state=dict(status='RUNNING',stage=stage,label=label,group=group,started_unix=time.time(),source_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip(),monitor='boundaries only; file polling during MEASURE')
- h.safe(h.sample(),True);env=h.env_for(group.get('environment','env1'));env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
+ def sample(pid=None):
+  row=h.sample(pid)
+  if group.get('b3_executor_study',False):
+   uuids={line.split(',')[1].strip():int(line.split(',')[0]) for line in subprocess.check_output(['nvidia-smi','--query-gpu=index,uuid','--format=csv,noheader'],text=True).splitlines()}
+   apps=[line.split(',') for line in subprocess.check_output(['nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader,nounits'],text=True).splitlines()]
+   target_pids={int(p.strip()) for uuid,p in apps if uuids[uuid.strip()] in gpus}
+   row['foreign_pids_on_other_gpus']=[p for p in row['foreign_pids'] if p not in target_pids]
+   row['foreign_pids']=[p for p in row['foreign_pids'] if p in target_pids]
+   row['gpus']=[g for g in row['gpus'] if g['gpu'] in gpus]
+  return row
+ h.safe(sample(),True);env=h.env_for(group.get('environment','env1'));env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
  if group.get('environment')=='env2':env['NCCL_DEBUG']='INFO'
- cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
+ cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/b3_measure_worker.py' if group.get('b3_executor_study') else 'examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
   from refactor_fingerprint import capture
   state['common_stack']=capture(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}',env)
@@ -52,11 +62,11 @@ def run(stage,group):
        assert paths=={'SHM'},('Env2 requires verified SHM channels',paths)
        state['transport_verification']=dict(status='PASS',observed_paths=sorted(paths),scope='NCCL initialization channel log before first MEASURE; P2P and NET absent')
       key=boundary['key'];assert len(list(out.glob(f'{key}_ready_rank*.json')))==world
-      sample=h.sample(proc.pid);h.safe(sample);state.setdefault('boundaries',[]).append(dict(key=key,sample=sample,diagnostics=boundary_diagnostics()));h.write(out/'status.json',state)
+      resource_row=sample(proc.pid);h.safe(resource_row);state.setdefault('boundaries',[]).append(dict(key=key,sample=resource_row,diagnostics=boundary_diagnostics()));h.write(out/'status.json',state)
       h.write(PACKET/'status.json',dict(status='RUNNING',stage=stage,label=label,active=boundary,started_unix=state['started_unix'],pid=proc.pid))
       (out/f'{key}_GO').touch();released.add(key);active=key
      elif time.monotonic()-last_scan>30:
-      h.safe(h.sample(proc.pid));last_scan=time.monotonic()
+      h.safe(sample(proc.pid));last_scan=time.monotonic()
     time.sleep(2)
    assert proc.returncode==0,str(out/'run.log')
    result=json.loads((out/'result.json').read_text());assert result['status']=='PASS';state.update(status='PASS',result=result)
