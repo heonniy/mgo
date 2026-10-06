@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "scope": "R4 C30 B128 decode64 H1b BR staged-vs-rank-private-full-pinned",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "pinned_bytes_per_rank": 57982058496,
+  "samples": {
+    "STAGED": [
+      {
+        "TTFT": 12.146423677913845,
+        "E2E_wall": 119.10270795132965,
+        "decode_wall": 106.96159072685987,
+        "TPOT": 1.671177734375
+      },
+      {
+        "TTFT": 11.586041297763586,
+        "E2E_wall": 117.21323144994676,
+        "decode_wall": 105.6318727452308,
+        "TPOT": 1.65037255859375
+      }
+    ],
+    "FULL_PINNED": [
+      {
+        "TTFT": 9.575397217646241,
+        "E2E_wall": 59.62485102470964,
+        "decode_wall": 50.05352701339871,
+        "TPOT": 0.7819798583984375
+      },
+      {
+        "TTFT": 10.093609708361328,
+        "E2E_wall": 60.06304535083473,
+        "decode_wall": 49.97449203860015,
+        "TPOT": 0.7807430419921875
+      }
+    ]
+  },
+  "estimates": {
+    "STAGED": {
+      "TTFT": 11.866232487838715,
+      "E2E_wall": 118.1579697006382,
+      "decode_wall": 106.29673173604533,
+      "TPOT": 1.660775146484375
+    },
+    "FULL_PINNED": {
+      "TTFT": 9.834503463003784,
+      "E2E_wall": 59.843948187772185,
+      "decode_wall": 50.01400952599943,
+      "TPOT": 0.7813614501953126
+    }
+  },
+  "gains": {
+    "TTFT": 0.17121938466292297,
+    "E2E_wall": 0.4935259268639164,
+    "decode_wall": 0.5294868552478775,
+    "TPOT": 0.5295200245202707
+  },
+  "relative_spread": {
+    "STAGED": {
+      "TTFT": 0.04722496215412725,
+      "E2E_wall": 0.015991105011113622,
+      "decode_wall": 0.012509490742678826,
+      "TPOT": 0.012527388686717503
+    },
+    "FULL_PINNED": {
+      "TTFT": 0.05269330502190978,
+      "E2E_wall": 0.007322283027686681,
+      "decode_wall": 0.001580256723018265,
+      "TPOT": 0.0015828991895375732
+    }
+  },
+  "caution": "Full pinned store allocation/copy is outside timing. Two repeats only; this is an implementation A/B before main-table runs."
+}

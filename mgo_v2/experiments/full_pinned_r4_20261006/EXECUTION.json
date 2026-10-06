@@ -1,0 +1,180 @@
+{
+  "status": "PASS",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "started_unix": 1791299204.924706,
+  "host_available_before": 1983104434176,
+  "initial_gpu_state": [
+    {
+      "gpu": 0,
+      "used_mib": 37183,
+      "temp_c": 70,
+      "util": 96
+    },
+    {
+      "gpu": 1,
+      "used_mib": 37183,
+      "temp_c": 59,
+      "util": 94
+    },
+    {
+      "gpu": 4,
+      "used_mib": 37183,
+      "temp_c": 66,
+      "util": 97
+    },
+    {
+      "gpu": 5,
+      "used_mib": 37183,
+      "temp_c": 56,
+      "util": 96
+    }
+  ],
+  "stopped_owned_idle_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "source_commit": "9e3bc39324dda84cd0065622e84caa1020b672d8",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/full_pinned_r4_worker.py",
+    "--inputs",
+    "/home/hwlee/mgo-results/full_pinned_r4_20261006/inputs_B128_H64",
+    "--output",
+    "/home/hwlee/mgo-results/full_pinned_r4_20261006"
+  ],
+  "pid": 2610640,
+  "result": {
+    "status": "PASS",
+    "scope": "R4 C30 B128 decode64 H1b BR staged-vs-rank-private-full-pinned",
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "pinned_bytes_per_rank": 57982058496,
+    "samples": {
+      "STAGED": [
+        {
+          "TTFT": 12.146423677913845,
+          "E2E_wall": 119.10270795132965,
+          "decode_wall": 106.96159072685987,
+          "TPOT": 1.671177734375
+        },
+        {
+          "TTFT": 11.586041297763586,
+          "E2E_wall": 117.21323144994676,
+          "decode_wall": 105.6318727452308,
+          "TPOT": 1.65037255859375
+        }
+      ],
+      "FULL_PINNED": [
+        {
+          "TTFT": 9.575397217646241,
+          "E2E_wall": 59.62485102470964,
+          "decode_wall": 50.05352701339871,
+          "TPOT": 0.7819798583984375
+        },
+        {
+          "TTFT": 10.093609708361328,
+          "E2E_wall": 60.06304535083473,
+          "decode_wall": 49.97449203860015,
+          "TPOT": 0.7807430419921875
+        }
+      ]
+    },
+    "estimates": {
+      "STAGED": {
+        "TTFT": 11.866232487838715,
+        "E2E_wall": 118.1579697006382,
+        "decode_wall": 106.29673173604533,
+        "TPOT": 1.660775146484375
+      },
+      "FULL_PINNED": {
+        "TTFT": 9.834503463003784,
+        "E2E_wall": 59.843948187772185,
+        "decode_wall": 50.01400952599943,
+        "TPOT": 0.7813614501953126
+      }
+    },
+    "gains": {
+      "TTFT": 0.17121938466292297,
+      "E2E_wall": 0.4935259268639164,
+      "decode_wall": 0.5294868552478775,
+      "TPOT": 0.5295200245202707
+    },
+    "relative_spread": {
+      "STAGED": {
+        "TTFT": 0.04722496215412725,
+        "E2E_wall": 0.015991105011113622,
+        "decode_wall": 0.012509490742678826,
+        "TPOT": 0.012527388686717503
+      },
+      "FULL_PINNED": {
+        "TTFT": 0.05269330502190978,
+        "E2E_wall": 0.007322283027686681,
+        "decode_wall": 0.001580256723018265,
+        "TPOT": 0.0015828991895375732
+      }
+    },
+    "caution": "Full pinned store allocation/copy is outside timing. Two repeats only; this is an implementation A/B before main-table runs."
+  },
+  "finished_unix": 1791300080.424865,
+  "host_available_after": 1991487332352,
+  "final_gpu_state": [
+    {
+      "gpu": 0,
+      "used_mib": 4,
+      "temp_c": 39,
+      "util": 0
+    },
+    {
+      "gpu": 1,
+      "used_mib": 4,
+      "temp_c": 32,
+      "util": 0
+    },
+    {
+      "gpu": 4,
+      "used_mib": 4,
+      "temp_c": 38,
+      "util": 0
+    },
+    {
+      "gpu": 5,
+      "used_mib": 4,
+      "temp_c": 33,
+      "util": 0
+    }
+  ],
+  "restored_owned_idle_models": [
+    {
+      "gpu": 0,
+      "pid": 2619349
+    },
+    {
+      "gpu": 1,
+      "pid": 2619362
+    },
+    {
+      "gpu": 4,
+      "pid": 2619375
+    },
+    {
+      "gpu": 5,
+      "pid": 2619397
+    }
+  ]
+}
