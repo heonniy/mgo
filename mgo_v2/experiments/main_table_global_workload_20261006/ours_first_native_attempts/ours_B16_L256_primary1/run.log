@@ -1,0 +1,159 @@
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=768 split_controller
+LA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controller
+
+
+LA_CA_NEAR event=1536 split_controllerLA_CA_NEAR event=1536 split_controller
+LA_CA_NEAR event=1536 split_controller
+
+LA_CA_NEAR event=1536 split_controller
+LA_CA_NEAR event=2304 split_controller
+LA_CA_NEAR event=2304 split_controllerLA_CA_NEAR event=2304 split_controller
+
+LA_CA_NEAR event=2304 split_controller
+{"status": "PASS", "repeat": 0, "TTFT": 10.552595773, "TPOT": 0.9809115531746031, "E2E": 72.350023623, "throughput": 56.613664998139484, "output_tokens": 64, "global_requests": 64, "smoke": false}
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py", line 92, in <module>
+[rank1]:     p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())
+[rank1]:                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py", line 76, in main
+[rank1]:     with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
+[rank1]:                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py", line 21, in generate_live
+[rank1]:     out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
+[rank1]:         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 918, in wrapper
+[rank1]:     output = func(self, *args, **kwargs)
+[rank1]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py", line 650, in forward
+[rank1]:     outputs: MoeModelOutputWithPast = self.model(
+[rank1]:                                       ^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 1072, in wrapper
+[rank1]:     outputs = func(self, *args, **kwargs)
+[rank1]:               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py", line 487, in forward
+[rank1]:     hidden_states = decoder_layer(
+[rank1]:                     ^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py", line 94, in __call__
+[rank1]:     return super().__call__(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+[rank1]:     return func(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/MoE-GEN/.venv/lib/python3.12/site-packages/transformers/models/qwen3_moe/modeling_qwen3_moe.py", line 359, in forward
+[rank1]:     hidden_states = self.mlp(hidden_states)
+[rank1]:                     ^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/examples/la_physical_worker.py", line 46, in forward
+[rank1]:     result=rt.execute(layer,flat,selected,weights,probs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/mgo_v2/decode_runtime.py", line 218, in execute
+[rank1]:     with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
+[rank1]:                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/mgo-main-table/mgo_v2/mgo_v2/decode_runtime.py", line 126, in compute
+[rank1]:     w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+[rank1]:                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1024, in compile_wrapper
+[rank1]:     return fn(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py", line 2316, in __call__
+[rank1]:     result = self._torchdynamo_orig_backend(
+[rank1]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py", line 729, in __call__
+[rank1]:     result = _compile(
+[rank1]:              ^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py", line 1694, in _compile
+[rank1]:     reasons = get_and_maybe_log_recompilation_reasons(
+[rank1]:               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/_dynamo/guards.py", line 4762, in get_and_maybe_log_recompilation_reasons
+[rank1]:     raise exc.RecompileError(message)
+[rank1]: torch._dynamo.exc.RecompileError: Recompiling function expert_kernel in /home/hwlee/mgo-main-table/mgo_v2/examples/env_offload_worker.py:51
+[rank1]:     triggered by the following guard failure(s):
+[rank1]:     - 0/2: 2 <= x.size()[0]  # def expert_kernel(x,gate,up,down):return F.linear(F.silu(F.linear(x,gate))*F.linear(x,up),down)  # mgo-main-table/mgo_v2/examples/env_offload_worker.py:51 in expert_kernel (user code shown is first use of this value--the guard itself is not due user code but due to 0/1 specialization in the framework; to avoid specialization try torch._dynamo.decorators.mark_unbacked(tensor, dim))
+[rank1]:     - 0/3: 2 <= gate.storage_offset()  # def expert_kernel(x,gate,up,down):return F.linear(F.silu(F.linear(x,gate))*F.linear(x,up),down)  # mgo-main-table/mgo_v2/examples/env_offload_worker.py:51 in expert_kernel (user code shown is first use of this value--the guard itself is not due user code but due to 0/1 specialization in the framework; to avoid specialization try torch._dynamo.decorators.mark_unbacked(tensor, dim))
+[rank1]:     - 0/1: tensor 'up' dispatch key set mismatch. expected DispatchKeySet(CUDA, BackendSelect), actual DispatchKeySet(CUDA, BackendSelect, ADInplaceOrView)
+[rank1]:     - 0/0: tensor 'up' dispatch key set mismatch. expected DispatchKeySet(CUDA, BackendSelect), actual DispatchKeySet(CUDA, BackendSelect, ADInplaceOrView)
+[rank1]:[W1007 02:02:09.036159418 ProcessGroupNCCL.cpp:1575] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+W1007 02:02:24.248000 2725965 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 2726012 closing signal SIGTERM
+W1007 02:02:24.250000 2725965 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 2726014 closing signal SIGTERM
+W1007 02:02:24.251000 2725965 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 2726015 closing signal SIGTERM
+E1007 02:02:48.112000 2725965 site-packages/torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 1 (pid: 2726013) of binary: /home/hwlee/sub-moe/phase01/.venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 994, in <module>
+    main()
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-07_02:02:48
+  host      : cloud-0n58xq
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 2726012)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 2726012
+[2]:
+  time      : 2026-10-07_02:02:48
+  host      : cloud-0n58xq
+  rank      : 2 (local_rank: 2)
+  exitcode  : -15 (pid: 2726014)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 2726014
+[3]:
+  time      : 2026-10-07_02:02:48
+  host      : cloud-0n58xq
+  rank      : 3 (local_rank: 3)
+  exitcode  : -15 (pid: 2726015)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 2726015
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-07_02:02:24
+  host      : cloud-0n58xq
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 2726013)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
