@@ -1,7 +1,7 @@
 {
-  "status": "FAIL",
-  "stage": "B4_C30_CLEAN_RETRY1",
-  "label": "B4_C30_CLEAN_RETRY1_B128_H64",
+  "status": "PASS",
+  "stage": "B5_C30_CLEAN",
+  "label": "B5_C30_CLEAN_B128_H64",
   "group": {
     "environment": "env1",
     "world": 4,
@@ -15,12 +15,12 @@
     "horizon": 64,
     "paired": true,
     "b3_executor_study": true,
-    "b4_measure": true,
+    "b5_measure": true,
     "cases": [
       {
-        "label": "BR",
+        "label": "BR_POST_EXPERT_BARRIER",
         "policy": "BR",
-        "executor": "H2",
+        "executor": "H1b",
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
@@ -31,12 +31,13 @@
         "unique_combine": true,
         "async_metadata_inputs": true,
         "isolated_cpu_threads": true,
-        "fixed_staging_team": true
+        "fixed_staging_team": true,
+        "post_expert_barrier": true
       },
       {
-        "label": "FCA",
+        "label": "FCA_POST_EXPERT_BARRIER",
         "policy": "FCA",
-        "executor": "H2",
+        "executor": "H1b",
         "P": 2,
         "trigger": "T2",
         "horizon": 64,
@@ -47,12 +48,13 @@
         "unique_combine": true,
         "async_metadata_inputs": true,
         "isolated_cpu_threads": true,
-        "fixed_staging_team": true
+        "fixed_staging_team": true,
+        "post_expert_barrier": true
       }
     ]
   },
-  "started_unix": 1791261238.7257838,
-  "source_sha": "6cd0db144297b3e11e7f6b927480da4745ef7736",
+  "started_unix": 1791265743.8358223,
+  "source_sha": "03fff7805da84acc481a1edac831b9ab8a5d8f1d",
   "monitor": "boundaries only; file polling during MEASURE",
   "common_stack": {
     "code": {
@@ -78,7 +80,7 @@
       "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
       "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
       "mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
-      "mgo_v2/decode_runtime.py": "0c5efbfd6bd2bbc31e1413277aa87cc7a8248e5a747457325620be1184e59c6b",
+      "mgo_v2/decode_runtime.py": "14ad28d58a05652a0bacca31a6c7db3ca4bdeb8ff22df2abc31dea906856d009",
       "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
       "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
       "mgo_v2/fanout_admission.py": "17e75ace440c9201b6da7d224b63d894961a1d0e87d7ec15b851c59843ebac86",
@@ -98,7 +100,7 @@
       "mgo_v2/rank_oracle.py": "a6995879d072dc11963925e4ce8cada340d6d0ada6af690bac9974f834e41cf7",
       "mgo_v2/ready_compute.py": "6f8f2fe4ca34c995483c5483334d0d09e8571f42ef1be243212df49e89fe636b",
       "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
-      "mgo_v2/selected_runtime.py": "998ed913fcd606421b96237b358608d2a18cbf2eaf7e4a7dd85a3a5871ec18db",
+      "mgo_v2/selected_runtime.py": "e3b83826c30f85cb669800413b104624eb5a6ea6b9d1195ccde855c287f5e098",
       "mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
       "mgo_v2/staging_cpu_team.py": "40c2a8a17aa75ea7d85ff6f9aac074974a2e922d02f014911fdc6b35679dcb30",
       "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
@@ -113,7 +115,9 @@
       "scripts/old_ca_fanout_policy.py": "ef0492d0f403fad7dca41b70b5916a70ac3b28ff01c7ff962b30ca6fc2724ffc",
       "scripts/refactor_thread_affinity.py": "1ec8e0c02b0524a6331e18215c0870466766ca102530ceba4fba83b7a309d7e0",
       "scripts/refactor_thread_usage.py": "2e223886568fb3a1303a04b921d19e23bc19da7509d36bf347e7b3b99f423510",
-      "examples/b3_measure_worker.py": "edf820b9cfaac3f1d08a3956ad9e734d0863ec4e6f3c4f15a41f2d2c7f2ea4e2",
+      "examples/b5_measure_worker.py": "cc521b5473fb6363a54d018986e53edff81fe560efc954a60470f47cce91761e",
+      "scripts/run_b5_measure.py": "00fa67627b13270301019bb527da57819b6331cc4556c0cc9bd5874f791d8624",
+      "examples/b3_measure_worker.py": "0ff387ec3b72d86325290de07feb45e0f6bbee77d8c304f671b244b276293d4f",
       "examples/b4_correctness_worker.py": "8f4043cc383c87cb14f8230fe2ed9ee3c08a3c1ed3a34545b19bee603c835aaf",
       "examples/b4_measure_worker.py": "7e8e48d01fc0d0b6ab5cad725b7b3dd3d8744412d50dccb619d2d0cb993b1298",
       "scripts/physical_repeat_rule.py": "1822adc9726fae4899d68a7177b4a03145d075aca7573ecaf6a86da9e0e635d2",
@@ -144,12 +148,14 @@
     "precision": "bf16",
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
-  "pid": 2052643,
+  "pid": 2117082,
   "completed": [
     "BR_H1b_r1",
-    "FCA_H1b_r1"
+    "FCA_H1b_r1",
+    "FCA_H1b_r2",
+    "BR_H1b_r2",
+    "FCA_H1b_r3"
   ],
-  "error": "AssertionError('/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CLEAN_RETRY1_B128_H64/run.log')",
-  "exit_code": 1,
-  "finished_unix": 1791262273.734979
+  "exit_code": 0,
+  "finished_unix": 1791267227.1062737
 }
