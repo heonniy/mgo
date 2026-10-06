@@ -43,7 +43,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   super().reset()
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena
-  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0
+  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0;self.h2d_global_barriers=0
   self.transport=FusedTokenRankTransport('exact')
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
@@ -131,6 +131,51 @@ class DecodeOffloadRuntime(LiveRuntime):
    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
    fused=getattr(self.args,'fused',False) and self.index>=48
    overlap=getattr(self.args,'streaming',False) and self.index>=48
+   if getattr(self.args,'strict_serialized_phases',False):
+    # Characterization substrate:
+    # required H2D -> all-rank H2D barrier -> forward dispatch -> expert compute
+    # -> all-rank compute barrier -> return communication.  No speculative
+    # prefetch and no H2D/compute/communication overlap are permitted.
+    assert getattr(self.args,'arena_budget',0)==0
+    with nvtx_phase('moe.strict_demand_h2d'):self.apply_fetches(e)
+    fetch_slots=[slot for _,slot,_,_ in e['fetches']]
+    with nvtx_phase('moe.strict_h2d_local_complete'):
+     if isinstance(self.h2d,PriorityH2DScheduler):
+      if fetch_slots:self.h2d.wait_slots(fetch_slots,host=True)
+     else:self.h2d.synchronize()
+     torch.cuda.current_stream().synchronize()
+    with nvtx_phase('moe.strict_h2d_global_barrier'):
+     dist.barrier();torch.cuda.current_stream().synchronize()
+    self.h2d_global_barriers+=1
+    if fused:
+     before=self.transport.calls
+     with nvtx_phase('moe.strict_forward_a2a'):
+      pending=self.transport.forward(hidden,dense,e,async_op=True)
+      received,rw,recv_ids=pending.finish();packet=('current',received,recv_ids,rw)
+    else:
+     with nvtx_phase('moe.strict_forward_a2a'):packet=self.dispatch(hidden,dense,e)
+    with nvtx_phase('moe.strict_expert_compute'):values=self.compute(packet,e,layer)
+    with nvtx_phase('moe.strict_compute_local_complete'):torch.cuda.current_stream().synchronize()
+    with nvtx_phase('moe.strict_compute_global_barrier'):
+     dist.barrier();torch.cuda.current_stream().synchronize()
+    self.post_expert_barriers+=1
+    if fused:
+     with nvtx_phase('moe.strict_return_a2a'):
+      precision=getattr(self.args,'partial_precision',None)
+      if precision:result=combine_rank_partials(self.transport,hidden,values,e,{'bf16':torch.bfloat16,'fp32':torch.float32,'fp64':torch.float64}[precision],unique_rows=getattr(self.args,'unique_combine',False))
+      else:result=self.transport.combine(hidden,values,e)
+     assert self.transport.calls-before==2
+    else:
+     with nvtx_phase('moe.strict_return_a2a'):result=self.combine(hidden,values,e,packet[0])
+    self.index+=1
+    if self.args.phase!='MEASURE':
+     self.arena.assert_consistent()
+     assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
+     self.actual_h2d_bytes=self.h2d.metrics['bytes'] if hasattr(self.h2d,'metrics') else self.actual_h2d_bytes
+    if self.index==48:
+     self.arena.assert_consistent();assert not self.arena.reservations and np.all(self.keys[self.cap:]<0)
+     self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
+    return result
    if fused:
     before=self.transport.calls;trigger=getattr(self.args,'trigger','T1')
     if overlap:
