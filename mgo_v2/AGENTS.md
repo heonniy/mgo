@@ -1,3 +1,14 @@
+**B5 COMPLETE (2026-10-06), including owner-added OLD_CA.**
+Read `experiments/critical_path_admission_followup_20261006/B5_RESULTS.md`
+and `B5_OLD_CA_RESULTS.md`. C30/B128/H64 H1b post-expert barrier:
+BR TPOT 1.481771 s (2 repeats), FCA 1.542861 s (3-repeat median),
+OLD_CA 1.516545 s (2 repeats). All canonical tokens/copies/traffic and
+3072-barrier/rank checks passed; no OOM. Separate first8 BR/FCA diagnostics
+passed. OLD_CA was a sequential addition, not interleaved with BR/FCA.
+All valid samples are retained. Owned model loads restored only to GPUs
+0,1,4,5. Do not auto-repeat, extend matrix axes or launch the newly merged
+prefill/decode headroom plan without an owner execution request.
+
 **B5 OWNER POLICY ADDITION (2026-10-06, chat):** Add OLD_CA in the same
 C30/local B128/decode64/H1b/post-expert-barrier setting after active BR/FCA
 work. Reuse frozen input and canonical OLD_CA CPU/physical receipts. One

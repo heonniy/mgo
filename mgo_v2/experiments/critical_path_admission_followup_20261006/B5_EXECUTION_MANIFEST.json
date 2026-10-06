@@ -1,5 +1,5 @@
 {
-  "status": "RUNNING",
+  "status": "COMPLETE",
   "plan_commit": "528da2d6f22698cd85899b7ed7ecde0b748ee1c5",
   "execution_commit": "03fff78",
   "owner_authorization": "2026-10-06 chat: \uc5c9 \uc2e4\ud5d8\ud574\uc918",
@@ -23,5 +23,7 @@
   "repeat_rule": "2 first; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat",
   "correctness": "Compare canonical B3 full64 tokens/controller/physical copies/bytes/traffic, plus 3072 barriers per rank. Preserve receipts on failure. Diagnostic also matches canonical B4 H1b first8 copy counters.",
   "scope": "No H0 primary cells, H2, C60, R8 or Stage C. No scientific retry after a copy mismatch.",
-  "resource_policy": "Existing guards; owned idle workers only paused/restored. Other GPU jobs are not modified."
+  "resource_policy": "Existing guards; owned idle workers only paused/restored. Other GPU jobs are not modified.",
+  "old_ca_extension": "B5_OLD_CA_RESULTS.md",
+  "resource_restoration": "B5_RESOURCE_RESTORATION.json"
 }
