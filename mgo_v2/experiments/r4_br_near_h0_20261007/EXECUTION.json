@@ -1,0 +1,44 @@
+{
+  "status": "FAIL",
+  "started_unix": 1791301465.8156567,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "source_commit": "ec47086cdc4322cd8272a82317a769de7d658615",
+  "completed_cells": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/r4_br_near_h0_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/r4_br_near_h0_20261007"
+  ],
+  "pid": 2654310,
+  "error": "AssertionError('see run.log')",
+  "finished_unix": 1791301584.8847704,
+  "restored_owned_idle_models": [
+    {
+      "gpu": 0,
+      "pid": 2655355
+    },
+    {
+      "gpu": 1,
+      "pid": 2655366
+    },
+    {
+      "gpu": 4,
+      "pid": 2655386
+    },
+    {
+      "gpu": 5,
+      "pid": 2655409
+    }
+  ]
+}

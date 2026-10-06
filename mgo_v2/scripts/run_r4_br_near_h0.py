@@ -22,6 +22,10 @@ def main():
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0'
   cmd=[common.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',str(P/'examples/r4_br_near_h0_worker.py'),'--output',str(ROOT)]
+  # B16/B64 frozen-gate metadata parity is checked before loading the model.
+  with (ROOT/'metadata_preflight.log').open('w') as testlog:
+   subprocess.run([common.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',str(P/'scripts/test_async_metadata.py')],env=env,stdout=testlog,stderr=subprocess.STDOUT,timeout=120,check=True)
+  state['metadata_preflight']='PASS'
   state['command']=cmd
   with (ROOT/'run.log').open('w') as log:
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(ROOT/'status.json',state);released=set()

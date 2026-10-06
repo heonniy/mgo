@@ -6,7 +6,7 @@ import torch.distributed as dist
 
 class CompactMetadata:
  def __init__(self,batch,topk=8,experts=128,window=128,async_inputs=False):
-  if batch<window:raise ValueError('compact primary path requires batch >= Gate window')
+  if batch<=0:raise ValueError('compact metadata requires a positive batch')
   self.batch=batch;self.topk=topk;self.experts=experts;self.window=window
   self.world=dist.get_world_size();self.rank=dist.get_rank();self.header_bytes=24
   self.ids_end=24+batch*topk;self.record_bytes=self.ids_end+experts*4
@@ -23,6 +23,8 @@ class CompactMetadata:
    self.gate_host=torch.empty(experts,dtype=torch.float32,pin_memory=True)
   self.calls=0
  def collect(self,event,selected,probs,frozen_gate=None):
+  if frozen_gate is None and self.batch<self.window:
+   raise ValueError('batch below Gate window requires frozen gate scores; live rolling history is not implemented')
   if tuple(selected.shape)!=(self.batch,self.topk):raise ValueError('fixed-batch metadata shape mismatch')
   if self.async_inputs:
    # collect is serial: its blocking receive-to-host copy completes every
