@@ -31,7 +31,15 @@ def generate(engine,ids,n):
 
 def main(a):
  rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
+ physical=[0,1,4,5]
+ cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
+ # Match the existing GPU-local CPU placement used by OURS. Apply before
+ # pinned parameter allocation so first-touch placement is local as well.
+ for task in Path('/proc/self/task').iterdir():
+  try:os.sched_setaffinity(int(task.name),cpus)
+  except FileNotFoundError:pass
  torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
+ write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='gpu-local fixed CPU range before model/pinned allocation'))
  deepspeed.init_distributed();assert dist.get_world_size()==4
  spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
@@ -83,7 +91,7 @@ def main(a):
   gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
   if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   live_peak[0]=0
-  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,kv_gpu_resident=True,cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
+  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
   write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(r['release_ns'] for r in rr))==1
