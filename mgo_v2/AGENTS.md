@@ -1,3 +1,9 @@
+**OWNER QUICK FETCH EXECUTION: f9d5725c (2026-10-06).**
+Run experiments/quick_fetch_path_20261006/PLAN.md on GPUs 0,1,4,5 only.
+Three measured repeats follow the committed harness. Preserve failed attempts.
+This is the short expert-fetch microbenchmark; the full main-table matrix
+remains a separate draft. Do not resume strict R8 or the held Static queue.
+
 **OWNER STRICT HEADROOM EXECUTION (2026-10-06): latest82b093db authorized.**
 Prioritize `experiments/strict_laca_headroom_20261006/PLAN.md`: C30 strict
 TTFT, R4/R8 x B16/B64 x L256/L512, BR vs LA_CA_NEAR and selected-seed LA.

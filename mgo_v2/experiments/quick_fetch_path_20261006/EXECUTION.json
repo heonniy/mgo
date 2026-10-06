@@ -1,0 +1,76 @@
+{
+  "status": "FAIL",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "started_unix": 1791297621.819773,
+  "initial": [
+    {
+      "gpu": 0,
+      "memory_used_mib": 4,
+      "temperature_c": 51,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 1,
+      "memory_used_mib": 4,
+      "temperature_c": 39,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 4,
+      "memory_used_mib": 4,
+      "temperature_c": 51,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 5,
+      "memory_used_mib": 4,
+      "temperature_c": 40,
+      "utilization_gpu": 0
+    }
+  ],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/quick_fetch_path_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/quick_fetch_path_20261006"
+  ],
+  "pid": 2581326,
+  "error": "AssertionError('/home/hwlee/mgo-results/quick_fetch_path_20261006/run.log')",
+  "finished_unix": 1791297626.3089192,
+  "final": [
+    {
+      "gpu": 0,
+      "memory_used_mib": 4,
+      "temperature_c": 47,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 1,
+      "memory_used_mib": 4,
+      "temperature_c": 37,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 4,
+      "memory_used_mib": 4,
+      "temperature_c": 48,
+      "utilization_gpu": 0
+    },
+    {
+      "gpu": 5,
+      "memory_used_mib": 4,
+      "temperature_c": 38,
+      "utilization_gpu": 0
+    }
+  ]
+}

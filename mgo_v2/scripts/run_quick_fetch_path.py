@@ -6,7 +6,7 @@ import os,time,subprocess,signal,json
 from pathlib import Path
 
 P=Path(__file__).resolve().parents[1]
-ROOT=Path('/home/hwlee/mgo-results/quick_fetch_path_20261006')
+ROOT=Path(os.environ.get('MGO_QUICK_FETCH_ROOT','/home/hwlee/mgo-results/quick_fetch_path_20261006'))
 PACKET=P/'experiments/quick_fetch_path_20261006'
 PYTHON='/home/hwlee/sub-moe/phase01/.venv/bin/python'
 GPUS=[0,1,4,5]
@@ -37,7 +37,7 @@ def main():
  foreign=foreign_target_processes()
  if foreign:raise RuntimeError(f'foreign process on owned target GPU(s): {foreign}')
  # Keep this microbench standalone: no model process manipulation and never touch 2,3,6,7.
- env=dict(os.environ,PYTHONPATH=f'{P}:{P/"scripts"}:{P/"examples"}',
+ env=dict(os.environ,PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{P}:{P/"scripts"}:{P/"examples"}',
   CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',
   OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
  cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',

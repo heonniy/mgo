@@ -16,7 +16,7 @@ The direct-pinned path is an upper-bound microbenchmark. It does NOT pin the ful
 - pair01 and pair23
 - all4
 - burst sizes 1,8,16,32 experts
-- 1 warmup + 5 measured repeats
+- 1 warmup + 3 measured repeats
 
 No model forward, no GEMM, no NCCL payload communication.
 

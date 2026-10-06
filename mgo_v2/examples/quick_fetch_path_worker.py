@@ -8,7 +8,7 @@ compares:
 
 Measured conditions:
   isolated rank 0/1/2/3, pairs (0,1)/(2,3), all four ranks.
-Burst sizes: 1, 8, 16, 32 experts.  Five measured repeats after one warmup.
+Burst sizes: 1, 8, 16, 32 experts.  Three measured repeats after one warmup.
 """
 import os
 os.environ['CUBLAS_WORKSPACE_CONFIG']=':4096:8'
