@@ -216,7 +216,7 @@ class PriorityH2DScheduler:
     def _worker(self):
         try:
             torch.cuda.set_device(self.device)
-            if self.cpu_team is not None:
+            if self.cpu_team is not None and not self.direct_pinned:
                 from .staging_cpu_team import initialize
                 self.cpu_team_receipt=initialize(self.stages[0],self.cpu_team)
             self.startup_done.set()
