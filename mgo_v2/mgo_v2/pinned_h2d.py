@@ -95,7 +95,7 @@ class CopyTicket:
         self.begin=torch.cuda.Event(enable_timing=True) if profile else None
         self.submitted=False;self.staging=False;self.counted=True
         self.previous_copy=None;self.previous_compute=None
-        self.queued_at=time.perf_counter();self.submitted_at=None
+        self.queued_at=time.perf_counter();self.submitted_at=None;self.staging_started_at=None;self.staging_finished_at=None
 
 class PriorityH2DScheduler:
     """One CPU staging worker, bounded pinned stages, urgent-before-background.
@@ -205,7 +205,9 @@ class PriorityH2DScheduler:
                 with self.cv:
                     t=self._pop()
                     if t is None:continue
+                if self.profile:t.staging_started_at=time.perf_counter()
                 copy_expert_to_stage(self.stages[sid],t.tensors,self.staging_backend)
+                if self.profile:t.staging_finished_at=time.perf_counter()
                 with self.cv:
                     t.staging=False
                     if t.state.state=='EMPTY':self.cv.notify_all();continue
