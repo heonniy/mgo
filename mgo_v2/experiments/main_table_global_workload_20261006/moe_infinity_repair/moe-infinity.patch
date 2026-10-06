@@ -189,6 +189,37 @@ index 9f26cfd..381a0eb 100644
    std::vector<cudaStream_t> fetch_streams_;
  
    std::unique_ptr<std::atomic<bool>[]> gpu_overload_;
+diff --git a/core/parallel/expert_module.cpp b/core/parallel/expert_module.cpp
+index eb3325d..4c52489 100644
+--- a/core/parallel/expert_module.cpp
++++ b/core/parallel/expert_module.cpp
+@@ -232,9 +232,23 @@ torch::Tensor MoEMLP::forward(torch::Tensor hidden_states, cudaStream_t stream,
+   int64_t batch_size = hidden_states.size(0);
+   int64_t hdim = hidden_states.size(1);
+ 
+-  DLOG_FATAL_IF(batch_size > kMaxTokens || batch_size <= 0,
+-                "batch_size should be (0,", kMaxTokens, "] , but got",
+-                batch_size);
++  TORCH_CHECK(batch_size > 0, "expert batch must be nonempty");
++  // A global256/input512 prefill has 131072 tokens and top8 routing.
++  // Its mean expert load already equals kMaxTokens=8192. Process skewed
++  // experts in bounded chunks without growing every worker's scratch arena.
++  if (batch_size > kMaxTokens) {
++    auto result = torch::empty_like(hidden_states);
++    if (kernel_start != nullptr) CUDA_CHECK(cudaEventRecord(kernel_start, stream));
++    for (int64_t begin = 0; begin < batch_size; begin += kMaxTokens) {
++      const auto count = std::min(kMaxTokens, batch_size - begin);
++      param_set_ = true;  // Same leased expert weights for every chunk.
++      auto part = forward(hidden_states.narrow(0, begin, count), stream,
++                          nullptr, nullptr);
++      result.narrow(0, begin, count).copy_(part);
++    }
++    if (kernel_stop != nullptr) CUDA_CHECK(cudaEventRecord(kernel_stop, stream));
++    return result;
++  }
+   TORCH_CHECK(hidden_states.scalar_type() == input_.scalar_type(),
+               "hidden_states dtype must match expert input dtype");
+ 
 diff --git a/core/prefetch/archer_prefetch_handle.cpp b/core/prefetch/archer_prefetch_handle.cpp
 index 8406e61..5c7bf57 100644
 --- a/core/prefetch/archer_prefetch_handle.cpp

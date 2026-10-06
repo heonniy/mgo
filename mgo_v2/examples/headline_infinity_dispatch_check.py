@@ -36,7 +36,7 @@ def main(a):
     for gpu in range(4):
         assert handle.set_expert_budget(gpu, 4 * 3 * 128 * 128 * 2)
     receipts = []
-    for rows in (1, 17):
+    for rows in (1, 17, 8193):
         cpu = torch.randn(rows, 128, dtype=torch.bfloat16) / 4
         for gpu in (1, 3, 0, 2):
             # Leave the caller's default device on zero while tensors and their
