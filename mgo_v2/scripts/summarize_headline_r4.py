@@ -60,6 +60,7 @@ def audit(job,spec):
     assert row['cache_after']['peak_accounted_bytes']<=17392730112
     for gpu,budget in enumerate(row['expert_budget_per_gpu']):assert row['cache_after'][f'gpu_{gpu}_peak_charged_bytes']<=budget
    else:
+    assert '--no-op-offload' in read(job/'config.json')['command'],'host expert op offload invalidates static GPU budget accounting'
     actual=[r['request_id'] for r in row['requests']]
     assert row['expert_resident_bytes']<=17392730112
     for request in row['requests']:

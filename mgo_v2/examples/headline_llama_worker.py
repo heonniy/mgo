@@ -1,5 +1,5 @@
 """Native llama.cpp layer split with exact-token readiness timestamps."""
-import argparse,concurrent.futures,json,os,socket,subprocess,threading,time,urllib.request
+import argparse,concurrent.futures,json,os,re,socket,subprocess,threading,time,urllib.request
 from pathlib import Path
 import psutil
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
@@ -15,8 +15,9 @@ def main(a):
  spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
  count=4 if a.smoke else spec['local_batch']*4;length=32 if a.smoke else spec['input_tokens'];n=2 if a.smoke else 64
  sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close();url=f'http://127.0.0.1:{port}'
- cmd=[str(TOOLS/'llama.cpp/build/bin/llama-server'),'-m',str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),'--host','127.0.0.1','--port',str(port),'--split-mode','layer','--n-gpu-layers','999','--n-cpu-moe','34','--parallel',str(count),'--ctx-size',str(count*(length+n+8)),'--cache-ram','0','--cache-reuse','0','--threads','32','--threads-batch','64','--threads-http','16','--batch-size','2048','--ubatch-size','512','--no-context-shift']
- write(a.output/'config.json',dict(command=cmd,global_expert_slots=14*128,expert_bytes=14*128*9*2**20,expert_budget_bytes=17392730112,cache_mode='static layer weights; no prompt reuse',eos_semantics='continue after EOS without suppressing its logit'))
+ cmd=[str(TOOLS/'llama.cpp/build/bin/llama-server'),'-m',str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),'--host','127.0.0.1','--port',str(port),'--split-mode','layer','--n-gpu-layers','999','--n-cpu-moe','34','--parallel',str(count),'--ctx-size',str(count*(length+n+8)),'--cache-ram','0','--cache-reuse','0','--threads','32','--threads-batch','64','--threads-http','16','--batch-size','2048','--ubatch-size','512','--no-context-shift','--no-op-offload']
+ if a.smoke:cmd+=['--log-verbosity','4']
+ write(a.output/'config.json',dict(command=cmd,global_expert_slots=14*128,expert_bytes=14*128*9*2**20,expert_budget_bytes=17392730112,cache_mode='static layer weights; no prompt reuse; host expert op offload disabled',eos_semantics='continue after EOS without suppressing its logit'))
  with (a.output/'server.log').open('w') as log:
   server=subprocess.Popen(cmd,stdout=log,stderr=subprocess.STDOUT,env=dict(os.environ,MGO_HEADLINE_CONTINUE_EOG="1"))
   try:
@@ -28,6 +29,11 @@ def main(a):
     except Exception:pass
     if time.monotonic()>deadline:raise TimeoutError('server startup')
     time.sleep(1)
+   if a.smoke:
+    lines=(a.output/'server.log').read_text().splitlines()
+    kv_lines=[line for line in lines if 'KV buffer size =' in line]
+    assert kv_lines and all(re.search(r'CUDA[0-3] KV buffer size',line) for line in kv_lines),kv_lines
+    write(a.output/'kv_placement.json',dict(status='PASS',evidence='actual smoke startup allocations',buffers=kv_lines,scope='smoke shape; primary placement uses the same all-layer GPU assignment'))
    for repeat in range((1 if a.smoke else 3)+1):
     phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests'][:count]
     write(a.output/'phase.json',dict(system='llama.cpp-layer',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))

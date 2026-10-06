@@ -1,0 +1,1 @@
+Stopped during first primary: default host-op offload permits copying CPU expert weights into GPU temporary buffers, so static14-layer budget accounting is not sufficient. No primary headline result. Warmup and stop receipts preserved. Corrected run must use --no-op-offload.
