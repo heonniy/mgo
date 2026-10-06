@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "moe_runtime_fingerprint_entries": 158,
+  "runtime_fingerprint_equal": true,
+  "patched_files": [
+    "core/memory/event_pool.h",
+    "core/model/model_topology.cpp",
+    "core/parallel/expert_dispatcher.cpp",
+    "core/parallel/expert_dispatcher.h",
+    "core/parallel/expert_module.cpp",
+    "core/prefetch/archer_prefetch_handle.cpp",
+    "core/prefetch/archer_prefetch_handle.h",
+    "core/prefetch/expert_residency.cpp",
+    "core/prefetch/expert_residency.h",
+    "core/python/py_archer_prefetch.cpp",
+    "moe_infinity/distributed/expert_executor.py",
+    "moe_infinity/entrypoints/big_modeling.py",
+    "moe_infinity/memory/expert_predictor.py",
+    "moe_infinity/memory/expert_prefetcher.py",
+    "moe_infinity/memory/expert_tracer.py",
+    "moe_infinity/runtime/model_offload.py",
+    "tests/cpp/unit/prefetch/test_expert_residency.cpp",
+    "tests/python/unit/test_eam_repair.py"
+  ],
+  "archive_patch_sha256": "cad758d7f05057f7cc81038caf03f7dc6db36dff4031913243ba669ac115bd9b",
+  "current_diff_sha256": "cad758d7f05057f7cc81038caf03f7dc6db36dff4031913243ba669ac115bd9b",
+  "patch_exact_match": true,
+  "eam_tests": 9,
+  "native_residency_tests": 15,
+  "notes": [
+    "Fingerprint receipts compare the two launched runs; they are not a new scan of all binaries during timing.",
+    "Existing CPU/GPU regression receipts were inspected, not rerun.",
+    "Final MoE small-cell confirmation remains running.",
+    "moe-store patch reversibility checked with --dry-run; no installed files changed."
+  ],
+  "llama_patch_exact_match": true,
+  "llama_patch_sha256": "3007cd983cdf0b09f81e96cf43e2934f585b7de0d5ab64407ef05e025484b088",
+  "llama_current_diff_sha256": "3007cd983cdf0b09f81e96cf43e2934f585b7de0d5ab64407ef05e025484b088",
+  "moe_store_reverse_patch_dry_run": "PASS"
+}
