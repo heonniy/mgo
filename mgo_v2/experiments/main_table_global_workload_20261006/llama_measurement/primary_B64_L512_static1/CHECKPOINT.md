@@ -1,0 +1,1 @@
+Warmup complete: all256 requests,512 input tokens,64 output tokens, no truncation; native timestamps monotonic and after release. TTFT374.060531308s, TPOT0.414032206349s, E2E400.144560308s. This is warmup only, not a primary measurement. Three primaries are in progress.
