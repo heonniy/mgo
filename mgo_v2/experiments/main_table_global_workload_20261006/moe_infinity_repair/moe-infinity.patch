@@ -1,0 +1,584 @@
+diff --git a/core/prefetch/archer_prefetch_handle.cpp b/core/prefetch/archer_prefetch_handle.cpp
+index 8406e61..5c7bf57 100644
+--- a/core/prefetch/archer_prefetch_handle.cpp
++++ b/core/prefetch/archer_prefetch_handle.cpp
+@@ -127,6 +127,16 @@ ExpertPolicyStats ArcherPrefetchHandle::GetExpertPolicyStats() const {
+   return kExpertResidencyManager->Snapshot();
+ }
+ 
++bool ArcherPrefetchHandle::ClearExpertCacheQuiescent(int device_id) {
++  return kExpertResidencyManager->ClearQuiescent(device_id);
++}
++
++bool ArcherPrefetchHandle::SetExpertBudget(int device_id, std::int64_t bytes) {
++  if (!kExpertResidencyManager->ConfigureCapacity(device_id, bytes)) return false;
++  kTopologyHandle->SetSparseCacheLimitOverride(device_id, bytes);
++  return true;
++}
++
+ void ArcherPrefetchHandle::ResetCache() {
+   // Non-terminal reset (BM3 ablation): drop pending prefetch work so a prior
+   // arm's route-ahead band cannot leak into the next, without tearing down the
+@@ -302,6 +312,16 @@ void ArcherPrefetchHandle::PrefetchTensors(
+   }
+ }
+ 
++void ArcherPrefetchHandle::ReplaceExpertPriorities(
++    const std::vector<std::uint32_t>& tensor_ids, const std::vector<double>& scores) {
++  if (tensor_ids.size() != scores.size())
++    throw std::invalid_argument("expert priorities length mismatch");
++  std::vector<std::pair<NodePtr, double>> priorities;
++  for (std::size_t i = 0; i < scores.size(); ++i)
++    priorities.emplace_back(kTopologyHandle->GetNodeFromTensorID(tensor_ids[i]), scores[i]);
++  kExpertResidencyManager->ReplacePriorities(priorities);
++}
++
+ void ArcherPrefetchHandle::ReplaceCacheCandidates(
+     const std::vector<std::uint32_t>& tensor_ids) {
+   std::vector<NodePtr> candidates;
+diff --git a/core/prefetch/archer_prefetch_handle.h b/core/prefetch/archer_prefetch_handle.h
+index 3c0fdf1..713a776 100644
+--- a/core/prefetch/archer_prefetch_handle.h
++++ b/core/prefetch/archer_prefetch_handle.h
+@@ -103,6 +103,10 @@ class ArcherPrefetchHandle {
+ 
+   void CleanUpResources();
+   void ResetCache();
++  bool ClearExpertCacheQuiescent(int device_id);
++  bool SetExpertBudget(int device_id, std::int64_t bytes);
++  void ReplaceExpertPriorities(const std::vector<std::uint32_t>& tensor_ids,
++                               const std::vector<double>& scores);
+ 
+   std::unordered_map<std::string, std::int64_t> ResizeExpertCache(
+       int device_id, std::int64_t target_bytes);
+diff --git a/core/prefetch/expert_residency.cpp b/core/prefetch/expert_residency.cpp
+index 3ae75c1..018ffc5 100644
+--- a/core/prefetch/expert_residency.cpp
++++ b/core/prefetch/expert_residency.cpp
+@@ -1,3 +1,5 @@
++#include <cmath>
++#include <stdexcept>
+ // Copyright (c) EfficientMoE.
+ // SPDX-License-Identifier: Apache-2.0
+ 
+@@ -141,6 +143,7 @@ std::uint32_t ExpertResidencyManager::NodeLeaseCount(
+ NodePtr ExpertResidencyManager::SelectVictim(const GpuState& state,
+                                              std::int64_t needed_bytes) const {
+   NodePtr victim;
++  double best_priority = 0;
+   std::size_t best_last_access = static_cast<std::size_t>(-1);
+   for (const auto& entry : state.entries) {
+     if (!entry.node || entry.state != ResidencyState::ACTIVE) continue;
+@@ -151,8 +154,12 @@ NodePtr ExpertResidencyManager::SelectVictim(const GpuState& state,
+       continue;
+     }
+     if (entry.bytes < needed_bytes) continue;
+-    if (!victim || entry.node->last_access_time < best_last_access) {
++    const auto it = priorities_.find(entry.node->id);
++    const double priority = it == priorities_.end() ? 0.0 : it->second;
++    if (!victim || std::tie(priority, entry.node->last_access_time, entry.node->id) <
++                   std::tie(best_priority, best_last_access, victim->id)) {
+       victim = entry.node;
++      best_priority = priority;
+       best_last_access = entry.node->last_access_time;
+     }
+   }
+@@ -269,6 +276,11 @@ ResidencyTicket ExpertResidencyManager::BeginAdmission(
+       }
+       return ticket;
+     }
++    if (source == AdmissionSource::PREFETCH && !priorities_.empty()) {
++      const double incoming_score = priorities_.count(incoming.node->id) ? priorities_.at(incoming.node->id) : 0;
++      const double victim_score = priorities_.count(victim->id) ? priorities_.at(victim->id) : 0;
++      if (incoming_score <= victim_score) return ticket;
++    }
+     ticket.reserved_victim = victim;
+     if (auto* victim_entry = FindEntry(state, victim->id)) {
+       ticket.reserved_victim_key = victim_entry->key;
+@@ -585,6 +597,34 @@ void ExpertResidencyManager::ReplaceProtectedVariants(
+   protected_variants_ = candidates;
+ }
+ 
++bool ExpertResidencyManager::ClearQuiescent(int gpu_id) {
++  std::lock_guard<std::mutex> lock(mutex_);
++  auto& state = StateFor(gpu_id);
++  // Caller drains queued work and synchronizes devices. Never evict live work.
++  if (!pending_tickets_.empty() || !leases_.empty() ||
++      state.transition_reserved_bytes || state.workspace_bytes) return false;
++  for (const auto& entry : state.entries)
++    if (entry.lease_count || !EventComplete(entry.last_use_event)) return false;
++  for (auto it = state.entries.begin(); it != state.entries.end();) {
++    if (transfer_ops_ && !transfer_ops_->MoveToHost(it->node)) return false;
++    state.resident_bytes -= it->bytes;
++    it = state.entries.erase(it);
++  }
++  return state.resident_bytes == 0;
++}
++
++void ExpertResidencyManager::ReplacePriorities(
++    const std::vector<std::pair<NodePtr, double>>& priorities) {
++  std::unordered_map<std::size_t, double> next;
++  for (const auto& item : priorities) {
++    if (!item.first || !std::isfinite(item.second) || item.second < 0)
++      throw std::invalid_argument("invalid expert priority");
++    next[item.first->id] = item.second;
++  }
++  std::lock_guard<std::mutex> lock(mutex_);
++  priorities_.swap(next);
++}
++
+ void ExpertResidencyManager::ReplaceProtectedCandidates(
+     const NodePtrList& candidates) {
+   std::lock_guard<std::mutex> lock(mutex_);
+diff --git a/core/prefetch/expert_residency.h b/core/prefetch/expert_residency.h
+index 5a5efdc..1f6b0ed 100644
+--- a/core/prefetch/expert_residency.h
++++ b/core/prefetch/expert_residency.h
+@@ -181,6 +181,8 @@ class ExpertResidencyManager {
+   void ReplaceProtectedVariants(
+       const std::vector<ResidencyVariantKey>& candidates);
+ 
++  bool ClearQuiescent(int gpu_id);
++  void ReplacePriorities(const std::vector<std::pair<NodePtr, double>>& priorities);
+   void ReplaceProtectedCandidates(const NodePtrList& candidates);
+   void RecordAccess(const NodePtr& node, ExpertPhase phase, bool hit);
+ 
+@@ -224,6 +226,7 @@ class ExpertResidencyManager {
+   std::vector<ResidencyVariant> registered_variants_;
+   std::unordered_map<std::uint64_t, WorkspaceRecord> workspace_records_;
+   std::unordered_map<std::size_t, ExpertPolicyMetadata> access_metadata_;
++  std::unordered_map<std::size_t, double> priorities_;
+   std::unordered_set<std::size_t> protected_ids_;
+   std::vector<ResidencyVariantKey> protected_variants_;
+   PhasePolicyConfig config_;
+diff --git a/core/python/py_archer_prefetch.cpp b/core/python/py_archer_prefetch.cpp
+index d36b103..6e9a058 100644
+--- a/core/python/py_archer_prefetch.cpp
++++ b/core/python/py_archer_prefetch.cpp
+@@ -128,6 +128,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+            &ArcherPrefetchHandle::DrainPrefetchSamples)
+       .def("get_inflight_prefetch_bytes",
+            &ArcherPrefetchHandle::GetInflightPrefetchBytes)
++      .def("replace_expert_priorities", &ArcherPrefetchHandle::ReplaceExpertPriorities)
+       .def("replace_cache_candidates",
+            &ArcherPrefetchHandle::ReplaceCacheCandidates)
+       .def("enqueue_prefetch", &ArcherPrefetchHandle::EnqueuePrefetch)
+@@ -148,6 +149,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+            py::arg("starvation_limit"))
+       .def("get_expert_policy_stats",
+            &ArcherPrefetchHandle::GetExpertPolicyStats)
++      .def("clear_expert_cache_quiescent", &ArcherPrefetchHandle::ClearExpertCacheQuiescent)
++      .def("set_expert_budget", &ArcherPrefetchHandle::SetExpertBudget)
+       .def("reset_cache", &ArcherPrefetchHandle::ResetCache);
+   //    .def("set_node_cache_priority",
+   //    &ArcherPrefetchHandle::SetNodeCachePriority);
+diff --git a/moe_infinity/distributed/expert_executor.py b/moe_infinity/distributed/expert_executor.py
+index afabc73..eb7f5c2 100644
+--- a/moe_infinity/distributed/expert_executor.py
++++ b/moe_infinity/distributed/expert_executor.py
+@@ -533,7 +533,9 @@ class DistributedExpertExecutor:
+         self._last_dispatch_used_native_routing = use_native_routing
+ 
+         generations = list(issued_generations)
+-        if route_ahead_handled:
++        if getattr(prefetcher, "eam_enabled", False):
++            pending_router_logits = None
++        elif route_ahead_handled:
+             # A0 section 3: the exact-union prefetch REPLACES the legacy
+             # mean(0)/topk prediction for this dispatch, so neither the
+             # overlap-triggered nor the deferred pooled call may fire.
+diff --git a/moe_infinity/entrypoints/big_modeling.py b/moe_infinity/entrypoints/big_modeling.py
+index 7079414..4ce9182 100644
+--- a/moe_infinity/entrypoints/big_modeling.py
++++ b/moe_infinity/entrypoints/big_modeling.py
+@@ -1278,8 +1278,17 @@ class MoE:
+                 )
+             self._configure_hook(input_ids)
+             self.model.eval()
+-            with torch.no_grad():
+-                return self.model.generate(input_ids, **kwargs)
++            try:
++                with torch.no_grad():
++                    output = self.model.generate(input_ids, **kwargs)
++            except BaseException:
++                for seq_id in self.seq_id_list:
++                    self.engine.expert_tracer.trace.pop(seq_id, None)
++                raise
++            else:
++                for seq_id in self.seq_id_list:
++                    self.engine.expert_tracer.finish_entry(seq_id)
++                return output
+ 
+         if native_engine is None:
+             raise RuntimeError(
+diff --git a/moe_infinity/memory/expert_predictor.py b/moe_infinity/memory/expert_predictor.py
+index b95ade3..abcd3b7 100644
+--- a/moe_infinity/memory/expert_predictor.py
++++ b/moe_infinity/memory/expert_predictor.py
+@@ -63,11 +63,11 @@ class ExpertPredictor:
+                 expert_matrix = tracer.find_most_similar(
+                     current_entry.matrix, layer_idx
+                 )
+-                expert_matrix[:layer_idx, :] = 0
++                expert_matrix[:layer_idx + 1, :] = 0
+ 
+-                for l in range(layer_idx, self.num_layers):
++                for l in range(layer_idx + 1, self.num_layers):
+                     expert_matrix[l] = (
+-                        expert_matrix[l] + 1e-8
++                        expert_matrix[l]
+                     ) * self.layer_decay_func(l, layer_idx, self.num_layers)
+ 
+                 return expert_matrix
+diff --git a/moe_infinity/memory/expert_prefetcher.py b/moe_infinity/memory/expert_prefetcher.py
+index 0f1065a..c8c9298 100644
+--- a/moe_infinity/memory/expert_prefetcher.py
++++ b/moe_infinity/memory/expert_prefetcher.py
+@@ -337,6 +337,72 @@ class ExpertPrefetcher(object):
+             tensor_ids.append(self.expert_tensor_map[(layer_id, j)])
+         self.archer_engine.replace_cache_candidates(tensor_ids)
+ 
++    def configure_eam_budget(self, per_gpu_bytes, expert_bytes):
++        if expert_bytes <= 0 or any(b < expert_bytes for b in per_gpu_bytes):
++            raise ValueError("invalid expert budget")
++        if self.archer_engine is None:
++            raise RuntimeError("EAM engine missing")
++        # Both phases use managed cache admission: no transient overflow slot.
++        self.archer_engine.configure_phase_policy(True, 0, 0, 1.0, 1.0, 8)
++        for gpu, budget in enumerate(per_gpu_bytes):
++            if not self.archer_engine.set_expert_budget(gpu, int(budget)):
++                raise RuntimeError(f"cannot set expert budget for GPU {gpu}")
++        self.eam_budget = tuple(int(b) for b in per_gpu_bytes)
++        self.eam_expert_bytes = int(expert_bytes)
++        self.eam_enabled = True
++        self.eam_calls = 0
++        self.eam_candidates = 0
++
++    def reset_eam_residency(self, timeout_seconds=30):
++        import time
++        import torch
++        engine = self.archer_engine
++        if not getattr(self, "eam_enabled", False):
++            raise RuntimeError("EAM is not configured")
++        deadline = time.monotonic() + timeout_seconds
++        engine.replace_expert_priorities([], [])
++        engine.replace_cache_candidates([])
++        while True:
++            engine.reset_cache()  # Cancel queued speculative work first.
++            for gpu in range(len(self.eam_budget)):
++                torch.cuda.synchronize(gpu)
++            cleared = [engine.clear_expert_cache_quiescent(gpu) for gpu in range(len(self.eam_budget))]
++            stats = dict(engine.get_expert_policy_stats())
++            if all(cleared) and all(int(stats.get(k, 0)) == 0 for k in
++                                   ("resident_bytes", "transition_reserved_bytes", "workspace_bytes")):
++                self.eam_calls = self.eam_candidates = 0
++                return stats
++            if time.monotonic() >= deadline:
++                raise RuntimeError(f"expert cache did not become quiescent: {stats}")
++            time.sleep(.01)
++
++    def prefetch_eam(self, layer_id, scores):
++        engine = self.archer_engine
++        if engine is None or not getattr(self, "eam_enabled", False):
++            raise RuntimeError("EAM requires an initialized engine and byte budget")
++        if scores.shape != (self.num_layers, self.num_experts) or not np.isfinite(scores).all() or (scores < 0).any():
++            raise ValueError("invalid EAM scores")
++        candidates = sorted(
++            ((float(scores[l, e]), self.expert_tensor_map[(l, e)])
++             for l in range(layer_id + 1, self.num_layers)
++             for e in range(self.num_experts) if scores[l, e] > 0),
++            key=lambda x: (-x[0], x[1]))
++        # Scores are soft eviction priorities, never hard protection of all
++        # predicted experts. Live demand leases remain authoritative.
++        engine.replace_expert_priorities([x[1] for x in candidates], [x[0] for x in candidates])
++        used = [0] * len(self.eam_budget)
++        admitted = []
++        for score, tensor_id in candidates:
++            gpu = engine.get_node_default_device([tensor_id])
++            if used[gpu] + self.eam_expert_bytes > self.eam_budget[gpu]:
++                continue
++            used[gpu] += self.eam_expert_bytes
++            admitted.append((tensor_id, gpu))
++        self.eam_calls += 1
++        self.eam_candidates += len(admitted)
++        for tensor_id, gpu in admitted:
++            engine.enqueue_prefetch(tensor_id, gpu)
++
+     def prefetch_experts(self, layer_id: int, expert_matrix):
+         if self.archer_engine is None:
+             return
+@@ -488,6 +554,8 @@ class ExpertPrefetcher(object):
+         *,
+         phase: ExpertPhase = ExpertPhase.MIXED,
+     ):
++        if getattr(self, "eam_enabled", False):
++            return  # EAM replaces the adjacent-layer same-expert heuristic.
+         if layer_idx >= self.num_layers:
+             _ = self._consume_prediction(phase)
+             return
+diff --git a/moe_infinity/memory/expert_tracer.py b/moe_infinity/memory/expert_tracer.py
+index d9c382a..2722afa 100644
+--- a/moe_infinity/memory/expert_tracer.py
++++ b/moe_infinity/memory/expert_tracer.py
+@@ -54,26 +54,25 @@ class ExpertTracer:
+ 
+         self.trace = {}
+ 
+-        self.trace_collection = torch.zeros(
+-            (capacity, self.num_layers, self.num_experts), device="cuda:0"
+-        )
+-        self.collection_access = np.zeros((capacity,))
+-
+-        self.cos = nn.CosineSimilarity(dim=2, eps=1e-6)
+-
+-    def load_trace(self, trace: Union[os.PathLike, np.ndarray]):
+-        if isinstance(trace, os.PathLike):
+-            self.trace_collection = torch.from_numpy(
+-                np.load(trace, allow_pickle=False)
+-            )
+-        elif isinstance(trace, np.ndarray):
+-            self.trace_collection = trace
+-
+-        self.persistent_capacity = self.trace_collection.shape[0]
+-        assert self.persistent_capacity <= self.capacity, (
+-            f"loaded trace capacity {self.persistent_capacity} must be "
+-            f"less than or equal to capacity in config {self.capacity}"
++        # EAM is host metadata, not part of the expert HBM budget.
++        if capacity <= 0:
++            raise ValueError("trace capacity must be positive")
++        self.trace_collection = np.zeros(
++            (capacity, self.num_layers, self.num_experts), dtype=np.float32
+         )
++        self.collection_access = np.zeros(capacity, dtype=np.int64)
++        self.persistent_capacity = 0
++        self.access_clock = 0
++
++    def load_trace(self, trace: Union[str, os.PathLike, np.ndarray]):
++        values = np.load(trace, allow_pickle=False) if isinstance(trace, (str, os.PathLike)) else np.asarray(trace)
++        if values.ndim != 3 or values.shape[1:] != (self.num_layers, self.num_experts) or len(values) > self.capacity:
++            raise ValueError("invalid EAM trace shape/capacity")
++        if not np.isfinite(values).all() or (values < 0).any():
++            raise ValueError("EAM counts must be finite and nonnegative")
++        self.trace_collection.fill(0)
++        self.trace_collection[:len(values)] = values
++        self.persistent_capacity = len(values)
+ 
+     def create_entry(self):
+         seq_id = uuid.uuid4().hex
+@@ -83,21 +82,15 @@ class ExpertTracer:
+         return seq_id
+ 
+     def finish_entry(self, seq_id):
+-        trace_sum = np.sum(self.trace_collection, axis=(1, 2))
+-
+-        if np.any(trace_sum == 0):
+-            # find the first zero entry
+-            idx = np.argwhere(trace_sum == 0)[0][0]
+-            self.trace_collection[idx] = self.trace[seq_id].matrix
+-            self.collection_access[idx] = 1
+-        else:
+-            # find the first entry after self.persistent_capacity that has the least access
+-            collection_access_copy = self.collection_access.copy()
+-            collection_access_copy[: self.persistent_capacity] = 1e9
+-
+-            idx = np.argmin(collection_access_copy)
+-            self.trace_collection[idx] = self.trace[seq_id].matrix
+-            self.collection_access[idx] = 1
++        entry = self.trace.pop(seq_id)
++        if not np.any(entry.matrix) or self.persistent_capacity == self.capacity:
++            return
++        candidates = np.arange(self.persistent_capacity, self.capacity)
++        empty = candidates[~self.trace_collection[candidates].any(axis=(1, 2))]
++        idx = int(empty[0] if len(empty) else candidates[np.argmin(self.collection_access[candidates])])
++        self.trace_collection[idx] = entry.matrix
++        self.access_clock += 1
++        self.collection_access[idx] = self.access_clock
+ 
+     def update_entry(self, seq_id, expert_list, layer_idx):
+         expert_counter = Counter(expert_list.flatten().tolist())
+@@ -116,32 +109,25 @@ class ExpertTracer:
+         return self.trace[seq_id]
+ 
+     def find_most_similar(self, matrix, layer_idx) -> np.ndarray:
+-        trace_collection_copy = self.trace_collection.clone()
+-        trace_collection_copy[:, : (layer_idx + 1), :] = 1e-9
+-
+-        trace_collection_copy /= torch.sum(
+-            trace_collection_copy, dim=2, keepdims=True
+-        )
+-
+-        matrix_copy = torch.from_numpy(matrix.copy()).to("cuda:0")
+-        matrix_copy /= torch.sum(matrix_copy, dim=1, keepdims=True)
+-        replicated_matrix_copy = torch.concat(
+-            [matrix_copy[None, ...]] * self.capacity, dim=0
+-        )
+-
+-        # fill nan with 0 using torch
+-        replicated_matrix_copy = torch.nan_to_num(replicated_matrix_copy)
+-        matrix_copy = torch.nan_to_num(matrix_copy)
+-
+-        cos_sim = self.cos(replicated_matrix_copy, trace_collection_copy)
+-
+-        cos_dist = 1 - torch.mean(cos_sim, dim=1)
+-        min_idx = torch.argmin(cos_dist).item()
+-
+-        self.collection_access[min_idx] += 1
+-
+-        entry = self.trace_collection[min_idx].to("cpu").numpy()
+-        return entry
++        # Match only observed layers; future rows are predictions, never evidence.
++        if not 0 <= layer_idx < self.num_layers:
++            raise ValueError("invalid layer")
++        query = np.asarray(matrix, dtype=np.float32)[:layer_idx + 1]
++        history = self.trace_collection[:, :layer_idx + 1]
++        observed = np.linalg.norm(query, axis=-1) > 0
++        if not observed.any():
++            return np.zeros_like(self.trace_collection[0])
++        dots = np.einsum("cle,le->cl", history, query)
++        denom = np.linalg.norm(history, axis=-1) * np.linalg.norm(query, axis=-1)[None, :]
++        similarity = np.divide(dots, denom, out=np.zeros_like(dots), where=denom > 0)[:, observed].mean(axis=1)
++        valid = history.any(axis=(1, 2))
++        if not valid.any():
++            return np.zeros_like(self.trace_collection[0])
++        similarity[~valid] = -np.inf
++        idx = int(np.argmax(similarity))
++        self.access_clock += 1
++        self.collection_access[idx] = self.access_clock
++        return self.trace_collection[idx].copy()
+ 
+     def _init_io_tracking(self):
+         global _io_profile_env_cache
+diff --git a/tests/cpp/unit/prefetch/test_expert_residency.cpp b/tests/cpp/unit/prefetch/test_expert_residency.cpp
+index 7b6b128..af303a9 100644
+--- a/tests/cpp/unit/prefetch/test_expert_residency.cpp
++++ b/tests/cpp/unit/prefetch/test_expert_residency.cpp
+@@ -80,3 +80,71 @@ TEST_F(ExpertResidencyManagerTest, DemandAndPrefetchClientsShareAccounting) {
+   EXPECT_EQ(manager->ResidentBytes(0), 40);
+   EXPECT_EQ(manager->ResidentCount(0), 1);
+ }
++
++TEST_F(ExpertResidencyManagerTest, PredictionPriorityOverridesRecencyButNotLeases) {
++  ASSERT_TRUE(manager->ConfigureCapacity(0, 120));
++  auto hot = MakeNode(1, 60), cold = MakeNode(2, 60);
++  for (auto node : {hot, cold}) {
++    auto t = manager->BeginAdmission(node, 0, ExpertPhase::DECODE,
++                                    AdmissionMode::CACHE, AdmissionSource::DEMAND);
++    node->device = node->default_device;
++    ASSERT_TRUE(manager->CommitAdmission(t));
++  }
++  hot->last_access_time = 1;
++  cold->last_access_time = 100;
++  manager->ReplacePriorities({{hot, 10}, {cold, 1}});
++  auto incoming = MakeNode(3, 60);
++  auto t = manager->BeginAdmission(incoming, 0, ExpertPhase::DECODE,
++                                  AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  ASSERT_TRUE(t.valid);
++  EXPECT_EQ(t.reserved_victim, cold);
++  ASSERT_TRUE(manager->AbortAdmission(t));
++  auto lease = manager->AcquireLease(cold, LeaseKind::EXECUTION);
++  t = manager->BeginAdmission(incoming, 0, ExpertPhase::DECODE,
++                             AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  EXPECT_EQ(t.reserved_victim, hot);
++  ASSERT_TRUE(manager->AbortAdmission(t));
++  ASSERT_TRUE(manager->ReleaseLease(lease));
++  manager->ReplacePriorities({});
++  t = manager->BeginAdmission(incoming, 0, ExpertPhase::DECODE,
++                             AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  EXPECT_EQ(t.reserved_victim, hot);
++  ASSERT_TRUE(manager->AbortAdmission(t));
++  EXPECT_EQ(manager->ResidentBytes(0), 120);
++}
++
++TEST_F(ExpertResidencyManagerTest, ColdResetRefusesLiveWorkAndRetainsBudget) {
++  ASSERT_TRUE(manager->ConfigureCapacity(0, 60));
++  auto node = MakeNode(1, 60);
++  auto t = manager->BeginAdmission(node, 0, ExpertPhase::DECODE,
++                                  AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  EXPECT_FALSE(manager->ClearQuiescent(0));
++  node->device = node->default_device;
++  ASSERT_TRUE(manager->CommitAdmission(t));
++  auto lease = manager->AcquireLease(node, LeaseKind::EXECUTION);
++  EXPECT_FALSE(manager->ClearQuiescent(0));
++  EXPECT_EQ(manager->ResidentBytes(0), 60);
++  ASSERT_TRUE(manager->ReleaseLease(lease));
++  ASSERT_TRUE(manager->ClearQuiescent(0));
++  EXPECT_EQ(manager->ResidentBytes(0), 0);
++  EXPECT_EQ(manager->CapacityBytes(0), 60);
++  EXPECT_TRUE(node->device.is_cpu());
++}
++
++TEST_F(ExpertResidencyManagerTest, PrefetchCannotDisplaceHigherPriorityResident) {
++  ASSERT_TRUE(manager->ConfigureCapacity(0, 60));
++  auto hot = MakeNode(1, 60), cold = MakeNode(2, 60);
++  auto t = manager->BeginAdmission(hot, 0, ExpertPhase::DECODE,
++                                  AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  hot->device = hot->default_device;
++  ASSERT_TRUE(manager->CommitAdmission(t));
++  manager->ReplacePriorities({{hot, 2}, {cold, 1}});
++  auto rejected = manager->BeginAdmission(cold, 0, ExpertPhase::DECODE,
++                                        AdmissionMode::CACHE, AdmissionSource::PREFETCH);
++  EXPECT_FALSE(rejected.valid);
++  auto demand = manager->BeginAdmission(cold, 0, ExpertPhase::DECODE,
++                                      AdmissionMode::CACHE, AdmissionSource::DEMAND);
++  ASSERT_TRUE(demand.valid);
++  EXPECT_EQ(demand.reserved_victim, hot);
++  ASSERT_TRUE(manager->AbortAdmission(demand));
++}
+diff --git a/tests/python/unit/test_eam_repair.py b/tests/python/unit/test_eam_repair.py
+new file mode 100644
+index 0000000..53e9608
+--- /dev/null
++++ b/tests/python/unit/test_eam_repair.py
+@@ -0,0 +1,52 @@
++import unittest
++import numpy as np
++from transformers import Qwen3MoeConfig
++from moe_infinity.memory.expert_tracer import ExpertTracer
++from moe_infinity.memory.expert_predictor import ExpertPredictor
++from moe_infinity.memory.expert_prefetcher import ExpertPrefetcher
++
++class FakeEngine:
++    def __init__(self): self.queued=[];self.limits={}
++    def configure_phase_policy(self,*args): assert args[:3]==(True,0,0)
++    def set_expert_budget(self,g,b): self.limits[g]=b;return True
++    def replace_expert_priorities(self,ids,scores): self.priorities=dict(zip(ids,scores))
++    def get_node_default_device(self,ids): return ids[0]%2
++    def enqueue_prefetch(self,t,g): self.queued.append((t,g))
++
++class EAMRepairTest(unittest.TestCase):
++    def setUp(self):
++        self.config=Qwen3MoeConfig(num_hidden_layers=3,num_experts=4,num_experts_per_tok=1,architectures=['Qwen3MoeForCausalLM'])
++        self.tracer=ExpertTracer(3,self.config)
++    def test_observed_prefix_and_no_alias(self):
++        a=np.zeros((2,3,4),np.float32)
++        a[0,0,0]=1;a[0,1,1]=2;a[1,0,3]=1;a[1,1,2]=5
++        self.tracer.load_trace(a)
++        q=np.zeros((3,4),np.float32);q[0,0]=1;q[2,3]=999
++        got=self.tracer.find_most_similar(q,0)
++        self.assertEqual(got[1,1],2)
++        got.fill(0);self.assertEqual(self.tracer.trace_collection[0,1,1],2)
++    def test_empty_history_does_not_prefetch_everything(self):
++        predictor=ExpertPredictor(self.config);predictor.add_tracer(self.tracer)
++        sid=self.tracer.create_entry()
++        self.assertFalse(predictor.predict(sid,np.array([1]),0).any())
++    def test_finish_retains_counts_and_releases_request(self):
++        sid=self.tracer.create_entry();self.tracer.update_entry(sid,np.array([2,2]),0)
++        self.tracer.finish_entry(sid)
++        self.assertNotIn(sid,self.tracer.trace)
++        self.assertEqual(self.tracer.trace_collection[0,0,2],2)
++    def test_persistent_full_pool_is_not_overwritten(self):
++        a=np.ones((3,3,4),np.float32);self.tracer.load_trace(a)
++        sid=self.tracer.create_entry();self.tracer.update_entry(sid,np.array([2]),0);self.tracer.finish_entry(sid)
++        np.testing.assert_array_equal(self.tracer.trace_collection,a)
++    def test_budget_and_priority_order(self):
++        p=ExpertPrefetcher(self.config);p.archer_engine=FakeEngine()
++        p.expert_tensor_map={(l,e):l*4+e for l in range(3) for e in range(4)}
++        p.configure_eam_budget([18,9],9)
++        scores=np.arange(12,dtype=np.float32).reshape(3,4)
++        p.prefetch_eam(0,scores)
++        self.assertEqual(p.archer_engine.queued,[(11,1),(10,0),(8,0)])
++        self.assertEqual(p.archer_engine.limits,{0:18,1:9})
++        self.assertEqual(len(p.archer_engine.priorities),8)
++        self.assertEqual(p.eam_calls,1)
++
++if __name__=='__main__': unittest.main()
