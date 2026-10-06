@@ -1,0 +1,1 @@
+Bounded small-cell confirmation warmup passes cold residency, exact byte caps,64x64 token shape and KV release. EAM3072calls/zero candidates is expected before completed warmup history exists. Warmup TTFT8.720284281s, TPOT3.159282266508s, E2E207.755067071s is excluded from primaries. Target repeats restore the same warmup EAM snapshot; primary1 running.
