@@ -7,7 +7,7 @@ attempts require bounded confirmation; preserve every sample without outlier rem
 
 | System | Local B16 / input256 | Local B64 / input512 |
 | --- | --- | --- |
-| OURS Near | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness PASS, timing UNSTABLE; bounded confirmation pending |
+| OURS Near | Correctness PASS; bounded confirmation remains UNSTABLE, all samples retained | Correctness PASS, timing UNSTABLE; bounded confirmation pending |
 | DeepSpeed CPU offload | Correctness PASS, timing UNSTABLE; fixed-CPU confirmation queued | Correctness PASS, timing UNSTABLE; confirmation queued |
 | MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 | llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness and stability PASS; selected |

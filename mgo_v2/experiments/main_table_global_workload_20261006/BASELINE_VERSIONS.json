@@ -21,7 +21,7 @@
     "locally_repaired": true,
     "weight_precision": "BF16 expert/projection weights, F32 small tensors as verified in GGUF_METADATA.json",
     "kv_precision": "FP16 K/V, native default; not weight quantization",
-    "kv_placement_evidence": "Configuration/source-derived GPU placement: no_kv_offload=false, n_gpu_layers=999, per-layer KV uses model.dev_layer; startup INFO buffer receipts are suppressed at default logging verbosity. Not per-layer runtime telemetry."
+    "kv_placement_evidence": "Actual smoke-shape startup allocations on CUDA0/1/2/3 are archived in llama_measurement/static_smoke1/kv_placement.json. Primaries retain the same all-layer GPU assignment (no_kv_offload=false, n_gpu_layers=999); full-primary per-layer allocation telemetry is not collected."
   },
   "source_note": "Versioned patch files and individual worker source-commit/hash receipts identify the repaired binaries/harness; upstream SHA alone is not the experiment version.",
   "gpu_ids": [
