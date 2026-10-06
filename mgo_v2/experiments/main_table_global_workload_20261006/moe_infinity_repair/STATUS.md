@@ -1,6 +1,11 @@
 # Owner-authorized MoE-Infinity baseline repairs
 
-Status: implementation checkpoint; native build passed; physical smoke validation running.
+Current status: priority eviction, EAM and exact expert budgets passed native
+builds, 9 Python tests, 15 native residency tests and full-model smoke8.
+The separate measurement-harness KV lifecycle fix still awaits physical
+validation; previous primary attempts are superseded, not headline results.
+The serial recovery queue runs lifecycle smoke, then both main cells after
+the current independent baseline queue. Historical checkpoints follow below.
 Upstream MoE-Infinity: 9f819a6d43e043bded6e0692e5e58793e1623364.
 moe-store: v0.2.2, 096f51f92ca9d698907d9a79120a7819ea094266.
 
