@@ -1,0 +1,24 @@
+{
+  "status": "INVALID_PREPARATION_NO_PRIMARY_SAMPLES",
+  "attempt": "B4_C30_CLEAN_B128_H64",
+  "failure": "rank 1 H1b/H2 full64 warm validation assertion",
+  "observed_H1b_reference_drift": {
+    "policy": "BR",
+    "rank": 1,
+    "token_hash_matches_B3": true,
+    "canonical_copy_count": 56623,
+    "observed_copy_count": 56622,
+    "bytes_difference": -9437184,
+    "controller_and_packet_counters_equal": true,
+    "inferred_canceled_prefetches": 1,
+    "inference_basis": "CPU proof fixes copies+canceled=56623 and validate passed; observed copies=56622"
+  },
+  "unavailable": "Failed H2 rank1 values were not written before the assertion, so their exact token/counter outcome cannot be reconstructed.",
+  "repair": "Write all warm correctness receipts before asserting, synchronize ranks at the gate, and compare both paths to the existing canonical B3 workload instead of trusting a potentially canceled warm baseline.",
+  "retry_bound": "Exactly one preparation retry; no further automatic retry if canonical parity fails again.",
+  "runtime_change": false,
+  "padding_or_forced_copy": false,
+  "latency_based_exclusion": false,
+  "primary_samples": 0,
+  "raw_root": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CLEAN_B128_H64"
+}

@@ -9,7 +9,7 @@ def main():
  for r in corr['ranks']:
   assert r['status']=='PASS' and r['reference']==r['observed'] and r['token_parity'] and not r['token_mismatches']
   assert r['executor']['graph_entries']==0 and r['executor']['persistent_workspace_bytes']==69206016
- clean=ROOT/'b4/C30/B4_C30_CLEAN_B128_H64';state=json.loads((clean/'status.json').read_text());assert state['status']=='PASS'
+ clean=ROOT/'b4/C30/B4_C30_CLEAN_RETRY1_B128_H64';state=json.loads((clean/'status.json').read_text());assert state['status']=='PASS'
  assert state['group']['gpus']==[0,1,4,5]
  fp=state['common_stack']
  for name,digest in fp['code'].items():assert sha(P/name)==digest,('code changed during measurement',name)

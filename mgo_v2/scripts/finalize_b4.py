@@ -5,7 +5,7 @@ from prepare_critical_microbench import ROOT,PACKET,write,sha
 from physical_repeat_rule import decide,final_unstable
 
 def main():
- cap=ROOT/'b4/C30/B4_C30_CLEAN_B128_H64';result=json.loads((cap/'result.json').read_text());assert result['status']=='PASS'
+ cap=ROOT/'b4/C30/B4_C30_CLEAN_RETRY1_B128_H64';result=json.loads((cap/'result.json').read_text());assert result['status']=='PASS'
  mechanism=json.loads((PACKET/'B4_KNOB_RUNTIME_GAP.json').read_text());correctness=json.loads((PACKET/'B4_CORRECTNESS.json').read_text())
  timing=[];summary={}
  for key,observations in result['samples'].items():

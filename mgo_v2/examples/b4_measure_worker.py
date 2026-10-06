@@ -51,11 +51,16 @@ def main(a):
    if rank==0:write(a.output/'phase.json',dict(stage='FULL64_WARM_VALIDATE',policy=policy,executor=mode))
    row,tokens=generate(model,rt,ids,mask,teacher,horizon);validate(rt,row,proofs[policy],rank)
    observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes)
-   if mode=='H1b':
-    warm_tokens[policy]=tokens.copy();references[policy]=observed
-   else:
-    assert np.array_equal(tokens,warm_tokens[policy]) and observed==references[policy]
-   write(a.output/f'{policy}_{mode}_correctness_rank{rank}.json',dict(status='PASS',reference=references[policy],observed=observed,argmax_hash=row['argmax_hash'],executor=mode,grouped=grouped.receipt()))
+   canonical=json.loads((prior/f'{policy}_correctness_rank{rank}.json').read_text())
+   references[policy]=canonical['observed']
+   token_ok=row['argmax_hash']==canonical['argmax_hash']
+   counters_ok=observed==references[policy]
+   if mode=='H1b':warm_tokens[policy]=tokens.copy()
+   else:token_ok=token_ok and np.array_equal(tokens,warm_tokens[policy])
+   write(a.output/f'{policy}_{mode}_correctness_rank{rank}.json',dict(status='PASS' if token_ok and counters_ok else 'FAIL',reference=references[policy],observed=observed,argmax_hash=row['argmax_hash'],expected_argmax_hash=canonical['argmax_hash'],token_parity=bool(token_ok),counter_parity=bool(counters_ok),scheduler_metrics=dict(rt.h2d.metrics),executor=mode,grouped=grouped.receipt()))
+   dist.barrier()
+   all_checks=[json.loads((a.output/f'{policy}_{mode}_correctness_rank{r}.json').read_text()) for r in range(world)]
+   assert all(r['status']=='PASS' for r in all_checks),'B4 canonical workload gate; inspect preserved correctness receipts'
  samples={key:[] for key in ['BR_H1b','FCA_H1b','BR_H2','FCA_H2']}
  for repeat in (1,2,3):
   order=list(samples) if repeat%2 else list(reversed(samples))
@@ -71,7 +76,9 @@ def main(a):
     if time.monotonic()>deadline:raise TimeoutError('B4 clean boundary release')
     time.sleep(.2)
    with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
-   assert before==dict(counters['stats']) and np.array_equal(tokens,warm_tokens[policy])
+   compile_ok=before==dict(counters['stats']);token_ok=np.array_equal(tokens,warm_tokens[policy])
+   write(a.output/f'{label}_validation_rank{rank}.json',dict(no_compile=compile_ok,token_parity=bool(token_ok),argmax_hash=row['argmax_hash'],scheduler_metrics=dict(rt.h2d.metrics),controller_counters=dict(rt.controller.counters)))
+   assert compile_ok and token_ok
    validate(rt,row,proofs[policy],rank)
    observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes)
    assert observed==references[policy]
