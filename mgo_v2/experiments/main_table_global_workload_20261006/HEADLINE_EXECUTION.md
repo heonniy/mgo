@@ -10,7 +10,7 @@ stable enough for headline selection; preserve all samples without outlier remov
 | OURS Near | Correctness PASS, timing UNSTABLE; confirmation queued | Preflight-only failure; new primary queued |
 | DeepSpeed CPU offload | Correctness PASS, timing UNSTABLE; fixed-CPU confirmation queued | Correctness PASS, timing UNSTABLE; confirmation queued |
 | MoE-Infinity repaired | Previous primary superseded by KV lifecycle fix; rerun queued | Previous primary superseded by KV lifecycle fix; rerun queued |
-| llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Corrected primary job running |
+| llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 
 Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.
 Current serial chain: `LLAMA_STATIC_RECOVERY_QUEUE.json` ->
