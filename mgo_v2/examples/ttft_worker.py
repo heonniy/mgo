@@ -80,9 +80,9 @@ class PrefillRuntime(LiveRuntime):
 
 def run_prefill(model,rt,ids,mask):
  # Align ranks after file-based release; polling latency is outside TTFT.
- dist.barrier();torch.cuda.synchronize();start=time.perf_counter()
+ context=ids.shape[1];dist.barrier();torch.cuda.synchronize();start=time.perf_counter()
  with torch.inference_mode():
-  out=model(input_ids=ids,attention_mask=mask,position_ids=torch.arange(512,device='cuda')[None,:].expand(len(ids),-1),use_cache=True,logits_to_keep=1)
+  out=model(input_ids=ids,attention_mask=mask,position_ids=torch.arange(context,device='cuda')[None,:].expand(len(ids),-1),use_cache=True,logits_to_keep=1)
   prefill=time.perf_counter();tokens=out.logits[:,-1].argmax(-1);actual=tokens.cpu().numpy();torch.cuda.synchronize();ttft=time.perf_counter()-start
   finite=bool(torch.isfinite(out.logits).all());del out,tokens
  return dict(TTFT=ttft,prefill_host_submit_s=prefill-start,argmax_hash=array_hash(actual),first_tokens=actual.tolist(),finite_logits=finite)
@@ -94,13 +94,13 @@ def check(rt,row,rank):
  return dict(status='PASS' if observed==expected and row['finite_logits'] else 'FAIL',observed=observed,expected=expected,expert_rows=rt.layer_rows,wire_bytes=rt.actual_wire_bytes,peer_bytes=rt.actual_peer_bytes,collective_calls=rt.actual_collective_calls,ready_metrics=dict(rt.ready_metrics),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
 
 def main(a):
- rank=int(os.environ['RANK']);assert int(os.environ['WORLD_SIZE'])==4;gpu=GPUS[rank];cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(gpu)]
+ rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);physical=[int(x) for x in os.environ.get('MGO_V2_PHYSICAL_GPUS',','.join(map(str,GPUS))).split(',')];assert len(physical)==world;gpu=physical[rank];cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(gpu)]
  for task in Path('/proc/self/task').iterdir():os.sched_setaffinity(int(task.name),cpus)
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  a.output.mkdir(parents=True,exist_ok=True);specs=json.loads(a.specs.read_text());model,backing,experts=load_model();results=[]
  for spec in specs:
   key=spec['key'];a.inputs=Path(spec['inputs']);source=json.loads((a.inputs/'receipt.json').read_text());a.capacities=source['capacities'];a.seed=source['placement_seed'];a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.phase='COUNTERS'
-  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];ids=torch.tensor([r['input_ids'] for r in records],device='cuda');assert ids.shape[1]==512;mask=torch.ones_like(ids);assert bool((mask.sum(1)==512).all())
+  receipt=json.loads((a.inputs/'receipt.json').read_text());context=int(receipt['context']);records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];ids=torch.tensor([r['input_ids'] for r in records],device='cuda');assert ids.shape[1]==context;mask=torch.ones_like(ids);assert bool((mask.sum(1)==context).all())
   candidate=spec['policy'];order=['BR',candidate] if spec['order']==0 else [candidate,'BR'];warm={};samples={p:[] for p in order};rts={}
   # Keep one arena alive at a time; policies do not share mutable cache state.
   def setup(policy,phase):
