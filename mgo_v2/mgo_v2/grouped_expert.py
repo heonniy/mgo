@@ -120,7 +120,7 @@ class GroupedExpertExecutor:
                 offset=0
                 for i,count,slot in zip(selected,counts,slots):
                     w=self.cache[slot]
-                    ref=self.kernel(self.x[offset:offset+count],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+                    ref=self.kernel(received[groups[i][1]],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
                     diff=(self.y[offset:offset+count].float()-ref.float()).abs()
                     self.max_abs=max(self.max_abs,diff.max().item())
                     self.max_rel=max(self.max_rel,(diff/ref.float().abs().clamp_min(1e-6)).max().item())

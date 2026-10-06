@@ -1,0 +1,10 @@
+{
+  "attempt": "B4_C30_CORRECTNESS_B128_H64",
+  "stage": "BR H2 untimed full64 correctness",
+  "failure": "Dynamo expert_kernel recompile_limit=8 hit during reference comparison",
+  "cause": "Reference check fed slices with changing storage offsets from packed H2 buffer instead of original H0 freshly gathered input",
+  "repair": "Use received[original_group_rows] in the untimed reference comparison, matching H0 call layout; H2 math unchanged",
+  "primary_samples": 0,
+  "preserved_raw_root": "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CORRECTNESS_B128_H64",
+  "next_attempt": "B4_C30_CORRECTNESS_RETRY1_B128_H64"
+}
