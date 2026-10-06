@@ -57,8 +57,8 @@ def main(a):
    if rank==0:write(root/'phase.json',dict(stage='WARM_CORRECTNESS',cell=spec['label'],policy=policy))
    rt=setup(policy,'COUNTERS');row,tokens=generation(model,rt,ids,teacher);v=validate_row(rt,row,tokens,policy)
    warm[policy]=row['argmax_hash'];warm_tokens[policy]=tokens.copy();write(out/f'{policy}_warm_rank{rank}.json',dict(**row,validation=v));rt.close();del rt;gc.collect();dist.barrier()
-  differences=int(np.count_nonzero(warm_tokens['BR']!=warm_tokens['LA_CA_NEAR']))
-  write(out/f'policy_token_difference_rank{rank}.json',dict(different_tokens=differences,total_tokens=int(warm_tokens['BR'].size),scope='BF16 policy reduction order; frozen routes and teacher inputs shared'))
+  differences=int(np.count_nonzero(warm_tokens[POLICIES[0]]!=warm_tokens[POLICIES[1]]))
+  write(out/f'policy_token_difference_rank{rank}.json',dict(different_tokens=differences,total_tokens=int(warm_tokens[POLICIES[0]].size),scope='BF16 policy reduction order; frozen routes and teacher inputs shared'))
   order=POLICIES if cell_index%2==0 else tuple(reversed(POLICIES))
   for policy in order:
    rt=setup(policy,'MEASURE');gc.collect();torch.cuda.synchronize();dist.barrier()
@@ -77,10 +77,10 @@ def main(a):
    rows=[json.loads((out/f'{policy}_r1_measure_rank{r}.json').read_text()) for r in range(4)];samples[policy]={m:max(x[m] for x in rows) for m in METRICS}
   if rank==0:
    diffs=[json.loads((out/f'policy_token_difference_rank{r}.json').read_text()) for r in range(4)]
-   result=dict(status='PASS',batch=spec['batch'],context=spec['context'],seed=spec['placement_seed'],executor='H0',source='full_pinned',runtime='V3_OPT_PF_OVERLAP',P=2,trigger='T2',decode_steps=32,generated_outputs=33,measured_repeats=1,samples=samples,gains={m:1-samples['LA_CA_NEAR'][m]/samples['BR'][m] for m in METRICS},policy_token_differences=diffs,scope='Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks.')
+   result=dict(status='PASS',batch=spec['batch'],context=spec['context'],seed=spec['placement_seed'],executor='H0',source='full_pinned',runtime='V3_OPT_PF_OVERLAP',P=2,trigger='T2',decode_steps=32,generated_outputs=33,measured_repeats=1,baseline_policy=POLICIES[0],candidate_policy=POLICIES[1],samples=samples,gains={m:1-samples[POLICIES[1]][m]/samples[POLICIES[0]][m] for m in METRICS},policy_token_differences=diffs,scope='Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks.')
    write(out/'result.json',result);all_results.append(result);write(root/'phase.json',dict(stage='CELL_COMPLETE',cell=spec['label'],completed_cells=len(all_results)))
   dist.barrier();del ids,teacher;gc.collect()
- if rank==0:write(root/'result.json',dict(status='PASS',results=all_results,primary_policy_runs=8,scope='Single measurement per requested combination; no repeat stability claim.'))
+ if rank==0:write(root/'result.json',dict(status='PASS',results=all_results,primary_policy_runs=len(manifest)*len(POLICIES),scope='Single measurement per requested combination; no repeat stability claim.'))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);main(p.parse_args())

@@ -3,6 +3,9 @@ import os,json,signal,subprocess,time,shutil
 from pathlib import Path
 import run_full_pinned_r4 as common
 P=common.P;ROOT=Path('/home/hwlee/mgo-results/r4_br_near_h0_20261007');PACKET=P/'experiments/r4_br_near_h0_20261007'
+WORKER=P/'examples/r4_br_near_h0_worker.py'
+POLICY_LABEL='BR Near'
+TIME_LIMIT=3600
 def write(p,row):common.write(p,row)
 def publish(paths,message):
  subprocess.run(['git','add',*[str(p) for p in paths]],cwd=P.parent,check=True)
@@ -21,7 +24,7 @@ def main():
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0'
-  cmd=[common.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',str(P/'examples/r4_br_near_h0_worker.py'),'--output',str(ROOT)]
+  cmd=[common.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',str(WORKER),'--output',str(ROOT)]
   # B16/B64 frozen-gate metadata parity is checked before loading the model.
   with (ROOT/'metadata_preflight.log').open('w') as testlog:
    subprocess.run([common.PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',str(P/'scripts/test_async_metadata.py')],env=env,stdout=testlog,stderr=subprocess.STDOUT,timeout=120,check=True)
@@ -30,17 +33,17 @@ def main():
   with (ROOT/'run.log').open('w') as log:
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;write(ROOT/'status.json',state);released=set()
    while proc.poll() is None:
-    if time.time()-state['started_unix']>3600:raise TimeoutError('one-hour matrix bound')
+    if time.time()-state['started_unix']>TIME_LIMIT:raise TimeoutError('configured matrix time bound')
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if common.host_available()<96*2**30:raise RuntimeError('host memory guard')
     if (ROOT/'boundary.json').exists():
      b=json.loads((ROOT/'boundary.json').read_text());key=b['key']
      if key not in released and all((ROOT/f'{key}_ready_rank{r}.json').exists() for r in range(4)):(ROOT/f'{key}_GO').touch();released.add(key)
-    for label in ['B16_L256','B16_L512','B64_L256','B64_L512']:
+    for label in [x['label'] for x in json.loads((ROOT/'manifest.json').read_text())]:
      f=ROOT/label/'result.json'
      if f.exists() and label not in state['completed_cells']:
       dest=PACKET/f'{label}_RESULT.json';shutil.copy2(f,dest)
-      try:publish([dest],f'results: H0 full pinned BR Near {label} single-shot PASS')
+      try:publish([dest],f'results: H0 full pinned {POLICY_LABEL} {label} single-shot PASS')
       except Exception as exc:state.setdefault('publish_errors',[]).append(repr(exc))
       state['completed_cells'].append(label);write(ROOT/'status.json',state)
     time.sleep(1)
