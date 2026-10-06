@@ -1,5 +1,7 @@
 # R4 main-table experiment results
 
+> Correction: llama.cpp TPOT below is an asynchronous **batch-tail interval**, not mean per-request TPOT. It must not support direct decode-speed rankings against synchronized runtimes. See [timestamp audit](LLAMA_TPOT_SEMANTICS.md). Original measurements are preserved.
+
 All eight matrix rows and their scheduled bounded confirmations completed. All final attempts pass execution/correctness checks. **Three rows satisfy the timing spread gate; five remain unstable.** This completes the requested experimental execution, but does not establish a fully stable eight-row headline comparison. No slow sample was removed and no open-ended repeat loop was added.
 
 ## Workload and reporting
