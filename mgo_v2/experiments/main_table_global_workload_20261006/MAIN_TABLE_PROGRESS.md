@@ -1,6 +1,6 @@
 # Main-table progress snapshot
 
-Generated UTC 2026-10-06T22:16:17.226041+00:00. This is an incomplete comparison, not the final headline table. All eight cells have completed full primary triplets; three are stable and selected. Two bounded confirmation jobs remain running/queued. OURS small-cell and both DeepSpeed bounded confirmations have completed and remain unstable; no further automatic repeat is scheduled for these cells.
+Generated UTC 2026-10-06T22:25:31.563555+00:00. This is an incomplete comparison, not the final headline table. All eight cells have completed full primary triplets; three are stable and selected. One bounded confirmation job remains running. Both OURS and both DeepSpeed bounded confirmations have completed and remain unstable; no further automatic repeat is scheduled for these cells.
 
 Scope: R4, physical GPUs0/1/4/5, C30 expert budget1843 slots (16.1982421875GiB global), identical frozen ShareGPT-long manifests, output64. B labels are requests per OURS/DeepSpeed rank; global batch is4x B. OURS=LA_CA_NEAR, H0/full-pinned.
 
@@ -14,7 +14,7 @@ All numbers are seconds. Each displayed estimate is the median of its full three
 | B16 / L256 | MoE-Infinity repaired | 4.916 | 3.050297 | 197.081 | 6.73% / 2.02% / 2.14% | UNSTABLE |
 | B16 / L256 | DeepSpeed CPU offload | 5.412 | 4.085473 | 262.797 | 12.95% / 0.73% / 0.43% | UNSTABLE |
 | B16 / L256 | llama.cpp static | 37.702 | 0.257713 | 54.170 | 1.50% / 1.42% / 1.05% | PASS |
-| B64 / L512 | OURS Near | 28.007 | 1.415347 | 117.174 | 4.67% / 9.87% / 8.59% | UNSTABLE |
+| B64 / L512 | OURS Near | 26.585 | 1.256196 | 107.559 | 8.73% / 13.80% / 10.37% | UNSTABLE |
 | B64 / L512 | MoE-Infinity repaired | 9.650 | 3.696202 | 242.535 | 1.57% / 3.36% / 3.17% | PASS |
 | B64 / L512 | DeepSpeed CPU offload | 7.928 | 4.825910 | 311.960 | 37.13% / 30.51% / 29.05% | UNSTABLE |
 | B64 / L512 | llama.cpp static | 334.629 | 0.404266 | 360.068 | 3.45% / 2.86% / 3.01% | PASS |
@@ -29,7 +29,7 @@ GiB=2^30 bytes. HBM is the largest per-GPU1Hz NVML observation during the measur
 | B16 / L256 | MoE-Infinity repaired | 11.80 | 59.66 | unavailable |
 | B16 / L256 | DeepSpeed CPU offload | 11.86 | 90.70 | 56.87 |
 | B16 / L256 | llama.cpp static | 14.84 | 41.28 | unavailable |
-| B64 / L512 | OURS Near | 19.23 | 677.32 | 216.00 |
+| B64 / L512 | OURS Near | 19.23 | 697.23 | 216.00 |
 | B64 / L512 | MoE-Infinity repaired | 59.95 | 59.82 | unavailable |
 | B64 / L512 | DeepSpeed CPU offload | 16.56 | 90.72 | 56.87 |
 | B64 / L512 | llama.cpp static | 18.37 | 41.95 | unavailable |
@@ -48,7 +48,7 @@ Displayed attempt mapping:
 - B16 / L256, MoE-Infinity repaired: `infinity_B16_L256_primary4`.
 - B16 / L256, DeepSpeed CPU offload: `deepspeed_B16_L256_affinity2`.
 - B16 / L256, llama.cpp static: `llama_B16_L256_confirmation1`.
-- B64 / L512, OURS Near: `ours_B64_L512_primary2`.
+- B64 / L512, OURS Near: `ours_B64_L512_confirmation1`.
 - B64 / L512, MoE-Infinity repaired: `infinity_B64_L512_primary3`.
 - B64 / L512, DeepSpeed CPU offload: `deepspeed_B64_L512_confirmation2`.
 - B64 / L512, llama.cpp static: `llama_B64_L512_static1`.

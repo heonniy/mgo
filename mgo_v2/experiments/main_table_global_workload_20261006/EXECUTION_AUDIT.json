@@ -2,7 +2,7 @@
   "status": "INCOMPLETE",
   "execution_complete": false,
   "stable_headline_panel_complete": false,
-  "completed_rows": 6,
+  "completed_rows": 7,
   "stable_rows": 3,
   "rows": [
     {
@@ -427,9 +427,136 @@
       "system": "Ours",
       "attempt": "ours_B64_L512_confirmation1",
       "confirmation_of": "ours_B64_L512_primary2",
-      "execution_complete": false,
+      "previous_attempt": {
+        "job": "/home/hwlee/mgo-results/headline_r4_20261007/ours_B64_L512_primary2",
+        "system": "Ours",
+        "cell": "R4_C30_B64_L512_O64",
+        "status": "UNSTABLE",
+        "metrics": {
+          "TTFT": {
+            "samples": [
+              29.157805079,
+              28.007338922,
+              27.833871164
+            ],
+            "median": 28.007338922,
+            "min": 27.833871164,
+            "max": 29.157805079,
+            "cv_percent": 2.539597728067141,
+            "spread_percent": 4.672762075289856
+          },
+          "TPOT": {
+            "samples": [
+              1.438853317,
+              1.4153465684126985,
+              1.3021442462063493
+            ],
+            "median": 1.4153465684126985,
+            "min": 1.3021442462063493,
+            "max": 1.438853317,
+            "cv_percent": 5.275863587382287,
+            "spread_percent": 9.867498921971904
+          },
+          "E2E": {
+            "samples": [
+              119.80556405,
+              117.174172732,
+              109.868958675
+            ],
+            "median": 117.174172732,
+            "min": 109.868958675,
+            "max": 119.80556405,
+            "cv_percent": 4.452873044801587,
+            "spread_percent": 8.594472608790776
+          },
+          "throughput": {
+            "samples": [
+              136.75491726880276,
+              139.82603519184536,
+              149.12310262687578
+            ],
+            "median": 139.82603519184536,
+            "min": 136.75491726880276,
+            "max": 149.12310262687578,
+            "cv_percent": 4.538342552028434,
+            "spread_percent": 8.716044780590694
+          }
+        },
+        "sampled_peak_hbm_bytes": {
+          "0": 20641218560,
+          "1": 20632829952,
+          "4": 20645412864,
+          "5": 20368588800
+        },
+        "host_rss_bytes": 727263387648,
+        "pinned_host_bytes": 231928233984
+      },
+      "execution_complete": true,
       "headline_eligible": false,
-      "error": "AssertionError('job not finished successfully')"
+      "result": {
+        "job": "/home/hwlee/mgo-results/headline_r4_20261007/ours_B64_L512_confirmation1",
+        "system": "Ours",
+        "cell": "R4_C30_B64_L512_O64",
+        "status": "UNSTABLE",
+        "metrics": {
+          "TTFT": {
+            "samples": [
+              28.784069675,
+              26.40534578,
+              26.584921701
+            ],
+            "median": 26.584921701,
+            "min": 26.40534578,
+            "max": 28.784069675,
+            "cv_percent": 4.859340520370436,
+            "spread_percent": 8.726664052790063
+          },
+          "TPOT": {
+            "samples": [
+              1.2561963798412699,
+              1.288150259174603,
+              1.1196251523333332
+            ],
+            "median": 1.2561963798412699,
+            "min": 1.1196251523333332,
+            "max": 1.288150259174603,
+            "cv_percent": 7.329025092027224,
+            "spread_percent": 13.798559304345478
+          },
+          "E2E": {
+            "samples": [
+              107.924441605,
+              107.558812108,
+              97.121306298
+            ],
+            "median": 107.558812108,
+            "min": 97.121306298,
+            "max": 107.924441605,
+            "cv_percent": 5.887025098039196,
+            "spread_percent": 10.367540998077441
+          },
+          "throughput": {
+            "samples": [
+              151.80991216025853,
+              152.32596640755753,
+              168.69624827459094
+            ],
+            "median": 152.32596640755753,
+            "min": 151.80991216025853,
+            "max": 168.69624827459094,
+            "cv_percent": 6.093383872543567,
+            "spread_percent": 10.713952260668123
+          }
+        },
+        "sampled_peak_hbm_bytes": {
+          "0": 20641218560,
+          "1": 20632829952,
+          "4": 20645412864,
+          "5": 20368588800
+        },
+        "host_rss_bytes": 748648280064,
+        "pinned_host_bytes": 231928233984
+      }
     },
     {
       "cell": "R4_C30_B64_L512_O64",

@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "started": 1791324928.1779594,
+  "system": "Ours",
+  "source_commit": "52aca42409c6658c62754332de77ead74731070c",
+  "requested_timeout_seconds": 7200,
+  "effective_timeout_seconds": 7200,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py",
+    "--cell",
+    "R4_C30_B64_L512_O64",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/ours_B64_L512_confirmation1"
+  ],
+  "pid": 3022181,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "system": "Ours",
+    "policy": "LA_CA_NEAR",
+    "cell": "R4_C30_B64_L512_O64",
+    "smoke": false,
+    "primary_repeats": 3
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791325504.5430412,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 3028623
+    },
+    {
+      "gpu": 1,
+      "pid": 3028641
+    },
+    {
+      "gpu": 4,
+      "pid": 3028660
+    },
+    {
+      "gpu": 5,
+      "pid": 3028682
+    }
+  ]
+}
