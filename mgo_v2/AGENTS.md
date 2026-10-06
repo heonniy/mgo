@@ -1,3 +1,12 @@
+**OWNER TTFT STOP (2026-10-06): experiment closed at owner request.**
+Read `experiments/prefill_decode_policy_headroom_20261006/TTFT_STOPPED_RESULTS.md`.
+C30/B16, C60/B16 and C30/B128 completed S1 (24 pairs each). C60/B128
+stopped after 13/24 pairs; 85 complete pairs audited. S2 and phase diagnostics
+were canceled, so all reported gains are single-shot selection observations,
+not validated primary results. Do not resume remaining candidates or S2
+without a new owner request. Raw `owner STOP` failure receipts are preserved.
+Owned model loads restored only on0,1,4,5; never touch2,3,6,7.
+
 **OWNER TTFT PRIORITY (2026-10-06): c68ecc2 execution authorized in chat.**
 Read `experiments/prefill_decode_policy_headroom_20261006/PLAN.md` and
 `TTFT_EXECUTION.md`. Owner specifies primary long-context ShareGPT only,

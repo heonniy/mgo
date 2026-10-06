@@ -1,0 +1,6259 @@
+{
+  "status": "OWNER_STOPPED_ANALYZED",
+  "dataset": "ShareGPT_LONG512",
+  "context": 512,
+  "gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "coverage": [
+    {
+      "cache": 30,
+      "batch": 16,
+      "completed": 24,
+      "planned": 24,
+      "status": "COMPLETE_S1"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "completed": 24,
+      "planned": 24,
+      "status": "COMPLETE_S1"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "completed": 24,
+      "planned": 24,
+      "status": "COMPLETE_S1"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "completed": 13,
+      "planned": 24,
+      "status": "OWNER_STOPPED_PARTIAL"
+    }
+  ],
+  "summaries": [
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 16,
+        "candidate": "CA",
+        "key": "C30_B16_CA_w24_p20",
+        "workload_seed": 24,
+        "placement_seed": 20,
+        "gain_pct": -8.223460385043424,
+        "wire_change_pct": -16.54126957182197,
+        "critical_rows_change_pct": 59.064122635692314,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.759030549786985,
+            "wire_bytes": 56374894560,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              3146526,
+              3132716,
+              3216289,
+              3087381
+            ],
+            "sum_layer_max_rank_rows": 3679777
+          },
+          "CA": {
+            "TTFT_s": 8.397091353312135,
+            "wire_bytes": 47049771280,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              5853205,
+              2614416,
+              1985672,
+              2129619
+            ],
+            "sum_layer_max_rank_rows": 5853205
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p20_result.json",
+        "source_sha256": "56d065563c1b6e892df28fdf54cfbf46b1ee775e2d0890f43f2b3a89291d9357"
+      },
+      "gain_range_pct": [
+        -9.782770910610928,
+        -8.223460385043424
+      ],
+      "median_screen_gain_pct": -8.624677819217087
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 16,
+        "candidate": "OLD_CA",
+        "key": "C30_B16_OLD_CA_w24_p20",
+        "workload_seed": 24,
+        "placement_seed": 20,
+        "gain_pct": -8.239411943072405,
+        "wire_change_pct": -16.53792890748069,
+        "critical_rows_change_pct": 58.99493366038213,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.8051791079342365,
+            "wire_bytes": 56374894560,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              3146526,
+              3132716,
+              3216289,
+              3087381
+            ],
+            "sum_layer_max_rank_rows": 3679777
+          },
+          "OLD_CA": {
+            "TTFT_s": 8.448279967531562,
+            "wire_bytes": 47051654576,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              5850659,
+              2617109,
+              1979280,
+              2135864
+            ],
+            "sum_layer_max_rank_rows": 5850659
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p20_result.json",
+        "source_sha256": "00977954edec9c386a10b4e310087dfdbc4a96009a37f4cc9ee4a97a5e4780ef"
+      },
+      "gain_range_pct": [
+        -9.466603536998331,
+        -8.239411943072405
+      ],
+      "median_screen_gain_pct": -8.802142943792525
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 16,
+        "candidate": "LA",
+        "key": "C30_B16_LA_w19_p9",
+        "workload_seed": 19,
+        "placement_seed": 9,
+        "gain_pct": 2.4547295046316586,
+        "wire_change_pct": 0.19917458337728178,
+        "critical_rows_change_pct": -17.4733332301796,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.920575652271509,
+            "wire_bytes": 56138608704,
+            "H2D_bytes_by_rank": [
+              14486077440,
+              14457765888,
+              14438891520,
+              14363394048
+            ],
+            "copies_by_rank": [
+              1535,
+              1532,
+              1530,
+              1522
+            ],
+            "expert_rows_by_rank": [
+              3265548,
+              3048203,
+              3222378,
+              3046783
+            ],
+            "sum_layer_max_rank_rows": 3813079
+          },
+          "LA": {
+            "TTFT_s": 7.726146944798529,
+            "wire_bytes": 56250422544,
+            "H2D_bytes_by_rank": [
+              14486077440,
+              14457765888,
+              14438891520,
+              14363394048
+            ],
+            "copies_by_rank": [
+              1535,
+              1532,
+              1530,
+              1522
+            ],
+            "expert_rows_by_rank": [
+              3145708,
+              3145952,
+              3145761,
+              3145491
+            ],
+            "sum_layer_max_rank_rows": 3146807
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p9_result.json",
+        "source_sha256": "9c9adce56c7233a88a2d1f81252dc2cee65ac2ff5ee9d34e100016c0360cc1c3"
+      },
+      "gain_range_pct": [
+        1.0230640417501657,
+        2.4547295046316586
+      ],
+      "median_screen_gain_pct": 1.8289009778545418
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "n": 8,
+      "best": {
+        "cache": 60,
+        "batch": 16,
+        "candidate": "CA",
+        "key": "C60_B16_CA_w24_p27",
+        "workload_seed": 24,
+        "placement_seed": 27,
+        "gain_pct": -8.677292428198346,
+        "wire_change_pct": -16.483905013619903,
+        "critical_rows_change_pct": 60.124270465670925,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.826645313762128,
+            "wire_bytes": 56336172432,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              3068920,
+              3258206,
+              3190663,
+              3065123
+            ],
+            "sum_layer_max_rank_rows": 3655414
+          },
+          "CA": {
+            "TTFT_s": 8.505786214955151,
+            "wire_bytes": 47049771280,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              5853205,
+              2614416,
+              1985672,
+              2129619
+            ],
+            "sum_layer_max_rank_rows": 5853205
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p27_result.json",
+        "source_sha256": "0299b5177ae564ef055f1cb4131330095b48dbc1d33aeccb26f940f39561f80e"
+      },
+      "gain_range_pct": [
+        -9.93436833534751,
+        -8.677292428198346
+      ],
+      "median_screen_gain_pct": -9.30289750432426
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "n": 8,
+      "best": {
+        "cache": 60,
+        "batch": 16,
+        "candidate": "OLD_CA",
+        "key": "C60_B16_OLD_CA_w24_p20",
+        "workload_seed": 24,
+        "placement_seed": 20,
+        "gain_pct": -8.960494748100789,
+        "wire_change_pct": -16.53792890748069,
+        "critical_rows_change_pct": 58.99493366038213,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.8182908510789275,
+            "wire_bytes": 56374894560,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              3146526,
+              3132716,
+              3216289,
+              3087381
+            ],
+            "sum_layer_max_rank_rows": 3679777
+          },
+          "OLD_CA": {
+            "TTFT_s": 8.518848392181098,
+            "wire_bytes": 47051654576,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14467203072,
+              14438891520
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1533,
+              1530
+            ],
+            "expert_rows_by_rank": [
+              5850659,
+              2617109,
+              1979280,
+              2135864
+            ],
+            "sum_layer_max_rank_rows": 5850659
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p20_result.json",
+        "source_sha256": "917bd73f31ab8055cb7054cbcae5ac1af67e3665527b6e737434a201be4b97cf"
+      },
+      "gain_range_pct": [
+        -9.78144562329164,
+        -8.960494748100789
+      ],
+      "median_screen_gain_pct": -9.235457173014428
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "n": 8,
+      "best": {
+        "cache": 60,
+        "batch": 16,
+        "candidate": "LA",
+        "key": "C60_B16_LA_w15_p12",
+        "workload_seed": 15,
+        "placement_seed": 12,
+        "gain_pct": 2.231882443751665,
+        "wire_change_pct": -0.022129018426042535,
+        "critical_rows_change_pct": -17.675673257512315,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 7.880825154483318,
+            "wire_bytes": 56311941904,
+            "H2D_bytes_by_rank": [
+              14420017152,
+              14410579968,
+              14353956864,
+              14278459392
+            ],
+            "copies_by_rank": [
+              1528,
+              1527,
+              1521,
+              1513
+            ],
+            "expert_rows_by_rank": [
+              3269207,
+              3034818,
+              3125123,
+              3153764
+            ],
+            "sum_layer_max_rank_rows": 3822423
+          },
+          "LA": {
+            "TTFT_s": 7.70493440143764,
+            "wire_bytes": 56299480624,
+            "H2D_bytes_by_rank": [
+              14420017152,
+              14410579968,
+              14353956864,
+              14278459392
+            ],
+            "copies_by_rank": [
+              1528,
+              1527,
+              1521,
+              1513
+            ],
+            "expert_rows_by_rank": [
+              3145788,
+              3145854,
+              3145673,
+              3145597
+            ],
+            "sum_layer_max_rank_rows": 3146784
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w15_p12_result.json",
+        "source_sha256": "73a6ba9861e426a8bf4ead96a7871350384f3fda13691e256ec3dddf7c42960f"
+      },
+      "gain_range_pct": [
+        1.438058948435006,
+        2.231882443751665
+      ],
+      "median_screen_gain_pct": 1.6401130229259986
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 128,
+        "candidate": "CA",
+        "key": "C30_B128_CA_w27_p27",
+        "workload_seed": 27,
+        "placement_seed": 27,
+        "gain_pct": -5.436775825857687,
+        "wire_change_pct": -9.186938987651649,
+        "critical_rows_change_pct": 57.0678930241328,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 47.48790311347693,
+            "wire_bytes": 450576921776,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              24901680,
+              25817417,
+              25282626,
+              24661573
+            ],
+            "sum_layer_max_rank_rows": 28967954
+          },
+          "CA": {
+            "TTFT_s": 50.069713950157166,
+            "wire_bytes": 409182694880,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              18307193,
+              18068056,
+              18788692,
+              45499355
+            ],
+            "sum_layer_max_rank_rows": 45499355
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p27_result.json",
+        "source_sha256": "76efe3f30a71561ec54f85241bec82fe8f4ad81feb2e7a2ce91064b0d9fe7fbc"
+      },
+      "gain_range_pct": [
+        -8.703342794172485,
+        -5.436775825857687
+      ],
+      "median_screen_gain_pct": -7.161750810880663
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 128,
+        "candidate": "OLD_CA",
+        "key": "C30_B128_OLD_CA_w9_p27",
+        "workload_seed": 9,
+        "placement_seed": 27,
+        "gain_pct": -0.6467112748666404,
+        "wire_change_pct": -8.934394414874935,
+        "critical_rows_change_pct": 20.127382224231162,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 47.82797847967595,
+            "wire_bytes": 450673943440,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              24906166,
+              25823258,
+              25300316,
+              24633556
+            ],
+            "sum_layer_max_rank_rows": 29087732
+          },
+          "OLD_CA": {
+            "TTFT_s": 48.1372874090448,
+            "wire_bytes": 410408955808,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              16701303,
+              34161175,
+              20051254,
+              29749564
+            ],
+            "sum_layer_max_rank_rows": 34942331
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w9_p27_result.json",
+        "source_sha256": "d679935355cfce7f51559caec84a93973c75736d8fb1d03c6b7afb5d07f9fd9e"
+      },
+      "gain_range_pct": [
+        -9.515051041600863,
+        -0.6467112748666404
+      ],
+      "median_screen_gain_pct": -7.83887148206035
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "n": 8,
+      "best": {
+        "cache": 30,
+        "batch": 128,
+        "candidate": "LA",
+        "key": "C30_B128_LA_w0_p28",
+        "workload_seed": 0,
+        "placement_seed": 28,
+        "gain_pct": 2.5830214870495083,
+        "wire_change_pct": 0.3583001539366082,
+        "critical_rows_change_pct": -16.503217900180978,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 47.371491375379264,
+            "wire_bytes": 449460745776,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14495514624,
+              14495514624
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1536,
+              1536
+            ],
+            "expert_rows_by_rank": [
+              24978033,
+              25722098,
+              25196957,
+              24766208
+            ],
+            "sum_layer_max_rank_rows": 30154913
+          },
+          "LA": {
+            "TTFT_s": 46.14787557441741,
+            "wire_bytes": 451071164320,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14495514624,
+              14495514624
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1536,
+              1536
+            ],
+            "expert_rows_by_rank": [
+              25166713,
+              25168203,
+              25166667,
+              25161713
+            ],
+            "sum_layer_max_rank_rows": 25178382
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w0_p28_result.json",
+        "source_sha256": "65d5a07dad07e2dfd83bf8b416cf5cbad68914c2e45e9edb7d558843dd278cfa"
+      },
+      "gain_range_pct": [
+        1.3385085085144466,
+        2.5830214870495083
+      ],
+      "median_screen_gain_pct": 1.645194408706857
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "n": 5,
+      "best": {
+        "cache": 60,
+        "batch": 128,
+        "candidate": "CA",
+        "key": "C60_B128_CA_w27_p24",
+        "workload_seed": 27,
+        "placement_seed": 24,
+        "gain_pct": -2.230830135924311,
+        "wire_change_pct": -9.21435901596518,
+        "critical_rows_change_pct": 54.071295182979014,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 48.00338494498283,
+            "wire_bytes": 450713009728,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              25052353,
+              25440622,
+              24753318,
+              25417003
+            ],
+            "sum_layer_max_rank_rows": 29531364
+          },
+          "CA": {
+            "TTFT_s": 49.074258922599256,
+            "wire_bytes": 409182694880,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              18307193,
+              18068056,
+              18788692,
+              45499355
+            ],
+            "sum_layer_max_rank_rows": 45499355
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p24_result.json",
+        "source_sha256": "05aeea6c911110bd70a11e2a624214c8743a1b2c58780b5ddcff7d9155834aa3"
+      },
+      "gain_range_pct": [
+        -4.923390979280207,
+        -2.230830135924311
+      ],
+      "median_screen_gain_pct": -3.11938219643324
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "n": 4,
+      "best": {
+        "cache": 60,
+        "batch": 128,
+        "candidate": "OLD_CA",
+        "key": "C60_B128_OLD_CA_w27_p6",
+        "workload_seed": 27,
+        "placement_seed": 6,
+        "gain_pct": -3.0343216494614467,
+        "wire_change_pct": -9.178656762225302,
+        "critical_rows_change_pct": 56.360581828725564,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 47.863459563814104,
+            "wire_bytes": 450642456816,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              25023217,
+              25771013,
+              24787309,
+              25081757
+            ],
+            "sum_layer_max_rank_rows": 29066767
+          },
+          "OLD_CA": {
+            "TTFT_s": 49.315790879540145,
+            "wire_bytes": 409279532480,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14486077440,
+              14476640256
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1535,
+              1534
+            ],
+            "expert_rows_by_rank": [
+              18307172,
+              18086132,
+              18821026,
+              45448966
+            ],
+            "sum_layer_max_rank_rows": 45448966
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_OLD_CA_w27_p6_result.json",
+        "source_sha256": "d6c95c4e5878f0b82644aa7fae4cc424c2e4b46ec79a6dcd5107d7c3971b85ef"
+      },
+      "gain_range_pct": [
+        -4.994788342208745,
+        -3.0343216494614467
+      ],
+      "median_screen_gain_pct": -3.5989542552572473
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "LA",
+      "n": 4,
+      "best": {
+        "cache": 60,
+        "batch": 128,
+        "candidate": "LA",
+        "key": "C60_B128_LA_w6_p28",
+        "workload_seed": 6,
+        "placement_seed": 28,
+        "gain_pct": 1.9693195645251294,
+        "wire_change_pct": 0.28516531420381686,
+        "critical_rows_change_pct": -16.430477601722227,
+        "classification": "STRICT_PLACEMENT",
+        "policies": {
+          "BR": {
+            "TTFT_s": 48.089059526100755,
+            "wire_bytes": 449763013984,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14495514624,
+              14495514624
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1536,
+              1536
+            ],
+            "expert_rows_by_rank": [
+              24994929,
+              25739186,
+              25218414,
+              24710767
+            ],
+            "sum_layer_max_rank_rows": 30128053
+          },
+          "LA": {
+            "TTFT_s": 47.142032268457115,
+            "wire_bytes": 451045582096,
+            "H2D_bytes_by_rank": [
+              14495514624,
+              14495514624,
+              14495514624,
+              14495514624
+            ],
+            "copies_by_rank": [
+              1536,
+              1536,
+              1536,
+              1536
+            ],
+            "expert_rows_by_rank": [
+              25163925,
+              25166189,
+              25164954,
+              25168228
+            ],
+            "sum_layer_max_rank_rows": 25177870
+          }
+        },
+        "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_LA_w6_p28_result.json",
+        "source_sha256": "e713395fb0e58452736257bd7464ec5abcf02d21898fe1be31307af54c8b482e"
+      },
+      "gain_range_pct": [
+        1.5623791833184741,
+        1.9693195645251294
+      ],
+      "median_screen_gain_pct": 1.860223291848756
+    }
+  ],
+  "pairs": [
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p30",
+      "workload_seed": 24,
+      "placement_seed": 30,
+      "gain_pct": -8.471584421799005,
+      "wire_change_pct": -16.321124027164224,
+      "critical_rows_change_pct": 59.09179245024036,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.683196034282446,
+          "wire_bytes": 56226581360,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3070276,
+            3158934,
+            3194140,
+            3159562
+          ],
+          "sum_layer_max_rank_rows": 3679137
+        },
+        "CA": {
+          "TTFT_s": 8.334084472618997,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p30_result.json",
+      "source_sha256": "1ee3c6f3530e0f36cc3592d0b91fbb1ef2ffbae8b93ca2e4e034deeb8d62677a"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p30",
+      "workload_seed": 24,
+      "placement_seed": 30,
+      "gain_pct": -8.593254512780192,
+      "wire_change_pct": -16.31777455089437,
+      "critical_rows_change_pct": 59.0225914392424,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.722402801737189,
+          "wire_bytes": 56226581360,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3070276,
+            3158934,
+            3194140,
+            3159562
+          ],
+          "sum_layer_max_rank_rows": 3679137
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.386008528992534,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p30_result.json",
+      "source_sha256": "2d1d9012ef1eae56e3fadb77cc183c7061a556dfaada154cc12b35870bf2b133"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w19_p4",
+      "workload_seed": 19,
+      "placement_seed": 4,
+      "gain_pct": 1.1793448640132431,
+      "wire_change_pct": 0.02912493342794864,
+      "critical_rows_change_pct": -17.947091271533044,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.836788201704621,
+          "wire_bytes": 56234044416,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3147749,
+            3101379,
+            3159868,
+            3173916
+          ],
+          "sum_layer_max_rank_rows": 3835095
+        },
+        "LA": {
+          "TTFT_s": 7.744365442544222,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p4_result.json",
+      "source_sha256": "6f05bca30d88481651586c3fe5aaf77cd5778066a2e6275738c60596733dbcb4"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p20",
+      "workload_seed": 24,
+      "placement_seed": 20,
+      "gain_pct": -8.223460385043424,
+      "wire_change_pct": -16.54126957182197,
+      "critical_rows_change_pct": 59.064122635692314,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.759030549786985,
+          "wire_bytes": 56374894560,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3146526,
+            3132716,
+            3216289,
+            3087381
+          ],
+          "sum_layer_max_rank_rows": 3679777
+        },
+        "CA": {
+          "TTFT_s": 8.397091353312135,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p20_result.json",
+      "source_sha256": "56d065563c1b6e892df28fdf54cfbf46b1ee775e2d0890f43f2b3a89291d9357"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p20",
+      "workload_seed": 24,
+      "placement_seed": 20,
+      "gain_pct": -8.239411943072405,
+      "wire_change_pct": -16.53792890748069,
+      "critical_rows_change_pct": 58.99493366038213,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8051791079342365,
+          "wire_bytes": 56374894560,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3146526,
+            3132716,
+            3216289,
+            3087381
+          ],
+          "sum_layer_max_rank_rows": 3679777
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.448279967531562,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p20_result.json",
+      "source_sha256": "00977954edec9c386a10b4e310087dfdbc4a96009a37f4cc9ee4a97a5e4780ef"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w15_p12",
+      "workload_seed": 15,
+      "placement_seed": 12,
+      "gain_pct": 1.0230640417501657,
+      "wire_change_pct": -0.022129018426042535,
+      "critical_rows_change_pct": -17.675673257512315,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.897778040729463,
+          "wire_bytes": 56311941904,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3269207,
+            3034818,
+            3125123,
+            3153764
+          ],
+          "sum_layer_max_rank_rows": 3822423
+        },
+        "LA": {
+          "TTFT_s": 7.8169787134975195,
+          "wire_bytes": 56299480624,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3145788,
+            3145854,
+            3145673,
+            3145597
+          ],
+          "sum_layer_max_rank_rows": 3146784
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w15_p12_result.json",
+      "source_sha256": "e2b84edf9a05f919bf83b172cc7620d81411bcf8b3fdc47f66f9739590d5bf57"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p27",
+      "workload_seed": 24,
+      "placement_seed": 27,
+      "gain_pct": -8.245908106088873,
+      "wire_change_pct": -16.483905013619903,
+      "critical_rows_change_pct": 60.124270465670925,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.785127010196447,
+          "wire_bytes": 56336172432,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3068920,
+            3258206,
+            3190663,
+            3065123
+          ],
+          "sum_layer_max_rank_rows": 3655414
+        },
+        "CA": {
+          "TTFT_s": 8.42708142939955,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p27_result.json",
+      "source_sha256": "bcd7684f9ce34dd0573e76776501595bc3b641853d285e785dc2cbcbe50b44d8"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p27",
+      "workload_seed": 24,
+      "placement_seed": 27,
+      "gain_pct": -8.794897032384474,
+      "wire_change_pct": -16.480562053105018,
+      "critical_rows_change_pct": 60.054620352168044,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.7826446779072285,
+          "wire_bytes": 56336172432,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3068920,
+            3258206,
+            3190663,
+            3065123
+          ],
+          "sum_layer_max_rank_rows": 3655414
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.46712026372552,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p27_result.json",
+      "source_sha256": "55c6268c046c64a4294bdc5c3a311a4bdb917fa8925dbc8ba8e6ce72ae2e63ad"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w19_p23",
+      "workload_seed": 19,
+      "placement_seed": 23,
+      "gain_pct": 2.2238515949076776,
+      "wire_change_pct": -0.01428839655501779,
+      "critical_rows_change_pct": -17.506477069352556,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.849852430634201,
+          "wire_bytes": 56258460976,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3102609,
+            3080097,
+            3170410,
+            3229796
+          ],
+          "sum_layer_max_rank_rows": 3814611
+        },
+        "LA": {
+          "TTFT_s": 7.675283362157643,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p23_result.json",
+      "source_sha256": "e7ee15992bac85dd69c588d6649041b15eef5046ecb8625a270d1e19855ad536"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p10",
+      "workload_seed": 24,
+      "placement_seed": 10,
+      "gain_pct": -8.602428741875269,
+      "wire_change_pct": -16.612348105617702,
+      "critical_rows_change_pct": 60.52481246021644,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.802060898393393,
+          "wire_bytes": 56422947776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3127907,
+            3144950,
+            3104419,
+            3205636
+          ],
+          "sum_layer_max_rank_rows": 3646293
+        },
+        "CA": {
+          "TTFT_s": 8.473227627575397,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p10_result.json",
+      "source_sha256": "cf401f13df0cac34434f7394c53286a97812e34f387210331e9119aec23b845c"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p10",
+      "workload_seed": 24,
+      "placement_seed": 10,
+      "gain_pct": -8.809388855200574,
+      "wire_change_pct": -16.60901028638947,
+      "critical_rows_change_pct": 60.454988120812004,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.779878800734878,
+          "wire_bytes": 56422947776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3127907,
+            3144950,
+            3104419,
+            3205636
+          ],
+          "sum_layer_max_rank_rows": 3646293
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.465238576754928,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p10_result.json",
+      "source_sha256": "3561d59e6bea1e8a8237c6d9583f47cb7fd0e92c4f110614c34d59185eb06c96"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w19_p9",
+      "workload_seed": 19,
+      "placement_seed": 9,
+      "gain_pct": 2.4547295046316586,
+      "wire_change_pct": 0.19917458337728178,
+      "critical_rows_change_pct": -17.4733332301796,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.920575652271509,
+          "wire_bytes": 56138608704,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3265548,
+            3048203,
+            3222378,
+            3046783
+          ],
+          "sum_layer_max_rank_rows": 3813079
+        },
+        "LA": {
+          "TTFT_s": 7.726146944798529,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p9_result.json",
+      "source_sha256": "9c9adce56c7233a88a2d1f81252dc2cee65ac2ff5ee9d34e100016c0360cc1c3"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p19",
+      "workload_seed": 24,
+      "placement_seed": 19,
+      "gain_pct": -8.646926896558904,
+      "wire_change_pct": -16.424799084446363,
+      "critical_rows_change_pct": 60.386212255894314,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.7823934545740485,
+          "wire_bytes": 56296330448,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3164382,
+            3212249,
+            3111545,
+            3094736
+          ],
+          "sum_layer_max_rank_rows": 3649444
+        },
+        "CA": {
+          "TTFT_s": 8.455331327393651,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p19_result.json",
+      "source_sha256": "f66582125a6d13ec97fc221bd350ca4be27969ec66aced54df147d132ee680d5"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p19",
+      "workload_seed": 24,
+      "placement_seed": 19,
+      "gain_pct": -9.28343556639788,
+      "wire_change_pct": -16.421453758054717,
+      "critical_rows_change_pct": 60.3164482041648,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.748934988863766,
+          "wire_bytes": 56296330448,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3164382,
+            3212249,
+            3111545,
+            3094736
+          ],
+          "sum_layer_max_rank_rows": 3649444
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.468302375636995,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p19_result.json",
+      "source_sha256": "cc8e13dde9d3116b7a669bf0a515ce57abab69505a1c4d3e38ebdd11a44d747b"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w2_p12",
+      "workload_seed": 2,
+      "placement_seed": 12,
+      "gain_pct": 1.676894741778956,
+      "wire_change_pct": 0.23580335373996064,
+      "critical_rows_change_pct": -17.306606837660745,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8284394750371575,
+          "wire_bytes": 56185901472,
+          "H2D_bytes_by_rank": [
+            14410579968,
+            14391705600,
+            14353956864,
+            14259585024
+          ],
+          "copies_by_rank": [
+            1527,
+            1525,
+            1521,
+            1511
+          ],
+          "expert_rows_by_rank": [
+            3305249,
+            3011806,
+            3139205,
+            3126652
+          ],
+          "sum_layer_max_rank_rows": 3805512
+        },
+        "LA": {
+          "TTFT_s": 7.697164785116911,
+          "wire_bytes": 56318389712,
+          "H2D_bytes_by_rank": [
+            14410579968,
+            14391705600,
+            14353956864,
+            14259585024
+          ],
+          "copies_by_rank": [
+            1527,
+            1525,
+            1521,
+            1511
+          ],
+          "expert_rows_by_rank": [
+            3145740,
+            3145814,
+            3145816,
+            3145542
+          ],
+          "sum_layer_max_rank_rows": 3146907
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w2_p12_result.json",
+      "source_sha256": "d53dd81adbcdfedb279664579826228d731843bb8ef1302ed788bc3fa5f741cd"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p13",
+      "workload_seed": 24,
+      "placement_seed": 13,
+      "gain_pct": -9.30468070702888,
+      "wire_change_pct": -16.465354661482156,
+      "critical_rows_change_pct": 61.84163412020875,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.76049249060452,
+          "wire_bytes": 56323661984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3150527,
+            3100371,
+            3175427,
+            3156587
+          ],
+          "sum_layer_max_rank_rows": 3616625
+        },
+        "CA": {
+          "TTFT_s": 8.482581538148224,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p13_result.json",
+      "source_sha256": "12424ff409a85479ca13b3a56ad2b233a81fb8bd7ec7ca1b8c83ac4f03cd53cc"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p13",
+      "workload_seed": 24,
+      "placement_seed": 13,
+      "gain_pct": -9.466603536998331,
+      "wire_change_pct": -16.46201095843861,
+      "critical_rows_change_pct": 61.77123699581792,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.784276816062629,
+          "wire_bytes": 56323661984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3150527,
+            3100371,
+            3175427,
+            3156587
+          ],
+          "sum_layer_max_rank_rows": 3616625
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.521183440461755,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p13_result.json",
+      "source_sha256": "0f5a67fcf3761f3bd42771eaac5f4054224c0099cffc2a6c26c527e5ceef4245"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w19_p28",
+      "workload_seed": 19,
+      "placement_seed": 28,
+      "gain_pct": 2.3872245061678288,
+      "wire_change_pct": 0.03359564215459354,
+      "critical_rows_change_pct": -17.02383937656744,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8967523872852325,
+          "wire_bytes": 56231531200,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3178791,
+            3179111,
+            3111977,
+            3113033
+          ],
+          "sum_layer_max_rank_rows": 3792423
+        },
+        "LA": {
+          "TTFT_s": 7.708239179104567,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p28_result.json",
+      "source_sha256": "e988f3e5deef26f61fe24d88489119e64203e096de1e767995b3fd15409f4a9a"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p18",
+      "workload_seed": 24,
+      "placement_seed": 18,
+      "gain_pct": -9.116086428247883,
+      "wire_change_pct": -16.438856320834315,
+      "critical_rows_change_pct": 61.14747409561798,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.825752531178296,
+          "wire_bytes": 56305801008,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3138654,
+            3178673,
+            3203594,
+            3061991
+          ],
+          "sum_layer_max_rank_rows": 3632204
+        },
+        "CA": {
+          "TTFT_s": 8.539154895581305,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p18_result.json",
+      "source_sha256": "c6595db94dda549295905379212d56719870b777e0c0bf317bb7647067dad895"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p18",
+      "workload_seed": 24,
+      "placement_seed": 18,
+      "gain_pct": -9.35788456761497,
+      "wire_change_pct": -16.435511557122084,
+      "critical_rows_change_pct": 61.07737891373943,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.785978013649583,
+          "wire_bytes": 56305801008,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3138654,
+            3178673,
+            3203594,
+            3061991
+          ],
+          "sum_layer_max_rank_rows": 3632204
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.514580848626792,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p18_result.json",
+      "source_sha256": "398a0201d269243afae3892d5b4fd71f703935ddea47adb066a49a5a14eda680"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w15_p2",
+      "workload_seed": 15,
+      "placement_seed": 2,
+      "gain_pct": 1.9140749517874256,
+      "wire_change_pct": 0.11490773734268434,
+      "critical_rows_change_pct": -16.999452164057484,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.894019962288439,
+          "wire_bytes": 56234862416,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3174274,
+            3167975,
+            3215330,
+            3025333
+          ],
+          "sum_layer_max_rank_rows": 3791281
+        },
+        "LA": {
+          "TTFT_s": 7.742922503501177,
+          "wire_bytes": 56299480624,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3145788,
+            3145854,
+            3145673,
+            3145597
+          ],
+          "sum_layer_max_rank_rows": 3146784
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w15_p2_result.json",
+      "source_sha256": "676deb1f5bc85bf3f6bd6f646d74cb519c72d52760c1b7b08cf3b0197c72ccd3"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C30_B16_CA_w24_p26",
+      "workload_seed": 24,
+      "placement_seed": 26,
+      "gain_pct": -9.782770910610928,
+      "wire_change_pct": -16.3390636175644,
+      "critical_rows_change_pct": 60.18943454535353,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.767130826599896,
+          "wire_bytes": 56238638144,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3137085,
+            3170193,
+            3214015,
+            3061619
+          ],
+          "sum_layer_max_rank_rows": 3653927
+        },
+        "CA": {
+          "TTFT_s": 8.526971441693604,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_CA_w24_p26_result.json",
+      "source_sha256": "cf4fa1c52947af3127bcc3d099903dbe1a96764d88a2077f32b548531ed86006"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C30_B16_OLD_CA_w24_p26",
+      "workload_seed": 24,
+      "placement_seed": 26,
+      "gain_pct": -8.377847950076877,
+      "wire_change_pct": -16.335714859375805,
+      "critical_rows_change_pct": 60.119756087081115,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.842706365510821,
+          "wire_bytes": 56238638144,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3137085,
+            3170193,
+            3214015,
+            3061619
+          ],
+          "sum_layer_max_rank_rows": 3653927
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.49975637998432,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_OLD_CA_w24_p26_result.json",
+      "source_sha256": "7c52b8f18838ebeadf74d3f9fd933f30c3857e2231ba0ecfe57acccf51a98716"
+    },
+    {
+      "cache": 30,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C30_B16_LA_w19_p30",
+      "workload_seed": 19,
+      "placement_seed": 30,
+      "gain_pct": 1.743727003921658,
+      "wire_change_pct": -0.12010149203897091,
+      "critical_rows_change_pct": -16.945853398724996,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8514822749421,
+          "wire_bytes": 56318061376,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3100467,
+            3159328,
+            3146690,
+            3176427
+          ],
+          "sum_layer_max_rank_rows": 3788862
+        },
+        "LA": {
+          "TTFT_s": 7.714573858305812,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B16/C30_B16_LA_w19_p30_result.json",
+      "source_sha256": "366dc40dd5d9214bb72771ef5945829921fd8f0a9f36c147946cb1d9071195ed"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p30",
+      "workload_seed": 24,
+      "placement_seed": 30,
+      "gain_pct": -8.863765763421384,
+      "wire_change_pct": -16.321124027164224,
+      "critical_rows_change_pct": 59.09179245024036,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.7402233928442,
+          "wire_bytes": 56226581360,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3070276,
+            3158934,
+            3194140,
+            3159562
+          ],
+          "sum_layer_max_rank_rows": 3679137
+        },
+        "CA": {
+          "TTFT_s": 8.426298663951457,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p30_result.json",
+      "source_sha256": "ca09fa79688ac083ce9938bde342545c46fae0df46abcae631343d9464543d72"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p30",
+      "workload_seed": 24,
+      "placement_seed": 30,
+      "gain_pct": -9.491953351480408,
+      "wire_change_pct": -16.31777455089437,
+      "critical_rows_change_pct": 59.0225914392424,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.792429897934198,
+          "wire_bytes": 56226581360,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3070276,
+            3158934,
+            3194140,
+            3159562
+          ],
+          "sum_layer_max_rank_rows": 3679137
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.532083708792925,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p30_result.json",
+      "source_sha256": "17973d86b8599d7e5b2a4eb7e9ccc8f6607bba88acdcfdb9ae428dfa9cd24868"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w19_p4",
+      "workload_seed": 19,
+      "placement_seed": 4,
+      "gain_pct": 1.5386891995575414,
+      "wire_change_pct": 0.02912493342794864,
+      "critical_rows_change_pct": -17.947091271533044,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.84050770662725,
+          "wire_bytes": 56234044416,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3147749,
+            3101379,
+            3159868,
+            3173916
+          ],
+          "sum_layer_max_rank_rows": 3835095
+        },
+        "LA": {
+          "TTFT_s": 7.719866661354899,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w19_p4_result.json",
+      "source_sha256": "e95310e2b480b2340de015494924c246a0aee4fc0239767d429c5b4ef6dcd5bf"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p20",
+      "workload_seed": 24,
+      "placement_seed": 20,
+      "gain_pct": -9.400779954189886,
+      "wire_change_pct": -16.54126957182197,
+      "critical_rows_change_pct": 59.064122635692314,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.767347597517073,
+          "wire_bytes": 56374894560,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3146526,
+            3132716,
+            3216289,
+            3087381
+          ],
+          "sum_layer_max_rank_rows": 3679777
+        },
+        "CA": {
+          "TTFT_s": 8.497538853436708,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p20_result.json",
+      "source_sha256": "d07ba75e17539cccaa9826423461d72c81b0504de43e50e22b69c25c4089019b"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p20",
+      "workload_seed": 24,
+      "placement_seed": 20,
+      "gain_pct": -8.960494748100789,
+      "wire_change_pct": -16.53792890748069,
+      "critical_rows_change_pct": 58.99493366038213,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8182908510789275,
+          "wire_bytes": 56374894560,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3146526,
+            3132716,
+            3216289,
+            3087381
+          ],
+          "sum_layer_max_rank_rows": 3679777
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.518848392181098,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p20_result.json",
+      "source_sha256": "917bd73f31ab8055cb7054cbcae5ac1af67e3665527b6e737434a201be4b97cf"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w15_p12",
+      "workload_seed": 15,
+      "placement_seed": 12,
+      "gain_pct": 2.231882443751665,
+      "wire_change_pct": -0.022129018426042535,
+      "critical_rows_change_pct": -17.675673257512315,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.880825154483318,
+          "wire_bytes": 56311941904,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3269207,
+            3034818,
+            3125123,
+            3153764
+          ],
+          "sum_layer_max_rank_rows": 3822423
+        },
+        "LA": {
+          "TTFT_s": 7.70493440143764,
+          "wire_bytes": 56299480624,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3145788,
+            3145854,
+            3145673,
+            3145597
+          ],
+          "sum_layer_max_rank_rows": 3146784
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w15_p12_result.json",
+      "source_sha256": "73a6ba9861e426a8bf4ead96a7871350384f3fda13691e256ec3dddf7c42960f"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p27",
+      "workload_seed": 24,
+      "placement_seed": 27,
+      "gain_pct": -8.677292428198346,
+      "wire_change_pct": -16.483905013619903,
+      "critical_rows_change_pct": 60.124270465670925,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.826645313762128,
+          "wire_bytes": 56336172432,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3068920,
+            3258206,
+            3190663,
+            3065123
+          ],
+          "sum_layer_max_rank_rows": 3655414
+        },
+        "CA": {
+          "TTFT_s": 8.505786214955151,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p27_result.json",
+      "source_sha256": "0299b5177ae564ef055f1cb4131330095b48dbc1d33aeccb26f940f39561f80e"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p27",
+      "workload_seed": 24,
+      "placement_seed": 27,
+      "gain_pct": -9.410064779612547,
+      "wire_change_pct": -16.480562053105018,
+      "critical_rows_change_pct": 60.054620352168044,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.803585444577038,
+          "wire_bytes": 56336172432,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3068920,
+            3258206,
+            3190663,
+            3065123
+          ],
+          "sum_layer_max_rank_rows": 3655414
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.537907890044153,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p27_result.json",
+      "source_sha256": "620f304e06cd1f01307d55c26de29c1b9e53270aee5f495626a9320808ef2435"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w19_p23",
+      "workload_seed": 19,
+      "placement_seed": 23,
+      "gain_pct": 1.438058948435006,
+      "wire_change_pct": -0.01428839655501779,
+      "critical_rows_change_pct": -17.506477069352556,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.829741260968149,
+          "wire_bytes": 56258460976,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3102609,
+            3080097,
+            3170410,
+            3229796
+          ],
+          "sum_layer_max_rank_rows": 3814611
+        },
+        "LA": {
+          "TTFT_s": 7.717144966125488,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w19_p23_result.json",
+      "source_sha256": "0ecde9b5e78553709ca7976063552fe2ac1232ad8a94966add18624ef8844315"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p10",
+      "workload_seed": 24,
+      "placement_seed": 10,
+      "gain_pct": -9.335322937072954,
+      "wire_change_pct": -16.612348105617702,
+      "critical_rows_change_pct": 60.52481246021644,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.811382574029267,
+          "wire_bytes": 56422947776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3127907,
+            3144950,
+            3104419,
+            3205636
+          ],
+          "sum_layer_max_rank_rows": 3646293
+        },
+        "CA": {
+          "TTFT_s": 8.54060036316514,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p10_result.json",
+      "source_sha256": "8f9e8ada16eacc09c6719883e8384b2a2bf0444a7ac5c584607b547e26372ec4"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p10",
+      "workload_seed": 24,
+      "placement_seed": 10,
+      "gain_pct": -9.124197355956177,
+      "wire_change_pct": -16.60901028638947,
+      "critical_rows_change_pct": 60.454988120812004,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.833199356682599,
+          "wire_bytes": 56422947776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3127907,
+            3144950,
+            3104419,
+            3205636
+          ],
+          "sum_layer_max_rank_rows": 3646293
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.547915925271809,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p10_result.json",
+      "source_sha256": "135b96d63cf71ea8ffdf22038c8d601444991d70dd8d38ed2106b608f66b9924"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w19_p9",
+      "workload_seed": 19,
+      "placement_seed": 9,
+      "gain_pct": 1.6112160977405643,
+      "wire_change_pct": 0.19917458337728178,
+      "critical_rows_change_pct": -17.4733332301796,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8794064382091165,
+          "wire_bytes": 56138608704,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3265548,
+            3048203,
+            3222378,
+            3046783
+          ],
+          "sum_layer_max_rank_rows": 3813079
+        },
+        "LA": {
+          "TTFT_s": 7.752452173270285,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w19_p9_result.json",
+      "source_sha256": "57545482acd32d913bb6a3a46c8faa0e394f36366e1a138136233079066ee8a5"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p19",
+      "workload_seed": 24,
+      "placement_seed": 19,
+      "gain_pct": -9.19083508818417,
+      "wire_change_pct": -16.424799084446363,
+      "critical_rows_change_pct": 60.386212255894314,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.805351786315441,
+          "wire_bytes": 56296330448,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3164382,
+            3212249,
+            3111545,
+            3094736
+          ],
+          "sum_layer_max_rank_rows": 3649444
+        },
+        "CA": {
+          "TTFT_s": 8.52272879704833,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p19_result.json",
+      "source_sha256": "bac8a4807271f8fc8b778e9b9f4c9024cccb1a8c017e65e36a742bded5748e1b"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p19",
+      "workload_seed": 24,
+      "placement_seed": 19,
+      "gain_pct": -9.137928492361125,
+      "wire_change_pct": -16.421453758054717,
+      "critical_rows_change_pct": 60.3164482041648,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.820004048757255,
+          "wire_bytes": 56296330448,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3164382,
+            3212249,
+            3111545,
+            3094736
+          ],
+          "sum_layer_max_rank_rows": 3649444
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.534590426832438,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p19_result.json",
+      "source_sha256": "dcae27ea90b2bba81d90692874f50918a4bfb213f7248c6b2bb470f53119317d"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w2_p12",
+      "workload_seed": 2,
+      "placement_seed": 12,
+      "gain_pct": 2.150977817455091,
+      "wire_change_pct": 0.23580335373996064,
+      "critical_rows_change_pct": -17.306606837660745,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8977415189146996,
+          "wire_bytes": 56185901472,
+          "H2D_bytes_by_rank": [
+            14410579968,
+            14391705600,
+            14353956864,
+            14259585024
+          ],
+          "copies_by_rank": [
+            1527,
+            1525,
+            1521,
+            1511
+          ],
+          "expert_rows_by_rank": [
+            3305249,
+            3011806,
+            3139205,
+            3126652
+          ],
+          "sum_layer_max_rank_rows": 3805512
+        },
+        "LA": {
+          "TTFT_s": 7.727862850762904,
+          "wire_bytes": 56318389712,
+          "H2D_bytes_by_rank": [
+            14410579968,
+            14391705600,
+            14353956864,
+            14259585024
+          ],
+          "copies_by_rank": [
+            1527,
+            1525,
+            1521,
+            1511
+          ],
+          "expert_rows_by_rank": [
+            3145740,
+            3145814,
+            3145816,
+            3145542
+          ],
+          "sum_layer_max_rank_rows": 3146907
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w2_p12_result.json",
+      "source_sha256": "5a00d55186f1799e2553edb2a9cdd9cfa5dadae60959f3cab6bf3ecac17caad6"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p13",
+      "workload_seed": 24,
+      "placement_seed": 13,
+      "gain_pct": -9.93436833534751,
+      "wire_change_pct": -16.465354661482156,
+      "critical_rows_change_pct": 61.84163412020875,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.821109624579549,
+          "wire_bytes": 56323661984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3150527,
+            3100371,
+            3175427,
+            3156587
+          ],
+          "sum_layer_max_rank_rows": 3616625
+        },
+        "CA": {
+          "TTFT_s": 8.598087462596595,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p13_result.json",
+      "source_sha256": "01f9e1fd4c5f495f0c62c756ca87980b0951289066667a8b2f671fdb3fa1bf07"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p13",
+      "workload_seed": 24,
+      "placement_seed": 13,
+      "gain_pct": -9.33298585366773,
+      "wire_change_pct": -16.46201095843861,
+      "critical_rows_change_pct": 61.77123699581792,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.833527136594057,
+          "wire_bytes": 56323661984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3150527,
+            3100371,
+            3175427,
+            3156587
+          ],
+          "sum_layer_max_rank_rows": 3616625
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.564629116095603,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p13_result.json",
+      "source_sha256": "5ee6ce14bb015f713d77fbfb6fc7d9e7d2635bf72e649fa45165f6931c3dff3f"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w19_p28",
+      "workload_seed": 19,
+      "placement_seed": 28,
+      "gain_pct": 1.6690099481114329,
+      "wire_change_pct": 0.03359564215459354,
+      "critical_rows_change_pct": -17.02383937656744,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.8776717111468315,
+          "wire_bytes": 56231531200,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3178791,
+            3179111,
+            3111977,
+            3113033
+          ],
+          "sum_layer_max_rank_rows": 3792423
+        },
+        "LA": {
+          "TTFT_s": 7.746192586608231,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w19_p28_result.json",
+      "source_sha256": "82e649510a2fb086555c20f123ca8564556da0917b6e130b32cdf4227d8856d5"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p18",
+      "workload_seed": 24,
+      "placement_seed": 18,
+      "gain_pct": -9.270472071575565,
+      "wire_change_pct": -16.438856320834315,
+      "critical_rows_change_pct": 61.14747409561798,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.851068495772779,
+          "wire_bytes": 56305801008,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3138654,
+            3178673,
+            3203594,
+            3061991
+          ],
+          "sum_layer_max_rank_rows": 3632204
+        },
+        "CA": {
+          "TTFT_s": 8.578899607993662,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p18_result.json",
+      "source_sha256": "a67f7ee20fc9223101a702c5768f233b938ce2e8657c6b3c0412a63bdf6dc9e9"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p18",
+      "workload_seed": 24,
+      "placement_seed": 18,
+      "gain_pct": -9.78144562329164,
+      "wire_change_pct": -16.435511557122084,
+      "critical_rows_change_pct": 61.07737891373943,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.835599307902157,
+          "wire_bytes": 56305801008,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3138654,
+            3178673,
+            3203594,
+            3061991
+          ],
+          "sum_layer_max_rank_rows": 3632204
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.602034193463624,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p18_result.json",
+      "source_sha256": "7e49ccc370d2bc9c007077c035d45e858aacdcac56225af60c78c71dd2265df4"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w15_p2",
+      "workload_seed": 15,
+      "placement_seed": 2,
+      "gain_pct": 1.5302989245373766,
+      "wire_change_pct": 0.11490773734268434,
+      "critical_rows_change_pct": -16.999452164057484,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.883180878125131,
+          "wire_bytes": 56234862416,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3174274,
+            3167975,
+            3215330,
+            3025333
+          ],
+          "sum_layer_max_rank_rows": 3791281
+        },
+        "LA": {
+          "TTFT_s": 7.762544645927846,
+          "wire_bytes": 56299480624,
+          "H2D_bytes_by_rank": [
+            14420017152,
+            14410579968,
+            14353956864,
+            14278459392
+          ],
+          "copies_by_rank": [
+            1528,
+            1527,
+            1521,
+            1513
+          ],
+          "expert_rows_by_rank": [
+            3145788,
+            3145854,
+            3145673,
+            3145597
+          ],
+          "sum_layer_max_rank_rows": 3146784
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w15_p2_result.json",
+      "source_sha256": "abe4a93798b2218ae8e30e45d1ac07ced426b511869787656485c0c873880321"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "CA",
+      "key": "C60_B16_CA_w24_p26",
+      "workload_seed": 24,
+      "placement_seed": 26,
+      "gain_pct": -9.491743289785749,
+      "wire_change_pct": -16.3390636175644,
+      "critical_rows_change_pct": 60.18943454535353,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.874037253670394,
+          "wire_bytes": 56238638144,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3137085,
+            3170193,
+            3214015,
+            3061619
+          ],
+          "sum_layer_max_rank_rows": 3653927
+        },
+        "CA": {
+          "TTFT_s": 8.621420656330884,
+          "wire_bytes": 47049771280,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5853205,
+            2614416,
+            1985672,
+            2129619
+          ],
+          "sum_layer_max_rank_rows": 5853205
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_CA_w24_p26_result.json",
+      "source_sha256": "73799b89cc53928f6c6bbd3cd43ce2f8c11a0cc89a289d1151d9dcfaf0b6a81c"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "OLD_CA",
+      "key": "C60_B16_OLD_CA_w24_p26",
+      "workload_seed": 24,
+      "placement_seed": 26,
+      "gain_pct": -9.125460820660614,
+      "wire_change_pct": -16.335714859375805,
+      "critical_rows_change_pct": 60.119756087081115,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.876358054578304,
+          "wire_bytes": 56238638144,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            3137085,
+            3170193,
+            3214015,
+            3061619
+          ],
+          "sum_layer_max_rank_rows": 3653927
+        },
+        "OLD_CA": {
+          "TTFT_s": 8.595112022943795,
+          "wire_bytes": 47051654576,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14467203072,
+            14438891520
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1533,
+            1530
+          ],
+          "expert_rows_by_rank": [
+            5850659,
+            2617109,
+            1979280,
+            2135864
+          ],
+          "sum_layer_max_rank_rows": 5850659
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_OLD_CA_w24_p26_result.json",
+      "source_sha256": "d1e5793efe000e8ac85874c52b88ea950749646b5e20bbe3889d7e1737bb3e15"
+    },
+    {
+      "cache": 60,
+      "batch": 16,
+      "candidate": "LA",
+      "key": "C60_B16_LA_w19_p30",
+      "workload_seed": 19,
+      "placement_seed": 30,
+      "gain_pct": 1.8294635682816196,
+      "wire_change_pct": -0.12010149203897091,
+      "critical_rows_change_pct": -16.945853398724996,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 7.925443539395928,
+          "wire_bytes": 56318061376,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3100467,
+            3159328,
+            3146690,
+            3176427
+          ],
+          "sum_layer_max_rank_rows": 3788862
+        },
+        "LA": {
+          "TTFT_s": 7.780450437217951,
+          "wire_bytes": 56250422544,
+          "H2D_bytes_by_rank": [
+            14486077440,
+            14457765888,
+            14438891520,
+            14363394048
+          ],
+          "copies_by_rank": [
+            1535,
+            1532,
+            1530,
+            1522
+          ],
+          "expert_rows_by_rank": [
+            3145708,
+            3145952,
+            3145761,
+            3145491
+          ],
+          "sum_layer_max_rank_rows": 3146807
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B16/C60_B16_LA_w19_p30_result.json",
+      "source_sha256": "53c27bccbf6df200f6850619892a333aaf48065829073143e26ccd6d5480f9b2"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p27",
+      "workload_seed": 27,
+      "placement_seed": 27,
+      "gain_pct": -5.436775825857687,
+      "wire_change_pct": -9.186938987651649,
+      "critical_rows_change_pct": 57.0678930241328,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.48790311347693,
+          "wire_bytes": 450576921776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24901680,
+            25817417,
+            25282626,
+            24661573
+          ],
+          "sum_layer_max_rank_rows": 28967954
+        },
+        "CA": {
+          "TTFT_s": 50.069713950157166,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p27_result.json",
+      "source_sha256": "76efe3f30a71561ec54f85241bec82fe8f4ad81feb2e7a2ce91064b0d9fe7fbc"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p27",
+      "workload_seed": 27,
+      "placement_seed": 27,
+      "gain_pct": -9.407846344044168,
+      "wire_change_pct": -9.16544707465745,
+      "critical_rows_change_pct": 56.89394563385457,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 46.71171204186976,
+          "wire_bytes": 450576921776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24901680,
+            25817417,
+            25282626,
+            24661573
+          ],
+          "sum_layer_max_rank_rows": 28967954
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.106278135441244,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p27_result.json",
+      "source_sha256": "43f4371da5dc531f32fbb007ee2d1e2a02f544bb7b8aeb4a20f7a1849d4bb35f"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w26_p28",
+      "workload_seed": 26,
+      "placement_seed": 28,
+      "gain_pct": 1.3385085085144466,
+      "wire_change_pct": 0.2775023584511649,
+      "critical_rows_change_pct": -16.509756831234323,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.50605105329305,
+          "wire_bytes": 449409807888,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24954097,
+            25700239,
+            25272304,
+            24736656
+          ],
+          "sum_layer_max_rank_rows": 30155641
+        },
+        "LA": {
+          "TTFT_s": 46.870178517885506,
+          "wire_bytes": 450656930704,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25166487,
+            25162737,
+            25168916,
+            25165156
+          ],
+          "sum_layer_max_rank_rows": 25177018
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w26_p28_result.json",
+      "source_sha256": "5aa02139ae38eac253b7de80a4f23468ad919610b0de80081223b85a8f6878eb"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p20",
+      "workload_seed": 27,
+      "placement_seed": 20,
+      "gain_pct": -7.585590185993163,
+      "wire_change_pct": -9.184595328737066,
+      "critical_rows_change_pct": 53.70539123390525,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.40994223114103,
+          "wire_bytes": 450565293808,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25124142,
+            24623433,
+            26148799,
+            24766922
+          ],
+          "sum_layer_max_rank_rows": 29601665
+        },
+        "CA": {
+          "TTFT_s": 51.006266156211495,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p20_result.json",
+      "source_sha256": "d4fd96d829bc04426976f00ee439267f9d0d22329a226e4bf0bc5ae5e4ec700b"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p20",
+      "workload_seed": 27,
+      "placement_seed": 20,
+      "gain_pct": -8.834933109967768,
+      "wire_change_pct": -9.163102861090133,
+      "critical_rows_change_pct": 53.53516770087088,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.08064478170127,
+          "wire_bytes": 450565293808,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25124142,
+            24623433,
+            26148799,
+            24766922
+          ],
+          "sum_layer_max_rank_rows": 29601665
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.240188255906105,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p20_result.json",
+      "source_sha256": "9df062ea94c2361dfbf39dcc996e3bab35899b3b10488e120d93a6c6c9ed338b"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w0_p28",
+      "workload_seed": 0,
+      "placement_seed": 28,
+      "gain_pct": 2.5830214870495083,
+      "wire_change_pct": 0.3583001539366082,
+      "critical_rows_change_pct": -16.503217900180978,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.371491375379264,
+          "wire_bytes": 449460745776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24978033,
+            25722098,
+            25196957,
+            24766208
+          ],
+          "sum_layer_max_rank_rows": 30154913
+        },
+        "LA": {
+          "TTFT_s": 46.14787557441741,
+          "wire_bytes": 451071164320,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25166713,
+            25168203,
+            25166667,
+            25161713
+          ],
+          "sum_layer_max_rank_rows": 25178382
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w0_p28_result.json",
+      "source_sha256": "65d5a07dad07e2dfd83bf8b416cf5cbad68914c2e45e9edb7d558843dd278cfa"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p6",
+      "workload_seed": 27,
+      "placement_seed": 6,
+      "gain_pct": -8.703342794172485,
+      "wire_change_pct": -9.200145549740835,
+      "critical_rows_change_pct": 56.53393788170524,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.141717279329896,
+          "wire_bytes": 450642456816,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25023217,
+            25771013,
+            24787309,
+            25081757
+          ],
+          "sum_layer_max_rank_rows": 29066767
+        },
+        "CA": {
+          "TTFT_s": 51.24462253320962,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p6_result.json",
+      "source_sha256": "1260d4b64ad831314d3c278bf8e0709b1d8377d725d2899084c9c2bdd0509192"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p6",
+      "workload_seed": 27,
+      "placement_seed": 6,
+      "gain_pct": -7.862922306274833,
+      "wire_change_pct": -9.178656762225302,
+      "critical_rows_change_pct": 56.360581828725564,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.72712246887386,
+          "wire_bytes": 450642456816,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25023217,
+            25771013,
+            24787309,
+            25081757
+          ],
+          "sum_layer_max_rank_rows": 29066767
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.479869027622044,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p6_result.json",
+      "source_sha256": "5b5a8194c59a611b7c4aca75a2dbf21de94d6510cb8ffe58b06382ce9eca2be9"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w6_p28",
+      "workload_seed": 6,
+      "placement_seed": 28,
+      "gain_pct": 1.419853317311437,
+      "wire_change_pct": 0.28516531420381686,
+      "critical_rows_change_pct": -16.430477601722227,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.85834389086813,
+          "wire_bytes": 449763013984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24994929,
+            25739186,
+            25218414,
+            24710767
+          ],
+          "sum_layer_max_rank_rows": 30128053
+        },
+        "LA": {
+          "TTFT_s": 47.17882560752332,
+          "wire_bytes": 451045582096,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25163925,
+            25166189,
+            25164954,
+            25168228
+          ],
+          "sum_layer_max_rank_rows": 25177870
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w6_p28_result.json",
+      "source_sha256": "6cb69c685ede11f56ef6bef3d8d22349696dd8bd1ae346f4581a4b1d7f190396"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p24",
+      "workload_seed": 27,
+      "placement_seed": 24,
+      "gain_pct": -7.28337759765143,
+      "wire_change_pct": -9.21435901596518,
+      "critical_rows_change_pct": 54.071295182979014,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.572615270502865,
+          "wire_bytes": 450713009728,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25052353,
+            25440622,
+            24753318,
+            25417003
+          ],
+          "sum_layer_max_rank_rows": 29531364
+        },
+        "CA": {
+          "TTFT_s": 51.03750847373158,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p24_result.json",
+      "source_sha256": "b8fe0fdb6e01c23ac24aeef1a4960b27cfadea5b10705b97b95b8f211ed0d5bc"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p24",
+      "workload_seed": 27,
+      "placement_seed": 24,
+      "gain_pct": -7.666997612450976,
+      "wire_change_pct": -9.192873592223272,
+      "critical_rows_change_pct": 53.90066642367077,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.95904554799199,
+          "wire_bytes": 450713009728,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25052353,
+            25440622,
+            24753318,
+            25417003
+          ],
+          "sum_layer_max_rank_rows": 29531364
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.63606442511082,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p24_result.json",
+      "source_sha256": "49d541f9fd22156c63a1748ffc2acde735bbd2db5237a1e3367a647d15c9223c"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w2_p28",
+      "workload_seed": 2,
+      "placement_seed": 28,
+      "gain_pct": 1.6514864024876563,
+      "wire_change_pct": 0.5090268466858339,
+      "critical_rows_change_pct": -16.414716840044218,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.52846319321543,
+          "wire_bytes": 449625234288,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25237641,
+            25508676,
+            25089723,
+            24827256
+          ],
+          "sum_layer_max_rank_rows": 30121738
+        },
+        "LA": {
+          "TTFT_s": 47.72702222224325,
+          "wire_bytes": 451913947440,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25164519,
+            25167770,
+            25167841,
+            25163166
+          ],
+          "sum_layer_max_rank_rows": 25177340
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w2_p28_result.json",
+      "source_sha256": "6511aefa88a79237033e41f487774990386a174a2f93c904dab4284eff4fc4c8"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p19",
+      "workload_seed": 27,
+      "placement_seed": 19,
+      "gain_pct": -6.853097665606356,
+      "wire_change_pct": -9.235834447025514,
+      "critical_rows_change_pct": 56.214079908514236,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.00147840753198,
+          "wire_bytes": 450819651552,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25333556,
+            25792288,
+            24989248,
+            24548204
+          ],
+          "sum_layer_max_rank_rows": 29126283
+        },
+        "CA": {
+          "TTFT_s": 51.29106660373509,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p19_result.json",
+      "source_sha256": "6812490105b646a681b2db38aedc42a5b7a8d80a1941ca5ab098f64c3617e695"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w9_p27",
+      "workload_seed": 9,
+      "placement_seed": 27,
+      "gain_pct": -0.6467112748666404,
+      "wire_change_pct": -8.934394414874935,
+      "critical_rows_change_pct": 20.127382224231162,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.82797847967595,
+          "wire_bytes": 450673943440,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24906166,
+            25823258,
+            25300316,
+            24633556
+          ],
+          "sum_layer_max_rank_rows": 29087732
+        },
+        "OLD_CA": {
+          "TTFT_s": 48.1372874090448,
+          "wire_bytes": 410408955808,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            16701303,
+            34161175,
+            20051254,
+            29749564
+          ],
+          "sum_layer_max_rank_rows": 34942331
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w9_p27_result.json",
+      "source_sha256": "d679935355cfce7f51559caec84a93973c75736d8fb1d03c6b7afb5d07f9fd9e"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w11_p28",
+      "workload_seed": 11,
+      "placement_seed": 28,
+      "gain_pct": 1.6447049592670182,
+      "wire_change_pct": 0.33522375780810076,
+      "critical_rows_change_pct": -16.349470676627075,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.240402108989656,
+          "wire_bytes": 449578216608,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25191098,
+            25534339,
+            25076759,
+            24861100
+          ],
+          "sum_layer_max_rank_rows": 30097953
+        },
+        "LA": {
+          "TTFT_s": 47.44698982313275,
+          "wire_bytes": 451085309600,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25165548,
+            25163249,
+            25169831,
+            25164668
+          ],
+          "sum_layer_max_rank_rows": 25177097
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w11_p28_result.json",
+      "source_sha256": "fa1cdde4f9816d404ec5f542518d5ead2c50351556f1e84cd7af4a7a3abb7833"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p11",
+      "workload_seed": 27,
+      "placement_seed": 11,
+      "gain_pct": -8.302488884901038,
+      "wire_change_pct": -9.173245962485787,
+      "critical_rows_change_pct": 55.01154665014276,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.173950091935694,
+          "wire_bytes": 450508992880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25088119,
+            25161505,
+            25508327,
+            24905345
+          ],
+          "sum_layer_max_rank_rows": 29352236
+        },
+        "CA": {
+          "TTFT_s": 51.090562054887414,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p11_result.json",
+      "source_sha256": "35d100cf3cf1c6afa4e290b330163ff82b4043cbe8f907fbc0f5d802dbeb8000"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p19",
+      "workload_seed": 27,
+      "placement_seed": 19,
+      "gain_pct": -9.515051041600863,
+      "wire_change_pct": -9.214354105681332,
+      "critical_rows_change_pct": 56.04107808744425,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.15044190362096,
+          "wire_bytes": 450819651552,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25333556,
+            25792288,
+            24989248,
+            24548204
+          ],
+          "sum_layer_max_rank_rows": 29126283
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.63683051709086,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p19_result.json",
+      "source_sha256": "6e7948dfb387dd2a07731fd4888b29437508b43e3fdb8911da682c299c94d174"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w21_p28",
+      "workload_seed": 21,
+      "placement_seed": 28,
+      "gain_pct": 1.8647361785331995,
+      "wire_change_pct": 0.43953977341570916,
+      "critical_rows_change_pct": -16.271466969375837,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.49290754087269,
+          "wire_bytes": 449224475104,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25223872,
+            25521313,
+            25069080,
+            24849031
+          ],
+          "sum_layer_max_rank_rows": 30071548
+        },
+        "LA": {
+          "TTFT_s": 47.58864274993539,
+          "wire_bytes": 451198995344,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25164237,
+            25168799,
+            25164344,
+            25165916
+          ],
+          "sum_layer_max_rank_rows": 25178466
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w21_p28_result.json",
+      "source_sha256": "adf9efd2daa6a0901aaf4e907f9e68292e80c6899072f6d9a18c6148a336be89"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p10",
+      "workload_seed": 27,
+      "placement_seed": 10,
+      "gain_pct": -7.040124024109895,
+      "wire_change_pct": -9.136180870104837,
+      "critical_rows_change_pct": 56.387964926528575,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.94411805551499,
+          "wire_bytes": 450325221632,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25309314,
+            24951706,
+            24852138,
+            25550138
+          ],
+          "sum_layer_max_rank_rows": 29093898
+        },
+        "CA": {
+          "TTFT_s": 51.31944342888892,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p10_result.json",
+      "source_sha256": "5c9543fde185ceb378b4e4f510c4b216e82dfd09db36a0dce1fea166d6c1b293"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p11",
+      "workload_seed": 27,
+      "placement_seed": 11,
+      "gain_pct": -7.814820657845867,
+      "wire_change_pct": -9.151750808886094,
+      "critical_rows_change_pct": 54.839876594069345,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.93783041462302,
+          "wire_bytes": 450508992880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25088119,
+            25161505,
+            25508327,
+            24905345
+          ],
+          "sum_layer_max_rank_rows": 29352236
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.684085888788104,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p11_result.json",
+      "source_sha256": "2cf4ed4a1e44f8272e17938142c5b9a59a899137f2ea1d84795d9eaff76cdb5c"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w25_p28",
+      "workload_seed": 25,
+      "placement_seed": 28,
+      "gain_pct": 1.4618178647281432,
+      "wire_change_pct": 0.4186857505080299,
+      "critical_rows_change_pct": -16.206000752350292,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.31672049872577,
+          "wire_bytes": 449431236128,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25184439,
+            25559189,
+            25048009,
+            24871659
+          ],
+          "sum_layer_max_rank_rows": 30049832
+        },
+        "LA": {
+          "TTFT_s": 47.610418046824634,
+          "wire_bytes": 451312940672,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25163441,
+            25169353,
+            25161898,
+            25168604
+          ],
+          "sum_layer_max_rank_rows": 25179956
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w25_p28_result.json",
+      "source_sha256": "2ac77e076ed61086a4cf369053951034aa2237a30ef340d8df2881a2b26c6d63"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C30_B128_CA_w27_p30",
+      "workload_seed": 27,
+      "placement_seed": 30,
+      "gain_pct": -6.065429389518662,
+      "wire_change_pct": -9.169099094655008,
+      "critical_rows_change_pct": 54.47822423711459,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.08322454523295,
+          "wire_bytes": 450488424976,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24441407,
+            25273004,
+            25661508,
+            25287377
+          ],
+          "sum_layer_max_rank_rows": 29453572
+        },
+        "CA": {
+          "TTFT_s": 50.99967857822776,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_CA_w27_p30_result.json",
+      "source_sha256": "c7ae06b3c462c64464929b52aba9d73429c11935d05f6962e5fcc1131f0adc29"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C30_B128_OLD_CA_w27_p10",
+      "workload_seed": 27,
+      "placement_seed": 10,
+      "gain_pct": -6.986256387569356,
+      "wire_change_pct": -9.114676944642019,
+      "critical_rows_change_pct": 56.21477053366999,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.92061707936227,
+          "wire_bytes": 450325221632,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25309314,
+            24951706,
+            24852138,
+            25550138
+          ],
+          "sum_layer_max_rank_rows": 29093898
+        },
+        "OLD_CA": {
+          "TTFT_s": 51.268474251031876,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_OLD_CA_w27_p10_result.json",
+      "source_sha256": "a35e94450c93df89bcb6667c47f17bb1da39038e1ad4f102d32cc31ffde277a0"
+    },
+    {
+      "cache": 30,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C30_B128_LA_w19_p23",
+      "workload_seed": 19,
+      "placement_seed": 23,
+      "gain_pct": 1.645683858146696,
+      "wire_change_pct": 0.3582549560059878,
+      "critical_rows_change_pct": -16.17394189021295,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.254252253100276,
+          "wire_bytes": 449932783616,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14457765888
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1532
+          ],
+          "expert_rows_by_rank": [
+            24994145,
+            24793804,
+            25814497,
+            25060850
+          ],
+          "sum_layer_max_rank_rows": 30035801
+        },
+        "LA": {
+          "TTFT_s": 47.460139812901616,
+          "wire_bytes": 451544690112,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14457765888
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1532
+          ],
+          "expert_rows_by_rank": [
+            25165321,
+            25167258,
+            25164675,
+            25166042
+          ],
+          "sum_layer_max_rank_rows": 25177828
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C30_B128/C30_B128_LA_w19_p23_result.json",
+      "source_sha256": "f8fd25deb9bed7751f18b95c3e63d00cd68e876f070da9ac11e288363a8a265e"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C60_B128_CA_w27_p27",
+      "workload_seed": 27,
+      "placement_seed": 27,
+      "gain_pct": -4.559686659518514,
+      "wire_change_pct": -9.186938987651649,
+      "critical_rows_change_pct": 57.0678930241328,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 46.68679995648563,
+          "wire_bytes": 450576921776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24901680,
+            25817417,
+            25282626,
+            24661573
+          ],
+          "sum_layer_max_rank_rows": 28967954
+        },
+        "CA": {
+          "TTFT_s": 48.815571745857596,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p27_result.json",
+      "source_sha256": "64265b84f33530ee886c38a175a3aec4fe255117baf9e846da83e102d8fc15c7"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C60_B128_OLD_CA_w27_p27",
+      "workload_seed": 27,
+      "placement_seed": 27,
+      "gain_pct": -3.0365588509999375,
+      "wire_change_pct": -9.16544707465745,
+      "critical_rows_change_pct": 56.89394563385457,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.73219675477594,
+          "wire_bytes": 450576921776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            24901680,
+            25817417,
+            25282626,
+            24661573
+          ],
+          "sum_layer_max_rank_rows": 28967954
+        },
+        "OLD_CA": {
+          "TTFT_s": 49.18161300010979,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_OLD_CA_w27_p27_result.json",
+      "source_sha256": "9114b22014f64ddf81946f9f9aed2db9b27d451f08cef99fbebbb4fa4ca87eb6"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C60_B128_LA_w26_p28",
+      "workload_seed": 26,
+      "placement_seed": 28,
+      "gain_pct": 1.757846694479781,
+      "wire_change_pct": 0.2775023584511649,
+      "critical_rows_change_pct": -16.509756831234323,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.73432216886431,
+          "wire_bytes": 449409807888,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24954097,
+            25700239,
+            25272304,
+            24736656
+          ],
+          "sum_layer_max_rank_rows": 30155641
+        },
+        "LA": {
+          "TTFT_s": 46.8952259644866,
+          "wire_bytes": 450656930704,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25166487,
+            25162737,
+            25168916,
+            25165156
+          ],
+          "sum_layer_max_rank_rows": 25177018
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_LA_w26_p28_result.json",
+      "source_sha256": "13a91ea282b5c51c6c0045e07dd0f49d7b49e38481206e642cf93583489b42dc"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C60_B128_CA_w27_p20",
+      "workload_seed": 27,
+      "placement_seed": 20,
+      "gain_pct": -3.0872965417823917,
+      "wire_change_pct": -9.184595328737066,
+      "critical_rows_change_pct": 53.70539123390525,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.662930455990136,
+          "wire_bytes": 450565293808,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25124142,
+            24623433,
+            26148799,
+            24766922
+          ],
+          "sum_layer_max_rank_rows": 29601665
+        },
+        "CA": {
+          "TTFT_s": 49.13442645967007,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p20_result.json",
+      "source_sha256": "f13894be492162e8f2f7de19582039f96e518d55a6aabfbf03d91ea670c66e9d"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C60_B128_OLD_CA_w27_p20",
+      "workload_seed": 27,
+      "placement_seed": 20,
+      "gain_pct": -4.161349659514557,
+      "wire_change_pct": -9.163102861090133,
+      "critical_rows_change_pct": 53.53516770087088,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.38628541119397,
+          "wire_bytes": 450565293808,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25124142,
+            24623433,
+            26148799,
+            24766922
+          ],
+          "sum_layer_max_rank_rows": 29601665
+        },
+        "OLD_CA": {
+          "TTFT_s": 49.35819443780929,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_OLD_CA_w27_p20_result.json",
+      "source_sha256": "6fe66a6417be261b2686ccba84f40796557b7f583a5d9357ab3a7959616e1294"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C60_B128_LA_w0_p28",
+      "workload_seed": 0,
+      "placement_seed": 28,
+      "gain_pct": 1.962599889217731,
+      "wire_change_pct": 0.3583001539366082,
+      "critical_rows_change_pct": -16.503217900180978,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.23960423190147,
+          "wire_bytes": 449460745776,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24978033,
+            25722098,
+            25196957,
+            24766208
+          ],
+          "sum_layer_max_rank_rows": 30154913
+        },
+        "LA": {
+          "TTFT_s": 47.2928538126871,
+          "wire_bytes": 451071164320,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25166713,
+            25168203,
+            25166667,
+            25161713
+          ],
+          "sum_layer_max_rank_rows": 25178382
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_LA_w0_p28_result.json",
+      "source_sha256": "ee42442935590a84d4d27ab37c607ec1e3df7c47108017fa7b34edb10f3267d1"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C60_B128_CA_w27_p6",
+      "workload_seed": 27,
+      "placement_seed": 6,
+      "gain_pct": -3.11938219643324,
+      "wire_change_pct": -9.200145549740835,
+      "critical_rows_change_pct": 56.53393788170524,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.526071136817336,
+          "wire_bytes": 450642456816,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25023217,
+            25771013,
+            24787309,
+            25081757
+          ],
+          "sum_layer_max_rank_rows": 29066767
+        },
+        "CA": {
+          "TTFT_s": 49.00859093852341,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p6_result.json",
+      "source_sha256": "7c371bac65dc2443af205e86ea4416551f067cca3b98dc7de63e7e6775f1e9df"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C60_B128_OLD_CA_w27_p6",
+      "workload_seed": 27,
+      "placement_seed": 6,
+      "gain_pct": -3.0343216494614467,
+      "wire_change_pct": -9.178656762225302,
+      "critical_rows_change_pct": 56.360581828725564,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.863459563814104,
+          "wire_bytes": 450642456816,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25023217,
+            25771013,
+            24787309,
+            25081757
+          ],
+          "sum_layer_max_rank_rows": 29066767
+        },
+        "OLD_CA": {
+          "TTFT_s": 49.315790879540145,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_OLD_CA_w27_p6_result.json",
+      "source_sha256": "d6c95c4e5878f0b82644aa7fae4cc424c2e4b46ec79a6dcd5107d7c3971b85ef"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C60_B128_LA_w6_p28",
+      "workload_seed": 6,
+      "placement_seed": 28,
+      "gain_pct": 1.9693195645251294,
+      "wire_change_pct": 0.28516531420381686,
+      "critical_rows_change_pct": -16.430477601722227,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.089059526100755,
+          "wire_bytes": 449763013984,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            24994929,
+            25739186,
+            25218414,
+            24710767
+          ],
+          "sum_layer_max_rank_rows": 30128053
+        },
+        "LA": {
+          "TTFT_s": 47.142032268457115,
+          "wire_bytes": 451045582096,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14495514624,
+            14495514624
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1536,
+            1536
+          ],
+          "expert_rows_by_rank": [
+            25163925,
+            25166189,
+            25164954,
+            25168228
+          ],
+          "sum_layer_max_rank_rows": 25177870
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_LA_w6_p28_result.json",
+      "source_sha256": "e713395fb0e58452736257bd7464ec5abcf02d21898fe1be31307af54c8b482e"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C60_B128_CA_w27_p24",
+      "workload_seed": 27,
+      "placement_seed": 24,
+      "gain_pct": -2.230830135924311,
+      "wire_change_pct": -9.21435901596518,
+      "critical_rows_change_pct": 54.071295182979014,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.00338494498283,
+          "wire_bytes": 450713009728,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25052353,
+            25440622,
+            24753318,
+            25417003
+          ],
+          "sum_layer_max_rank_rows": 29531364
+        },
+        "CA": {
+          "TTFT_s": 49.074258922599256,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p24_result.json",
+      "source_sha256": "05aeea6c911110bd70a11e2a624214c8743a1b2c58780b5ddcff7d9155834aa3"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "OLD_CA",
+      "key": "C60_B128_OLD_CA_w27_p24",
+      "workload_seed": 27,
+      "placement_seed": 24,
+      "gain_pct": -4.994788342208745,
+      "wire_change_pct": -9.192873592223272,
+      "critical_rows_change_pct": 53.90066642367077,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.817107426933944,
+          "wire_bytes": 450713009728,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25052353,
+            25440622,
+            24753318,
+            25417003
+          ],
+          "sum_layer_max_rank_rows": 29531364
+        },
+        "OLD_CA": {
+          "TTFT_s": 50.20547073427588,
+          "wire_bytes": 409279532480,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307172,
+            18086132,
+            18821026,
+            45448966
+          ],
+          "sum_layer_max_rank_rows": 45448966
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_OLD_CA_w27_p24_result.json",
+      "source_sha256": "c8169b5b235b6a119a1ba697d942e99edb0afdf67c5c79a0ec354f2485186423"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "LA",
+      "key": "C60_B128_LA_w2_p28",
+      "workload_seed": 2,
+      "placement_seed": 28,
+      "gain_pct": 1.5623791833184741,
+      "wire_change_pct": 0.5090268466858339,
+      "critical_rows_change_pct": -16.414716840044218,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 48.58473777770996,
+          "wire_bytes": 449625234288,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25237641,
+            25508676,
+            25089723,
+            24827256
+          ],
+          "sum_layer_max_rank_rows": 30121738
+        },
+        "LA": {
+          "TTFT_s": 47.82565994840115,
+          "wire_bytes": 451913947440,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14467203072
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1533
+          ],
+          "expert_rows_by_rank": [
+            25164519,
+            25167770,
+            25167841,
+            25163166
+          ],
+          "sum_layer_max_rank_rows": 25177340
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_LA_w2_p28_result.json",
+      "source_sha256": "f7e5f35cd11dd16c5223686640541cf0c471a472edab43d159fe869d6618c238"
+    },
+    {
+      "cache": 60,
+      "batch": 128,
+      "candidate": "CA",
+      "key": "C60_B128_CA_w27_p19",
+      "workload_seed": 27,
+      "placement_seed": 19,
+      "gain_pct": -4.923390979280207,
+      "wire_change_pct": -9.235834447025514,
+      "critical_rows_change_pct": 56.214079908514236,
+      "classification": "STRICT_PLACEMENT",
+      "policies": {
+        "BR": {
+          "TTFT_s": 47.859942686744034,
+          "wire_bytes": 450819651552,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            25333556,
+            25792288,
+            24989248,
+            24548204
+          ],
+          "sum_layer_max_rank_rows": 29126283
+        },
+        "CA": {
+          "TTFT_s": 50.216274787671864,
+          "wire_bytes": 409182694880,
+          "H2D_bytes_by_rank": [
+            14495514624,
+            14495514624,
+            14486077440,
+            14476640256
+          ],
+          "copies_by_rank": [
+            1536,
+            1536,
+            1535,
+            1534
+          ],
+          "expert_rows_by_rank": [
+            18307193,
+            18068056,
+            18788692,
+            45499355
+          ],
+          "sum_layer_max_rank_rows": 45499355
+        }
+      },
+      "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/physical/TTFT_S1_C60_B128/C60_B128_CA_w27_p19_result.json",
+      "source_sha256": "a9f56fe2bb888b419b1d36b19cb3d57a9ae21673fbc8d3a175dfcf7476a770ee"
+    }
+  ],
+  "incomplete_pairs": [
+    {
+      "key": "C60_B128_OLD_CA_w9_p27",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_LA_w11_p28",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_CA_w27_p11",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_OLD_CA_w27_p19",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_LA_w21_p28",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_CA_w27_p10",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_OLD_CA_w27_p11",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_LA_w25_p28",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_CA_w27_p30",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_OLD_CA_w27_p10",
+      "available_measure_receipts": [],
+      "included": false
+    },
+    {
+      "key": "C60_B128_LA_w19_p23",
+      "available_measure_receipts": [],
+      "included": false
+    }
+  ],
+  "primary_validated_gain": null,
+  "S2_run": false,
+  "phase_timing_attribution": "NOT_MEASURED",
+  "stop_reason": "Owner requested stop last condition, analyze existing samples and commit. No continuation or S2.",
+  "limitations": [
+    "S1 single-shot selection samples only; no repeated primary timing or stability claim.",
+    "Policy-specific best seeds; BR is paired within each comparison. Not average-case performance.",
+    "C60/B128 incomplete; unmatched/interrupted pairs excluded without latency-based filtering.",
+    "Row imbalance is measured work, not elapsed compute time. Controller, GEMM, synchronization and communication time shares not identified.",
+    "Cold expert cache: same H2D work across policies; cache capacity is not a repeated-decode hit-rate experiment."
+  ]
+}
