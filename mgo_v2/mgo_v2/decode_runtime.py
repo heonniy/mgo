@@ -56,7 +56,14 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.metadata'):
    live=getattr(self.args,'live_routes',False)
    if self.index<48:
-    g=gather_global_routes(layer,selected,weights,probs)
+    g=gather_global_routes(layer,selected,weights,probs,probability_tail=128 if live and getattr(self.args,'prefill_optimized',False) else None)
+    if live and getattr(self.args,'validate_prefill_optimized',False):
+     ref=gather_global_routes(layer,selected,weights,probs)
+     np.testing.assert_array_equal(g.routes.selected_experts,ref.routes.selected_experts)
+     np.testing.assert_array_equal(g.routes.routing_weights,ref.routes.routing_weights)
+     np.testing.assert_array_equal(g.routes.origin_ranks,ref.routes.origin_ranks)
+     np.testing.assert_array_equal(g.routes.full_router_probs,ref.routes.full_router_probs[-128:])
+     self.prefill_metadata_checks=getattr(self,'prefill_metadata_checks',0)+1
     if live:
      self.gate_history.update(layer,g.routes.full_router_probs)
      gate=(self.gate_history.sums[layer]/max(1,len(self.gate_history.rows[layer]))).astype(np.float32)
@@ -113,7 +120,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
  def compute(self,packet,e,layer):
-  if self.index<48 or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
+  if (self.index<48 and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
   grouped=getattr(self,'grouped_executor',None)
   if grouped is not None:return grouped.compute(self,packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
@@ -133,7 +140,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    else:part=executor(slot,received[rows],check=check)
    self.h2d.record_slot_use(slot)
    parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
-  if getattr(self.args,'fused',False) and self.index>=48:return parts
+  if getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False)):return parts
   return torch.cat(parts) if parts else received.new_empty((0,2048))
  def close(self):
   if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
@@ -143,7 +150,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    layer,hidden,selected,weights,probs=args
    e=self.plan_event(layer,selected,weights,probs)
    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
-   fused=getattr(self.args,'fused',False) and self.index>=48
+   fused=getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False))
    overlap=getattr(self.args,'streaming',False) and self.index>=48
    if getattr(self.args,'strict_serialized_phases',False):
     # Characterization substrate:
@@ -233,6 +240,13 @@ class DecodeOffloadRuntime(LiveRuntime):
      if precision:result=combine_rank_partials(self.transport,hidden,values,e,{'bf16':torch.bfloat16,'fp32':torch.float32,'fp64':torch.float64}[precision],unique_rows=getattr(self.args,'unique_combine',False))
      else:result=self.transport.combine(hidden,values,e)
     assert self.transport.calls-before==2
+    if self.index<48 and getattr(self.args,'validate_prefill_optimized',False):
+     reference=self.transport.combine(hidden,values,e)
+     diff=result.float()-reference.float()
+     assert bool(torch.isfinite(result).all()) and bool(torch.isfinite(reference).all())
+     row=dict(layer=layer,max_abs=float(diff.abs().max()),relative_l2=float(torch.linalg.vector_norm(diff)/torch.linalg.vector_norm(reference.float()).clamp_min(1e-20)))
+     if not hasattr(self,'prefill_numerics'):self.prefill_numerics=[]
+     self.prefill_numerics.append(row)
    else:
     with nvtx_phase('moe.combine'):result=self.combine(hidden,values,e,packet[0])
    self.index+=1

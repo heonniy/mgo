@@ -35,6 +35,9 @@ def main(a):
   if a.repeats is not None:
    assert a.worker=='headline_ours_worker.py','repeat override currently supported for OURS only'
    command+=['--repeats',str(a.repeats)]
+  if a.prefill_optimized:
+   assert a.worker=='headline_ours_worker.py'
+   command+=['--prefill-optimized']
   state['command']=command
   with (out/'run.log').open('w') as log,(out/'resources.jsonl').open('w') as resources:
    proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;c.write(out/'status.json',state)
@@ -66,4 +69,4 @@ def main(a):
   state['restored']=c.restore_target_idle([gpu for gpu in c.GPUS if gpu not in already_idle])
   c.write(out/'status.json',state)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--label',required=True);p.add_argument('--system',required=True);p.add_argument('--worker',required=True);p.add_argument('--cell',required=True);p.add_argument('--python',default=c.PYTHON);p.add_argument('--ranks',type=int,default=4);p.add_argument('--timeout',type=int,default=3600);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4));main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--label',required=True);p.add_argument('--system',required=True);p.add_argument('--worker',required=True);p.add_argument('--cell',required=True);p.add_argument('--python',default=c.PYTHON);p.add_argument('--ranks',type=int,default=4);p.add_argument('--timeout',type=int,default=3600);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4));p.add_argument('--prefill-optimized',action='store_true');main(p.parse_args())

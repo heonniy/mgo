@@ -43,6 +43,7 @@ def gather_global_routes(
     routing_weights: torch.Tensor,
     full_router_probs: torch.Tensor,
     stats=None,
+    probability_tail: int | None = None,
 ) -> GatheredRoutes:
     """Gather compact routing metadata without RPC or CPU tensor payloads.
 
@@ -64,7 +65,18 @@ def gather_global_routes(
 
     all_selected = _all_gather_padded(selected_experts.to(torch.int64), counts, stats)
     all_weights = _all_gather_padded(routing_weights, counts, stats)
-    all_probs = _all_gather_padded(full_router_probs.to(torch.float32), counts, stats)
+    if probability_tail is None:
+        all_probs = _all_gather_padded(full_router_probs.to(torch.float32), counts, stats)
+    else:
+        if probability_tail <= 0:
+            raise ValueError("probability_tail must be positive")
+        # Only the exact global suffix can survive the W-token Gate history.
+        suffix_start = max(0, sum(counts) - probability_tail)
+        offsets = np.cumsum([0] + counts)
+        tail_counts = [max(0, int(offsets[r + 1]) - max(int(offsets[r]), suffix_start)) for r in range(world)]
+        n_tail = tail_counts[rank]
+        local_tail = full_router_probs[-n_tail:] if n_tail else full_router_probs[:0]
+        all_probs = _all_gather_padded(local_tail.to(torch.float32), tail_counts, stats)
 
     selected = torch.cat(all_selected, dim=0).cpu().numpy()
     weights = torch.cat(all_weights, dim=0).float().cpu().numpy()
