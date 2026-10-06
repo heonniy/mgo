@@ -7,3 +7,5 @@ All3 repeats pass manifest/count, finite logits, EAM, priority eviction, empty c
 TTFT spread6.5945% exceeds the5% headline gate; TPOT1.1000%, E2E1.0799%. Preserve all3 samples; this is not a stable headline row and no cross-system gain is claimed. FINAL_ATTEMPT_AUDIT.json is current; PARTIAL_AUDIT.json preserves the earlier two-sample checkpoint.
 
 Native greedy outputs are not bitwise identical across repeats (see partial audit). Candidate counts are submissions across layers/steps, not distinct experts or prefetch hits. HBM is a1Hz sampled device peak; host RSS is process RSS and not uniquely owned physical RAM.
+
+**SUPERSEDED for headline use:** the harness retained the previous batch DynamicCache in the local `kv` variable during the next generation. No prefix reuse occurred, but live HBM was inflated (about3.37GiB/GPU for global256). A corrected harness explicitly releases the cache and verifies weak references before the next batch. Original receipts remain unchanged; they are not eligible primary results.

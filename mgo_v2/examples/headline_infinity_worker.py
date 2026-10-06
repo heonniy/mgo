@@ -1,5 +1,5 @@
 """Owner-repaired BF16 MoE-Infinity, native requests and cold expert cache."""
-import argparse,copy,hashlib,json,os,time
+import argparse,copy,gc,hashlib,json,os,time,weakref
 from pathlib import Path
 import torch,psutil
 from moe_infinity import MoE
@@ -73,6 +73,12 @@ def main(a):
   assert len(streamer.stamps)==n and output.shape==(len(rows),ids.shape[1]+n)
   assert torch.equal(output[:,:ids.shape[1]],ids)
   tokens=output[:,ids.shape[1]:].cpu().tolist()
+  # Do not retain the preceding batch's KV while generating the next batch.
+  kv_ref=weakref.ref(kv);kv_tensors=[weakref.ref(t) for layer in kv.layers for t in (layer.keys,layer.values)]
+  del output,kv
+  gc.collect();sync()
+  assert kv_ref() is None and all(ref() is None for ref in kv_tensors),'previous batch KV retained'
+  live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
   assert not tracer.trace
   stats=dict(p.archer_engine.get_expert_policy_stats());assert p.eam_calls==48*n
   assert stats['capacity_bytes']==sum(budgets)
@@ -81,7 +87,7 @@ def main(a):
   assert stats['peak_accounted_bytes'] <= sum(budgets)
   assert stats['resident_bytes']+stats['transition_reserved_bytes']+stats['workspace_bytes']<=sum(budgets)
   first,end=streamer.stamps[0],streamer.stamps[-1]
-  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(4)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(4)],host_rss_bytes=psutil.Process().memory_info().rss)
+  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(4)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(4)],host_rss_bytes=psutil.Process().memory_info().rss)
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
   if repeat==0:

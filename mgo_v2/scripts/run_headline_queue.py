@@ -17,7 +17,14 @@ SMALL = 'R4_C30_B16_L256_O64'
 LARGE = 'R4_C30_B64_L512_O64'
 
 
-def jobs(after):
+def jobs(after, recovery=False):
+    if recovery:
+        return [
+            ('infinity_kv_release_smoke1', 'MoE-Infinity-repaired', 'infinity', SMALL, 'infinity-env', 1, True, None),
+            ('infinity_B16_L256_primary3', 'MoE-Infinity-repaired', 'infinity', SMALL, 'infinity-env', 1, False, 'infinity_kv_release_smoke1'),
+            ('infinity_B64_L512_primary2', 'MoE-Infinity-repaired', 'infinity', LARGE, 'infinity-env', 1, False, 'infinity_B16_L256_primary3'),
+            ('ours_B16_L256_confirmation1', 'Ours', 'ours', SMALL, None, 4, False, None),
+        ]
     return [
         ('infinity_B64_L512_primary1', 'MoE-Infinity-repaired', 'infinity', LARGE, 'infinity-env', 1, False, after),
         ('deepspeed_B16_L256_primary1', 'DeepSpeed-ZeRO-Inference', 'deepspeed', SMALL, 'base-env', 4, False, None),
@@ -35,7 +42,7 @@ def state(label):
 
 
 def main(a):
-    queue = jobs(a.after)
+    queue = jobs(a.after, a.recovery)
     if a.dry_run:
         print(json.dumps(queue, indent=2))
         return
@@ -54,7 +61,11 @@ def main(a):
             save()
             return
         prior = state(a.after)
-        assert prior is not None, 'the predecessor must already exist'
+        if prior is None:
+            # A recovery queue can wait for the last job of the active queue.
+            assert a.recovery, 'the predecessor must already exist'
+            time.sleep(5)
+            continue
         if prior['status'] in ('PASS', 'FAIL'):
             break  # supervisor writes terminal status after restoring idle jobs
         time.sleep(5)
@@ -92,4 +103,5 @@ if __name__ == '__main__':
     p.add_argument('--after', required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--dry-run', action='store_true')
+    p.add_argument('--recovery', action='store_true')
     main(p.parse_args())

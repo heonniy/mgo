@@ -50,6 +50,7 @@ def audit(job,spec):
   else:
    host.append(row['host_rss_bytes'])
    if system=='MoE-Infinity-repaired':
+    assert row.get('kv_released',False),'old KV retention invalidates the primary memory protocol'
     actual=row['request_ids'];assert len(row['tokens'])==spec['global_requests'] and all(len(t)==64 for t in row['tokens'])
     check_clock(row['release_ns'],row['token_ready_ns'])
     start=row['release_ns'];first=row['token_ready_ns'][0];end=row['token_ready_ns'][-1]
