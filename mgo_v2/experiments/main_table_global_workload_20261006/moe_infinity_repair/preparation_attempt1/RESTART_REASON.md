@@ -1,0 +1,1 @@
+Store conversion completed (name_id_map.json and model_signature.json). Restart requested to install native admission/eviction reservation protection discovered during source audit. This is a preparation attempt, not a primary timing result.

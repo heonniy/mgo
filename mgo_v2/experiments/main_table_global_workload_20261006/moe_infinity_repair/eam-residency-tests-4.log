@@ -1,0 +1,70 @@
+W1007 02:41:09.934000 2769266 site-packages/torch/utils/cpp_extension.py:140] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+Running main() from /home/hwlee/mgo-tools/headline-r4/googletest/googletest/src/gtest_main.cc
+[==========] Running 15 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 15 tests from ExpertResidencyManagerTest
+[ RUN      ] ExpertResidencyManagerTest.AdmissionRejectsUntilCapacityConfigured
+[       OK ] ExpertResidencyManagerTest.AdmissionRejectsUntilCapacityConfigured (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.CapacityAndVictimTransactionAreAtomic
+[       OK ] ExpertResidencyManagerTest.CapacityAndVictimTransactionAreAtomic (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.LeaseBlocksEvictionUntilReleased
+[       OK ] ExpertResidencyManagerTest.LeaseBlocksEvictionUntilReleased (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.DemandAndPrefetchClientsShareAccounting
+[       OK ] ExpertResidencyManagerTest.DemandAndPrefetchClientsShareAccounting (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.PredictionPriorityOverridesRecencyButNotLeases
+/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/tests/cpp/unit/prefetch/test_expert_residency.cpp:111: Failure
+Expected equality of these values:
+  t.reserved_victim
+    Which is: (nullptr)
+  hot
+    Which is: (ptr = 0x56471dc3f6c0, value = 272-byte object <00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 3C-00 00-00 00-00 00-00 01-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 01-00 00-00 00-00 00-00 01-00 00-00 00-00 00-00 ... 00-66 69-6C 00-00 00-00 00-30 2E-32 31-31 2E-30 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00 00-00>)
+
+/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/tests/cpp/unit/prefetch/test_expert_residency.cpp:112: Failure
+Value of: manager->AbortAdmission(t)
+  Actual: false
+Expected: true
+
+[  FAILED  ] ExpertResidencyManagerTest.PredictionPriorityOverridesRecencyButNotLeases (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.ColdResetRefusesLiveWorkAndRetainsBudget
+[       OK ] ExpertResidencyManagerTest.ColdResetRefusesLiveWorkAndRetainsBudget (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.PrefetchCannotDisplaceHigherPriorityResident
+[       OK ] ExpertResidencyManagerTest.PrefetchCannotDisplaceHigherPriorityResident (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.FetchStateAndDuplicateAdmissionAreProtected
+/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/tests/cpp/unit/prefetch/test_expert_residency.cpp:172: Failure
+Expected equality of these values:
+  first->exec_state.load()
+    Which is: 1-byte object <03>
+  NodeExecState::IDLE
+    Which is: 1-byte object <00>
+
+[  FAILED  ] ExpertResidencyManagerTest.FetchStateAndDuplicateAdmissionAreProtected (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.HostReadyVariantsConsumeNoCapacity
+[       OK ] ExpertResidencyManagerTest.HostReadyVariantsConsumeNoCapacity (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.TransitionReservesDestinationAndWorkspace
+[       OK ] ExpertResidencyManagerTest.TransitionReservesDestinationAndWorkspace (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.CommitTransitionRetiresOldGeneration
+[       OK ] ExpertResidencyManagerTest.CommitTransitionRetiresOldGeneration (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.DemandAndPrefetchClientsShareVariantCharge
+[       OK ] ExpertResidencyManagerTest.DemandAndPrefetchClientsShareVariantCharge (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.ConcurrentTransitionForLogicalExpertIsRejected
+[       OK ] ExpertResidencyManagerTest.ConcurrentTransitionForLogicalExpertIsRejected (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.WorkspaceRemainsChargedUntilCompletion
+[       OK ] ExpertResidencyManagerTest.WorkspaceRemainsChargedUntilCompletion (0 ms)
+[ RUN      ] ExpertResidencyManagerTest.VictimReservationNeverOverchargesCapacityOrUnderflowsOnAbort
+[       OK ] ExpertResidencyManagerTest.VictimReservationNeverOverchargesCapacityOrUnderflowsOnAbort (0 ms)
+[----------] 15 tests from ExpertResidencyManagerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 15 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 13 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] ExpertResidencyManagerTest.PredictionPriorityOverridesRecencyButNotLeases
+[  FAILED  ] ExpertResidencyManagerTest.FetchStateAndDuplicateAdmissionAreProtected
+
+ 2 FAILED TESTS
+Traceback (most recent call last):
+  File "/home/hwlee/mgo-tools/headline-r4/build-residency-tests.py", line 12, in <module>
+    subprocess.run([str(tools/'test_eam_residency')],check=True,env=dict(os.environ,CUDA_VISIBLE_DEVICES=''))
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/hwlee/mgo-tools/headline-r4/test_eam_residency']' returned non-zero exit status 1.
