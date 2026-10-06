@@ -1,0 +1,223 @@
+{
+  "status": "PASS",
+  "results": [
+    {
+      "status": "PASS",
+      "batch": 16,
+      "context": 256,
+      "seed": 12,
+      "executor": "H0",
+      "source": "full_pinned",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "P": 2,
+      "trigger": "T2",
+      "decode_steps": 32,
+      "generated_outputs": 33,
+      "measured_repeats": 1,
+      "samples": {
+        "BR": {
+          "TTFT": 4.095168082043529,
+          "TPOT": 0.7323713437945116,
+          "E2E": 27.529221944510937
+        },
+        "LA_CA_NEAR": {
+          "TTFT": 4.017659395001829,
+          "TPOT": 0.7180529058678076,
+          "E2E": 26.993662600405514
+        }
+      },
+      "gains": {
+        "TTFT": 0.018926863437317643,
+        "TPOT": 0.019550789429469417,
+        "E2E": 0.019454212879133292
+      },
+      "policy_token_differences": [
+        {
+          "different_tokens": 4,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 7,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 5,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 4,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        }
+      ],
+      "scope": "Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks."
+    },
+    {
+      "status": "PASS",
+      "batch": 16,
+      "context": 512,
+      "seed": 45,
+      "executor": "H0",
+      "source": "full_pinned",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "P": 2,
+      "trigger": "T2",
+      "decode_steps": 32,
+      "generated_outputs": 33,
+      "measured_repeats": 1,
+      "samples": {
+        "LA_CA_NEAR": {
+          "TTFT": 6.334362720139325,
+          "TPOT": 0.7037404602742754,
+          "E2E": 28.852680874057114
+        },
+        "BR": {
+          "TTFT": 6.455959523096681,
+          "TPOT": 0.7338571639847942,
+          "E2E": 29.938290640711784
+        }
+      },
+      "gains": {
+        "TTFT": 0.01883481495234507,
+        "TPOT": 0.041038917637578276,
+        "E2E": 0.03626158152056935
+      },
+      "policy_token_differences": [
+        {
+          "different_tokens": 2,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 1,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 2,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 5,
+          "total_tokens": 528,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        }
+      ],
+      "scope": "Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks."
+    },
+    {
+      "status": "PASS",
+      "batch": 64,
+      "context": 256,
+      "seed": 23,
+      "executor": "H0",
+      "source": "full_pinned",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "P": 2,
+      "trigger": "T2",
+      "decode_steps": 32,
+      "generated_outputs": 33,
+      "measured_repeats": 1,
+      "samples": {
+        "BR": {
+          "TTFT": 11.93574860598892,
+          "TPOT": 0.9326100223697722,
+          "E2E": 41.77759247086942
+        },
+        "LA_CA_NEAR": {
+          "TTFT": 11.950213789008558,
+          "TPOT": 0.9130419050634373,
+          "E2E": 41.16650614421815
+        }
+      },
+      "gains": {
+        "TTFT": -0.00121192088549682,
+        "TPOT": 0.02098210059614425,
+        "E2E": 0.0146271312086107
+      },
+      "policy_token_differences": [
+        {
+          "different_tokens": 24,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 13,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 14,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 18,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        }
+      ],
+      "scope": "Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks."
+    },
+    {
+      "status": "PASS",
+      "batch": 64,
+      "context": 512,
+      "seed": 28,
+      "executor": "H0",
+      "source": "full_pinned",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "P": 2,
+      "trigger": "T2",
+      "decode_steps": 32,
+      "generated_outputs": 33,
+      "measured_repeats": 1,
+      "samples": {
+        "LA_CA_NEAR": {
+          "TTFT": 23.32056990172714,
+          "TPOT": 0.9366845309268683,
+          "E2E": 53.292785653844476
+        },
+        "BR": {
+          "TTFT": 23.803116475231946,
+          "TPOT": 0.9789990468416363,
+          "E2E": 55.130252508446574
+        }
+      },
+      "gains": {
+        "TTFT": 0.020272411556147008,
+        "TPOT": 0.043222223812453664,
+        "E2E": 0.03332955629616563
+      },
+      "policy_token_differences": [
+        {
+          "different_tokens": 16,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 18,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 22,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 25,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        }
+      ],
+      "scope": "Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks."
+    }
+  ],
+  "primary_policy_runs": 8,
+  "scope": "Single measurement per requested combination; no repeat stability claim."
+}
