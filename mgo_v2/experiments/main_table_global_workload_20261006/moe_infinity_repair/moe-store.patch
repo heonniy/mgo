@@ -1,18 +1,15 @@
 --- a/moe_store/wrappers/qwen.py
 +++ b/moe_store/wrappers/qwen.py
-@@ -76,6 +76,16 @@
+@@ -76,6 +76,13 @@
              routing_weights_mask,
              router_logits=router_logits,
          )
 +        prefetcher = getattr(self, "expert_prefetcher", None)
 +        if getattr(prefetcher, "eam_enabled", False):
-+            import numpy as np
 +            selected = selected_experts.view(batch_size, sequence_length, self.top_k).detach().cpu().numpy()
 +            if len(self.seq_id_list) != batch_size:
 +                raise RuntimeError("EAM request identities do not match batch")
-+            scores = np.zeros((self.expert_tracer.num_layers, self.num_experts), dtype=np.float32)
-+            for seq_id, experts in zip(self.seq_id_list, selected):
-+                scores += self.expert_predictor.predict(seq_id, experts, self.layer_id)
++            scores = self.expert_predictor.predict_batch(self.seq_id_list, selected, self.layer_id)
 +            prefetcher.prefetch_eam(self.layer_id, scores)
          final_hidden_states = executor.wait_dispatch_local()
  

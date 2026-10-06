@@ -1,0 +1,74 @@
+"""Stock ZeRO-3 BF16 CPU parameter offload; same native request manifests."""
+import argparse,gc,json,os,time
+from pathlib import Path
+import torch,torch.distributed as dist,psutil
+import deepspeed
+from transformers import AutoModelForCausalLM
+from transformers.integrations import HfDeepSpeedConfig
+from deepspeed.runtime.zero.partition_parameters import ZeroParamStatus
+ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
+MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+def write(p,v):
+ q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
+def release():
+ dist.barrier();torch.cuda.synchronize()
+ stamp=torch.tensor([time.perf_counter_ns()+200_000_000 if dist.get_rank()==0 else 0],device='cuda',dtype=torch.int64)
+ dist.broadcast(stamp,0);start=stamp.item()
+ while time.perf_counter_ns()<start:time.sleep(.0001)
+ return start
+
+def generate(engine,ids,n):
+ start=release();mask=torch.ones_like(ids);past=None;tokens=[];stamps=[];finite=torch.ones((),device='cuda',dtype=torch.bool)
+ with torch.no_grad():
+  for step in range(n):
+   out=engine(input_ids=ids,attention_mask=mask,past_key_values=past,use_cache=True,logits_to_keep=1)
+   past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
+   torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
+   ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
+ assert finite.item()
+ return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,tokens=torch.stack(tokens,1).cpu().tolist(),finite_logits=True)
+
+def main(a):
+ rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
+ torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
+ deepspeed.init_distributed();assert dist.get_world_size()==4
+ spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
+ batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
+ cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=1_500_000_000,stage3_prefetch_bucket_size=1_000_000_000,stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
+ dschf=HfDeepSpeedConfig(cfg)
+ model=AutoModelForCausalLM.from_pretrained(MODEL,torch_dtype=torch.bfloat16,attn_implementation='sdpa')
+ model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
+ params=list(engine.module.named_parameters());assert all(hasattr(p,'ds_id') for _,p in params)
+ pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
+ coordinator=engine.optimizer.get_param_coordinator()
+ budget=17392730112//4;peak=[0];samples=[0]
+ def measure_residency(*args):
+  charged=sum(p.ds_numel*p.element_size() for name,p in params if '.experts.' in name and p.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT))
+  peak[0]=max(peak[0],charged);samples[0]+=1
+ hooks=[m.register_forward_pre_hook(measure_residency) for m in engine.module.modules() if type(m).__name__=='Qwen3MoeSparseMoeBlock']
+ assert len(hooks)==48
+ rows=json.loads(Path(spec['warmup']['path']).read_text())['requests']
+ local_rows=rows[rank*batch:(rank+1)*batch];ids=torch.tensor([r['input_ids'][-32:] for r in local_rows],device='cuda')
+ generate(engine,ids,2)
+ for h in hooks:h.remove()
+ assert 0<peak[0]<=budget,(peak,budget)
+ write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',expert_peak_bytes=peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
+ for repeat in range((1 if a.smoke else 3)+1):
+  phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests'];local_rows=rows[rank*batch:(rank+1)*batch]
+  ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local_rows],device='cuda')
+  coordinator.release_and_reset_all(engine.module)
+  assert all(p.ds_status==ZeroParamStatus.NOT_AVAILABLE for _,p in params)
+  gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
+  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
+  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
+  write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
+  if rank==0:
+   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(r['release_ns'] for r in rr))==1
+   start=rr[0]['release_ns'];first=max(r['first_ns'] for r in rr);end=max(r['end_ns'] for r in rr)
+   result=dict(status='PASS',system='DeepSpeed-ZeRO-Inference',repeat=repeat,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=4*batch*n/((end-start)/1e9),global_requests=4*batch,output_tokens=n)
+   write(a.output/f'repeat{repeat}.json',result);print(json.dumps(result),flush=True)
+  dist.barrier()
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='DeepSpeed-ZeRO-Inference',cell=a.cell,smoke=a.smoke))
+ dist.barrier();dist.destroy_process_group()
+if __name__=='__main__':
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())

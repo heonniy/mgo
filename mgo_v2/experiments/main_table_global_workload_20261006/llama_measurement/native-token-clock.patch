@@ -1,0 +1,60 @@
+diff --git a/tools/server/server-context.cpp b/tools/server/server-context.cpp
+index d1af984..31e319c 100644
+--- a/tools/server/server-context.cpp
++++ b/tools/server/server-context.cpp
+@@ -288,6 +288,7 @@ struct server_slot {
+     std::string  generated_text;
+     std::string  debug_generated_text;
+     llama_tokens generated_tokens;
++    std::vector<int64_t> token_ready_us;
+     size_t n_sent_text = 0; // number of sent text character (i.e. handle partial UTF-8 on streaming)
+ 
+     std::vector<completion_token_output> generated_token_probs;
+@@ -394,6 +395,7 @@ struct server_slot {
+             spec_ckpt.clear();
+         }
+         generated_tokens.clear();
++        token_ready_us.clear();
+         generated_token_probs.clear();
+         json_schema = json();
+ 
+@@ -1968,6 +1970,7 @@ private:
+         const std::string token_str = result.text_to_send;
+         slot.sampled = result.tok;
+ 
++        slot.token_ready_us.push_back(ggml_time_us());
+         slot.generated_text += token_str;
+         if (slot.task->params.return_tokens) {
+             slot.generated_tokens.push_back(result.tok);
+@@ -2240,6 +2243,7 @@ private:
+             res->content     = std::move(slot.generated_text);
+             res->tokens      = std::move(slot.generated_tokens);
+         }
++        res->token_ready_us  = slot.token_ready_us;
+         res->stats           = slot.stats;
+         res->prompt          = slot.task->tokens.detokenize(ctx_tgt, true);
+         res->response_fields = std::move(slot.task->params.response_fields);
+diff --git a/tools/server/server-task.cpp b/tools/server/server-task.cpp
+index a5c33c0..c5d505f 100644
+--- a/tools/server/server-task.cpp
++++ b/tools/server/server-task.cpp
+@@ -339,6 +339,7 @@ json server_task_result_cmpl_final::to_json() {
+ 
+ json server_task_result_cmpl_final::to_json_non_oaicompat() {
+     json res = json {
++        {"token_ready_us",      token_ready_us},
+         {"index",               index},
+         {"content",             content},
+         {"tokens",              tokens},
+diff --git a/tools/server/server-task.h b/tools/server/server-task.h
+index 752595b..1fc2004 100644
+--- a/tools/server/server-task.h
++++ b/tools/server/server-task.h
+@@ -350,6 +350,7 @@ struct completion_token_output {
+ };
+ 
+ struct server_task_result_cmpl_final : server_task_result {
++    std::vector<int64_t> token_ready_us;
+     std::string content;
+     llama_tokens tokens;
+ 

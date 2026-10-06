@@ -14,5 +14,7 @@ Report this as repaired MoE-Infinity, never as unmodified upstream.
 - New quiescent cache clear refuses live tickets/leases, clears physical residency while retaining capacity. The old reset_cache only cancels queues.
 - Preserve warmup EAM history and restore its snapshot before every measured repeat, preventing earlier target repeats from training later ones. Clear expert residency before each measured batch, retain CPU source and compiled code.
 
-CPU unit checks: six EAM tests passed (prefix matching, no alias, empty history, finished traces, persistent pool, per-GPU candidate budget). C++ tests added for priority versus LRU, lease protection, cold reset and prefetch rejection; all 14 residency/variant C++ tests passed.
+CPU unit checks: seven EAM tests passed (prefix matching, no alias, empty history, finished traces, persistent pool, per-GPU candidate budget). C++ tests added for priority versus LRU, lease protection, cold reset and prefetch rejection; all 14 residency/variant C++ tests passed.
 Physical acceptance still requires observed nonzero EAM calls, actual priority evictions, peak charged bytes within all GPU budgets, cold residency receipts, BF16 output sanity and clean timing.
+
+Latest checkpoint adds batched prefix search (equivalent to independent search), native per-GPU peak charged bytes, actual eviction/rejected-prefetch counters and hard accounting assertions. The updated 14 C++ tests pass. The initial native build passed; telemetry build is staged separately under `eam-next-build`, and must be installed atomically only after the active smoke process exits. Active `infinity_smoke1` uses the prior loaded native build and single-request EAM lookup; it is preparation/smoke only, never a primary result.

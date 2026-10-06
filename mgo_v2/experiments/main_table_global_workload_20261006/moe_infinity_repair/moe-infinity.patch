@@ -52,7 +52,7 @@ index 3c0fdf1..713a776 100644
    std::unordered_map<std::string, std::int64_t> ResizeExpertCache(
        int device_id, std::int64_t target_bytes);
 diff --git a/core/prefetch/expert_residency.cpp b/core/prefetch/expert_residency.cpp
-index 3ae75c1..018ffc5 100644
+index 3ae75c1..244ea2e 100644
 --- a/core/prefetch/expert_residency.cpp
 +++ b/core/prefetch/expert_residency.cpp
 @@ -1,3 +1,5 @@
@@ -69,7 +69,7 @@ index 3ae75c1..018ffc5 100644
    std::size_t best_last_access = static_cast<std::size_t>(-1);
    for (const auto& entry : state.entries) {
      if (!entry.node || entry.state != ResidencyState::ACTIVE) continue;
-@@ -151,8 +154,12 @@ NodePtr ExpertResidencyManager::SelectVictim(const GpuState& state,
+@@ -151,14 +154,31 @@ NodePtr ExpertResidencyManager::SelectVictim(const GpuState& state,
        continue;
      }
      if (entry.bytes < needed_bytes) continue;
@@ -83,19 +83,67 @@ index 3ae75c1..018ffc5 100644
        best_last_access = entry.node->last_access_time;
      }
    }
-@@ -269,6 +276,11 @@ ResidencyTicket ExpertResidencyManager::BeginAdmission(
+   return victim;
+ }
+ 
++void ExpertResidencyManager::RecordBudgetPeak(int gpu_id) {
++  const auto& state = StateFor(gpu_id);
++  const auto charged = state.resident_bytes + state.transition_reserved_bytes + state.workspace_bytes;
++  if (charged > state.capacity_bytes || charged < 0)
++    throw std::logic_error("expert residency exceeded configured budget");
++  auto& peak = counters_["gpu_" + std::to_string(gpu_id) + "_peak_charged_bytes"];
++  peak = std::max(peak, charged);
++  std::int64_t total = 0;
++  for (const auto& gpu : gpu_states_)
++    total += gpu.second.resident_bytes + gpu.second.transition_reserved_bytes + gpu.second.workspace_bytes;
++  counters_["peak_accounted_bytes"] = std::max(counters_["peak_accounted_bytes"], total);
++}
++
+ bool ExpertResidencyManager::ConfigureCapacity(int gpu_id,
+                                                std::int64_t capacity_bytes) {
+   std::lock_guard<std::mutex> lock(mutex_);
+@@ -269,6 +289,14 @@ ResidencyTicket ExpertResidencyManager::BeginAdmission(
        }
        return ticket;
      }
 +    if (source == AdmissionSource::PREFETCH && !priorities_.empty()) {
 +      const double incoming_score = priorities_.count(incoming.node->id) ? priorities_.at(incoming.node->id) : 0;
 +      const double victim_score = priorities_.count(victim->id) ? priorities_.at(victim->id) : 0;
-+      if (incoming_score <= victim_score) return ticket;
++      if (incoming_score <= victim_score) {
++        ++counters_["priority_prefetch_rejections"];
++        return ticket;
++      }
 +    }
      ticket.reserved_victim = victim;
      if (auto* victim_entry = FindEntry(state, victim->id)) {
        ticket.reserved_victim_key = victim_entry->key;
-@@ -585,6 +597,34 @@ void ExpertResidencyManager::ReplaceProtectedVariants(
+@@ -284,6 +312,7 @@ ResidencyTicket ExpertResidencyManager::BeginAdmission(
+     state.transition_reserved_bytes += ticket.reserved_aligned_bytes;
+     state.workspace_bytes += ticket.reserved_workspace_bytes;
+   }
++  RecordBudgetPeak(gpu_id);
+   pending_tickets_[ticket.id] = ticket;
+   return ticket;
+ }
+@@ -333,6 +362,7 @@ ResidencyTicket ExpertResidencyManager::BeginTransition(
+   ++current_entry->lease_count;
+   state.transition_reserved_bytes += ticket.reserved_aligned_bytes;
+   state.workspace_bytes += ticket.reserved_workspace_bytes;
++  RecordBudgetPeak(gpu_id);
+   pending_tickets_[ticket.id] = ticket;
+   return ticket;
+ }
+@@ -360,6 +390,9 @@ bool ExpertResidencyManager::EvictReserved(const ResidencyTicket& ticket) {
+   pending.reserved_victim_key.reset();
+   state.transition_reserved_bytes += pending.reserved_aligned_bytes;
+   state.workspace_bytes += pending.reserved_workspace_bytes;
++  ++counters_["evictions"];
++  if (!priorities_.empty()) ++counters_["priority_evictions"];
++  RecordBudgetPeak(pending.gpu_id);
+   return true;
+ }
+ 
+@@ -585,6 +618,40 @@ void ExpertResidencyManager::ReplaceProtectedVariants(
    protected_variants_ = candidates;
  }
  
@@ -112,6 +160,11 @@ index 3ae75c1..018ffc5 100644
 +    state.resident_bytes -= it->bytes;
 +    it = state.entries.erase(it);
 +  }
++  counters_["gpu_" + std::to_string(gpu_id) + "_peak_charged_bytes"] = 0;
++  counters_["peak_accounted_bytes"] = 0;
++  counters_["priority_evictions"] = 0;
++  counters_["priority_prefetch_rejections"] = 0;
++  counters_["evictions"] = 0;
 +  return state.resident_bytes == 0;
 +}
 +
@@ -125,13 +178,32 @@ index 3ae75c1..018ffc5 100644
 +  }
 +  std::lock_guard<std::mutex> lock(mutex_);
 +  priorities_.swap(next);
++  ++counters_["priority_updates"];
 +}
 +
  void ExpertResidencyManager::ReplaceProtectedCandidates(
      const NodePtrList& candidates) {
    std::lock_guard<std::mutex> lock(mutex_);
+@@ -641,7 +708,7 @@ void ExpertResidencyManager::RecordAccess(const NodePtr& node,
+ 
+ ExpertPolicyStats ExpertResidencyManager::Snapshot() const {
+   std::lock_guard<std::mutex> lock(mutex_);
+-  ExpertPolicyStats stats;
++  ExpertPolicyStats stats = counters_;
+   std::int64_t resident_bytes = 0;
+   std::int64_t resident_payload_bytes = 0;
+   std::int64_t capacity_bytes = 0;
+@@ -707,7 +774,7 @@ ExpertPolicyStats ExpertResidencyManager::Snapshot() const {
+   stats["pending_tickets"] = static_cast<std::int64_t>(pending_tickets_.size());
+   stats["pending_transactions"] =
+       static_cast<std::int64_t>(pending_tickets_.size());
+-  stats["peak_accounted_bytes"] =
++  stats["current_accounted_bytes"] =
+       resident_bytes + transition_reserved_bytes + workspace_bytes;
+   return stats;
+ }
 diff --git a/core/prefetch/expert_residency.h b/core/prefetch/expert_residency.h
-index 5a5efdc..1f6b0ed 100644
+index 5a5efdc..dcf7c18 100644
 --- a/core/prefetch/expert_residency.h
 +++ b/core/prefetch/expert_residency.h
 @@ -181,6 +181,8 @@ class ExpertResidencyManager {
@@ -143,7 +215,15 @@ index 5a5efdc..1f6b0ed 100644
    void ReplaceProtectedCandidates(const NodePtrList& candidates);
    void RecordAccess(const NodePtr& node, ExpertPhase phase, bool hit);
  
-@@ -224,6 +226,7 @@ class ExpertResidencyManager {
+@@ -204,6 +206,7 @@ class ExpertResidencyManager {
+     std::vector<ResidencyEntry> entries;
+   };
+ 
++  void RecordBudgetPeak(int gpu_id);
+   GpuState& StateFor(int gpu_id);
+   const GpuState* FindState(int gpu_id) const;
+   ResidencyEntry* FindEntry(GpuState& state, std::size_t node_id);
+@@ -224,6 +227,7 @@ class ExpertResidencyManager {
    std::vector<ResidencyVariant> registered_variants_;
    std::unordered_map<std::uint64_t, WorkspaceRecord> workspace_records_;
    std::unordered_map<std::size_t, ExpertPolicyMetadata> access_metadata_;
@@ -212,10 +292,30 @@ index 7079414..4ce9182 100644
          if native_engine is None:
              raise RuntimeError(
 diff --git a/moe_infinity/memory/expert_predictor.py b/moe_infinity/memory/expert_predictor.py
-index b95ade3..abcd3b7 100644
+index b95ade3..0483534 100644
 --- a/moe_infinity/memory/expert_predictor.py
 +++ b/moe_infinity/memory/expert_predictor.py
-@@ -63,11 +63,11 @@ class ExpertPredictor:
+@@ -41,6 +41,19 @@ class ExpertPredictor:
+         scored.sort(key=lambda item: (-item[1], item[0]))
+         return scored
+ 
++    def predict_batch(self, seq_ids, selected_experts, layer_idx):
++        import numpy as np
++        if self.tracer is None or len(seq_ids) != len(selected_experts):
++            raise ValueError("EAM request batch mismatch")
++        for seq_id, experts in zip(seq_ids, selected_experts):
++            self.tracer.update_entry(seq_id, experts, layer_idx)
++        matrices = np.stack([self.tracer.get_entry(sid).matrix for sid in seq_ids])
++        scores = self.tracer.find_most_similar_batch(matrices, layer_idx).sum(axis=0)
++        scores[:layer_idx + 1] = 0
++        for layer in range(layer_idx + 1, self.num_layers):
++            scores[layer] *= self.layer_decay_func(layer, layer_idx, self.num_layers)
++        return scores
++
+     def predict(self, seq_id, expert_list, layer_idx):
+         if self.tracer is None:
+             raise RuntimeError("tracer must be added before predict")
+@@ -63,11 +76,11 @@ class ExpertPredictor:
                  expert_matrix = tracer.find_most_similar(
                      current_entry.matrix, layer_idx
                  )
@@ -317,7 +417,7 @@ index 0f1065a..c8c9298 100644
              _ = self._consume_prediction(phase)
              return
 diff --git a/moe_infinity/memory/expert_tracer.py b/moe_infinity/memory/expert_tracer.py
-index d9c382a..2722afa 100644
+index d9c382a..a90dfbc 100644
 --- a/moe_infinity/memory/expert_tracer.py
 +++ b/moe_infinity/memory/expert_tracer.py
 @@ -54,26 +54,25 @@ class ExpertTracer:
@@ -396,7 +496,7 @@ index d9c382a..2722afa 100644
  
      def update_entry(self, seq_id, expert_list, layer_idx):
          expert_counter = Counter(expert_list.flatten().tolist())
-@@ -116,32 +109,25 @@ class ExpertTracer:
+@@ -116,32 +109,50 @@ class ExpertTracer:
          return self.trace[seq_id]
  
      def find_most_similar(self, matrix, layer_idx) -> np.ndarray:
@@ -445,14 +545,39 @@ index d9c382a..2722afa 100644
 +        self.access_clock += 1
 +        self.collection_access[idx] = self.access_clock
 +        return self.trace_collection[idx].copy()
++
++    def find_most_similar_batch(self, matrices, layer_idx):
++        """One batched prefix search; never copy the trace pool per request."""
++        queries = np.asarray(matrices, dtype=np.float32)[:, :layer_idx + 1]
++        history = self.trace_collection[:, :layer_idx + 1]
++        active = np.flatnonzero(history.any(axis=(1, 2)))
++        result = np.zeros((len(queries), self.num_layers, self.num_experts), dtype=np.float32)
++        if not len(active):
++            return result
++        h = history[active]
++        hn = np.linalg.norm(h, axis=-1, keepdims=True)
++        qn = np.linalg.norm(queries, axis=-1, keepdims=True)
++        h = np.divide(h, hn, out=np.zeros_like(h), where=hn > 0)
++        q = np.divide(queries, qn, out=np.zeros_like(queries), where=qn > 0)
++        # Summed per-layer cosine. Dividing by the query's observed-layer
++        # count does not change its argmax. CPU torch uses the configured team.
++        similarity = (torch.from_numpy(q.reshape(len(q), -1)) @
++                      torch.from_numpy(h.reshape(len(h), -1)).T).numpy()
++        indices = active[similarity.argmax(axis=1)]
++        valid = queries.any(axis=(1, 2))
++        result[valid] = self.trace_collection[indices[valid]]
++        for idx in indices[valid]:
++            self.access_clock += 1
++            self.collection_access[idx] = self.access_clock
++        return result
  
      def _init_io_tracking(self):
          global _io_profile_env_cache
 diff --git a/tests/cpp/unit/prefetch/test_expert_residency.cpp b/tests/cpp/unit/prefetch/test_expert_residency.cpp
-index 7b6b128..af303a9 100644
+index 7b6b128..6a105c4 100644
 --- a/tests/cpp/unit/prefetch/test_expert_residency.cpp
 +++ b/tests/cpp/unit/prefetch/test_expert_residency.cpp
-@@ -80,3 +80,71 @@ TEST_F(ExpertResidencyManagerTest, DemandAndPrefetchClientsShareAccounting) {
+@@ -80,3 +80,73 @@ TEST_F(ExpertResidencyManagerTest, DemandAndPrefetchClientsShareAccounting) {
    EXPECT_EQ(manager->ResidentBytes(0), 40);
    EXPECT_EQ(manager->ResidentCount(0), 1);
  }
@@ -487,6 +612,7 @@ index 7b6b128..af303a9 100644
 +  EXPECT_EQ(t.reserved_victim, hot);
 +  ASSERT_TRUE(manager->AbortAdmission(t));
 +  EXPECT_EQ(manager->ResidentBytes(0), 120);
++  EXPECT_EQ(manager->Snapshot().at("gpu_0_peak_charged_bytes"), 120);
 +}
 +
 +TEST_F(ExpertResidencyManagerTest, ColdResetRefusesLiveWorkAndRetainsBudget) {
@@ -518,6 +644,7 @@ index 7b6b128..af303a9 100644
 +  auto rejected = manager->BeginAdmission(cold, 0, ExpertPhase::DECODE,
 +                                        AdmissionMode::CACHE, AdmissionSource::PREFETCH);
 +  EXPECT_FALSE(rejected.valid);
++  EXPECT_EQ(manager->Snapshot().at("priority_prefetch_rejections"), 1);
 +  auto demand = manager->BeginAdmission(cold, 0, ExpertPhase::DECODE,
 +                                      AdmissionMode::CACHE, AdmissionSource::DEMAND);
 +  ASSERT_TRUE(demand.valid);
@@ -526,10 +653,10 @@ index 7b6b128..af303a9 100644
 +}
 diff --git a/tests/python/unit/test_eam_repair.py b/tests/python/unit/test_eam_repair.py
 new file mode 100644
-index 0000000..2577aeb
+index 0000000..dea290b
 --- /dev/null
 +++ b/tests/python/unit/test_eam_repair.py
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,82 @@
 +import unittest
 +import numpy as np
 +from transformers import Qwen3MoeConfig
@@ -570,6 +697,15 @@ index 0000000..2577aeb
 +        a=np.ones((3,3,4),np.float32);self.tracer.load_trace(a)
 +        sid=self.tracer.create_entry();self.tracer.update_entry(sid,np.array([2]),0);self.tracer.finish_entry(sid)
 +        np.testing.assert_array_equal(self.tracer.trace_collection,a)
++    def test_batched_search_matches_independent_search(self):
++        rng=np.random.default_rng(13)
++        self.tracer.load_trace(rng.integers(0,5,(3,3,4)).astype(np.float32))
++        queries=rng.integers(0,5,(8,3,4)).astype(np.float32)
++        queries[0]=0
++        for layer in range(3):
++            expected=np.stack([self.tracer.find_most_similar(q,layer) for q in queries])
++            np.testing.assert_array_equal(self.tracer.find_most_similar_batch(queries,layer),expected)
++
 +    def test_qwen_wrapper_calls_eam_per_request(self):
 +        import torch
 +        from moe_store.wrappers.qwen import Qwen3MoEBlock
