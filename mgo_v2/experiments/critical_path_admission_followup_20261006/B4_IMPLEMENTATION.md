@@ -27,3 +27,27 @@ the compiled reference. Full real-model correctness is a separate gate, pending.
 
 Validation order: full64 correctness -> isolated grouped calibration -> separate
 first8 diagnostics H1b/H2 -> clean C30 repeats -> C30 gate. C60 only on PASS.
+
+## Full64 checkpoint
+
+BR and FCA passed on all four ranks, with 648,450 cumulative expert comparisons,
+maximum absolute/relative difference 0, and identical token, cache, controller,
+H2D-copy/byte, and forward/return-byte receipts. The two CPU scheduler hazard
+tests also pass. The initial reference-check storage-offset recompilation error
+and preserved attempt are described in B4_PREPARATION_CORRECTION.json.
+
+The micro-calibration contains 53 structural/matched-total wave vectors. Its
+CUDA-event span includes gaps between the three submitted math kernels; it is
+not presented as a sum of pure kernel-active durations. The diagnostic reports
+also retain separately attributed actual GPU kernel-active time. Coefficients
+are fit only to this isolated calibration, before policy timing.
+
+Current-event row/column indices let routing-weight gather and multiply fuse
+in the final scatter kernel, avoiding another packed-weight buffer. Original
+group offsets preserve the unchanged return accumulation order.
+
+H1b reference signatures are checked against committed B3 artifacts and rebuilt
+outside timing, avoiding another discovery pass. H1b receives a fresh full64
+validation in diagnostic preparation. H2 full64 correctness is independently
+executed without any graph object. Paired timing retains common H1b buffers in
+both arms to avoid a memory-fixture difference; these are not required by H2.
