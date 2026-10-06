@@ -1,6 +1,6 @@
 # Owner-authorized MoE-Infinity baseline repairs
 
-Status: implementation checkpoint; native build and physical validation pending.
+Status: implementation checkpoint; native build passed; physical smoke validation running.
 Upstream MoE-Infinity: 9f819a6d43e043bded6e0692e5e58793e1623364.
 moe-store: v0.2.2, 096f51f92ca9d698907d9a79120a7819ea094266.
 
@@ -14,5 +14,5 @@ Report this as repaired MoE-Infinity, never as unmodified upstream.
 - New quiescent cache clear refuses live tickets/leases, clears physical residency while retaining capacity. The old reset_cache only cancels queues.
 - Preserve warmup EAM history and restore its snapshot before every measured repeat, preventing earlier target repeats from training later ones. Clear expert residency before each measured batch, retain CPU source and compiled code.
 
-CPU unit checks: five EAM tests passed (prefix matching, no alias, empty history, finished traces, persistent pool, per-GPU candidate budget). C++ tests added for priority versus LRU, lease protection, cold reset and prefetch rejection; not run yet.
+CPU unit checks: six EAM tests passed (prefix matching, no alias, empty history, finished traces, persistent pool, per-GPU candidate budget). C++ tests added for priority versus LRU, lease protection, cold reset and prefetch rejection; all 14 residency/variant C++ tests passed.
 Physical acceptance still requires observed nonzero EAM calls, actual priority evictions, peak charged bytes within all GPU budgets, cold residency receipts, BF16 output sanity and clean timing.

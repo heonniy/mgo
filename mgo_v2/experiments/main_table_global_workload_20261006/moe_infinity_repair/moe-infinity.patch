@@ -526,10 +526,10 @@ index 7b6b128..af303a9 100644
 +}
 diff --git a/tests/python/unit/test_eam_repair.py b/tests/python/unit/test_eam_repair.py
 new file mode 100644
-index 0000000..53e9608
+index 0000000..2577aeb
 --- /dev/null
 +++ b/tests/python/unit/test_eam_repair.py
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,73 @@
 +import unittest
 +import numpy as np
 +from transformers import Qwen3MoeConfig
@@ -570,6 +570,27 @@ index 0000000..53e9608
 +        a=np.ones((3,3,4),np.float32);self.tracer.load_trace(a)
 +        sid=self.tracer.create_entry();self.tracer.update_entry(sid,np.array([2]),0);self.tracer.finish_entry(sid)
 +        np.testing.assert_array_equal(self.tracer.trace_collection,a)
++    def test_qwen_wrapper_calls_eam_per_request(self):
++        import torch
++        from moe_store.wrappers.qwen import Qwen3MoEBlock
++        self.config.hidden_size=8;self.config.moe_intermediate_size=4
++        block=Qwen3MoEBlock(self.config);block.layer_id=0
++        block.expert_tracer=self.tracer
++        block.expert_predictor=ExpertPredictor(self.config)
++        block.expert_predictor.add_tracer(self.tracer)
++        p=ExpertPrefetcher(self.config);p.archer_engine=FakeEngine()
++        p.expert_tensor_map={(l,e):l*4+e for l in range(3) for e in range(4)}
++        p.configure_eam_budget([18,9],9);block.expert_prefetcher=p
++        block.seq_id_list=[self.tracer.create_entry() for _ in range(2)]
++        class Executor:
++            def dispatch_local(self,layer,hidden,*args,**kwargs):self.hidden=hidden
++            def wait_dispatch_local(self):return torch.zeros_like(self.hidden)
++        block.expert_executor=Executor()
++        out=block(torch.randn(2,3,8))
++        self.assertEqual(tuple(out.shape),(2,3,8));self.assertEqual(p.eam_calls,1)
++        for sid in block.seq_id_list:self.assertEqual(self.tracer.trace[sid].matrix[0].sum(),3)
++        self.assertEqual(p.eam_candidates,0)
++
 +    def test_budget_and_priority_order(self):
 +        p=ExpertPrefetcher(self.config);p.archer_engine=FakeEngine()
 +        p.expert_tensor_map={(l,e):l*4+e for l in range(3) for e in range(4)}
