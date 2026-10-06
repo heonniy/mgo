@@ -1,3 +1,8 @@
+**OWNER STATIC HOLD: STATIC_MOD execution postponed.**
+The waiting static queue was terminated before any static GPU run or full
+trace replay. Keep implementation/tests; do not resume without a new owner
+request. Existing BR/LA_CA_NEAR/LA decode32 final validation continues.
+
 **OWNER STATIC BASELINE ADDITION: all eight selected decode32 cells.**
 Read `experiments/strict_laca_headroom_20261006/STATIC_MOD_AMENDMENT.md`.
 Append STATIC_MOD (missing expert e -> logical rank e % world) after current

@@ -1,4 +1,8 @@
-# Owner-authorized static ownership baseline
+# Static ownership baseline — execution on hold
+
+Owner follow-up: postpone execution. Waiting queue stopped before any static
+GPU run or full trace replay. Implementation and CPU unit checks are retained.
+Do not resume automatically; earlier execution authorization is withdrawn.
 
 Add STATIC_MOD to all eight selected final conditions: R4/R8 x localB16/B64
 x input256/512. For every missing expert e, fetch to logical rank e % world.
