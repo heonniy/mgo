@@ -97,6 +97,10 @@ def main(a):
    from refactor_thread_affinity import configure
    rt.profile_thread_placement=configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  place_threads()
+ if case.get('b3_executor')=='H1':
+  from b3_prepare import prepare
+  a.b3_cache=case['b3_cache']
+  prepare(rt,model,ids,mask,teacher,generate,validate,place_threads,write)
  warm,expected=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
  rt.reset();place_threads();a.phase='MEASURE';rt.capture=True;rt.arm_profile();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
  from torch._dynamo.utils import counters
