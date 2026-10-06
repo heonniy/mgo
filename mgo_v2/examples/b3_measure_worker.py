@@ -30,7 +30,8 @@ def main(a):
   if first.get('isolated_cpu_threads',False):
    from refactor_thread_affinity import configure as configure_affinity
    rt.measurement_thread_placement=configure_affinity(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
- graph=GraphExpertExecutor(rt.cache,rt.kernel)
+ candidate=first.get('executor','H1');assert candidate in ('H1','H1b')
+ graph=GraphExpertExecutor(rt.cache,rt.kernel,wrapper=candidate=='H1b')
  rt.graph_executor=graph
  references={}
  for policy in policies:
@@ -55,12 +56,12 @@ def main(a):
   assert observed==references[policy]
   write(a.output/f'{policy}_correctness_rank{rank}.json',dict(status='PASS',reference=references[policy],observed=observed,argmax_hash=row['argmax_hash'],graph=graph.receipt()))
  rt.graph_check=False
- samples={key:[] for key in ['BR_H0','FCA_H0','BR_H1','FCA_H1']}
+ samples={key:[] for key in ['BR_H0','FCA_H0','BR_'+candidate,'FCA_'+candidate]}
  for repeat in (1,2,3):
   order=list(samples) if repeat%2 else list(reversed(samples))
   for key in order:
    if repeat==3 and decide(samples[key])['target_repeats']!=3:continue
-   policy,mode=key.split('_');rt.graph_executor=graph if mode=='H1' else None
+   policy,mode=key.split('_');rt.graph_executor=graph if mode==candidate else None
    configure(policy,'MEASURE');torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
    before=dict(counters['stats']);label=f'{key}_r{repeat}'
    write(a.output/f'{label}_ready_rank{rank}.json',dict(rank=rank,case=key,repeat=repeat));dist.barrier()
@@ -80,7 +81,7 @@ def main(a):
    if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=key,repeat=repeat,samples=samples))
  gates={key:dict(initial=decide(rows[:2]),unstable=final_unstable(rows),estimate={k:statistics.median([r[k] for r in rows]) for k in ['E2E_wall','TPOT']},range={k:[min(r[k] for r in rows),max(r[k] for r in rows)] for k in ['E2E_wall','TPOT']}) for key,rows in samples.items()}
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',samples=samples,gates=gates,unstable=any(g['unstable'] for g in gates.values()),rule='Two repeats; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat. Retain every sample.'))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',candidate=candidate,samples=samples,gates=gates,unstable=any(g['unstable'] for g in gates.values()),rule='Two repeats; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat. Retain every sample.'))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--cases',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())

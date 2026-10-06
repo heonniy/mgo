@@ -5,30 +5,33 @@ from prepare_critical_microbench import ROOT,PACKET,write
 
 
 def finalize():
-    diagnosis=json.loads((PACKET/'B3_DIAGNOSTIC_RESULTS.json').read_text())
+    diagnostic_path=PACKET/'B3_H1b_DIAGNOSTIC_RESULTS.json'
+    if not diagnostic_path.exists():diagnostic_path=PACKET/'B3_DIAGNOSTIC_RESULTS.json'
+    diagnosis=json.loads(diagnostic_path.read_text());candidate=diagnosis.get('candidate','H1')
+    correctness_path=PACKET/('B3_H1b_CORRECTNESS.json' if candidate=='H1b' else 'B3_CORRECTNESS.json')
     clean=ROOT/'b3/C30/B3_C30_CLEAN_B128_H64/result.json'
-    timings=[];gate=dict(correctness=json.loads((PACKET/'B3_CORRECTNESS.json').read_text())['status']=='PASS',
+    timings=[];gate=dict(correctness=json.loads(correctness_path.read_text())['status']=='PASS',
                         diagnostic=diagnosis['status']=='DIAGNOSTIC_PASS')
-    result=dict(status='DIAGNOSTIC_GATE_FAIL',repair_gate=gate,causal_case=None,c60_authorized=False,primary_timing_available=clean.exists())
+    result=dict(candidate=candidate,status='DIAGNOSTIC_GATE_FAIL',repair_gate=gate,causal_case=None,c60_authorized=False,primary_timing_available=clean.exists())
     if clean.exists():
         timing=json.loads(clean.read_text());assert timing['status']=='PASS'
         for key,rows in timing['samples'].items():
             policy,mode=key.split('_')
             for i,row in enumerate(rows,1):timings.append(dict(cache='C30',policy=policy,executor=mode,repeat=i,**row))
         est={key:value['estimate'] for key,value in timing['gates'].items()}
-        gate.update(stable=not timing['unstable'],br_tpot_within_one_percent=est['BR_H1']['TPOT']<=1.01*est['BR_H0']['TPOT'])
+        gate.update(stable=not timing['unstable'],br_tpot_within_one_percent=est['BR_'+candidate]['TPOT']<=1.01*est['BR_H0']['TPOT'])
         result['estimates_seconds']=est
         result['full_ranges_seconds']={key:g['range'] for key,g in timing['gates'].items()}
-        result['repair_gains']={policy:{k:1-est[policy+'_H1'][k]/est[policy+'_H0'][k] for k in ('TPOT','E2E_wall')} for policy in ('BR','FCA')}
+        result['repair_gains']={policy:{k:1-est[policy+'_'+candidate][k]/est[policy+'_H0'][k] for k in ('TPOT','E2E_wall')} for policy in ('BR','FCA')}
         before=est['FCA_H0']['TPOT']/est['BR_H0']['TPOT']-1
-        after=est['FCA_H1']['TPOT']/est['BR_H1']['TPOT']-1
+        after=est['FCA_'+candidate]['TPOT']/est['BR_'+candidate]['TPOT']-1
         result['fca_slowdown']=dict(H0=before,H1=after)
         result['status']='REPAIR_PASS' if all(gate.values()) else 'REPAIR_GATE_FAIL'
         if result['status']=='REPAIR_PASS' and before>0:
             # Case A also requires corresponding reduction in measured skew.
             rows=diagnosis['rows']
-            skew={mode:next(r['return_gpu_start_spread_ms'] for r in rows if r['policy']=='FCA' and r['executor']==mode) for mode in ('H0','H1')}
-            if after<=.5*before and skew['H1']<skew['H0']:result['causal_case']='A'
+            skew={mode:next(r['return_gpu_start_spread_ms'] for r in rows if r['policy']=='FCA' and r['executor']==mode) for mode in ('H0',candidate)}
+            if after<=.5*before and skew[candidate]<skew['H0']:result['causal_case']='A'
             elif abs(after-before)/before<.25:result['causal_case']='B'
             else:result['causal_case']='INTERMEDIATE_OR_SKEW_NOT_CONFIRMED'
             result['c60_authorized']=result['causal_case'] in ('A','B')
@@ -41,7 +44,7 @@ def finalize():
     write(PACKET/'B3_REPAIR_DECISION.json',result)
     lines=['# B3 host executor repair', '', 'Status: '+result['status'], '',
            'R4 GPUs 0/1/4/5, C30/B128, frozen64, BF16 V3 P2/T2. Other users’ GPUs untouched.', '',
-           'H0 is unchanged; H1 replays the exact expert kernel against live slot weights.',
+           f'H0 is unchanged; {candidate} replays the exact expert kernel against live slot weights.',
            'Full64 discovery/capture/validation occurs before any timing; no new graph entry or compile is permitted during measurement.', '',
            '| Policy | Host call reduction | Expert host-loop reduction | Counter/packet parity |',
            '|---|---:|---:|---|']
@@ -56,7 +59,7 @@ def finalize():
             'Runtime repair is not an admission-method contribution. See graph signatures, correctness receipts and diagnostic source hashes.']
     (PACKET/'B3_RESULTS.md').write_text('\n'.join(lines)+'\n')
     sources={}
-    for p in [PACKET/'STAGE_B3_HOST_EXECUTOR_REPAIR.md',PACKET/'B3_DIAGNOSTIC_RESULTS.json',PACKET/'B3_CORRECTNESS.json',PACKET/'B3_GRAPH_SIGNATURES.json']:
+    for p in [PACKET/'STAGE_B3_HOST_EXECUTOR_REPAIR.md',diagnostic_path,correctness_path,PACKET/('B3_H1b_GRAPH_SIGNATURES.json' if candidate=='H1b' else 'B3_GRAPH_SIGNATURES.json')]:
         sources[str(p)]=hashlib.sha256(p.read_bytes()).hexdigest()
     if clean.exists():sources[str(clean)]=hashlib.sha256(clean.read_bytes()).hexdigest()
     write(PACKET/'B3_SOURCE_RECEIPTS.json',dict(sources=sources,diagnostic_sources=diagnosis['sources']))

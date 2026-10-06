@@ -106,14 +106,15 @@ class DecodeOffloadRuntime(LiveRuntime):
    expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
    if getattr(self.args,'fused',False) and self.args.phase!='MEASURE':self.mismatch.logical_or_((packet[2][rows,cols]!=expert).any())
    executor=getattr(self,'graph_executor',None)
-   consolidated=executor is not None and executor.wrapper and executor.mode=='replay'
+   if executor is None:
+    w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+    self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
+    continue
+   consolidated=executor.wrapper and executor.mode=='replay'
    check=getattr(self,'graph_check',False) and self.index<96
    if consolidated:
     executor.gather(slot,received,rows,check);part=executor.launch(slot,len(rows),check)
-   elif executor is not None:
-    part=executor(slot,received[rows],check=check)
-   else:
-    w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+   else:part=executor(slot,received[rows],check=check)
    self.h2d.record_slot_use(slot)
    parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
   if getattr(self.args,'fused',False) and self.index>=48:return parts
