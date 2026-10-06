@@ -51,3 +51,16 @@ outside timing, avoiding another discovery pass. H1b receives a fresh full64
 validation in diagnostic preparation. H2 full64 correctness is independently
 executed without any graph object. Paired timing retains common H1b buffers in
 both arms to avoid a memory-fixture difference; these are not required by H2.
+
+## Prediction boundary
+
+The primary H2 service predictor receives the current event/rank's complete
+expert-row vector. It cannot consume the observed number or composition of ready
+waves: those are outcomes of physical H2D/readiness timing, not placement-only
+inputs. A sum of calibrated services over observed waves is retained separately
+as a post-hoc mechanism diagnostic. H1b uses the previously calibrated A3 tau(n)
+reference. No coefficients are fit to BR/FCA TPOT or diagnostic loop spans.
+
+The completed first8 diagnostics preserve all packet/H2D counters. Kernel/graph
+host dispatch counts include both CUDA runtime and driver APIs, with nested
+driver calls deduplicated. This correctly includes direct Triton dispatch.

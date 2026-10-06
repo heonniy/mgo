@@ -50,6 +50,6 @@ def main(a):
  result=dict(status='PASS',scope='three grouped math kernels only; excluding gather, metadata, routing weight and readiness',fit_target='isolated CUDA-event grouped service, never TPOT',feature_order=['intercept','experts','total_rows','row_tiles','grid_row_tiles'],coefficients=coefficients.tolist(),rows=rows,source_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(a.source.glob('*_waves_rank*.json'))},workspace_bytes=ex.workspace_bytes)
  a.output.write_text(json.dumps(result,indent=2)+'\n')
  with a.output.with_suffix('.csv').open('w') as f:
-  writer=csv.DictWriter(f,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+  writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator="\n");writer.writeheader();writer.writerows(rows)
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())

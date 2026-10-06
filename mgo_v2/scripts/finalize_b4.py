@@ -28,7 +28,7 @@ def main():
  write(PACKET/'B4_REPAIR_DECISION.json',decision)
  write(PACKET/'B4_TIMING_REPEATS.json',dict(status='PASS',samples=timing,summaries=result['gates'],source_hashes={str(p):sha(p) for p in sorted(cap.glob('*_measure_rank*.json'))}))
  with (PACKET/'B4_TIMING_REPEATS.csv').open('w') as f:
-  w=csv.DictWriter(f,fieldnames=list(timing[0]));w.writeheader();w.writerows(timing)
+  w=csv.DictWriter(f,fieldnames=list(timing[0]),lineterminator="\n");w.writeheader();w.writerows(timing)
  lines=['# B4 C30 dynamic grouped executor results','',f"Decision: **{decision['status']}**, interpretation **{interpretation}**. No Stage C oracle authorized.",'','R4 GPUs 0,1,4,5; C30/local B128; BF16; frozen decode64; V3 P2/T2; Env1.','', '|Policy/runtime|TPOT seconds|E2E seconds|','|---|---:|---:|']
  for key,r in summary.items():lines.append(f"|{key}|{r['TPOT']:.6f}|{r['E2E_wall']:.6f}|")
  lines+=['','All valid samples retained; initial two repeats use the frozen <=2% / <=5% rule.','Full ranges and stability decisions are in B4_TIMING_REPEATS.json.','', '## Mechanism gate','']

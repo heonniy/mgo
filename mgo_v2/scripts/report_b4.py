@@ -45,6 +45,7 @@ def dispatch_counts(cap,rank):
 
 def main():
  state=json.loads((ROOT/'b4/C30/diagnostic_status.json').read_text());assert state['status']=='DIAGNOSTICS_COMPLETE'
+ original_tau=json.loads((PACKET/'CRITICAL_PATH_MODEL.json').read_text())['tau']
  calibration=json.loads((PACKET/'B4_GROUPED_SERVICE_CALIBRATION.json').read_text());co=np.array(calibration['coefficients'])
  def predict(v):return float(co@np.array([1,len(v),sum(v),sum((n+31)//32 for n in v),len(v)*((max(v)+31)//32)]))
  rows=[];waves=[];sources={};summaries=[];all_caps={}
@@ -58,15 +59,20 @@ def main():
     phases=e['phases'];loop=phases['expert_loop'];event=e['event']
     if mode=='H2':vectors=[w['rows'] for w in evwaves[event]]
     else:vectors=[[d['rows']] for d in e['expert_calls']]
-    pred=sum(predict(v) for v in vectors);nrows=sum(map(sum,vectors))
-    for j,v in enumerate(vectors):waves.append(dict(policy=policy,executor=mode,rank=rank,event=event,wave=j,experts=len(v),rows=v,predicted_service_ms=predict(v)))
+    flat=[n for v in vectors for n in v];nrows=sum(flat)
+    # Primary placement-visible predictor cannot consume observed wave count.
+    # Keep the actual-wave service sum as a separately labelled post-hoc check.
+    wave_prediction=sum(predict(v) for v in vectors)
+    pred=predict(flat) if mode=='H2' else float(sum(np.interp(n,original_tau['rows'],original_tau['ms']) for n in flat))
+    for j,v in enumerate(vectors if mode=='H2' else []):waves.append(dict(policy=policy,executor=mode,rank=rank,event=event,wave=j,experts=len(v),rows=v,predicted_service_ms=predict(v)))
     wait=phases.get('expert_ready_wait',{}).get('host_union_ms',0.)
-    rows.append(dict(policy=policy,executor=mode,rank=rank,event=event,expert_rows=nrows,experts=sum(map(len,vectors)),waves=len(vectors),pred_group_service_ms=pred,host_loop_ms=loop['host_union_ms'],observed_expert_stage_ms=e['expert_exclusive_account']['full_loop_span_ms'],grouped_gpu_active_ms=phases['expert_compiled_kernel']['gpu_union_ms'],ready_wait_ms=wait,host_dispatch_calls=calls[event],all_expert_cuda_api_calls=all_calls[event],forward_host_entry_ns=phases['forward_collective_host_call']['host_start_ns'],forward_gpu_start_ns=phases['forward_collective_host_call']['gpu_start_ns'],forward_gpu_end_ns=phases['forward_collective_host_call']['gpu_end_ns'],return_host_entry_ns=phases['return_collective_host_call']['host_start_ns'],return_gpu_start_ns=phases['return_collective_host_call']['gpu_start_ns'],forward_nccl_ms=phases['forward_collective_host_call']['gpu_union_ms'],return_nccl_ms=phases['return_collective_host_call']['gpu_union_ms']))
+    rows.append(dict(policy=policy,executor=mode,rank=rank,event=event,expert_rows=nrows,experts=sum(map(len,vectors)),waves=len(vectors),pred_group_service_ms=pred,posthoc_observed_wave_service_ms=wave_prediction,host_loop_ms=loop['host_union_ms'],observed_expert_stage_ms=e['expert_exclusive_account']['full_loop_span_ms'],grouped_gpu_active_ms=phases['expert_compiled_kernel']['gpu_union_ms'],ready_wait_ms=wait,host_dispatch_calls=calls[event],all_expert_cuda_api_calls=all_calls[event],forward_host_entry_ns=phases['forward_collective_host_call']['host_start_ns'],forward_gpu_start_ns=phases['forward_collective_host_call']['gpu_start_ns'],forward_gpu_end_ns=phases['forward_collective_host_call']['gpu_end_ns'],return_host_entry_ns=phases['return_collective_host_call']['host_start_ns'],return_gpu_start_ns=phases['return_collective_host_call']['gpu_start_ns'],forward_nccl_ms=phases['forward_collective_host_call']['gpu_union_ms'],return_nccl_ms=phases['return_collective_host_call']['gpu_union_ms']))
    for name in (f'rank{rank}.json',f'b2_host_rank{rank}.json',f'b2_rank{rank}_analysis.json',f'communication_rank{rank}.json',f'copy_trace_rank{rank}.json'):sources[str(cap/name)]=sha(cap/name)
   data=[r for r in rows if r['policy']==policy and r['executor']==mode]
   summary=dict(policy=policy,executor=mode)
   for name in ('host_loop_ms','observed_expert_stage_ms','grouped_gpu_active_ms','ready_wait_ms','host_dispatch_calls','all_expert_cuda_api_calls','pred_group_service_ms','forward_nccl_ms','return_nccl_ms'):summary[name+'_per_step']=sum(r[name] for r in data)/32
   summary['service_stage_spearman']=correlation([r['pred_group_service_ms'] for r in data],[r['observed_expert_stage_ms'] for r in data])
+  summary['posthoc_observed_wave_service_stage_spearman']=correlation([r['posthoc_observed_wave_service_ms'] for r in data],[r['observed_expert_stage_ms'] for r in data])
   summary['raw_rows_stage_spearman']=correlation([r['expert_rows'] for r in data],[r['observed_expert_stage_ms'] for r in data])
   summary['service_gpu_spearman']=correlation([r['pred_group_service_ms'] for r in data],[r['grouped_gpu_active_ms'] for r in data])
   summary['service_stage_aggregate_relative_error']=abs(sum(r['pred_group_service_ms']-r['observed_expert_stage_ms'] for r in data))/sum(r['observed_expert_stage_ms'] for r in data)
@@ -91,11 +97,11 @@ def main():
   gates[policy]=dict(parity=bool(same),host_call_reduction=1-b['host_dispatch_calls_per_step']/a['host_dispatch_calls_per_step'],host_loop_reduction=1-b['host_loop_ms_per_step']/a['host_loop_ms_per_step'],service_stage_spearman=b['service_stage_spearman'])
  h2=[r for r in summaries if r['executor']=='H2'];br=next(r for r in h2 if r['policy']=='BR');fca=next(r for r in h2 if r['policy']=='FCA')
  predicted=fca['pred_group_service_ms_per_step']-br['pred_group_service_ms_per_step'];actual=fca['observed_expert_stage_ms_per_step']-br['observed_expert_stage_ms_per_step'];waitdelta=fca['ready_wait_ms_per_step']-br['ready_wait_ms_per_step']
- gap=dict(status='DIAGNOSTIC_COMPLETE',summaries=summaries,gates=gates,delta=dict(predicted_ms_per_step=predicted,observed_ms_per_step=actual,relative_error=abs(predicted-actual)/max(abs(actual),1e-9),measured_ready_wait_delta_ms_per_step=waitdelta,residual_after_readiness_ms_per_step=actual-predicted-waitdelta),exception_applied=False,notes=['No arbitrary scale or coefficient fit to policy timing.','H1b service predictor is summed singleton grouped service, a diagnostic comparison only.','Ready-wait is separately measured host time, not automatically an additive physical critical-path correction.','Launch count is main-thread CUDA runtime/driver kernel/graph dispatch calls within expert-loop, excluding event queries and deduplicating nested driver calls. All top-level CUDA API calls also reported.'])
+ gap=dict(status='DIAGNOSTIC_COMPLETE',summaries=summaries,gates=gates,delta=dict(predicted_ms_per_step=predicted,observed_ms_per_step=actual,relative_error=abs(predicted-actual)/max(abs(actual),1e-9),measured_ready_wait_delta_ms_per_step=waitdelta,residual_after_readiness_ms_per_step=actual-predicted-waitdelta),exception_applied=False,notes=['No arbitrary scale or coefficient fit to policy timing.','Primary H2 predictor uses the whole current event/rank expert-row vector, without observed wave count. The actual-wave sum is separately labelled post-hoc and cannot pass the placement-visible gate.','H1b reference uses the existing A3 isolated expert tau(n), summed over its current row vector.','Ready-wait is separately measured host time, not automatically an additive physical critical-path correction.','Launch count is main-thread CUDA runtime/driver kernel/graph dispatch calls within expert-loop, excluding event queries and deduplicating nested driver calls. All top-level CUDA API calls also reported.'])
  write(PACKET/'B4_KNOB_RUNTIME_GAP.json',gap)
  for name,data in [('B4_WAVE_STATS',waves),('B4_DIAGNOSTIC_RESULTS',rows)]:
-  write(PACKET/(name+'.json'),dict(status='PASS' if parity else 'FAIL',primary_timing=False,rows=data,sources=sources))
+  (PACKET/(name+'.json')).write_text(json.dumps(dict(status='PASS' if parity else 'FAIL',primary_timing=False,rows=data,sources=sources),separators=(',',':'))+'\n')
   with (PACKET/(name+'.csv')).open('w') as f:
-   w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
+   w=csv.DictWriter(f,fieldnames=list(data[0]),lineterminator="\n");w.writeheader();w.writerows(data)
  assert parity,'H1b/H2 diagnostic counters mismatch'
 if __name__=='__main__':main()
