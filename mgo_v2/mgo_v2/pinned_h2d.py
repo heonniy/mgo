@@ -46,6 +46,30 @@ def copy_expert_to_stage(stage: torch.Tensor, tensors, backend="torch") -> int:
         raise RuntimeError(f"expert size mismatch copied={pos} expected={stage.numel()}")
     return pos
 
+def build_full_pinned_expert_store(experts, bytes_per_expert: int):
+    """Materialize one full rank-private pinned expert copy.
+
+    This is deliberately simple for the R4 experiment: every rank owns its own
+    page-locked copy of all experts.  Returned expert sources are one flat,
+    contiguous pinned BF16 tensor per expert, so the H2D scheduler can DMA
+    directly without the pageable/file-backed -> staging memcpy.
+    """
+    if bytes_per_expert % 2:
+        raise ValueError("BF16 expert size must be even")
+    rows=len(experts);elems=bytes_per_expert//2
+    try:
+        pool=torch.empty((rows,elems),dtype=torch.bfloat16,device="cpu",pin_memory=True)
+    except RuntimeError as exc:
+        raise RuntimeError(
+            f"failed to allocate full pinned expert store: {rows*bytes_per_expert/2**30:.2f} GiB"
+        ) from exc
+    if not pool.is_pinned():
+        raise RuntimeError("full expert store is not pinned")
+    for key,tensors in enumerate(experts):
+        copy_expert_to_stage(pool[key],tensors,"torch")
+    sources=[(pool[key],) for key in range(rows)]
+    return pool,sources
+
 class PinnedH2DCache:
     def __init__(self,cache:torch.Tensor,stage_count:int=2):
         if not cache.is_cuda:raise ValueError("cache must be CUDA")
@@ -104,9 +128,9 @@ class PriorityH2DScheduler:
     prior compute. A promoted reservation reuses its ticket/copy rather than
     issuing a second H2D. Physical readiness is not replicated controller state.
     """
-    def __init__(self,cache,stage_count=2,profile=False,autostart=True,staging_backend="torch",cpu_team=None):
+    def __init__(self,cache,stage_count=2,profile=False,autostart=True,staging_backend="torch",cpu_team=None,direct_pinned=False):
         if staging_backend not in ("torch","memmove"):raise ValueError("unknown staging backend")
-        self.staging_backend=staging_backend
+        self.staging_backend=staging_backend;self.direct_pinned=bool(direct_pinned)
         self.cpu_team=cpu_team;self.cpu_team_receipt=None;self.startup_done=threading.Event()
         if cpu_team is not None and staging_backend!="torch":raise ValueError("fixed copy team requires torch staging")
         if not cache.is_cuda or stage_count<2:raise ValueError('CUDA arena and >=2 stages required')
@@ -201,41 +225,50 @@ class PriorityH2DScheduler:
                     while not self.pending and not self.stopping:self.cv.wait()
                     if self.stopping and not self.pending:return
                 sid=self.cursor
-                if self.stage_done[sid] is not None:self.stage_done[sid].synchronize()
+                if not self.direct_pinned and self.stage_done[sid] is not None:self.stage_done[sid].synchronize()
                 with self.cv:
                     t=self._pop()
                     if t is None:continue
-                if self.profile:t.staging_started_at=time.perf_counter()
-                copy_expert_to_stage(self.stages[sid],t.tensors,self.staging_backend)
-                if self.profile:t.staging_finished_at=time.perf_counter()
+                direct_source=None
+                if self.direct_pinned:
+                    tensors=tuple(t.tensors)
+                    if len(tensors)!=1:
+                        raise RuntimeError("direct-pinned source must be one flat expert tensor")
+                    direct_source=tensors[0]
+                    if (direct_source.device.type!="cpu" or not direct_source.is_pinned()
+                        or not direct_source.is_contiguous() or direct_source.dtype!=self.cache.dtype
+                        or direct_source.numel()!=self.cache.shape[1]):
+                        raise RuntimeError("invalid direct-pinned expert source")
+                    if self.profile:
+                        now=time.perf_counter();t.staging_started_at=now;t.staging_finished_at=now
+                else:
+                    if self.profile:t.staging_started_at=time.perf_counter()
+                    copy_expert_to_stage(self.stages[sid],t.tensors,self.staging_backend)
+                    if self.profile:t.staging_finished_at=time.perf_counter()
                 with self.cv:
                     t.staging=False
                     if t.state.state=='EMPTY':self.cv.notify_all();continue
-                    if not t.state.urgent and any(x.state.state=='QUEUED' for x in self.urgent):
+                    if (not self.direct_pinned and not t.state.urgent
+                        and any(x.state.state=='QUEUED' for x in self.urgent)):
                         # Urgent arrival during CPU staging: requeue speculative
                         # bytes instead of placing them ahead on the DMA stream.
                         self.background.appendleft(t);self.metrics['restaged']+=1;continue
                     t.state.start()
-                # CUDA/CUPTI calls can block. Never hold the planner's lock
-                # across them: compute must still publish slot-use events.
-                # INFLIGHT commits this copy; discarding it only retires the
-                # logical reservation after completion. One worker serializes
-                # submissions, so a replacement's previous_copy is recorded
-                # before that replacement can reach this stream.
+                # Direct-pinned mode retains the same queue, priority, slot
+                # hazards and completion events, but removes CPU staging.
                 with torch.cuda.stream(self.h2d_stream):
                     if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
                     if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
                     if t.begin is not None:t.begin.record(self.h2d_stream)
-                    self.cache[t.slot].copy_(self.stages[sid],non_blocking=True)
+                    self.cache[t.slot].copy_(direct_source if self.direct_pinned else self.stages[sid],non_blocking=True)
                     t.done.record(self.h2d_stream)
                 with self.cv:
                     t.submitted=True;t.submitted_at=time.perf_counter();self._retire_pending(t)
-                    self.stage_done[sid]=t.done;self.cursor=(sid+1)%len(self.stages)
+                    if not self.direct_pinned:
+                        self.stage_done[sid]=t.done;self.cursor=(sid+1)%len(self.stages)
                     self.metrics['copies']+=1;self.metrics['bytes']+=self.bytes_per_expert
                     self.metrics['urgent_copies' if t.state.urgent else 'background_copies']+=1
                     if self.profile:self.trace.append(t)
-                    # Tensor backing is immutable and held by the model store;
-                    # tickets need not retain an additional Python reference.
                     t.tensors=None;self.cv.notify_all()
         except BaseException as exc:
             with self.cv:self.error=exc;self.cv.notify_all()
