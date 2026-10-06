@@ -15,7 +15,7 @@ def prepare(rt, model, ids, mask, teacher, generate, validate, place_threads, wr
     def status(stage, **kw):
         write(output / f'b3_preparation_rank{rank}.json', dict(stage=stage, **kw))
     rt.stage_frozen_inputs(64)
-    executor = GraphExpertExecutor(rt.cache, rt.kernel)
+    executor = GraphExpertExecutor(rt.cache, rt.kernel, wrapper=getattr(rt.args,'b3_wrapper',False))
     rt.graph_executor = executor
     status('FULL64_H0_DISCOVERY')
     reference, expected = generate(model, rt, ids, mask, teacher, 64)

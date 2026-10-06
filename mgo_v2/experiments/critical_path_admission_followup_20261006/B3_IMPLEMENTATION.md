@@ -31,3 +31,20 @@ GEMM, policy retuning, or automatic C60 expansion.
 Shared-server safeguards retain host memory and selected-GPU checks. Foreign
 processes on 2/3/6/7 are recorded and untouched. Owned idle workers resume only
 on 0/1/4/5 after experiment exit. All valid observations and failures persist.
+
+## Conditional H1b
+
+C30 matched host ranges: H1 launch budget fell 72.94% BR / 73.67% FCA,
+but full host loop fell only 34.92% / 33.59%. Section 5 therefore permits the
+narrow wrapper consolidation. H1b uses `index_select(..., out=input_scratch)`
+in place of allocating a gather and copying it, then the same graph, unchanged
+slot-use recording, and the same BF16 routing multiplication into a persistent
+per-signature buffer. Parts remain in original group positions; each slot is
+unique within a layer. Current-stream ordering completes return partial reads
+before the next layer can overwrite scratch. No padded/grouped arithmetic,
+extra expert work, fused MoE kernel, scheduler, placement or transport change.
+
+H1b repeats full64 discovery and validation, including exact gather/kernel
+checks on the first decode step. Two new diagnostic captures only (BR/FCA),
+reusing this checkpoint's H0 references. Separate H1b receipts preserve H1.
+No clean timing is authorized until the diagnostic repair gate passes.

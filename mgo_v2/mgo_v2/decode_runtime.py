@@ -105,11 +105,17 @@ class DecodeOffloadRuntime(LiveRuntime):
   for i in expert_order(groups,self.h2d,getattr(self.args,'ready_first',False),self.ready_metrics):
    expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
    if getattr(self.args,'fused',False) and self.args.phase!='MEASURE':self.mismatch.logical_or_((packet[2][rows,cols]!=expert).any())
-   if getattr(self,'graph_executor',None) is not None:
-    part=self.graph_executor(slot,received[rows],check=getattr(self,'graph_check',False) and self.index<96)
+   executor=getattr(self,'graph_executor',None)
+   consolidated=executor is not None and executor.wrapper and executor.mode=='replay'
+   check=getattr(self,'graph_check',False) and self.index<96
+   if consolidated:
+    executor.gather(slot,received,rows,check);part=executor.launch(slot,len(rows),check)
+   elif executor is not None:
+    part=executor(slot,received[rows],check=check)
    else:
     w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
-   self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
+   self.h2d.record_slot_use(slot)
+   parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
   if getattr(self.args,'fused',False) and self.index>=48:return parts
   return torch.cat(parts) if parts else received.new_empty((0,2048))
  def close(self):

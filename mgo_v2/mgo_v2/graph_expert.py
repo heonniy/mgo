@@ -4,11 +4,13 @@ import torch
 
 
 class GraphExpertExecutor:
-    def __init__(self, cache, kernel):
+    def __init__(self, cache, kernel, wrapper=False):
         self.cache = cache
         self.kernel = kernel
         self.signatures = set()
         self.entries = {}
+        self.wrapper = wrapper
+        self.weighted = {}
         self.mode = 'discover'
         self.calls = 0
         self.checked = 0
@@ -40,13 +42,37 @@ class GraphExpertExecutor:
             self.checked += 1
         return out
 
+    def gather(self, slot, received, rows, check=False):
+        key = (int(slot), len(rows))
+        if key not in self.entries:
+            raise RuntimeError(f'B3 undiscovered graph signature {key}; run invalid')
+        assert self.cache.data_ptr() == self.slot_pointer
+        inp = self.entries[key][0]
+        torch.index_select(received, 0, rows, out=inp)
+        if check:
+            assert torch.equal(inp, received[rows]), 'H1b gather mismatch'
+
+    def launch(self, slot, n, check=False):
+        inp, out, graph = self.entries[(int(slot), n)]
+        graph.replay()
+        self.calls += 1
+        if check:
+            assert torch.equal(out, self.kernel(inp, *self.weights(slot))), 'H1b kernel mismatch'
+            self.checked += 1
+        return out
+
+    def weight(self, slot, part, rw, rows, cols):
+        out = self.weighted[(int(slot), len(rows))]
+        torch.mul(part, rw[rows, cols, None], out=out)
+        return out
+
     @torch.inference_mode()
     def build(self, progress=None):
         assert self.mode == 'discover' and self.signatures
         # Inputs and outputs are independent persistent allocations. Only dead
         # within-call temporaries share a graph pool; every graph fully writes
         # its own output before return, and replays are on one current stream.
-        required = sum(n * 2048 * 2 * 2 for _, n in self.signatures)
+        required = sum(n * 2048 * 2 * (3 if self.wrapper else 2) for _, n in self.signatures)
         free, total = torch.cuda.mem_get_info()
         free = min(free, int(total * .85) - torch.cuda.memory_reserved())
         if required > free - 12 * 1024**3:
@@ -67,6 +93,8 @@ class GraphExpertExecutor:
                                   free_bytes=free))
             inp = torch.zeros((n, 2048), device=self.cache.device, dtype=torch.bfloat16)
             out = torch.empty_like(inp)
+            if self.wrapper:
+                self.weighted[(slot, n)] = torch.empty_like(inp)
             weights = self.weights(slot)
             stream.wait_stream(torch.cuda.current_stream())
             with torch.cuda.stream(stream):
@@ -84,7 +112,7 @@ class GraphExpertExecutor:
         self.scratch_bytes = required
 
     def receipt(self):
-        return dict(mode=self.mode, signatures=sorted(self.signatures),
+        return dict(mode=self.mode, executor='H1b' if self.wrapper else 'H1', signatures=sorted(self.signatures),
                     entries=len(self.entries), calls=self.calls, exact_expert_checks=self.checked,
                     scratch_bytes=getattr(self, 'scratch_bytes', None),
                     build_seconds=getattr(self, 'build_seconds', None),

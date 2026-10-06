@@ -51,14 +51,17 @@ def install(rt):
      except StopIteration:break
     expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
     meta=dict(expert=int(expert),rows=len(rows),slot=int(slot),key=int(layer*128+expert))
+    executor=getattr(self,'graph_executor',None);consolidated=executor is not None and getattr(executor,'wrapper',False)
     with rec.phase('expert_gather',**meta):
-     x=received[rows]
-     if getattr(self,'graph_executor',None) is None:
-      w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
+     if consolidated:executor.gather(slot,received,rows)
+     else:
+      x=received[rows]
+      if executor is None:
+       w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
     with rec.phase('expert_compiled_kernel',**meta):
-     part=self.graph_executor(slot,x) if getattr(self,'graph_executor',None) is not None else self.kernel(x,gate,up,down)
+     part=executor.launch(slot,len(rows)) if consolidated else executor(slot,x) if executor is not None else self.kernel(x,gate,up,down)
     with rec.phase('expert_record_use',**meta):self.h2d.record_slot_use(slot)
-    with rec.phase('expert_weight_partial',**meta):parts[i]=part*rw[rows,cols,None]
+    with rec.phase('expert_weight_partial',**meta):parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
   return parts
  replace(rt,'compute',MethodType(compute,rt))
  old_forward=rt.transport.forward

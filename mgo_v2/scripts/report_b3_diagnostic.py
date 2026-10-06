@@ -6,9 +6,10 @@ from report_b2 import export
 from prepare_critical_microbench import PACKET, ROOT, write, sha
 
 
-def report(cache='C30'):
+def report(cache='C30',candidate='H1'):
     root=ROOT/'b3'
-    state=json.loads((root/'status.json').read_text())
+    state=json.loads((root/('h1b_status.json' if candidate=='H1b' else 'status.json')).read_text())
+    prefix='B3_H1b' if candidate=='H1b' else 'B3'
     assert state['status']=='DIAGNOSTICS_COMPLETE'
     summaries=[];signatures=[];correctness=[];sources={}
     for path in state['completed']:
@@ -37,7 +38,7 @@ def report(cache='C30'):
             receipt=json.loads((cap/f'rank{rank}.json').read_text());assert receipt['status']=='PASS'
             for filename in (f'rank{rank}.json',f'b2_rank{rank}_analysis.json',f'communication_rank{rank}.json',f'copy_trace_rank{rank}.json',f'profile_rank{rank}.nsys-rep'):
                 sources[str(cap/filename)]=sha(cap/filename)
-            if case['b3_executor']=='H1':
+            if case['b3_executor']==candidate:
                 corr=json.loads((cap/f'b3_correctness_rank{rank}.json').read_text());assert corr['status']=='PASS'
                 signature_list=corr['graph'].pop('signatures');corr['graph'].update(signature_count=len(signature_list),signatures_sha256=hashlib.sha256(json.dumps(signature_list,separators=(',',':')).encode()).hexdigest())
                 correctness.append(dict(cache=cache,policy=case['policy'],rank=rank,**corr))
@@ -47,7 +48,7 @@ def report(cache='C30'):
     gates={}
     for policy in ('BR','FCA'):
         a=next(r for r in summaries if r['policy']==policy and r['executor']=='H0')
-        b=next(r for r in summaries if r['policy']==policy and r['executor']=='H1')
+        b=next(r for r in summaries if r['policy']==policy and r['executor']==candidate)
         host=1-b['host_kernel_launch_ms']/a['host_kernel_launch_ms']
         loop=1-b['host_expert_loop_ms']/a['host_expert_loop_ms']
         parity=True
@@ -70,13 +71,15 @@ def report(cache='C30'):
         gates[policy]=dict(host_call_reduction=host,host_loop_reduction=loop,
                           counters_and_packets_equal=bool(parity),kernel_identity=kernel_identity,
                           diagnostic_gate=bool(host>=.70 and loop>=.40 and parity))
-    (PACKET/'B3_GRAPH_SIGNATURES.json').write_text(json.dumps(dict(rows=signatures),separators=(',',':'))+'\n')
-    write(PACKET/'B3_CORRECTNESS.json',dict(status='PASS' if all(g['counters_and_packets_equal'] for g in gates.values()) else 'FAIL',rows=correctness))
-    result=dict(status='DIAGNOSTIC_PASS' if all(g['diagnostic_gate'] for g in gates.values()) else 'DIAGNOSTIC_GATE_FAIL',rows=summaries,gates=gates,
+    (PACKET/(prefix+'_GRAPH_SIGNATURES.json')).write_text(json.dumps(dict(rows=signatures),separators=(',',':'))+'\n')
+    write(PACKET/(prefix+'_CORRECTNESS.json'),dict(status='PASS' if all(g['counters_and_packets_equal'] for g in gates.values()) else 'FAIL',rows=correctness))
+    result=dict(candidate=candidate,status='DIAGNOSTIC_PASS' if all(g['diagnostic_gate'] for g in gates.values()) else 'DIAGNOSTIC_GATE_FAIL',rows=summaries,gates=gates,
                 units='ms/step; host and GPU spans overlap. Expert/NCCL residency mean across ranks; arrival spreads max-min across ranks.',
                 primary_timing=False,graph_service_note='H1 launch range includes scratch copy, graph replay and graph output copy.',sources=sources)
-    write(PACKET/'B3_DIAGNOSTIC_RESULTS.json',result)
-    with (PACKET/'B3_DIAGNOSTIC_RESULTS.csv').open('w') as f:
+    write(PACKET/(prefix+'_DIAGNOSTIC_RESULTS.json'),result)
+    with (PACKET/(prefix+'_DIAGNOSTIC_RESULTS.csv')).open('w') as f:
         w=csv.DictWriter(f,fieldnames=list(summaries[0]));w.writeheader();w.writerows(summaries)
     return result
-if __name__=='__main__':print(json.dumps(report()['gates'],indent=2))
+if __name__=='__main__':
+    import sys
+    print(json.dumps(report(candidate='H1b' if '--wrapper' in sys.argv else 'H1')['gates'],indent=2))
