@@ -12,7 +12,7 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  source=json.loads((a.inputs/'receipt.json').read_text());a.seed=source['winner']['placement_seed'];a.capacities=source['capacities'];assert len(a.capacities)==world;a.comm_mode='current';a.phase='COUNTERS'
  cases=json.loads(a.cases.read_text());candidates=[c for c in cases if not c.get('baseline')];assert len(candidates)==2
- for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm','staging_backend','unique_combine','async_metadata_inputs','isolated_cpu_threads','fixed_staging_team']:assert all(c.get(key)==candidates[0].get(key) for c in candidates)
+ for key in ['P','trigger','horizon','overlap','partial_precision','runtime_arm','staging_backend','unique_combine','async_metadata_inputs','isolated_cpu_threads','fixed_staging_team','post_expert_barrier']:assert all(c.get(key)==candidates[0].get(key) for c in candidates)
  policies=[c['policy'] for c in candidates];baseline=policies[0];assert policies==['BR','FCA'];horizon=candidates[0]['horizon'];assert all(c['horizon']==horizon for c in candidates)
  records=json.loads((a.inputs/'requests.json').read_text())['ranks'][rank];batch=len(records);model,backing,experts=load_model();length=max(len(r['input_ids']) for r in records);pad=model.generation_config.pad_token_id
  ids=torch.tensor([[pad]*(length-len(r['input_ids']))+r['input_ids'] for r in records],device='cuda');mask=torch.tensor([[0]*(length-len(r['input_ids']))+[1]*len(r['input_ids']) for r in records],device='cuda');teacher=torch.tensor(np.load(a.inputs/'teacher.npy')[rank*batch:(rank+1)*batch],device='cuda')
@@ -39,7 +39,9 @@ def main(a):
   if rank==0:write(a.output/'phase.json',dict(stage='FULL64_H0_DISCOVERY',policy=policy))
   row,tokens=generate(model,rt,ids,mask,teacher,horizon);validate(rt,row,proofs[policy],rank)
   warm_tokens[policy]=tokens.copy()
-  references[policy]=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes)
+  expected_barriers=horizon*48 if first.get('post_expert_barrier',False) else 0
+  assert rt.post_expert_barriers==expected_barriers,(policy,rt.post_expert_barriers,expected_barriers)
+  references[policy]=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes,post_expert_barriers=rt.post_expert_barriers)
  rt.h2d.synchronize();torch.cuda.synchronize();rt.h2d.close()
  def graph_progress(row):write(a.output/f'graph_progress_rank{rank}.json',row)
  graph.build(graph_progress)
@@ -52,7 +54,7 @@ def main(a):
   with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
   validate(rt,row,proofs[policy],rank)
   assert before==dict(counters['stats']) and np.array_equal(tokens,warm_tokens[policy])
-  observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes)
+  observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes,post_expert_barriers=rt.post_expert_barriers)
   assert observed==references[policy]
   write(a.output/f'{policy}_correctness_rank{rank}.json',dict(status='PASS',reference=references[policy],observed=observed,argmax_hash=row['argmax_hash'],graph=graph.receipt()))
  rt.graph_check=False
@@ -73,7 +75,7 @@ def main(a):
    with torch._dynamo.config.patch(error_on_recompile=True):row,tokens=generate(model,rt,ids,mask,teacher,horizon)
    assert before==dict(counters['stats']) and np.array_equal(tokens,warm_tokens[policy])
    validate(rt,row,proofs[policy],rank)
-   observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes)
+   observed=dict(counters=dict(rt.controller.counters),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],forward=rt.transport.forward_bytes,back=rt.transport.return_bytes,post_expert_barriers=rt.post_expert_barriers)
    assert observed==references[policy]
    row.update(status='PASS',rank=rank,policy=policy,executor=mode,repeat=repeat,no_compile_in_measure=True,thread_placement=rt.measurement_thread_placement,counters=observed,peak_gpu_bytes=torch.cuda.max_memory_allocated())
    write(a.output/f'{label}_measure_rank{rank}.json',row);dist.barrier()

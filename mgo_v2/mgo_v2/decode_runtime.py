@@ -43,7 +43,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   super().reset()
   self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
   self.policy=self.controller.main;self.arena=self.controller.arena
-  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0
+  self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0
   self.transport=FusedTokenRankTransport('exact')
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
@@ -157,6 +157,17 @@ class DecodeOffloadRuntime(LiveRuntime):
      dist.barrier();torch.cuda.current_stream().synchronize()
    if not fused:self.prefetch_next()
    with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
+   if fused and self.index>=48 and getattr(self.args,'post_expert_barrier',False):
+    # Diagnostic isolation mode: make every rank finish its current-layer
+    # required H2D dependencies and expert/weight work before the return A2A.
+    # Future speculative prefetch on the dedicated H2D stream is intentionally
+    # not drained; only the current compute stream is synchronized here.
+    with nvtx_phase('moe.post_expert_local_complete'):
+     torch.cuda.current_stream().synchronize()
+    with nvtx_phase('moe.post_expert_global_barrier'):
+     dist.barrier()
+     torch.cuda.current_stream().synchronize()
+    self.post_expert_barriers+=1
    if fused:
     with nvtx_phase('moe.return_a2a'):
      precision=getattr(self.args,'partial_precision',None)

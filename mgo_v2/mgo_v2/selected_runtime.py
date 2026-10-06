@@ -63,7 +63,9 @@ def create_explicit_runtime(args, model, backing, experts, case):
     options['staging_backend']=case.get('staging_backend','torch')
     options['unique_combine']=case.get('unique_combine',False)
     options['async_metadata_inputs']=case.get('async_metadata_inputs',False)
+    options['post_expert_barrier']=case.get('post_expert_barrier',False)
     if type(options['async_metadata_inputs']) is not bool:raise ValueError('Invalid async metadata flag')
+    if type(options['post_expert_barrier']) is not bool:raise ValueError('Invalid post-expert barrier flag')
     if type(options['unique_combine']) is not bool:raise ValueError('Invalid unique combine flag')
     if options['staging_backend'] not in ('torch','memmove'):raise ValueError('Unknown staging backend')
     if case['partial_precision'] != 'bf16' or case['overlap'] != options['streaming']:

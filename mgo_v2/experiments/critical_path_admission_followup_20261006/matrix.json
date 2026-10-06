@@ -1,5 +1,5 @@
 {
-  "status": "B3_C30_COMPLETE_B4_GROUPED_GEMM_AUTHORIZED",
+  "status": "B4_CLOSED_B5_POST_EXPERT_BARRIER_IMPLEMENTED",
   "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
   "hardware": {
     "world": 4,
@@ -272,6 +272,34 @@
       "stop_after_stage_b4": true
     },
     {
+      "id": "B5_POST_EXPERT_BARRIER",
+      "purpose": "isolate local rank-ready imbalance from return communication by synchronizing ranks after H1b expert execution",
+      "primary_setting": {
+        "cache_ratio": 0.3,
+        "local_batch": 128,
+        "decode_horizon": 64
+      },
+      "policies": [
+        "BR",
+        "FCA"
+      ],
+      "executor": "H1b",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "post_expert_barrier": true,
+      "architecture": [
+        "forward A2A completion",
+        "ready-first required H2D plus expert execution",
+        "local compute-stream synchronize",
+        "global dist.barrier",
+        "return A2A",
+        "combine"
+      ],
+      "expected_barriers_per_rank": 3072,
+      "future_prefetch_stream_drained": false,
+      "execution_authorized": false,
+      "stop_before_gpu_run": true
+    },
+    {
       "id": "C_ORACLE",
       "action_space": "current-layer residual miss expert-to-rank assignment only",
       "future_routes": false,
@@ -325,5 +353,8 @@
   "stage_b2_result_commit": "0848cd07a7c1ca37b3764bb618b0138e74674c94",
   "stage_b3_authorized": true,
   "stage_b3_result_commit": "1fc62786450a52099b372e69b7e47eb1544a4017",
-  "stage_b4_authorized": true
+  "stage_b4_authorized": true,
+  "stage_b4_result_commit": "8084b32b403c1700cffc4dd1b6a9c0b17c948729",
+  "stage_b5_implemented": true,
+  "stage_b5_execution_authorized": false
 }

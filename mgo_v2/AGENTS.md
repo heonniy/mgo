@@ -2,6 +2,15 @@
 GPUs 2,3,6,7 are allocated to other users, including when temporarily idle.
 Do not launch experiment/load workers there or terminate their processes.
 
+**B5 IMPLEMENTED (2026-10-06): H1b post-expert global barrier isolation.**
+Read `experiments/critical_path_admission_followup_20261006/STAGE_B5_POST_EXPERT_BARRIER.md`.
+The runtime now has an opt-in `post_expert_barrier` case flag. In fused decode it
+synchronizes the local compute stream after expert work, executes a global
+`dist.barrier()`, then enters return A2A. Existing runtime behavior is unchanged
+when the flag is false. The committed C30 BR/FCA H1b case config is preparation
+only; this commit does not authorize an automatic GPU run, C60, R8, or Stage C.
+Only GPUs 0,1,4,5 may be used if the owner later authorizes execution.
+
 **B4 CHECKPOINT CLOSED (2026-10-06): H2_NOT_ACCEPTED.**
 Read `experiments/critical_path_admission_followup_20261006/B4_RESULTS.md`,
 `B4_REPAIR_DECISION.json`, and `B4_FAST_PATH_COUNTER_FAILURE.json`.

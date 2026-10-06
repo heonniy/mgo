@@ -1,0 +1,36 @@
+[
+  {
+    "label": "BR_POST_EXPERT_BARRIER",
+    "policy": "BR",
+    "executor": "H1b",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "post_expert_barrier": true
+  },
+  {
+    "label": "FCA_POST_EXPERT_BARRIER",
+    "policy": "FCA",
+    "executor": "H1b",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 64,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "post_expert_barrier": true
+  }
+]
