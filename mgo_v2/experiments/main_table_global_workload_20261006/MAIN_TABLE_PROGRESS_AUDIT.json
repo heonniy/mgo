@@ -1,0 +1,757 @@
+{
+  "status": "INCOMPLETE",
+  "attempts": [
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/deepspeed_B16_L256_primary1",
+      "system": "DeepSpeed-ZeRO-Inference",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.091647906,
+            5.416454479,
+            5.461541401
+          ],
+          "median": 5.461541401,
+          "min": 5.416454479,
+          "max": 6.091647906,
+          "cv_percent": 6.673352643362317,
+          "spread_percent": 11.936492636758285
+        },
+        "TPOT": {
+          "samples": [
+            4.825709887571429,
+            4.1283442883333334,
+            4.127035072587302
+          ],
+          "median": 4.1283442883333334,
+          "min": 4.127035072587302,
+          "max": 4.825709887571429,
+          "cv_percent": 9.242411204493692,
+          "spread_percent": 16.023317363987882
+        },
+        "E2E": {
+          "samples": [
+            310.111370823,
+            265.502144644,
+            265.464750974
+          ],
+          "median": 265.502144644,
+          "min": 265.464750974,
+          "max": 310.111370823,
+          "cv_percent": 9.190327884038368,
+          "spread_percent": 15.924779523047583
+        },
+        "throughput": {
+          "samples": [
+            13.20815805344282,
+            15.427370673378718,
+            15.429543790547045
+          ],
+          "median": 15.427370673378718,
+          "min": 13.20815805344282,
+          "max": 15.429543790547045,
+          "cv_percent": 8.727257546599427,
+          "spread_percent": 15.123445465081103
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 12638486528,
+        "1": 12739149824,
+        "4": 12739149824,
+        "5": 12235833344
+      },
+      "host_rss_bytes": 97156431872,
+      "pinned_host_bytes": 61064245248
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/deepspeed_B64_L512_primary1",
+      "system": "DeepSpeed-ZeRO-Inference",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            8.510366356,
+            5.79512485,
+            5.694123932
+          ],
+          "median": 5.79512485,
+          "min": 5.694123932,
+          "max": 8.510366356,
+          "cv_percent": 23.96446463400129,
+          "spread_percent": 42.24444927416183
+        },
+        "TPOT": {
+          "samples": [
+            5.06441479552381,
+            4.728005424380952,
+            4.693160583555556
+          ],
+          "median": 4.728005424380952,
+          "min": 4.693160583555556,
+          "max": 5.06441479552381,
+          "cv_percent": 4.2461494309799,
+          "spread_percent": 7.68876754764784
+        },
+        "E2E": {
+          "samples": [
+            327.568498474,
+            303.659466586,
+            301.363240696
+          ],
+          "median": 303.659466586,
+          "min": 301.363240696,
+          "max": 327.568498474,
+          "cv_percent": 4.668359328659082,
+          "spread_percent": 8.42982143181059
+        },
+        "throughput": {
+          "samples": [
+            50.017019574000464,
+            53.95517611949652,
+            54.3662855567954
+          ],
+          "median": 53.95517611949652,
+          "min": 50.017019574000464,
+          "max": 54.3662855567954,
+          "cv_percent": 4.549470113756684,
+          "spread_percent": 8.24044657076102
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 17677942784,
+        "1": 17778606080,
+        "4": 17778606080,
+        "5": 17275289600
+      },
+      "host_rss_bytes": 97296625664,
+      "pinned_host_bytes": 61064245248
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/infinity_B16_L256_primary2",
+      "system": "MoE-Infinity-repaired",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "INVALID",
+      "error": "AssertionError('old KV retention invalidates the primary memory protocol')"
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/infinity_B16_L256_primary4",
+      "system": "MoE-Infinity-repaired",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.250308408,
+            4.916001564,
+            4.912147844
+          ],
+          "median": 4.916001564,
+          "min": 4.912147844,
+          "max": 5.250308408,
+          "cv_percent": 3.862480856144047,
+          "spread_percent": 6.728020228458105
+        },
+        "TPOT": {
+          "samples": [
+            3.0868035915873016,
+            3.025173636238095,
+            3.050296530031746
+          ],
+          "median": 3.050296530031746,
+          "min": 3.025173636238095,
+          "max": 3.0868035915873016,
+          "cv_percent": 1.0146953097066167,
+          "spread_percent": 2.0179474105875306
+        },
+        "E2E": {
+          "samples": [
+            199.718934678,
+            195.501940647,
+            197.080829236
+          ],
+          "median": 197.080829236,
+          "min": 195.501940647,
+          "max": 199.718934678,
+          "cv_percent": 1.0791220032081146,
+          "spread_percent": 2.135901685843813
+        },
+        "throughput": {
+          "samples": [
+            20.508821592723997,
+            20.951198675801244,
+            20.783350749428447
+          ],
+          "median": 20.783350749428447,
+          "min": 20.508821592723997,
+          "max": 20.951198675801244,
+          "cv_percent": 1.076365896469047,
+          "spread_percent": 2.1321648032991956
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 12409896960,
+        "1": 11619270656,
+        "4": 11422138368,
+        "5": 12669943808
+      },
+      "host_rss_bytes": 64060530688,
+      "pinned_host_bytes": null
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/infinity_B64_L512_primary3",
+      "system": "MoE-Infinity-repaired",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "PASS",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            9.674713595,
+            9.650224808,
+            9.523654747
+          ],
+          "median": 9.650224808,
+          "min": 9.523654747,
+          "max": 9.674713595,
+          "cv_percent": 0.8431036043083382,
+          "spread_percent": 1.5708791816768357
+        },
+        "TPOT": {
+          "samples": [
+            3.6962017900476187,
+            3.6377621323809524,
+            3.7619635785079364
+          ],
+          "median": 3.6962017900476187,
+          "min": 3.6377621323809524,
+          "max": 3.7619635785079364,
+          "cv_percent": 1.6799862341723677,
+          "spread_percent": 3.3580278741863077
+        },
+        "E2E": {
+          "samples": [
+            242.535426368,
+            238.829239148,
+            246.527360193
+          ],
+          "median": 242.535426368,
+          "min": 238.829239148,
+          "max": 246.527360193,
+          "cv_percent": 1.586750852144846,
+          "spread_percent": 3.172773202523413
+        },
+        "throughput": {
+          "samples": [
+            67.55301790485852,
+            68.60131556106079,
+            66.45915482635836
+          ],
+          "median": 67.55301790485852,
+          "min": 66.45915482635836,
+          "max": 68.60131556106079,
+          "cv_percent": 1.5860165199179184,
+          "spread_percent": 3.1717938713126754
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 59604205568,
+        "1": 60088647680,
+        "4": 60097036288,
+        "5": 64375226368
+      },
+      "host_rss_bytes": 64232587264,
+      "pinned_host_bytes": null
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/llama_B16_L256_static1",
+      "system": "llama.cpp-layer",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            41.396564603,
+            35.822114859,
+            37.4114255
+          ],
+          "median": 37.4114255,
+          "min": 35.822114859,
+          "max": 41.396564603,
+          "cv_percent": 7.515699121733713,
+          "spread_percent": 14.588967913397447
+        },
+        "TPOT": {
+          "samples": [
+            0.251160253968254,
+            0.2553603333333333,
+            0.26704157142857143
+          ],
+          "median": 0.2553603333333333,
+          "min": 0.251160253968254,
+          "max": 0.26704157142857143,
+          "cv_percent": 3.191377838006651,
+          "spread_percent": 6.159033484673334
+        },
+        "E2E": {
+          "samples": [
+            57.219660603,
+            51.909815859,
+            54.2350445
+          ],
+          "median": 54.2350445,
+          "min": 51.909815859,
+          "max": 57.219660603,
+          "cv_percent": 4.887971912468582,
+          "spread_percent": 9.750914175364525
+        },
+        "throughput": {
+          "samples": [
+            71.58378705561998,
+            78.90607840192995,
+            75.52312416743753
+          ],
+          "median": 75.52312416743753,
+          "min": 71.58378705561998,
+          "max": 78.90607840192995,
+          "cv_percent": 4.864322673840949,
+          "spread_percent": 9.719297141008793
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 2207252480,
+        "1": 2123366400,
+        "4": 5797576704,
+        "5": 15937306624
+      },
+      "host_rss_bytes": 44400664576,
+      "pinned_host_bytes": null
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/llama_B64_L512_static1",
+      "system": "llama.cpp-layer",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "PASS",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            343.53801243,
+            334.628984114,
+            331.90871341
+          ],
+          "median": 334.628984114,
+          "min": 331.90871341,
+          "max": 343.53801243,
+          "cv_percent": 1.8066715137362628,
+          "spread_percent": 3.45398832148817
+        },
+        "TPOT": {
+          "samples": [
+            0.4042664444444445,
+            0.40379392063492064,
+            0.4154528571428571
+          ],
+          "median": 0.4042664444444445,
+          "min": 0.40379392063492064,
+          "max": 0.4154528571428571,
+          "cv_percent": 1.6180736320610198,
+          "spread_percent": 2.8587193737295573
+        },
+        "E2E": {
+          "samples": [
+            369.00679843,
+            360.068001114,
+            358.08224341
+          ],
+          "median": 360.068001114,
+          "min": 358.08224341,
+          "max": 369.00679843,
+          "cv_percent": 1.6058531546663442,
+          "spread_percent": 3.01462104968277
+        },
+        "throughput": {
+          "samples": [
+            44.4002659834681,
+            45.50251605060765,
+            45.75485185742794
+          ],
+          "median": 45.50251605060765,
+          "min": 44.4002659834681,
+          "max": 45.75485185742794,
+          "cv_percent": 1.5930449152927226,
+          "spread_percent": 2.9955981873674853
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 6569328640,
+        "1": 6147801088,
+        "4": 9824108544,
+        "5": 19722665984
+      },
+      "host_rss_bytes": 45038850048,
+      "pinned_host_bytes": null
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/ours_B16_L256_confirmation2",
+      "system": "Ours",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.816702441,
+            4.04177856,
+            3.992524478
+          ],
+          "median": 4.04177856,
+          "min": 3.992524478,
+          "max": 5.816702441,
+          "cv_percent": 22.50947862599023,
+          "spread_percent": 39.51001172656457
+        },
+        "TPOT": {
+          "samples": [
+            0.787127640904762,
+            0.7697977871428572,
+            0.7581354991904762
+          ],
+          "median": 0.7697977871428572,
+          "min": 0.7581354991904762,
+          "max": 0.787127640904762,
+          "cv_percent": 1.8904175864726023,
+          "spread_percent": 3.756982121702584
+        },
+        "E2E": {
+          "samples": [
+            55.405743818,
+            52.53903915,
+            51.755060927
+          ],
+          "median": 52.53903915,
+          "min": 51.755060927,
+          "max": 55.405743818,
+          "cv_percent": 3.610164788254999,
+          "spread_percent": 6.857895665947411
+        },
+        "throughput": {
+          "samples": [
+            73.92735333460693,
+            77.96107554052975,
+            79.14201870571397
+          ],
+          "median": 77.96107554052975,
+          "min": 73.92735333460693,
+          "max": 79.14201870571397,
+          "cv_percent": 3.550566915364623,
+          "spread_percent": 6.771400167004556
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 15220080640,
+        "1": 15270412288,
+        "4": 15268315136,
+        "5": 14997782528
+      },
+      "host_rss_bytes": 651103305728,
+      "pinned_host_bytes": 231928233984
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/ours_B16_L256_primary2",
+      "system": "Ours",
+      "cell": "R4_C30_B16_L256_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.875742675,
+            4.019454845,
+            3.994945152
+          ],
+          "median": 4.019454845,
+          "min": 3.994945152,
+          "max": 5.875742675,
+          "cv_percent": 23.301558075447694,
+          "spread_percent": 40.62155949178287
+        },
+        "TPOT": {
+          "samples": [
+            0.7819231619206349,
+            0.751909329968254,
+            0.7422397535714286
+          ],
+          "median": 0.751909329968254,
+          "min": 0.7422397535714286,
+          "max": 0.7819231619206349,
+          "cv_percent": 2.727409852639266,
+          "spread_percent": 5.230511697731375
+        },
+        "E2E": {
+          "samples": [
+            55.136901876,
+            51.389742633,
+            50.756049627
+          ],
+          "median": 51.389742633,
+          "min": 50.756049627,
+          "max": 55.136901876,
+          "cv_percent": 4.516042845141191,
+          "spread_percent": 8.356009425700597
+        },
+        "throughput": {
+          "samples": [
+            74.28781561234051,
+            79.70462178126861,
+            80.6997398359605
+          ],
+          "median": 79.70462178126861,
+          "min": 74.28781561234051,
+          "max": 80.6997398359605,
+          "cv_percent": 4.41095261794141,
+          "spread_percent": 8.196171213684746
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 15220080640,
+        "1": 15270412288,
+        "4": 15268315136,
+        "5": 14997782528
+      },
+      "host_rss_bytes": 726912913408,
+      "pinned_host_bytes": 231928233984
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/ours_B64_L512_primary2",
+      "system": "Ours",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "UNSTABLE",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            29.157805079,
+            28.007338922,
+            27.833871164
+          ],
+          "median": 28.007338922,
+          "min": 27.833871164,
+          "max": 29.157805079,
+          "cv_percent": 2.539597728067141,
+          "spread_percent": 4.672762075289856
+        },
+        "TPOT": {
+          "samples": [
+            1.438853317,
+            1.4153465684126985,
+            1.3021442462063493
+          ],
+          "median": 1.4153465684126985,
+          "min": 1.3021442462063493,
+          "max": 1.438853317,
+          "cv_percent": 5.275863587382287,
+          "spread_percent": 9.867498921971904
+        },
+        "E2E": {
+          "samples": [
+            119.80556405,
+            117.174172732,
+            109.868958675
+          ],
+          "median": 117.174172732,
+          "min": 109.868958675,
+          "max": 119.80556405,
+          "cv_percent": 4.452873044801587,
+          "spread_percent": 8.594472608790776
+        },
+        "throughput": {
+          "samples": [
+            136.75491726880276,
+            139.82603519184536,
+            149.12310262687578
+          ],
+          "median": 139.82603519184536,
+          "min": 136.75491726880276,
+          "max": 149.12310262687578,
+          "cv_percent": 4.538342552028434,
+          "spread_percent": 8.716044780590694
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 20641218560,
+        "1": 20632829952,
+        "4": 20645412864,
+        "5": 20368588800
+      },
+      "host_rss_bytes": 727263387648,
+      "pinned_host_bytes": 231928233984
+    }
+  ],
+  "selected": [
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/infinity_B64_L512_primary3",
+      "system": "MoE-Infinity-repaired",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "PASS",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            9.674713595,
+            9.650224808,
+            9.523654747
+          ],
+          "median": 9.650224808,
+          "min": 9.523654747,
+          "max": 9.674713595,
+          "cv_percent": 0.8431036043083382,
+          "spread_percent": 1.5708791816768357
+        },
+        "TPOT": {
+          "samples": [
+            3.6962017900476187,
+            3.6377621323809524,
+            3.7619635785079364
+          ],
+          "median": 3.6962017900476187,
+          "min": 3.6377621323809524,
+          "max": 3.7619635785079364,
+          "cv_percent": 1.6799862341723677,
+          "spread_percent": 3.3580278741863077
+        },
+        "E2E": {
+          "samples": [
+            242.535426368,
+            238.829239148,
+            246.527360193
+          ],
+          "median": 242.535426368,
+          "min": 238.829239148,
+          "max": 246.527360193,
+          "cv_percent": 1.586750852144846,
+          "spread_percent": 3.172773202523413
+        },
+        "throughput": {
+          "samples": [
+            67.55301790485852,
+            68.60131556106079,
+            66.45915482635836
+          ],
+          "median": 67.55301790485852,
+          "min": 66.45915482635836,
+          "max": 68.60131556106079,
+          "cv_percent": 1.5860165199179184,
+          "spread_percent": 3.1717938713126754
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 59604205568,
+        "1": 60088647680,
+        "4": 60097036288,
+        "5": 64375226368
+      },
+      "host_rss_bytes": 64232587264,
+      "pinned_host_bytes": null
+    },
+    {
+      "job": "/home/hwlee/mgo-results/headline_r4_20261007/llama_B64_L512_static1",
+      "system": "llama.cpp-layer",
+      "cell": "R4_C30_B64_L512_O64",
+      "status": "PASS",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            343.53801243,
+            334.628984114,
+            331.90871341
+          ],
+          "median": 334.628984114,
+          "min": 331.90871341,
+          "max": 343.53801243,
+          "cv_percent": 1.8066715137362628,
+          "spread_percent": 3.45398832148817
+        },
+        "TPOT": {
+          "samples": [
+            0.4042664444444445,
+            0.40379392063492064,
+            0.4154528571428571
+          ],
+          "median": 0.4042664444444445,
+          "min": 0.40379392063492064,
+          "max": 0.4154528571428571,
+          "cv_percent": 1.6180736320610198,
+          "spread_percent": 2.8587193737295573
+        },
+        "E2E": {
+          "samples": [
+            369.00679843,
+            360.068001114,
+            358.08224341
+          ],
+          "median": 360.068001114,
+          "min": 358.08224341,
+          "max": 369.00679843,
+          "cv_percent": 1.6058531546663442,
+          "spread_percent": 3.01462104968277
+        },
+        "throughput": {
+          "samples": [
+            44.4002659834681,
+            45.50251605060765,
+            45.75485185742794
+          ],
+          "median": 45.50251605060765,
+          "min": 44.4002659834681,
+          "max": 45.75485185742794,
+          "cv_percent": 1.5930449152927226,
+          "spread_percent": 2.9955981873674853
+        }
+      },
+      "sampled_peak_hbm_bytes": {
+        "0": 6569328640,
+        "1": 6147801088,
+        "4": 9824108544,
+        "5": 19722665984
+      },
+      "host_rss_bytes": 45038850048,
+      "pinned_host_bytes": null
+    }
+  ],
+  "missing_or_unstable": [
+    {
+      "cell": "R4_C30_B16_L256_O64",
+      "system": "Ours",
+      "selected_label": null
+    },
+    {
+      "cell": "R4_C30_B16_L256_O64",
+      "system": "MoE-Infinity-repaired",
+      "selected_label": null
+    },
+    {
+      "cell": "R4_C30_B16_L256_O64",
+      "system": "DeepSpeed-ZeRO-Inference",
+      "selected_label": null
+    },
+    {
+      "cell": "R4_C30_B16_L256_O64",
+      "system": "llama.cpp-layer",
+      "selected_label": null
+    },
+    {
+      "cell": "R4_C30_B64_L512_O64",
+      "system": "Ours",
+      "selected_label": null
+    },
+    {
+      "cell": "R4_C30_B64_L512_O64",
+      "system": "DeepSpeed-ZeRO-Inference",
+      "selected_label": null
+    }
+  ],
+  "notes": [
+    "All three repeats retained. No outlier removal.",
+    "Spread=(max-min)/mean; CV uses sample standard deviation.",
+    "HBM is the observed 1 Hz NVML peak; host RSS is end-of-repeat.",
+    "Null pinned memory means unavailable, not zero.",
+    "Multi-rank host RSS is summed process RSS and can double-count shared pages; it is not unique physical RAM."
+  ]
+}
