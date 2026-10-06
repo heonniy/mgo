@@ -1,0 +1,27 @@
+{
+  "status": "RUNNING",
+  "plan_commit": "528da2d6f22698cd85899b7ed7ecde0b748ee1c5",
+  "execution_commit": "03fff78",
+  "owner_authorization": "2026-10-06 chat: \uc5c9 \uc2e4\ud5d8\ud574\uc918",
+  "gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "clean_horizon": 64,
+  "policies": [
+    "BR",
+    "FCA"
+  ],
+  "executor": "H1b",
+  "cache": "C30",
+  "batch_local": 128,
+  "environment": "env1 NCCL_CUMEM_ENABLE=0",
+  "diagnostic_horizon": 8,
+  "diagnostic_selection": "Preselected first8 prefix, as previous B3/B4 diagnostics; never selected by latency. No new routing capture.",
+  "repeat_rule": "2 first; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat",
+  "correctness": "Compare canonical B3 full64 tokens/controller/physical copies/bytes/traffic, plus 3072 barriers per rank. Preserve receipts on failure. Diagnostic also matches canonical B4 H1b first8 copy counters.",
+  "scope": "No H0 primary cells, H2, C60, R8 or Stage C. No scientific retry after a copy mismatch.",
+  "resource_policy": "Existing guards; owned idle workers only paused/restored. Other GPU jobs are not modified."
+}
