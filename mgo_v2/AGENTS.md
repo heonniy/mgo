@@ -1,3 +1,10 @@
+**B5 OWNER POLICY ADDITION (2026-10-06, chat):** Add OLD_CA in the same
+C30/local B128/decode64/H1b/post-expert-barrier setting after active BR/FCA
+work. Reuse frozen input and canonical OLD_CA CPU/physical receipts. One
+untimed H0 pass discovers H1b signatures; primary timing is H1b only with
+2 repeats and the same bounded third-repeat rule. No trace recapture or
+changes to completed BR/FCA results. GPUs 0,1,4,5 only.
+
 **B5 OWNER EXECUTION AUTHORIZED (2026-10-06, chat):** "엉 실험해줘".
 Run C30/local B128/decode64 BR/FCA H1b post-expert barrier isolation on GPUs
 0,1,4,5 only. Canonical token/copy parity and 3072 barriers/rank are required
