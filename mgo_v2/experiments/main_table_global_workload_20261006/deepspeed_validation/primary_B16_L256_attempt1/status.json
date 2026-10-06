@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "started": 1791313418.0056856,
+  "system": "DeepSpeed-ZeRO-Inference",
+  "source_commit": "63e13649cf1fb7e927dbf015a2aedb3ee7c59a66",
+  "command": [
+    "/home/hwlee/mgo-tools/headline-r4/base-env/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_deepspeed_worker.py",
+    "--cell",
+    "R4_C30_B16_L256_O64",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/deepspeed_B16_L256_primary1"
+  ],
+  "pid": 2851140,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "system": "DeepSpeed-ZeRO-Inference",
+    "cell": "R4_C30_B16_L256_O64",
+    "smoke": false
+  },
+  "finished": 1791314762.228461,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 2868004
+    },
+    {
+      "gpu": 1,
+      "pid": 2868015
+    },
+    {
+      "gpu": 4,
+      "pid": 2868029
+    },
+    {
+      "gpu": 5,
+      "pid": 2868050
+    }
+  ]
+}

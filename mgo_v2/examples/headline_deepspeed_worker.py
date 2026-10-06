@@ -33,13 +33,13 @@ def main(a):
  rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
  physical=[0,1,4,5]
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
- # Match the existing GPU-local CPU placement used by OURS. Apply before
- # pinned parameter allocation so first-touch placement is local as well.
+ # Match OURS' non-overlapping per-rank CPU ranges. The live host exposes
+ # one NUMA node; this controls CPU scheduling, not cross-NUMA placement.
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
   except FileNotFoundError:pass
  torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
- write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='gpu-local fixed CPU range before model/pinned allocation'))
+ write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank CPU range matching OURS; single NUMA node'))
  deepspeed.init_distributed();assert dist.get_world_size()==4
  spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
