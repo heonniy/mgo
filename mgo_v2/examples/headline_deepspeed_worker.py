@@ -26,6 +26,7 @@ def generate(engine,ids,n):
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
    ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
  assert finite.item()
+ assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in past.layers)
  return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,tokens=torch.stack(tokens,1).cpu().tolist(),finite_logits=True)
 
 def main(a):
@@ -39,6 +40,7 @@ def main(a):
  model=AutoModelForCausalLM.from_pretrained(MODEL,torch_dtype=torch.bfloat16,attn_implementation='sdpa')
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
  params=list(engine.module.named_parameters());assert all(hasattr(p,'ds_id') for _,p in params)
+ assert all(p.dtype==torch.bfloat16 for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
  budget=17392730112//4;peak=[0];all_peak=[0];samples=[0]
@@ -49,6 +51,7 @@ def main(a):
    if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
     all_charged+=nbytes
     if expert:charged+=nbytes
+  assert all_charged == getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
   peak[0]=max(peak[0],charged);all_peak[0]=max(all_peak[0],all_charged);samples[0]+=1
  # Observe every native parameter-fetch boundary, including embedding/lm_head,
  # without attaching hooks to every individual expert Linear.
@@ -62,6 +65,16 @@ def main(a):
  coordinator.fetch_sub_module=original_fetch
  assert 0<peak[0]<=all_peak[0]<=budget,(peak,all_peak,budget)
  write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',expert_peak_bytes=peak[0],all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
+ # Validate the native live-parameter counter against the complete scan above,
+ # then sample that O(1) counter at fetch boundaries in primary execution.
+ live_peak=[0]
+ def bounded_fetch(*args,**kwargs):
+  result=original_fetch(*args,**kwargs)
+  charged=getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
+  assert 0<=charged<=budget,(charged,budget)
+  live_peak[0]=max(live_peak[0],charged)
+  return result
+ coordinator.fetch_sub_module=bounded_fetch
  for repeat in range((1 if a.smoke else 3)+1):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests'];local_rows=rows[rank*batch:(rank+1)*batch]
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local_rows],device='cuda')
@@ -69,7 +82,8 @@ def main(a):
   assert all(p.ds_status==ZeroParamStatus.NOT_AVAILABLE for _,p in params)
   gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
   if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
-  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
+  live_peak[0]=0
+  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,kv_gpu_resident=True,cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
   write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(r['release_ns'] for r in rr))==1

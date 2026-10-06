@@ -27,7 +27,9 @@ def audit(job,spec):
      assert rank['policy']=='LA_CA_NEAR'
      assert rank['no_compile'] and rank['expert_cache_start']=='empty'
      assert rank['validation']['status']=='PASS' and rank['validation']['physical_slots']==1843
-    else:assert rank['cache_start']=='all parameters NOT_AVAILABLE'
+    else:
+     assert rank['cache_start']=='all parameters NOT_AVAILABLE'
+     assert rank['kv_gpu_resident'] and 0<rank['all_parameter_peak_bytes']<=rank['parameter_budget_bytes']
    host.append(sum(r['host_rss_bytes'] for r in ranks));pinned.append(sum(r['pinned_host_bytes'] for r in ranks))
   else:
    host.append(row['host_rss_bytes'])
