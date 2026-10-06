@@ -1,3 +1,91 @@
+diff --git a/core/memory/event_pool.h b/core/memory/event_pool.h
+index f4e6fb1..9644298 100644
+--- a/core/memory/event_pool.h
++++ b/core/memory/event_pool.h
+@@ -10,6 +10,7 @@
+ #include <memory>
+ #include <mutex>
+ #include <vector>
++#include <unordered_map>
+ 
+ #include "base/noncopyable.h"
+ #include "utils/cuda_utils.h"
+@@ -18,29 +19,35 @@ class CudaEventPool : public base::noncopyable {
+  public:
+   CudaEventPool() {}
+   ~CudaEventPool() {
+-    for (auto& ev : pool_) cudaEventDestroy(ev);
++    for (auto& entry : pool_)
++      for (auto ev : entry.second) cudaEventDestroy(ev);
+   }
+ 
+   cudaEvent_t Acquire() {
+     std::lock_guard<std::mutex> lock(mutex_);
+-    if (!pool_.empty()) {
+-      auto ev = pool_.back();
+-      pool_.pop_back();
++    int device;
++    CUDA_CHECK(cudaGetDevice(&device));
++    auto& available = pool_[device];
++    if (!available.empty()) {
++      auto ev = available.back();
++      available.pop_back();
+       return ev;
+     }
+     cudaEvent_t ev;
+-    cudaEventCreateWithFlags(&ev, cudaEventDisableTiming);
++    CUDA_CHECK(cudaEventCreateWithFlags(&ev, cudaEventDisableTiming));
++    owners_[ev] = device;
+     return ev;
+   }
+ 
+   void Release(cudaEvent_t ev) {
+     std::lock_guard<std::mutex> lock(mutex_);
+-    pool_.push_back(ev);
++    pool_[owners_.at(ev)].push_back(ev);
+   }
+ 
+  private:
+   std::mutex mutex_;
+-  std::vector<cudaEvent_t> pool_;
++  std::unordered_map<int, std::vector<cudaEvent_t>> pool_;
++  std::unordered_map<cudaEvent_t, int> owners_;
+ };
+ 
+ extern std::unique_ptr<CudaEventPool> kCudaEventPool;
+diff --git a/core/model/model_topology.cpp b/core/model/model_topology.cpp
+index bb8b460..6a158a8 100644
+--- a/core/model/model_topology.cpp
++++ b/core/model/model_topology.cpp
+@@ -64,8 +64,8 @@ void Node::SetDevice(const torch::Device& target_device, bool on_demand,
+   }
+   auto sync_stream_with_event = [](cudaStream_t sync_stream) {
+     cudaEvent_t sync_event = kCudaEventPool->Acquire();
+-    cudaEventRecord(sync_event, sync_stream);
+-    cudaEventSynchronize(sync_event);
++    CUDA_CHECK(cudaEventRecord(sync_event, sync_stream));
++    CUDA_CHECK(cudaEventSynchronize(sync_event));
+     kCudaEventPool->Release(sync_event);
+   };
+   DLOG_TRACE("SetDevice: " + str() + " to " + target_device.str());
+@@ -144,7 +144,7 @@ void Node::SetDevice(const torch::Device& target_device, bool on_demand,
+ #endif
+         if (transfer_event != nullptr && !own_stream) {
+           *transfer_event = kCudaEventPool->Acquire();
+-          cudaEventRecord(*transfer_event, h2d_stream);
++          CUDA_CHECK(cudaEventRecord(*transfer_event, h2d_stream));
+         } else {
+           sync_stream_with_event(h2d_stream);
+         }
+@@ -203,7 +203,7 @@ void Node::SetDevice(const torch::Device& target_device, bool on_demand,
+ #endif
+           if (transfer_event != nullptr) {
+             *transfer_event = kCudaEventPool->Acquire();
+-            cudaEventRecord(*transfer_event, stream);
++            CUDA_CHECK(cudaEventRecord(*transfer_event, stream));
+           } else {
+             sync_stream_with_event(stream);
+           }
 diff --git a/core/parallel/expert_dispatcher.cpp b/core/parallel/expert_dispatcher.cpp
 index 00d899d..6bdead4 100644
 --- a/core/parallel/expert_dispatcher.cpp

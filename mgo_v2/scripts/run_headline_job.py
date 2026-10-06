@@ -12,6 +12,7 @@ def main(a):
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0'
+  env['PYTHONFAULTHANDLER']='1'
   command=[a.python,'-u']
   if a.ranks>1:command+=['-m','torch.distributed.run','--standalone',f'--nproc_per_node={a.ranks}']
   command +=[str(c.P/'examples'/a.worker),'--cell',a.cell,'--output',str(out)]+(['--smoke'] if a.smoke else [])
@@ -24,7 +25,8 @@ def main(a):
     if c.host_available()<96*2**30:raise RuntimeError('host available below96 GiB')
     phase=json.loads((out/'phase.json').read_text()) if (out/'phase.json').exists() else {'phase':'loading'}
     resources.write(json.dumps(dict(unix=time.time(),phase=phase,gpus=c.gpu_state(),host_available=c.host_available()))+'\n');resources.flush();time.sleep(1)
-   assert proc.returncode==0,'see run.log'
+   state['worker_returncode']=proc.returncode
+   assert proc.returncode==0,f'worker exited {proc.returncode}; see run.log'
   result=json.loads((out/'result.json').read_text());assert result['status']=='PASS';state.update(status='PASS',result=result)
  except BaseException as e:
   state.update(status='FAIL',error=repr(e))
