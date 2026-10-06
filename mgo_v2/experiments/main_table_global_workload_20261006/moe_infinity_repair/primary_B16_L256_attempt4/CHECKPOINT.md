@@ -1,1 +1,3 @@
 Primary1 passes exact manifest/64-token coverage, raw clock identities, physical KV release, empty expert-cache start, actual EAM/priority eviction and per-GPU byte limits. TTFT5.250308408s, TPOT3.086803591587s, E2E199.718934678s. EAM3072calls/4729595candidate submissions. Repeats2/3 pending; no stability claim. Previous primary attempts remain superseded or preflight-only failures.
+
+Primary2 passes cache/KV/EAM/priority/budget and clock checks. TTFT4.916001564s, TPOT3.025173636238s, E2E195.501940647s. First-two relative differences: TTFT 6.5768%, TPOT 2.0167%, E2E 2.1340%. TTFT exceeds5%; retain both samples and finish repeat3.
