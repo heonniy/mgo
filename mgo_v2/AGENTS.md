@@ -1,3 +1,13 @@
+**OWNER PREFILL OPTIMIZATION FOLLOW-UP COMPLETE (2026-10-07).**
+Read `experiments/main_table_global_workload_20261006/prefill_optimized/RESULTS.md`.
+Opt-in exact Gate-tail metadata plus packed forward/BF16 rank-partial return
+validated and measured twice on R4/C30 B16/L256 and B64/L512, output64,
+Near/H0/full-pinned, GPUs0/1/4/5. Prefill H2D barrier retained; no overlap change.
+TTFT remains unstable in both cells; preserve every sample and BF16 output
+changes. No default promotion, more repeats or new matrix runs authorized.
+The earlier llama.cpp synchronous rerun request remains pending; no modified
+llama run has been launched. Other GPUs remain reserved for other users.
+
 **OWNER MAIN-TABLE EXECUTION COMPLETE (2026-10-07).**
 Read `experiments/main_table_global_workload_20261006/FINAL_RESULTS.md` and
 `EXECUTION_AUDIT.json`. All8 R4/C30 rows plus scheduled bounded confirmations
