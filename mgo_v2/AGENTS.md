@@ -1,3 +1,10 @@
+**OWNER EIGHT-COMBINATION R4 RERUN (2026-10-07).**
+Run experiments/r4_br_near_h0_20261007/PLAN.md: C30, local B16/B64,
+input256/512, BR/LA_CA_NEAR, decode32, H0/full-pinned V3 P2/T2. Reuse
+previous selected frozen inputs; no strict layer barriers, seed search or R8.
+One primary sample per requested combination; preserve warm correctness and
+all rank records. Report single-shot limitations. GPUs0,1,4,5 only.
+
 **FINAL RUNTIME VALIDATED (2026-10-07): H0 + FULL_PINNED.**
 Default create_selected_runtime uses Normal/H0 with rank-private pinned
 expert sources; no H1b graph cache. Read experiments/full_pinned_h0_20261007/RESULTS.md
