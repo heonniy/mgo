@@ -42,6 +42,8 @@ def install(rt):
  old_compute=rt.compute
  def compute(self,packet,e,layer):
   if self.index<48:return old_compute(packet,e,layer)
+  if getattr(self,'grouped_executor',None) is not None:
+   with rec.phase('expert_loop'):return old_compute(packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current';groups=e['groups'];parts=[None]*len(groups)
   with rec.phase('expert_loop'):
    order=iter(expert_order(groups,self.h2d,self.args.ready_first,self.ready_metrics))
@@ -64,6 +66,11 @@ def install(rt):
     with rec.phase('expert_weight_partial',**meta):parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
   return parts
  replace(rt,'compute',MethodType(compute,rt))
+ if getattr(rt,'grouped_executor',None) is not None:
+  wrap(rt.grouped_executor,'math','expert_compiled_kernel')
+  wrap(rt.h2d,'ready_many','expert_ready_select')
+  wrap(rt.h2d,'wait_slots','expert_ready_wait')
+  wrap(rt.h2d,'record_slots_use','expert_record_use')
  old_forward=rt.transport.forward
  def forward(hidden,dense,e,async_op=False):
   if rt.index<48:return old_forward(hidden,dense,e,async_op)

@@ -6,6 +6,7 @@ import numpy as np
 from analyze_refactor_nsys import union,duration,intersection
 
 def analyze(capture,rank):
+ grouped=(capture/f'b4_waves_rank{rank}.json').exists()
  host=json.loads((capture/f'b2_host_rank{rank}.json').read_text());byid={x['serial']:x for x in host['rows']}
  dbpath=capture/f'interval_analysis/rank{rank}.sqlite';db=sqlite3.connect(dbpath.resolve().as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
  strings=dict(db.execute('select id,value from StringIds'));ranges=defaultdict(list);anchors=[]
@@ -83,12 +84,12 @@ def analyze(capture,rank):
   assert phases['forward_collective_host_call']['gpu_start_ns'] and phases['return_collective_host_call']['gpu_start_ns']
   loop=phases['expert_loop'];sub=['expert_ready_select','expert_gather','expert_compiled_kernel','expert_record_use','expert_weight_partial']
   loop['host_other_ms']=max(0,loop['host_union_ms']-sum(phases.get(p,{}).get('host_union_ms',0) for p in sub))
-  eintervals=[tuple(i) for d in data['details'] if d['phase'] in sub for i in d['gpu_intervals_raw_ns']]
+  eintervals=[tuple(i) for d in data['details'] if d['phase'] in (sub+(['expert_loop'] if grouped else [])) for i in d['gpu_intervals_raw_ns']]
   loop['gpu_union_ms']=duration(eintervals)/1e6
   loop['gpu_span_ms']=(max(b for a,b in eintervals)-min(a for a,b in eintervals))/1e6
   loop['gpu_start_ns']=min(a for a,b in eintervals);loop['gpu_end_ns']=max(b for a,b in eintervals)
   # Ready_wait is nested inside ready_select. Never add both independently.
-  loop['host_ready_select_without_wait_ms']=phases['expert_ready_select']['host_union_ms']-phases.get('expert_ready_wait',{}).get('host_union_ms',0)
+  loop['host_ready_select_without_wait_ms']=phases['expert_ready_select']['host_union_ms']-(0 if grouped else phases.get('expert_ready_wait',{}).get('host_union_ms',0))
   # Exclusive full-loop accounting on the aligned physical timeline. GPU
   # execution overlaps CPU enqueue/waits; priority partitions avoid adding it twice.
   start=loop['host_start_ns'];end=max(loop['host_end_ns'],loop['gpu_end_ns']);window=[(start,end)]
@@ -105,7 +106,7 @@ def analyze(capture,rank):
   account['compiled_host_without_gpu_ms']=(duration(compiled_host)-duration(intersection(compiled_host,compiled_ints)))/1e6
   wait_bounds=[]
   for d in data['details']:
-   if d['phase']!='expert_ready_wait':continue
+   if grouped or d['phase']!='expert_ready_wait':continue
    gather=next(x for x in data['details'] if x['phase']=='expert_gather' and x['slot']==d['slot'] and x['key']==d['key'])
    assert gather['gpu_intervals_raw_ns']
    gs=min(a for a,b in gather['gpu_intervals_raw_ns']);candidates=[(end,source) for end,source in copies_by_key[d['key']] if source<=event and end<=gs]
@@ -116,6 +117,6 @@ def analyze(capture,rank):
    prev_end=mapped(ops[i][1]) if i>=0 else d['host_start_raw_ns']
    upper=max(0,min(copy_end,gs)-max(prev_end,d['host_start_raw_ns']))/1e6
    wait_bounds.append(dict(slot=d['slot'],key=d['key'],source_event=source,dma_done_raw_ns=copy_end,gather_start_raw_ns=gs,gpu_wait_upper_bound_ms=upper,host_wait_ms=(d['host_end_raw_ns']-d['host_start_raw_ns'])/1e6))
-  results.append(dict(event=event,rank=rank,step=event//48-1,layer=event%48,phases=phases,expert_exclusive_account=account,slot_wait_bounds=wait_bounds,expert_calls=[{k:d[k] for k in ('expert','rows','slot','key','gpu_union_ms','gpu_intervals_raw_ns','host_start_raw_ns','host_end_raw_ns')} for d in data['details'] if d['phase']=='expert_compiled_kernel'],ready_wait_calls=[d for d in data['details'] if d['phase']=='expert_ready_wait']))
+  results.append(dict(event=event,rank=rank,step=event//48-1,layer=event%48,phases=phases,expert_exclusive_account=account,slot_wait_bounds=wait_bounds,expert_calls=[{k:d.get(k) for k in ('expert','rows','slot','key','gpu_union_ms','gpu_intervals_raw_ns','host_start_raw_ns','host_end_raw_ns')} for d in data['details'] if d['phase']=='expert_compiled_kernel'],ready_wait_calls=[d for d in data['details'] if d['phase']=='expert_ready_wait']))
  assert len(results)==384
  db.close();return dict(rank=rank,status='PASS',clock_alignment=clock,events=results,kernel_names=dict(names))
