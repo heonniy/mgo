@@ -33,7 +33,16 @@ def main():
  for key,r in summary.items():lines.append(f"|{key}|{r['TPOT']:.6f}|{r['E2E_wall']:.6f}|")
  lines+=['','All valid samples retained; initial two repeats use the frozen <=2% / <=5% rule.','Full ranges and stability decisions are in B4_TIMING_REPEATS.json.','', '## Mechanism gate','']
  for policy,m in mechanism['gates'].items():lines.append(f"- {policy}: host dispatch count reduction {100*m['host_call_reduction']:.2f}%; host-loop reduction {100*m['host_loop_reduction']:.2f}%; grouped service/expert-stage Spearman {m['service_stage_spearman']}.")
- lines+=['',f"BR->FCA expert-stage delta relative prediction error: {100*mechanism['delta']['relative_error']:.2f}%. No readiness exception automatically applied.",'','Correctness, workspace, micro-calibration, per-event diagnostics and provenance are in the corresponding B4 artifacts. H2 never reads future signatures. H1b uses its previously validated graph signatures as a reference. Clean paired runs retain the same H1b graph buffers in both modes; graph-free H2 memory is recorded separately in the correctness process.','', 'C60 may run only if the C30 gate passes. A failed mechanism criterion is not replaced by a TPOT-only claim.']
+ wave_rows=json.loads((PACKET/'B4_WAVE_STATS.json').read_text())['rows']
+ lines+=['','Ready waves in the separate first8 captures:','']
+ for policy in ('BR','FCA'):
+  ws=[w for w in wave_rows if w['policy']==policy and w['executor']=='H2']
+  lines.append(f"- {policy}: {100*sum(w['experts']==1 for w in ws)/len(ws):.2f}% singleton waves; mean {statistics.mean(w['experts'] for w in ws):.3f} experts/wave.")
+ lines+=['','The high post-hoc observed-wave correlation is not an admission-visible predictor: wave boundaries are measured outcomes of runtime readiness. The primary gate uses only the current assigned expert-row vector. No latency coefficient was fit to policy TPOT.','',f"BR->FCA expert-stage delta relative prediction error: {100*mechanism['delta']['relative_error']:.2f}%. No readiness exception automatically applied.",'','Correctness, workspace, micro-calibration, per-event diagnostics and provenance are in the corresponding B4 artifacts. H2 never reads future signatures. H1b uses its previously validated graph signatures as a reference. Clean paired runs retain the same H1b graph buffers in both modes; graph-free H2 memory is recorded separately in the correctness process.','', 'C60 may run only if the C30 gate passes. A failed mechanism criterion is not replaced by a TPOT-only claim.']
+ lines+=['','The first clean preparation was invalidated before any timing sample because its BR/H1b rank1 baseline canceled one 9-MiB prefetch. Its tokens still matched. Exactly one bounded preparation retry used canonical B3 copy counts and preserved every validation receipt before assertion. No forced copy, timing exclusion, or counter tolerance was introduced.']
+ audit=PACKET/'B4_AUDIT.json'
+ if audit.exists():
+  ar=json.loads(audit.read_text());lines+=['',f"Receipt audit: {ar['status']}; {ar['physical_samples']} physical samples / {ar['rank_receipts']} rank receipts. Minimum host available {ar['minimum_timing_host_available_bytes']/2**30:.1f} GiB; maximum paired-run GPU allocation {ar['peak_timing_gpu_allocated_bytes']/2**30:.2f} GiB. No worker was launched on GPUs 2,3,6,7."]
  (PACKET/'B4_RESULTS.md').write_text('\n'.join(lines)+'\n')
  print(json.dumps(dict(status=decision['status'],gains=gains,c60_authorized=passed)))
 if __name__=='__main__':main()
