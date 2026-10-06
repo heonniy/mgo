@@ -2,13 +2,19 @@
 GPUs 2,3,6,7 are allocated to other users, including when temporarily idle.
 Do not launch experiment/load workers there or terminate their processes.
 
-**B4 AUTHORIZED (2026-10-06): dynamic grouped-GEMM executor repair.**
-B3 C30 completed at `1fc6278`. Read
-`experiments/critical_path_admission_followup_20261006/STAGE_B4_GROUPED_GEMM_EXECUTOR.md`
-and the updated `AGENT_TASK.md` / `matrix.json`. Implement and validate H2 only
-within that scope. Primary cell is C30/B128 BR/FCA on GPUs 0,1,4,5. C60 is
-conditional on the C30 H2 gate. Stage C oracle remains unauthorized. Do not
-change admission objectives, add LA_CA, use R8, or touch GPUs 2,3,6,7.
+**B4 CHECKPOINT CLOSED (2026-10-06): H2_NOT_ACCEPTED.**
+Read `experiments/critical_path_admission_followup_20261006/B4_RESULTS.md`,
+`B4_REPAIR_DECISION.json`, and `B4_FAST_PATH_COUNTER_FAILURE.json`.
+Dynamic grouped GEMM passed full64 arithmetic/token checks, but immediate ready
+waves were mostly singleton and the first8 host-call/model gates failed.
+The initial clean preparation and one bounded retry exposed timing-dependent
+prefetch cancellation (one 9-MiB copy), first in H1b and then in H2. There is no
+valid paired two-repeat primary TPOT/E2E comparison and no accepted gain.
+All attempts and available receipts are retained. Do not add automatic retries,
+relax copy parity, force dummy copies, run C60, build an oracle, or tune another
+executor without a new owner plan. H0/H1b remain available; H2 stays opt-in.
+Only physical GPUs 0,1,4,5 may run owned resident model load; 2,3,6,7 remain
+reserved for other users even when idle.
 
 **OWNER PRIORITY (2026-10-04): decode-only prefetch runtime refactoring.**
 Read `experiments/decode_prefetch_runtime_refactoring_20261004/` in this order:

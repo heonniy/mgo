@@ -1,6 +1,6 @@
 {
-  "status": "PASS",
-  "correctness_pass": true,
+  "status": "ARITHMETIC_PASS_FAST_PATH_COUNTER_REPRODUCIBILITY_FAIL",
+  "correctness_pass": false,
   "purpose": "B4 correctness only; no primary timing",
   "ranks": [
     {
@@ -450,6 +450,66 @@
         "expert_comparisons": 82141
       },
       "peak_gpu_bytes": 13449195520
+    }
+  ],
+  "checked_full64_pass": true,
+  "checked_pass_scope": "Full64 expert-by-expert numerical checking slows/synchronizes the execution path; every checked output and token passed. This does not establish fast-path copy-count reproducibility.",
+  "fast_path_counter_failure": [
+    {
+      "rank": 0,
+      "physical_gpu": 0,
+      "token_parity": true,
+      "no_compile": true,
+      "expected_copies": 57369,
+      "actual_copies": 57369,
+      "copy_delta": 0,
+      "expected_bytes": 541401808896,
+      "actual_bytes": 541401808896,
+      "byte_delta": 0,
+      "canceled": 0,
+      "controller_equal": true
+    },
+    {
+      "rank": 1,
+      "physical_gpu": 1,
+      "token_parity": true,
+      "no_compile": true,
+      "expected_copies": 56623,
+      "actual_copies": 56623,
+      "copy_delta": 0,
+      "expected_bytes": 534361669632,
+      "actual_bytes": 534361669632,
+      "byte_delta": 0,
+      "canceled": 0,
+      "controller_equal": true
+    },
+    {
+      "rank": 2,
+      "physical_gpu": 4,
+      "token_parity": true,
+      "no_compile": true,
+      "expected_copies": 55845,
+      "actual_copies": 55845,
+      "copy_delta": 0,
+      "expected_bytes": 527019540480,
+      "actual_bytes": 527019540480,
+      "byte_delta": 0,
+      "canceled": 0,
+      "controller_equal": true
+    },
+    {
+      "rank": 3,
+      "physical_gpu": 5,
+      "token_parity": true,
+      "no_compile": true,
+      "expected_copies": 55023,
+      "actual_copies": 55022,
+      "copy_delta": -1,
+      "expected_bytes": 519262175232,
+      "actual_bytes": 519252738048,
+      "byte_delta": -9437184,
+      "canceled": 1,
+      "controller_equal": true
     }
   ]
 }

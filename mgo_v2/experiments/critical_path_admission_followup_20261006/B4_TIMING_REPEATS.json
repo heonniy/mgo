@@ -1,0 +1,35 @@
+{
+  "status": "INCOMPLETE_COUNTER_PARITY_FAILURE",
+  "samples": [
+    {
+      "policy": "BR",
+      "executor": "H1b",
+      "repeat": 1,
+      "status": "VALID_SINGLE_SAMPLE_ONLY",
+      "TPOT": 1.4564735107421876,
+      "E2E_wall": 103.45581296365708,
+      "primary_eligible": false,
+      "reason": "No second repeat and no valid paired H2 timing"
+    },
+    {
+      "policy": "FCA",
+      "executor": "H1b",
+      "repeat": 1,
+      "status": "VALID_SINGLE_SAMPLE_ONLY",
+      "TPOT": 1.5115546875,
+      "E2E_wall": 108.61229134909809,
+      "primary_eligible": false,
+      "reason": "No second repeat and no valid paired H2 timing"
+    }
+  ],
+  "invalid_sample": "BR_H2_r1",
+  "partial_rank_timing_paths": [
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CLEAN_RETRY1_B128_H64/BR_H2_r1_measure_rank0.json",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CLEAN_RETRY1_B128_H64/BR_H2_r1_measure_rank1.json",
+    "/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30/B4_C30_CLEAN_RETRY1_B128_H64/BR_H2_r1_measure_rank2.json"
+  ],
+  "primary_comparison_available": false,
+  "primary_gain": null,
+  "valid_samples_discarded": 0,
+  "rule": "Retain all receipts; no gain from single samples, incomplete ranks, or unequal H2D workload."
+}
