@@ -49,11 +49,14 @@ def main(a):
  from refactor_thread_affinity import configure
  configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  write(a.output/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
+ # Match normal cache tensor dispatch keys and both storage-offset classes.
+ # Synthetic inference tensors do not cover views of the persistent arena.
  for row_count in [1,2]:
-  with torch.inference_mode():
-   scratch=torch.zeros(EB//2,device='cuda',dtype=torch.bfloat16)
-   rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),scratch[:1572864].view(768,2048),scratch[1572864:3145728].view(768,2048),scratch[3145728:].view(2048,768))
- del scratch
+  for slot in [0,1]:
+   with torch.inference_mode():
+    w=rt.cache[slot];w.zero_()
+    rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+ torch.cuda.synchronize()
  n=2 if a.smoke else 64;repeats=1 if a.smoke else 3
  for repeat in range(repeats+1):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
