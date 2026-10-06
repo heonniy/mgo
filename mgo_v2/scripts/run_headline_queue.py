@@ -54,6 +54,17 @@ def state(label):
 def main(a):
     assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery]) <= 1
     queue = jobs(a.after, a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery)
+    if a.cleanup_recovery:
+        assert not any([a.recovery,a.deepspeed_confirmation,a.deepspeed_large_confirmation,a.llama_recovery])
+        queue = [
+            ('ours_B64_L512_primary2', 'Ours', 'ours', LARGE, None, 4, False, None),
+            ('infinity_kv_release_smoke2', 'MoE-Infinity-repaired', 'infinity', SMALL, 'infinity-env', 1, True, None),
+            ('infinity_B16_L256_primary4', 'MoE-Infinity-repaired', 'infinity', SMALL, 'infinity-env', 1, False, 'infinity_kv_release_smoke2'),
+            ('infinity_B64_L512_primary3', 'MoE-Infinity-repaired', 'infinity', LARGE, 'infinity-env', 1, False, 'infinity_B16_L256_primary4'),
+            ('ours_B16_L256_confirmation2', 'Ours', 'ours', SMALL, None, 4, False, None),
+            ('deepspeed_B16_L256_affinity2', 'DeepSpeed-ZeRO-Inference', 'deepspeed', SMALL, 'base-env', 4, False, None),
+            ('deepspeed_B64_L512_confirmation2', 'DeepSpeed-ZeRO-Inference', 'deepspeed', LARGE, 'base-env', 4, False, None),
+        ]
     if a.dry_run:
         print(json.dumps(queue, indent=2))
         return
@@ -71,13 +82,13 @@ def main(a):
             receipt['status'] = 'STOPPED'
             save()
             return
-        prior = state(a.after)
+        prior = (json.loads(a.after_queue.read_text()) if a.after_queue.exists() else None) if a.after_queue else state(a.after)
         if prior is None:
             # A recovery queue can wait for the last job of the active queue.
-            assert a.recovery or a.deepspeed_confirmation or a.deepspeed_large_confirmation or a.llama_recovery, 'the predecessor must already exist'
+            assert a.after_queue or a.recovery or a.deepspeed_confirmation or a.deepspeed_large_confirmation or a.llama_recovery, 'the predecessor must already exist'
             time.sleep(5)
             continue
-        if prior['status'] in ('PASS', 'FAIL'):
+        if prior['status'] in (('FINISHED',) if a.after_queue else ('PASS', 'FAIL')):
             break  # supervisor writes terminal status after restoring idle jobs
         time.sleep(5)
     for label, system, worker, cell, env, ranks, smoke, dependency in queue:
@@ -118,4 +129,6 @@ if __name__ == '__main__':
     p.add_argument('--deepspeed-confirmation', action='store_true')
     p.add_argument('--deepspeed-large-confirmation', action='store_true')
     p.add_argument('--llama-recovery', action='store_true')
+    p.add_argument('--cleanup-recovery', action='store_true')
+    p.add_argument('--after-queue', type=Path)
     main(p.parse_args())

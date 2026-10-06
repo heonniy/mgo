@@ -3,6 +3,13 @@ import argparse,os,time,subprocess,signal,json
 from pathlib import Path
 import run_full_pinned_r4 as c
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
+def wait_for_gpu_release(seconds=30):
+ deadline=time.monotonic()+seconds
+ observed=[]
+ while True:
+  occupants=c.foreign_on_targets()
+  if not occupants or time.monotonic()>=deadline:return occupants,observed
+  observed.append(dict(unix=time.time(),occupants=occupants));time.sleep(1)
 def main(a):
  requested_timeout=a.timeout
  # The small native llama warmup takes483s; the large cell has8x input
@@ -13,7 +20,10 @@ def main(a):
  out.mkdir(parents=True);state=dict(status='RUNNING',started=time.time(),system=a.system,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=c.P.parent,text=True).strip());stopped=[];proc=None
  state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout)
  try:
-  stopped=c.stop_target_idle();assert not c.foreign_on_targets()
+  stopped=c.stop_target_idle()
+  occupants,observed=wait_for_gpu_release()
+  state['preflight_release_observations']=observed
+  assert not occupants,f'GPU occupants remain after bounded cleanup wait: {occupants}'
   env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',TORCHINDUCTOR_COMPILE_THREADS='2',PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{c.P}:{c.P/"scripts"}:{c.P/"examples"}')
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
@@ -41,6 +51,16 @@ def main(a):
    try:proc.wait(timeout=20)
    except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
   raise
- finally:state['finished']=time.time();state['restored']=c.restore_target_idle(stopped);c.write(out/'status.json',state)
+ finally:
+  occupants,observed=wait_for_gpu_release()
+  state['final_release_observations']=observed
+  state['remaining_gpu_occupants']=occupants
+  state['finished']=time.time()
+  # Owner requests idle model loads on the four authorized GPUs whenever free.
+  # The helper skips occupied devices and never signals foreign processes.
+  idle_rows=json.loads((c.LOAD/'processes.json').read_text()) if (c.LOAD/'processes.json').exists() else []
+  already_idle={row['gpu'] for row in idle_rows if c.owned_idle(row['pid'])}
+  state['restored']=c.restore_target_idle([gpu for gpu in c.GPUS if gpu not in already_idle])
+  c.write(out/'status.json',state)
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--label',required=True);p.add_argument('--system',required=True);p.add_argument('--worker',required=True);p.add_argument('--cell',required=True);p.add_argument('--python',default=c.PYTHON);p.add_argument('--ranks',type=int,default=4);p.add_argument('--timeout',type=int,default=3600);p.add_argument('--smoke',action='store_true');main(p.parse_args())
