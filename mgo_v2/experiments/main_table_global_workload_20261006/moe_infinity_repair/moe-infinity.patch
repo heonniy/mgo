@@ -1,5 +1,5 @@
 diff --git a/core/parallel/expert_dispatcher.cpp b/core/parallel/expert_dispatcher.cpp
-index 00d899d..31bed06 100644
+index 00d899d..6bdead4 100644
 --- a/core/parallel/expert_dispatcher.cpp
 +++ b/core/parallel/expert_dispatcher.cpp
 @@ -627,8 +627,14 @@ void ExpertDispatcher::Enqueue(CallArgs& args) {
@@ -18,6 +18,89 @@ index 00d899d..31bed06 100644
        if (expert_node->node->is_prefetching.load(std::memory_order_acquire)) {
          expert_node->node->pending_dispatches.fetch_add(
              1, std::memory_order_acq_rel);
+@@ -1567,6 +1573,9 @@ bool ExpertDispatcher::OutputFunc(ExecArgs args, torch::Tensor output,
+ 
+     {
+       std::lock_guard<std::mutex> lock(accum_mutex_);
++      c10::cuda::CUDAGuard output_guard(output_device);
++      const int output_gpu = output_device.index();
++      const auto output_stream = c10::cuda::getCurrentCUDAStream(output_gpu).stream();
+       // Drop stragglers from a failed or superseded generation: after
+       // FailDispatch zeros pending_, a late worker must not accumulate into a
+       // reused final_hidden_states_ or leave a stray completion event that
+@@ -1589,17 +1598,17 @@ bool ExpertDispatcher::OutputFunc(ExecArgs args, torch::Tensor output,
+         final_hidden_states_.index_add_(0, token_indices, weighted_output);
+       }
+ 
+-      cudaEvent_t output_done = AcquireCompletionEvent(gpu_id);
++      cudaEvent_t output_done = AcquireCompletionEvent(output_gpu);
+       int event_fault =
+           static_cast<int>(DispatchFaultPoint::COMPLETION_EVENT_RECORD);
+       if (dispatch_fault_for_test_.compare_exchange_strong(
+               event_fault, 0, std::memory_order_acq_rel)) {
+-        ReleaseCompletionEvent(output_done, gpu_id);
++        ReleaseCompletionEvent(output_done, output_gpu);
+         throw std::runtime_error("injected completion_event failure");
+       }
+-      cudaError_t record_status = cudaEventRecord(output_done, exec_stream);
++      cudaError_t record_status = cudaEventRecord(output_done, output_stream);
+       if (record_status != cudaSuccess) {
+-        ReleaseCompletionEvent(output_done, gpu_id);
++        ReleaseCompletionEvent(output_done, output_gpu);
+         throw std::runtime_error(
+             std::string("OutputFunc: cudaEventRecord failed: ") +
+             cudaGetErrorString(record_status));
+@@ -1607,7 +1616,7 @@ bool ExpertDispatcher::OutputFunc(ExecArgs args, torch::Tensor output,
+       {
+         std::lock_guard<std::mutex> state_lock(route_state_mutex_);
+         completion_events_.push_back(
+-            CompletionEventRecord{output_done, args.generation, gpu_id});
++            CompletionEventRecord{output_done, args.generation, output_gpu});
+         completion_events_outstanding_.fetch_add(1, std::memory_order_relaxed);
+       }
+     }
+@@ -1759,7 +1768,10 @@ void ExpertDispatcher::SetInputs(const torch::Tensor& hidden_states,
+     std::lock_guard<std::mutex> lock(route_state_mutex_);
+     route_error_ = nullptr;
+   }
+-  int device = at::cuda::current_device();
++  TORCH_CHECK(hidden_states.is_cuda() && router_mask.device() == hidden_states.device() &&
++              router_weight.device() == hidden_states.device(), "expert inputs must share a CUDA device");
++  int device = hidden_states.device().index();
++  c10::cuda::CUDAGuard input_device_guard(device);
+   auto options =
+       torch::TensorOptions().dtype(torch::kFloat32).device(CUDA_DEVICE(device));
+   hidden_states_ = hidden_states;
+@@ -1767,10 +1779,15 @@ void ExpertDispatcher::SetInputs(const torch::Tensor& hidden_states,
+   router_weight_ = router_weight;  // this can be float32
+   final_hidden_states_ = torch::zeros_like(hidden_states, options);
+ 
++  if (input_ready_event_ != nullptr && input_ready_event_device_ != device) {
++    CUDA_CHECK(cudaEventDestroy(input_ready_event_));
++    input_ready_event_ = nullptr;
++  }
+   if (input_ready_event_ == nullptr) {
+-    cudaEventCreateWithFlags(&input_ready_event_, cudaEventDisableTiming);
++    CUDA_CHECK(cudaEventCreateWithFlags(&input_ready_event_, cudaEventDisableTiming));
++    input_ready_event_device_ = device;
+   }
+-  cudaEventRecord(input_ready_event_, c10::cuda::getCurrentCUDAStream());
++  CUDA_CHECK(cudaEventRecord(input_ready_event_, c10::cuda::getCurrentCUDAStream(device)));
+ }
+ 
+ void ExpertDispatcher::SyncExecStreamsWithCurrent() {
+diff --git a/core/parallel/expert_dispatcher.h b/core/parallel/expert_dispatcher.h
+index 9f26cfd..381a0eb 100644
+--- a/core/parallel/expert_dispatcher.h
++++ b/core/parallel/expert_dispatcher.h
+@@ -438,6 +438,7 @@ class ExpertDispatcher : public base::noncopyable {
+   std::vector<cudaStream_t> exec_streams_;
+   std::vector<cudaEvent_t> exec_done_events_;
+   cudaEvent_t input_ready_event_ = nullptr;
++  int input_ready_event_device_ = -1;
+   std::vector<cudaStream_t> fetch_streams_;
+ 
+   std::unique_ptr<std::atomic<bool>[]> gpu_overload_;
 diff --git a/core/prefetch/archer_prefetch_handle.cpp b/core/prefetch/archer_prefetch_handle.cpp
 index 8406e61..5c7bf57 100644
 --- a/core/prefetch/archer_prefetch_handle.cpp
@@ -399,10 +482,10 @@ index b95ade3..0483534 100644
  
                  return expert_matrix
 diff --git a/moe_infinity/memory/expert_prefetcher.py b/moe_infinity/memory/expert_prefetcher.py
-index 0f1065a..c8c9298 100644
+index 0f1065a..f4ffee0 100644
 --- a/moe_infinity/memory/expert_prefetcher.py
 +++ b/moe_infinity/memory/expert_prefetcher.py
-@@ -337,6 +337,72 @@ class ExpertPrefetcher(object):
+@@ -337,6 +337,82 @@ class ExpertPrefetcher(object):
              tensor_ids.append(self.expert_tensor_map[(layer_id, j)])
          self.archer_engine.replace_cache_candidates(tensor_ids)
  
@@ -418,6 +501,12 @@ index 0f1065a..c8c9298 100644
 +                raise RuntimeError(f"cannot set expert budget for GPU {gpu}")
 +        self.eam_budget = tuple(int(b) for b in per_gpu_bytes)
 +        self.eam_expert_bytes = int(expert_bytes)
++        # Canonical home placement is immutable; avoid millions of repeated
++        # native topology lookups in the per-layer prediction loop.
++        self.eam_homes = {tid: self.archer_engine.get_node_default_device([tid])
++                          for tid in self.expert_tensor_map.values()}
++        if any(not 0 <= gpu < len(self.eam_budget) for gpu in self.eam_homes.values()):
++            raise ValueError("expert home lies outside configured GPUs")
 +        self.eam_enabled = True
 +        self.eam_calls = 0
 +        self.eam_candidates = 0
@@ -456,13 +545,17 @@ index 0f1065a..c8c9298 100644
 +             for l in range(layer_id + 1, self.num_layers)
 +             for e in range(self.num_experts) if scores[l, e] > 0),
 +            key=lambda x: (-x[0], x[1]))
++        # Cancel obsolete queued predictions; demand band0 and already active
++        # transfers remain intact. In particular, the final layer must not
++        # leave an old speculative queue running with empty priorities.
++        engine.reset_cache()
 +        # Scores are soft eviction priorities, never hard protection of all
 +        # predicted experts. Live demand leases remain authoritative.
 +        engine.replace_expert_priorities([x[1] for x in candidates], [x[0] for x in candidates])
 +        used = [0] * len(self.eam_budget)
 +        admitted = []
 +        for score, tensor_id in candidates:
-+            gpu = engine.get_node_default_device([tensor_id])
++            gpu = self.eam_homes[tensor_id]
 +            if used[gpu] + self.eam_expert_bytes > self.eam_budget[gpu]:
 +                continue
 +            used[gpu] += self.eam_expert_bytes
@@ -475,7 +568,7 @@ index 0f1065a..c8c9298 100644
      def prefetch_experts(self, layer_id: int, expert_matrix):
          if self.archer_engine is None:
              return
-@@ -488,6 +554,8 @@ class ExpertPrefetcher(object):
+@@ -488,6 +564,8 @@ class ExpertPrefetcher(object):
          *,
          phase: ExpertPhase = ExpertPhase.MIXED,
      ):
@@ -811,10 +904,10 @@ index 7b6b128..d2a5a34 100644
 +}
 diff --git a/tests/python/unit/test_eam_repair.py b/tests/python/unit/test_eam_repair.py
 new file mode 100644
-index 0000000..0722bd8
+index 0000000..f0bae1c
 --- /dev/null
 +++ b/tests/python/unit/test_eam_repair.py
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,98 @@
 +import unittest
 +import numpy as np
 +from transformers import Qwen3MoeConfig
@@ -824,6 +917,7 @@ index 0000000..0722bd8
 +
 +class FakeEngine:
 +    def __init__(self): self.queued=[];self.limits={}
++    def reset_cache(self): self.queued.clear()
 +    def configure_phase_policy(self,*args): assert args[:3]==(True,0,0)
 +    def set_expert_budget(self,g,b): self.limits[g]=b;return True
 +    def replace_expert_priorities(self,ids,scores): self.priorities=dict(zip(ids,scores))
@@ -890,6 +984,15 @@ index 0000000..0722bd8
 +        self.assertEqual(tuple(out.shape),(2,3,8));self.assertEqual(p.eam_calls,1)
 +        for sid in block.seq_id_list:self.assertEqual(self.tracer.trace[sid].matrix[0].sum(),3)
 +        self.assertEqual(p.eam_candidates,0)
++
++    def test_final_layer_cancels_obsolete_predictions(self):
++        p=ExpertPrefetcher(self.config);p.archer_engine=FakeEngine()
++        p.expert_tensor_map={(l,e):l*4+e for l in range(3) for e in range(4)}
++        p.configure_eam_budget([18,9],9)
++        p.archer_engine.queued=[(7,1)]
++        p.prefetch_eam(2,np.zeros((3,4),np.float32))
++        self.assertEqual(p.archer_engine.queued,[])
++        self.assertEqual(p.archer_engine.priorities,{})
 +
 +    def test_budget_and_priority_order(self):
 +        p=ExpertPrefetcher(self.config);p.archer_engine=FakeEngine()
