@@ -26,6 +26,8 @@ Use only:
 - world size: R4
 - GPUs 2, 3, 6, 7: **never use**
 - model / precision: current Qwen3-30B-family MoE, BF16
+- primary dataset: **ShareGPT V3 cleaned, long-prompt subset**
+- source: reuse the repository's existing ShareGPT V3 cleaned source / prompt-formatting pipeline
 - substitution: OFF
 - replication: OFF
 - **prefill context length: exactly 512 valid tokens per request**
@@ -33,16 +35,29 @@ Use only:
 - no policy changes other than rank placement/admission
 - no concurrent B5 mutation: keep the existing B5 result path separate
 
-### Fixed prefill context protocol
+### Dataset and fixed prefill context protocol
 
-The primary study fixes **effective prefill context to 512 tokens per request**.
+The primary study uses **ShareGPT V3 cleaned** and fixes **effective prefill context to exactly 512 valid tokens per request**.
 
-- Every request entering the measured prefill has exactly 512 valid prompt tokens.
-- Prefer requests whose tokenized prompt is at least 512 tokens and truncate deterministically to 512.
-- Do **not** create the 512-token workload by merely padding a shorter prompt with masked pad tokens; the purpose is to hold actual prefill token traffic constant.
-- If the chosen corpus cannot provide enough >=512-token requests for an R4/B128 cell, build a separately recorded eligible long-prompt pool rather than silently changing the effective context length.
-- The attention mask must therefore contain 512 valid positions for every measured request.
+Build a new immutable `ShareGPT_LONG512` candidate pool:
+
+1. reuse the same ShareGPT V3 cleaned source already used by the repository;
+2. construct the model input with the same Qwen chat template / tokenizer used by the physical harness;
+3. keep only requests whose fully formatted input contains **at least 512 prompt tokens**;
+4. truncate every retained request to exactly 512 valid tokens using one frozen deterministic rule;
+5. record source row / conversation ID / turn, original token count, final 512-token input hash, and pool manifest hash.
+
+For conversational prompts, use the **most recent 512 tokens** of the fully formatted conversation when truncation is required, so the latest user turn and immediately preceding context are preserved. Apply the rule before rank assignment and freeze it for every policy.
+
+Requirements:
+
+- Every request entering the measured prefill has exactly **512 non-padding / attention-valid tokens**.
+- Do **not** create the workload by padding a shorter prompt to 512.
+- The eligible pool must contain at least **512 distinct requests**, enough for the largest R4/B128 cell without reuse.
+- Prefer a substantially larger pool (target >= 2048) so workload-seed search has real subset freedom.
+- If fewer than 512 long prompts survive the filter, stop preparation and choose a genuinely long-document dataset; do not relax the 512-valid-token invariant.
 - B16 and B128 differ only in local batch size, not prompt length.
+- Use the **same frozen long-prompt pool and tokenization manifest** for C30 and C60.
 
 Thus the controlled prefill token volume is:
 
@@ -181,7 +196,7 @@ The requested seed search is allowed, but it must be labeled **BEST-SEED HEADROO
 
 Search two independent seed axes:
 
-- `workload_seed`: sampling + rank assignment / request composition **within the fixed 512-valid-token eligible pool**
+- `workload_seed`: sampling + rank assignment / request composition **within the frozen `ShareGPT_LONG512` pool**
 - `placement_seed`: random initial placement / randomized tie behavior where the policy actually uses it
 
 Initial search domain:
@@ -233,7 +248,9 @@ Before interpreting `placement_seed` as an optimization axis:
 
 ### S0. CPU / trace seed screen
 
-Replay all 32 x 32 seed pairs without GPU timing. Every seed pair must preserve the same 512-valid-token context invariant.
+Before seed replay, validate and freeze the `ShareGPT_LONG512` manifest. Record eligible-count and token-length statistics before truncation.
+
+Replay all 32 x 32 seed pairs without GPU timing. Every seed pair must draw only from that frozen pool and preserve the same 512-valid-token context invariant.
 
 For every regime and candidate policy, rank seeds separately for prefill and decode using controller/trace features:
 
@@ -344,6 +361,8 @@ Does a phase-specific BR/CA/LA choice beat one global policy?
 - Do not change substitution or replication.
 - Do not call best-seed results an unbiased average-case benchmark.
 - Do not merge the prefill experiment with B5 output directories.
+- Do not use MATH for the primary fixed-512 prefill study.
+- Do not mix ShareGPT requests outside the frozen `ShareGPT_LONG512` manifest into the primary comparison.
 - Do not mix different prompt lengths in the primary C30/C60 x B16/B128 comparison.
 - Context-length sensitivity (for example 128 / 512 / 2048) is a **separate follow-up** and must not be pooled into this primary fixed-512 result.
 - Do not claim communication gain from packet reduction alone; use measured critical-path timing.
