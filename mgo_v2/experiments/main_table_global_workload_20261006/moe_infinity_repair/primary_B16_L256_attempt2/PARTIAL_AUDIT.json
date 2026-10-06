@@ -1,0 +1,17 @@
+{
+  "status": "PARTIAL_2_OF_3",
+  "relative_difference_percent": {
+    "TTFT": 6.219074725682447,
+    "TPOT": 0.20995640146240663,
+    "E2E": 0.04649330892186051
+  },
+  "different_requests": 12,
+  "different_tokens": 325,
+  "total_tokens": 4096,
+  "notes": [
+    "Both receipts pass finite logits, exact request/count and residency checks.",
+    "Native greedy BF16 outputs are not bitwise identical across repeats; cause not established by timing records.",
+    "No frozen routing, teacher forcing, outlier removal, or gain claim.",
+    "TTFT spread exceeds5%; retain all samples and assess final stability."
+  ]
+}
