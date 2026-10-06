@@ -1,3 +1,10 @@
+**QUICK FETCH COMPLETE (2026-10-06).**
+Read experiments/quick_fetch_path_20261006/RESULTS.md. All 288 active-rank
+samples preserved; GPU 0,1,4,5 only. All4/32 current 35.669 ms vs direct
+pinned 6.074 ms. This is microbenchmark headroom, not model TPOT gain.
+No further automatic repeats, full-store pinning or main-table/R8 expansion.
+Owned model-forward load restored only on GPUs 0,1,4,5.
+
 **OWNER QUICK FETCH EXECUTION: f9d5725c (2026-10-06).**
 Run experiments/quick_fetch_path_20261006/PLAN.md on GPUs 0,1,4,5 only.
 Three measured repeats follow the committed harness. Preserve failed attempts.
