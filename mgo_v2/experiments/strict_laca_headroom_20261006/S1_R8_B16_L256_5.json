@@ -1,0 +1,311 @@
+{
+  "status": "PASS",
+  "label": "S1_R8_B16_L256_5",
+  "world": 8,
+  "gpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "spec": {
+    "key": "S1_R8_B16_L256_5",
+    "cache": 30,
+    "batch": 16,
+    "context": 256,
+    "policy": "LA_CA_NEAR",
+    "workload_seed": 59,
+    "dp_seed": 51,
+    "placement_seed": 1,
+    "order": 0,
+    "inputs": "/home/hwlee/mgo-results/strict_laca_headroom_20261006/inputs/R8_B16_L256_s59_d51_r1"
+  },
+  "started_unix": 1791288168.17605,
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=8",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/examples/ttft_worker.py",
+    "--specs",
+    "/home/hwlee/mgo-results/strict_laca_headroom_20261006/physical/S1_R8_B16_L256_5/specs.json",
+    "--output",
+    "/home/hwlee/mgo-results/strict_laca_headroom_20261006/physical/S1_R8_B16_L256_5",
+    "--stage",
+    "S1"
+  ],
+  "source_commit": "c5c4a215ee1c89e0082ad02f777cab534379c019",
+  "source_hashes": {
+    "mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
+    "mgo_v2/compact_metadata.py": "527043d17bb30c53eec5e9dbebef22a49a880ebac1cf3f232f53ef1fa9ab8c70",
+    "mgo_v2/active_peer.py": "a33334b2f2b55a37d5b53e9fa8178c53ccea80fc681297066567b1373a7ddfa3",
+    "mgo_v2/__init__.py": "2fbb9e985e66e628bfc977a41df92df0bb089228f7646d0a534c3bf46e0205ef",
+    "mgo_v2/decode_runtime.py": "20a827f5b2e4c75c0183f3fcfb2d77d532904c69e8c71ce7caeb435d3bc3f64b",
+    "mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+    "mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+    "mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+    "mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+    "mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
+    "mgo_v2/ready_compute.py": "6f8f2fe4ca34c995483c5483334d0d09e8571f42ef1be243212df49e89fe636b",
+    "mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+    "mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+    "mgo_v2/staging_cpu_team.py": "40c2a8a17aa75ea7d85ff6f9aac074974a2e922d02f014911fdc6b35679dcb30",
+    "mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+    "mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
+    "mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
+    "mgo_v2/fanout_admission.py": "17e75ace440c9201b6da7d224b63d894961a1d0e87d7ec15b851c59843ebac86",
+    "mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+    "mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+    "mgo_v2/grouped_expert.py": "1301c8a57046dbebb34c8a134eb7770a2f9980461d2ff6048003274c8bdaed59",
+    "mgo_v2/phase_timing.py": "0189fc1a2e508caa865782e2d678d1766e09d79b3ab98e9166ac6b57fe9efca1",
+    "mgo_v2/coalesced_return.py": "790dce47d8a993086bc706497d730be66265621cfee8abfa235d65d9f378882e",
+    "mgo_v2/graph_expert.py": "164450cdb6efdf69cabb334d7dd6399282332a6ba43ae1d0cac7b0de4f4c658f",
+    "mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+    "mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
+    "mgo_v2/rank_oracle.py": "a6995879d072dc11963925e4ce8cada340d6d0ada6af690bac9974f834e41cf7",
+    "mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+    "mgo_v2/prefetch.py": "6528860a5892a2621767fabf427c471bd1a0e3be0b14f4e93c2b903bd93469a6",
+    "mgo_v2/controller.py": "5c91ed1c5945fa79e591aca92c7042545b7a7b4b7777b7a3a0373804d2c4dd8c",
+    "mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+    "mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
+    "mgo_v2/unique_combine.py": "97f0a17187348a67957d999dd1f5c02f19c194baa12123f67ef760f851a8b00d",
+    "mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+    "mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+    "mgo_v2/predictor.py": "015d1102081ef597b20ff24b9b70a4fbf8e03ddfd922d29038b4c44a13b06d03",
+    "mgo_v2/pinned_h2d.py": "0736ecd7f5b13241f59feb5f5e15fd9794c5a17895768f7c10ab37d0f60a1691",
+    "mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+    "mgo_v2/selected_runtime.py": "e3b83826c30f85cb669800413b104624eb5a6ea6b9d1195ccde855c287f5e098",
+    "mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+    "mgo_v2/cache.py": "45abe19a3b19972e0ead86fa6fdb7b15e97d81a2c021ca3c4e878f795d74dfeb",
+    "examples/ttft_worker.py": "a8b29e842f13967a15e3d140ac4d927c80c160d75f33345b20b35eabb232fdf5",
+    "examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
+    "scripts/env_offload_policy.py": "5821f2fae1306132781eb8bfc35ce37b26b9e0890a8540814988ae6d0ea6e20d",
+    "scripts/la_placement.py": "af96dc44a5546b2d97192bc82dcb34c4df67b18bae6f183284a6d4ac0531b436"
+  },
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 1,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 2,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 3,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 4,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 5,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 34
+      },
+      {
+        "gpu": 6,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 7,
+        "used_mib": 0,
+        "free_mib": 81090,
+        "temperature_c": 32
+      }
+    ],
+    "host_available_bytes": 1989393940480,
+    "unix": 1791288168.5241733,
+    "foreign_pids": [],
+    "collection_seconds": 0.3403144534677267
+  },
+  "pid": 2445990,
+  "boundaries": [
+    {
+      "key": "S1_R8_B16_L256_5_BR_r1",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 13881,
+            "free_mib": 67209,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 1,
+            "used_mib": 14547,
+            "free_mib": 66543,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 2,
+            "used_mib": 14345,
+            "free_mib": 66745,
+            "temperature_c": 33
+          },
+          {
+            "gpu": 3,
+            "used_mib": 14439,
+            "free_mib": 66651,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 4,
+            "used_mib": 13999,
+            "free_mib": 67091,
+            "temperature_c": 39
+          },
+          {
+            "gpu": 5,
+            "used_mib": 14469,
+            "free_mib": 66621,
+            "temperature_c": 35
+          },
+          {
+            "gpu": 6,
+            "used_mib": 14781,
+            "free_mib": 66309,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 7,
+            "used_mib": 13917,
+            "free_mib": 67173,
+            "temperature_c": 34
+          }
+        ],
+        "host_available_bytes": 1640944623616,
+        "unix": 1791288235.0872612,
+        "rss_bytes": 823762030592,
+        "foreign_pids": [],
+        "collection_seconds": 0.5425099730491638
+      }
+    },
+    {
+      "key": "S1_R8_B16_L256_5_LA_CA_NEAR_r1",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 13881,
+            "free_mib": 67209,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 14547,
+            "free_mib": 66543,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 2,
+            "used_mib": 14345,
+            "free_mib": 66745,
+            "temperature_c": 33
+          },
+          {
+            "gpu": 3,
+            "used_mib": 14439,
+            "free_mib": 66651,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 4,
+            "used_mib": 13999,
+            "free_mib": 67091,
+            "temperature_c": 39
+          },
+          {
+            "gpu": 5,
+            "used_mib": 14469,
+            "free_mib": 66621,
+            "temperature_c": 35
+          },
+          {
+            "gpu": 6,
+            "used_mib": 14781,
+            "free_mib": 66309,
+            "temperature_c": 37
+          },
+          {
+            "gpu": 7,
+            "used_mib": 13917,
+            "free_mib": 67173,
+            "temperature_c": 34
+          }
+        ],
+        "host_available_bytes": 1640938868736,
+        "unix": 1791288242.952131,
+        "rss_bytes": 823761518592,
+        "foreign_pids": [],
+        "collection_seconds": 0.5422345129773021
+      }
+    }
+  ],
+  "result": {
+    "status": "PASS",
+    "stage": "S1",
+    "results": [
+      {
+        "status": "PASS",
+        "spec": {
+          "key": "S1_R8_B16_L256_5",
+          "cache": 30,
+          "batch": 16,
+          "context": 256,
+          "policy": "LA_CA_NEAR",
+          "workload_seed": 59,
+          "dp_seed": 51,
+          "placement_seed": 1,
+          "order": 0,
+          "inputs": "/home/hwlee/mgo-results/strict_laca_headroom_20261006/inputs/R8_B16_L256_s59_d51_r1"
+        },
+        "samples": {
+          "BR": [
+            5.792257152497768
+          ],
+          "LA_CA_NEAR": [
+            5.686459205113351
+          ]
+        },
+        "estimates": {
+          "BR": 5.792257152497768,
+          "LA_CA_NEAR": 5.686459205113351
+        },
+        "relative_difference": {
+          "BR": null,
+          "LA_CA_NEAR": null
+        },
+        "unstable": false,
+        "selection_only": true,
+        "gain": 0.018265409252210874
+      }
+    ]
+  },
+  "finished_unix": 1791288261.5323157
+}
