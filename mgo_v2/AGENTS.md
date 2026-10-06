@@ -1,3 +1,14 @@
+**FINAL RUNTIME VALIDATED (2026-10-07): H0 + FULL_PINNED.**
+Default create_selected_runtime uses Normal/H0 with rank-private pinned
+expert sources; no H1b graph cache. Read experiments/full_pinned_h0_20261007/RESULTS.md
+and FINAL_RUNTIME_SELECTION.json. R4/C30/B128/H64 BR: TTFT 8.573 s,
+TPOT 1.021085 s, E2E 73.921 s; two counterbalanced repeats per mode.
+Token/state/copy/transport parity and no compilation in timing passed.
+H0 TPOT gain vs H0 staged is 43.06%; FULL_PINNED TPOT spread 3.16%.
+CPU cost is 216 GiB pinned for R4. C60/R8 remain physically unvalidated.
+Do not launch more experiments without a new owner request. Owned model
+load restored on 0,1,4,5 only. H1b is historical reference, not final runtime.
+
 **OWNER FINAL RUNTIME (2026-10-07): Normal/H0 + FULL_PINNED only.**
 Use experiments/full_pinned_h0_20261007/PLAN.md. Remove H1b persistent GPU
 graph buffers from final execution. Validate H0 STAGED control versus H0

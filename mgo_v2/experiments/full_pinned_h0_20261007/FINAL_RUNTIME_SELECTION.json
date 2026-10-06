@@ -1,6 +1,6 @@
 {
-  "status": "PENDING_PHYSICAL_VALIDATION",
-  "frozen": false,
+  "status": "PASS",
+  "frozen": true,
   "selection_basis": "owner mandates H0 plus full-pinned; no graph cache",
   "executor": "H0",
   "expert_source": "full_pinned",
@@ -13,5 +13,45 @@
   "staging_backend": "torch",
   "unique_combine": true,
   "async_metadata_inputs": true,
-  "host_pinned_gib_per_rank": 54
+  "host_pinned_gib_per_rank": 54,
+  "validation_source_commit": "3c0f717c435760a684b39c0208c3f1585d667dab",
+  "validation_scope": {
+    "world": 4,
+    "physical_gpus": [
+      0,
+      1,
+      4,
+      5
+    ],
+    "capacity": "C30",
+    "local_batch": 128,
+    "decode_steps": 64,
+    "policy": "BR",
+    "measured_repeats_per_mode": 2
+  },
+  "unvalidated_axes": [
+    "C60 physical measurement",
+    "R8",
+    "other workloads"
+  ],
+  "metrics": {
+    "TTFT": 8.572762433905154,
+    "E2E_wall": 73.92111367639154,
+    "decode_wall": 65.34960182197392,
+    "TPOT": 1.0210848083496096
+  },
+  "gain_vs_H0_staged": {
+    "TTFT": 0.16559262800453334,
+    "E2E_wall": 0.4087833395588054,
+    "decode_wall": 0.43056425663248354,
+    "TPOT": 0.43056595458082436
+  },
+  "relative_spread": {
+    "TTFT": 0.002620231945188217,
+    "E2E_wall": 0.028209091466832276,
+    "decode_wall": 0.031595693817605505,
+    "TPOT": 0.03159750556107528
+  },
+  "graph_buffer_bytes": 0,
+  "evidence": "mgo_v2/experiments/full_pinned_h0_20261007/RESULTS.md"
 }

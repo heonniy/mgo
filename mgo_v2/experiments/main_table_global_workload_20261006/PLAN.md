@@ -110,6 +110,15 @@ Dense weights, KV, activations and framework workspace are outside this percenta
 - Only minimal tuning needed for budget compliance and correctness; no exhaustive sweep.
 
 ### Ours
+Owner amendment (2026-10-07): use Normal/H0 with rank-private full-pinned
+expert sources as the final runtime. No H1/H1b persistent CUDA-graph expert
+buffers. Full pinned CPU cost is 54 GiB per rank (216 GiB for R4, 432 GiB
+for a separately authorized R8 run); report this separately from GPU HBM.
+Use `create_selected_runtime` and its validated selection receipt in
+`experiments/full_pinned_h0_20261007/FINAL_RUNTIME_SELECTION.json`.
+Do not substitute the old H1b timings for this runtime. The implementation
+A/B validates R4/C30/B128/decode64 only; it does not complete the table cells.
+
 Use optimized runtime, not strict characterization runtime.
 - Exact C30/C60 expert slots.
 - Prefill admission/placement enabled.

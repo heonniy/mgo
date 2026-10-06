@@ -105,7 +105,9 @@ def create_selected_runtime(args, model, backing, experts, *, selection_path=Non
     """Use the measured default, or explicitly select either ablation mode.
 
     The caller supplies the existing physical harness's model, expert backing,
-    frozen-input arguments and placement policy. No second cache is created.
+    frozen-input arguments and placement policy. The GPU cache budget is unchanged.
+    Full-pinned source allocation/copy happens here, outside generation timing,
+    and its pool is retained by the runtime for the lifetime of queued copies.
     """
     options = selected_options(selection_path, arm)
     return _create_runtime(args, model, backing, experts, options)

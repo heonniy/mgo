@@ -19,3 +19,6 @@ Report process high-water HBM/RSS, 216 GiB CPU pin cost and C30 residency
 separately. C60 is a supported cache budget, not physically validated here.
 Follow the 384/96 GiB launch/abort host guards and 30-minute run bound.
 Restore only owned model loads on 0,1,4,5 after completion.
+
+Status: COMPLETE. All correctness and bounded timing checks passed; see RESULTS.md.
+Final default selection is frozen. No additional cells are queued.
