@@ -100,12 +100,15 @@ expert-selective cache.
 
 ## MoE-Infinity
 
-Use the stock Qwen3-MoE multi-GPU offloading path if the checked-out upstream
-revision passes a correctness smoke test.
+Use the owner-authorized repaired Qwen3-MoE multi-GPU offloading path.
+See `moe_infinity_repair/STATUS.md` and versioned patches. Validate EAM,
+priority eviction, exact expert budgets and cold reset before headline timing.
+Label results MoE-Infinity (repaired), not unmodified upstream.
 Expose GPUs 0,1,4,5 to one generic multi-GPU process and submit the full global
 batch (64 or 256 requests).
-Keep stock/default request-level tracing, expert prefetching, caching and pinned
-I/O behavior enabled.
+Enable request-level EAM tracing/prediction, priority eviction, budgeted prefetch
+and native pinned I/O. Restore warmup-trained EAM history before every target
+repeat so target repeats cannot train subsequent repeats.
 Calibrate actual aggregate GPU expert-cache bytes to <=16.198 GiB for C30.
 Do not map C30 blindly to a generic device-memory ratio.
 

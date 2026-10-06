@@ -1,3 +1,16 @@
+**OWNER MAIN-TABLE EXECUTION ACTIVE (2026-10-07).**
+Execute `experiments/main_table_global_workload_20261006/HEADLINE_R4_PROTOCOL.md`
+and `HEADLINE_R4_MATRIX.json`, global64/input256 and global256/input512, output64.
+GPUs0,1,4,5 only; OURS=LA_CA_NEAR H0/full-pinned, plus llama.cpp layer split,
+DeepSpeed ZeRO-3 CPU offload and owner-repaired MoE-Infinity. Fix blockers.
+After warmup reset expert residency before EACH measured batch; preserve CPU
+sources/compiled code, carry measured prefill cache into decode. MoE-Infinity
+owner explicitly authorizes repairs to EAM, priority eviction and exact expert
+budget; preserve patches, validate actual mechanisms and label repaired baseline.
+Latest progress is in `HEADLINE_EXECUTION.md`, `moe_infinity_repair/STATUS.md`
+and `ours_first_native_attempts/STATUS.md`. Prior completed packets below remain
+historical and do not restrict this newer authorized goal. No R8 expansion.
+
 **OWNER PURE LA/NEAR CLEAN COMPARISON COMPLETE (2026-10-07).**
 Read experiments/r4_la_near_h0_20261007/RESULTS.md. R4/C30/local B64/input512,
 decode32, H0/full-pinned V3 P2/T2, GPUs0,1,4,5 only. One clean primary per
