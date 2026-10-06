@@ -61,8 +61,27 @@ Primary cells are C30/C60 × BR/FCA at B128. LA_CA is confirmation-only if neede
 
 After B2 and any revised delta-model validation, STOP for owner review.
 
+### B3. Host-side expert executor repair
+B2 completed at `0848cd0` and showed that NCCL residency is dominated by rank-arrival skew, while the current per-expert host invocation path dominates the expert-loop budget.
+
+B3 is now owner-authorized. Read `STAGE_B3_HOST_EXECUTOR_REPAIR.md`.
+
+Implement H1 as an opt-in CUDA-graph replay executor for the existing compiled expert kernel, keyed by cache slot and exact row count. Preserve H0 unchanged.
+
+Primary first cell: C30/B128 with BR and FCA only.
+
+Required order:
+1. implementation + full frozen-schedule graph-signature discovery;
+2. correctness parity;
+3. separate B2-style diagnostic capture H0 vs H1;
+4. clean uninstrumented paired timing H0 vs H1;
+5. evaluate the C30 repair gate;
+6. run C60 confirmation only if C30 establishes a working H1 runtime.
+
+Do not introduce grouped GEMM/Triton yet unless H1 fails and the owner explicitly authorizes another repair.
+
 ### C/D. Exact current-layer oracle and frozen replay
-NOT authorized in this checkpoint. Do not run any oracle planning or frozen-oracle GPU replay after B2 without owner approval.
+NOT authorized in this checkpoint. Do not run any oracle planning or frozen-oracle GPU replay after B3 without owner approval.
 
 Do not read future routes.
 
@@ -90,7 +109,7 @@ Use physical oracle TPOT headroom:
 - no replication/migration;
 - no latency-based sample exclusion.
 
-Do not use instrumented runs as primary TPOT. B2 instrumentation is mechanism-only.
+Do not use instrumented runs as primary TPOT. B2/B3 instrumentation is mechanism-only.
 
 Do not terminate foreign jobs.
 

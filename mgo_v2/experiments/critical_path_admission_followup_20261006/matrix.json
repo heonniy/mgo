@@ -1,5 +1,5 @@
 {
-  "status": "STAGE_B_FAILED_STAGE_B2_AUTHORIZED",
+  "status": "B2_COMPLETE_B3_HOST_REPAIR_AUTHORIZED",
   "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
   "hardware": {
     "world": 4,
@@ -166,6 +166,53 @@
       "stop_after_stage_b2": true
     },
     {
+      "id": "B3_HOST_EXECUTOR_REPAIR",
+      "purpose": "remove per-expert host invocation as a runtime confounder without changing placement/cache/communication semantics",
+      "primary_setting": {
+        "cache_ratio": 0.3,
+        "local_batch": 128
+      },
+      "confirmation_setting": {
+        "cache_ratio": 0.6,
+        "local_batch": 128,
+        "run_only_after_primary_gate": true
+      },
+      "policies": [
+        "BR",
+        "FCA"
+      ],
+      "runtimes": [
+        "H0_CURRENT",
+        "H1_CUDA_GRAPH_EXPERT_KERNEL"
+      ],
+      "h1": {
+        "graph_key": [
+          "cache_slot",
+          "exact_row_count"
+        ],
+        "preserve_ready_first": true,
+        "preserve_h2d_scheduler": true,
+        "preserve_transport": true,
+        "preserve_bf16_arithmetic": true,
+        "capture_before_measure": true,
+        "new_signature_in_measure": "INVALIDATE"
+      },
+      "repair_gate": {
+        "correctness_parity": true,
+        "compiled_host_call_reduction_min": 0.7,
+        "expert_host_loop_reduction_min": 0.4,
+        "br_tpot_regression_max": 0.01,
+        "no_material_h2d_or_packet_increase": true,
+        "stable_primary_timing": true
+      },
+      "causal_cases": {
+        "A": "FCA slowdown under H1 <= 0.5 * FCA slowdown under H0 with corresponding arrival-skew reduction",
+        "B": "host repair passes but FCA slowdown changes by <25%",
+        "C": "H1 fails to reduce host loop"
+      },
+      "stop_after_stage_b3": true
+    },
+    {
       "id": "C_ORACLE",
       "action_space": "current-layer residual miss expert-to-rank assignment only",
       "future_routes": false,
@@ -215,5 +262,7 @@
   "stage_c_oracle_authorized": false,
   "stage_b_result_commit": "e656666d2b768510e7c1ee0b87264e8b2319d101",
   "stage_b_passed": false,
-  "stage_b2_authorized": true
+  "stage_b2_authorized": true,
+  "stage_b2_result_commit": "0848cd07a7c1ca37b3764bb618b0138e74674c94",
+  "stage_b3_authorized": true
 }
