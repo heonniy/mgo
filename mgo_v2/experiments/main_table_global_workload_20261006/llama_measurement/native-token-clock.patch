@@ -1,5 +1,5 @@
 diff --git a/tools/server/server-context.cpp b/tools/server/server-context.cpp
-index d1af984..31e319c 100644
+index d1af984..a206c5a 100644
 --- a/tools/server/server-context.cpp
 +++ b/tools/server/server-context.cpp
 @@ -288,6 +288,7 @@ struct server_slot {
@@ -26,6 +26,15 @@ index d1af984..31e319c 100644
          slot.generated_text += token_str;
          if (slot.task->params.return_tokens) {
              slot.generated_tokens.push_back(result.tok);
+@@ -2082,7 +2085,7 @@ private:
+             }
+         }
+ 
+-        if (llama_vocab_is_eog(vocab, result.tok)) {
++        if (!std::getenv("MGO_HEADLINE_CONTINUE_EOG") && llama_vocab_is_eog(vocab, result.tok)) {
+             slot.stop           = STOP_TYPE_EOS;
+             slot.has_next_token = false;
+ 
 @@ -2240,6 +2243,7 @@ private:
              res->content     = std::move(slot.generated_text);
              res->tokens      = std::move(slot.generated_tokens);

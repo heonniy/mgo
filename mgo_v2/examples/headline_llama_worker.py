@@ -16,9 +16,9 @@ def main(a):
  count=4 if a.smoke else spec['local_batch']*4;length=32 if a.smoke else spec['input_tokens'];n=2 if a.smoke else 64
  sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close();url=f'http://127.0.0.1:{port}'
  cmd=[str(TOOLS/'llama.cpp/build/bin/llama-server'),'-m',str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),'--host','127.0.0.1','--port',str(port),'--split-mode','layer','--n-gpu-layers','999','--n-cpu-moe','34','--parallel',str(count),'--ctx-size',str(count*(length+n+8)),'--cache-ram','0','--cache-reuse','0','--threads','32','--threads-batch','64','--threads-http','16','--batch-size','2048','--ubatch-size','512','--no-context-shift']
- write(a.output/'config.json',dict(command=cmd,global_expert_slots=14*128,expert_bytes=14*128*9*2**20,expert_budget_bytes=17392730112,cache_mode='static layer weights; no prompt reuse'))
+ write(a.output/'config.json',dict(command=cmd,global_expert_slots=14*128,expert_bytes=14*128*9*2**20,expert_budget_bytes=17392730112,cache_mode='static layer weights; no prompt reuse',eos_semantics='continue after EOS without suppressing its logit'))
  with (a.output/'server.log').open('w') as log:
-  server=subprocess.Popen(cmd,stdout=log,stderr=subprocess.STDOUT)
+  server=subprocess.Popen(cmd,stdout=log,stderr=subprocess.STDOUT,env=dict(os.environ,MGO_HEADLINE_CONTINUE_EOG="1"))
   try:
    deadline=time.monotonic()+900
    while True:
@@ -33,7 +33,7 @@ def main(a):
     write(a.output/'phase.json',dict(system='llama.cpp-layer',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
     barrier=threading.Barrier(count+1)
     def run(row):
-     payload=dict(prompt=row['input_ids'][-length:],n_predict=n,temperature=0,ignore_eos=True,cache_prompt=False,return_tokens=True,stream=False,seed=42)
+     payload=dict(prompt=row['input_ids'][-length:],n_predict=n,temperature=0,ignore_eos=False,cache_prompt=False,return_tokens=True,stream=False,seed=42)
      barrier.wait(timeout=30);result=request(url+'/completion',payload)
      assert result['tokens_evaluated']==length and result['tokens_predicted']==n and not result['truncated'],result
      assert len(result['tokens'])==len(result['token_ready_us'])==n

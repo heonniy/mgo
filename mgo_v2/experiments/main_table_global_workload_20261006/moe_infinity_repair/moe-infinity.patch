@@ -641,6 +641,57 @@ index d9c382a..a90dfbc 100644
  
      def _init_io_tracking(self):
          global _io_profile_env_cache
+diff --git a/moe_infinity/runtime/model_offload.py b/moe_infinity/runtime/model_offload.py
+index 8eff424..5e0263c 100644
+--- a/moe_infinity/runtime/model_offload.py
++++ b/moe_infinity/runtime/model_offload.py
+@@ -505,7 +505,7 @@ def _make_expert_tensor_map(name_id_map, config):
+     return result
+ 
+ 
+-def _make_expert_nbytes_map(model, config):
++def _make_expert_nbytes_map(model, config, tensor_index=None, name_id_map=None):
+     """Sum stored payload bytes per ``(layer_id, expert_id)`` from live params.
+ 
+     Read while the routed-expert weights still carry their true shape/dtype
+@@ -518,6 +518,24 @@ def _make_expert_nbytes_map(model, config):
+     """
+     if getattr(config, "model_type", "") == "gpt_oss":
+         return {}
++    if tensor_index is not None:
++        if name_id_map is None:
++            raise ValueError("canonical byte accounting requires name_id_map")
++        by_id = {int(row["tensor_id"]): row for row in tensor_index}
++        result = {}
++        seen = set()
++        for name, tensor_id in name_id_map.items():
++            layer, expert = parse_expert_id(name, config)
++            if expert is None or tensor_id in seen:
++                continue
++            seen.add(tensor_id)
++            row = by_id[int(tensor_id)]
++            nbytes = int(row["size"])
++            if nbytes <= 0:
++                raise ValueError("expert tensor has invalid canonical size")
++            key = (layer, expert)
++            result[key] = result.get(key, 0) + nbytes
++        return result
+     result: dict[tuple[int, int], int] = {}
+     for name, param in model.named_parameters(recurse=True):
+         layer_id, expert_id = parse_expert_id(name, config)
+@@ -1354,7 +1372,11 @@ class OffloadEngine(object):
+                     self.expert_tensor_map
+                 )
+                 self.expert_prefetcher.expert_nbytes_map = (
+-                    _make_expert_nbytes_map(model, self.config)
++                    _make_expert_nbytes_map(
++                        model, self.config,
++                        self.archer_engine.get_canonical_tensor_index_snapshot(),
++                        self.name_id_map,
++                    )
+                 )
+                 self.expert_prefetcher.configure_overlap_policy(
+                     self.archer_config
 diff --git a/tests/cpp/unit/prefetch/test_expert_residency.cpp b/tests/cpp/unit/prefetch/test_expert_residency.cpp
 index 7b6b128..d2a5a34 100644
 --- a/tests/cpp/unit/prefetch/test_expert_residency.cpp
@@ -742,10 +793,10 @@ index 7b6b128..d2a5a34 100644
 +}
 diff --git a/tests/python/unit/test_eam_repair.py b/tests/python/unit/test_eam_repair.py
 new file mode 100644
-index 0000000..dea290b
+index 0000000..0722bd8
 --- /dev/null
 +++ b/tests/python/unit/test_eam_repair.py
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,88 @@
 +import unittest
 +import numpy as np
 +from transformers import Qwen3MoeConfig
@@ -786,6 +837,12 @@ index 0000000..dea290b
 +        a=np.ones((3,3,4),np.float32);self.tracer.load_trace(a)
 +        sid=self.tracer.create_entry();self.tracer.update_entry(sid,np.array([2]),0);self.tracer.finish_entry(sid)
 +        np.testing.assert_array_equal(self.tracer.trace_collection,a)
++    def test_budget_uses_canonical_store_not_scalar_placeholders(self):
++        from moe_infinity.runtime.model_offload import _make_expert_nbytes_map
++        names={f"layers.0.mlp.experts.0.{proj}.weight":i for i,proj in enumerate(['gate_proj','up_proj','down_proj'])}
++        rows=[dict(tensor_id=i,size=3*2**20) for i in range(3)]
++        self.assertEqual(_make_expert_nbytes_map(None,self.config,rows,names),{(0,0):9*2**20})
++
 +    def test_batched_search_matches_independent_search(self):
 +        rng=np.random.default_rng(13)
 +        self.tracer.load_trace(rng.integers(0,5,(3,3,4)).astype(np.float32))
