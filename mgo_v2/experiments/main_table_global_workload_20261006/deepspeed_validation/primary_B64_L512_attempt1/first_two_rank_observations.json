@@ -1,0 +1,114 @@
+{
+  "scope": "Read-only analysis of first two repeats; third still running",
+  "ranks": [
+    {
+      "rank": 0,
+      "token_mismatches": 914,
+      "compared_tokens": 4096,
+      "first_mismatch_index": 2,
+      "repeats": [
+        {
+          "repeat": 1,
+          "TTFT": 8.366286451,
+          "TPOT": 5.064951379587302,
+          "interval_min": 4.175683015,
+          "interval_median": 4.838090499,
+          "interval_max": 6.822874795,
+          "intervals_over_5_5_seconds": 10
+        },
+        {
+          "repeat": 2,
+          "TTFT": 5.682557988,
+          "TPOT": 4.728326001,
+          "interval_min": 4.178268522,
+          "interval_median": 4.747034757,
+          "interval_max": 4.908468737,
+          "intervals_over_5_5_seconds": 0
+        }
+      ]
+    },
+    {
+      "rank": 1,
+      "token_mismatches": 1071,
+      "compared_tokens": 4096,
+      "first_mismatch_index": 1,
+      "repeats": [
+        {
+          "repeat": 1,
+          "TTFT": 8.352003422,
+          "TPOT": 5.065237691634921,
+          "interval_min": 4.128688437,
+          "interval_median": 4.834731585,
+          "interval_max": 6.82044617,
+          "intervals_over_5_5_seconds": 11
+        },
+        {
+          "repeat": 2,
+          "TTFT": 5.683848429,
+          "TPOT": 4.7283703715396825,
+          "interval_min": 4.174628343,
+          "interval_median": 4.751318021,
+          "interval_max": 4.892893014,
+          "intervals_over_5_5_seconds": 0
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "token_mismatches": 1141,
+      "compared_tokens": 4096,
+      "first_mismatch_index": 3,
+      "repeats": [
+        {
+          "repeat": 1,
+          "TTFT": 8.460004997,
+          "TPOT": 5.0652141821746035,
+          "interval_min": 4.074071712,
+          "interval_median": 4.827251069,
+          "interval_max": 6.824520299,
+          "intervals_over_5_5_seconds": 10
+        },
+        {
+          "repeat": 2,
+          "TTFT": 5.79512485,
+          "TPOT": 4.728005424380952,
+          "interval_min": 4.153463711,
+          "interval_median": 4.746134973,
+          "interval_max": 4.925166269,
+          "intervals_over_5_5_seconds": 0
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "token_mismatches": 1172,
+      "compared_tokens": 4096,
+      "first_mismatch_index": 4,
+      "repeats": [
+        {
+          "repeat": 1,
+          "TTFT": 8.510366356,
+          "TPOT": 5.0627360546031746,
+          "interval_min": 3.952034031,
+          "interval_median": 4.832168121,
+          "interval_max": 6.825588655,
+          "intervals_over_5_5_seconds": 10
+        },
+        {
+          "repeat": 2,
+          "TTFT": 5.68482687,
+          "TPOT": 4.728330379761904,
+          "interval_min": 4.17625499,
+          "interval_median": 4.745930569,
+          "interval_max": 4.909232728,
+          "intervals_over_5_5_seconds": 0
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "ZeRO synchronization prevents these aggregate rank timings from localizing a bottleneck.",
+    "Native greedy BF16 tokens differ, so internal decode routing is not held fixed.",
+    "No intervals or repeats are removed. No cause is established."
+  ]
+}
