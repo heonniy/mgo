@@ -28,18 +28,42 @@ Use only:
 - model / precision: current Qwen3-30B-family MoE, BF16
 - substitution: OFF
 - replication: OFF
+- **prefill context length: exactly 512 valid tokens per request**
 - decode horizon: 64
 - no policy changes other than rank placement/admission
 - no concurrent B5 mutation: keep the existing B5 result path separate
 
+### Fixed prefill context protocol
+
+The primary study fixes **effective prefill context to 512 tokens per request**.
+
+- Every request entering the measured prefill has exactly 512 valid prompt tokens.
+- Prefer requests whose tokenized prompt is at least 512 tokens and truncate deterministically to 512.
+- Do **not** create the 512-token workload by merely padding a shorter prompt with masked pad tokens; the purpose is to hold actual prefill token traffic constant.
+- If the chosen corpus cannot provide enough >=512-token requests for an R4/B128 cell, build a separately recorded eligible long-prompt pool rather than silently changing the effective context length.
+- The attention mask must therefore contain 512 valid positions for every measured request.
+- B16 and B128 differ only in local batch size, not prompt length.
+
+Thus the controlled prefill token volume is:
+
+```
+per rank:  B * 512 valid prompt tokens
+global R4: 4 * B * 512 valid prompt tokens
+```
+
+giving:
+
+- R4/B16: 32,768 global prefill tokens;
+- R4/B128: 262,144 global prefill tokens.
+
 Primary matrix:
 
-| Cache | local batch |
-|---|---:|
-| C30 | B16 |
-| C30 | B128 |
-| C60 | B16 |
-| C60 | B128 |
+| Cache | local batch | fixed context |
+|---|---:|---:|
+| C30 | B16 | 512 |
+| C30 | B128 | 512 |
+| C60 | B16 | 512 |
+| C60 | B128 | 512 |
 
 Policies:
 
@@ -157,7 +181,7 @@ The requested seed search is allowed, but it must be labeled **BEST-SEED HEADROO
 
 Search two independent seed axes:
 
-- `workload_seed`: dataset sampling + rank assignment / request composition
+- `workload_seed`: sampling + rank assignment / request composition **within the fixed 512-valid-token eligible pool**
 - `placement_seed`: random initial placement / randomized tie behavior where the policy actually uses it
 
 Initial search domain:
@@ -209,7 +233,7 @@ Before interpreting `placement_seed` as an optimization axis:
 
 ### S0. CPU / trace seed screen
 
-Replay all 32 x 32 seed pairs without GPU timing.
+Replay all 32 x 32 seed pairs without GPU timing. Every seed pair must preserve the same 512-valid-token context invariant.
 
 For every regime and candidate policy, rank seeds separately for prefill and decode using controller/trace features:
 
@@ -293,8 +317,8 @@ if prefill provides the dominant gain and decode remains consistently positive.
 
 Produce one row per regime / phase / candidate:
 
-| cache | batch | phase | candidate | best workload seed | best placement seed | BR metric | candidate metric | gain | copies parity | barrier share | return-A2A share | stability |
-|---|---:|---|---|---:|---:|---:|---:|---:|---|---:|---:|---|
+| cache | batch | context | phase | candidate | best workload seed | best placement seed | BR metric | candidate metric | gain | copies parity | barrier share | return-A2A share | stability |
+|---|---:|---:|---|---|---:|---:|---:|---:|---:|---|---:|---:|---|
 
 Also report the winning phase policy for each of:
 
@@ -320,4 +344,6 @@ Does a phase-specific BR/CA/LA choice beat one global policy?
 - Do not change substitution or replication.
 - Do not call best-seed results an unbiased average-case benchmark.
 - Do not merge the prefill experiment with B5 output directories.
+- Do not mix different prompt lengths in the primary C30/C60 x B16/B128 comparison.
+- Context-length sensitivity (for example 128 / 512 / 2048) is a **separate follow-up** and must not be pooled into this primary fixed-512 result.
 - Do not claim communication gain from packet reduction alone; use measured critical-path timing.
