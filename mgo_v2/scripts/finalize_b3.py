@@ -21,6 +21,7 @@ def finalize():
         est={key:value['estimate'] for key,value in timing['gates'].items()}
         gate.update(stable=not timing['unstable'],br_tpot_within_one_percent=est['BR_'+candidate]['TPOT']<=1.01*est['BR_H0']['TPOT'])
         result['estimates_seconds']=est
+        result['timing_stability']=timing['gates']
         result['full_ranges_seconds']={key:g['range'] for key,g in timing['gates'].items()}
         result['repair_gains']={policy:{k:1-est[policy+'_'+candidate][k]/est[policy+'_H0'][k] for k in ('TPOT','E2E_wall')} for policy in ('BR','FCA')}
         before=est['FCA_H0']['TPOT']/est['BR_H0']['TPOT']-1
@@ -54,13 +55,13 @@ def finalize():
         lines+=['','Original H1 also failed the 40% full-loop gate:']
         for p,g in original['gates'].items():lines.append(f"- {p}: launch reduction {g['host_call_reduction']:.2%}, host-loop reduction {g['host_loop_reduction']:.2%}.")
     lines+=['','## Remaining host path','', '| Policy/executor | Loop | Kernel launch | Gather | Weight multiply | Ready selection incl. wait | Host ready wait | Slot-use record |', '|---|---:|---:|---:|---:|---:|---:|---:|']
-    for r in diagnosis['rows']:
+    for r in sorted(diagnosis['rows'],key=lambda r:(r['policy'],r['executor'])):
         lines.append(f"| {r['policy']}/{r['executor']} | {r['host_expert_loop_ms']:.2f} | {r['host_kernel_launch_ms']:.2f} | {r['host_gather_ms']:.2f} | {r['host_weight_ms']:.2f} | {r['host_ready_select_including_wait_ms']:.2f} | {r['host_ready_wait_ms']:.2f} | {r['host_record_use_ms']:.2f} |")
     lines+=['','Values are diagnostic mean-rank ms/decode step. Ready wait is nested inside ready selection: do not add both. Other host-loop time includes diagnostic bookkeeping. This does not isolate a unique GIL/driver/OS cause.', '', 'Removing expert invocation overhead exposes more readiness waiting. Gather/weighting and slot-use recording remain material; CUDA-graph replay alone does not establish the required full-loop repair. No grouped GEMM or scheduler change is authorized here.'] if not gate['diagnostic'] else []
     if timings:
         lines+=['','| Policy/executor | TPOT (s) | E2E (s) |','|---|---:|---:|']
         for key,e in result['estimates_seconds'].items():lines.append(f"| {key} | {e['TPOT']:.6f} | {e['E2E_wall']:.6f} |")
-        lines+=['','All valid repeats and full ranges are retained in the accompanying JSON/CSV. Two stable repeats stop; at most one conditional third. No noise-based deletion.']
+        lines+=['',f"Observed TPOT reduction: BR {result['repair_gains']['BR']['TPOT']:.2%}; FCA {result['repair_gains']['FCA']['TPOT']:.2%}. Stability gate: {gate['stable']}. These are physical timing observations; the full repair gate still requires every host/correctness/stability criterion.",'','All valid repeats and full ranges are retained in the accompanying JSON/CSV. Two stable repeats stop; at most one conditional third. No noise-based deletion.']
     else:lines+=['','No primary timing has been run. Instrumented capture wall times are not performance evidence.']
     lines+=['','C60 authorization: '+str(result['c60_authorized'])+'. Stage C oracle remains unauthorized.', '',
             'Nsight node tracing is separate from timing. H1 launch ranges include scratch copies and replay; host and GPU spans overlap and must not be added.',
@@ -69,7 +70,26 @@ def finalize():
     sources={}
     for p in [PACKET/'STAGE_B3_HOST_EXECUTOR_REPAIR.md',diagnostic_path,correctness_path,PACKET/('B3_H1b_GRAPH_SIGNATURES.json' if candidate=='H1b' else 'B3_GRAPH_SIGNATURES.json')]:
         sources[str(p)]=hashlib.sha256(p.read_bytes()).hexdigest()
-    if clean.exists():sources[str(clean)]=hashlib.sha256(clean.read_bytes()).hexdigest()
+    if clean.exists():
+        sources[str(clean)]=hashlib.sha256(clean.read_bytes()).hexdigest()
+        directory=clean.parent;portable=[]
+        signature_packet=json.loads((PACKET/('B3_H1b_GRAPH_SIGNATURES.json' if candidate=='H1b' else 'B3_GRAPH_SIGNATURES.json')).read_text())
+        for rank in range(4):
+            source=directory/f'graph_signatures_rank{rank}.json';graph=json.loads(source.read_text())
+            expected=set()
+            for r in signature_packet['rows']:
+                if r['rank']==rank:expected.update(map(tuple,r['signatures']))
+            assert set(map(tuple,graph['signatures']))==expected, 'clean graph union differs from diagnostic discoveries'
+            signatures=graph.pop('signatures')
+            graph.update(rank=rank,signature_count=len(signatures),signature_sha256=hashlib.sha256(json.dumps(signatures,separators=(',',':')).encode()).hexdigest(),exact_union_of_committed_policy_signatures=True)
+            portable.append(graph);sources[str(source)]=hashlib.sha256(source.read_bytes()).hexdigest()
+            for policy in ('BR','FCA'):
+                path=directory/f'{policy}_correctness_rank{rank}.json'
+                assert json.loads(path.read_text())['status']=='PASS'
+                sources[str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
+        write(PACKET/'B3_CLEAN_GRAPH_SIGNATURES.json',dict(status='PASS',rows=portable))
+        lines+=['',f"Clean comparison graph cache: {min(r['signature_count'] for r in portable)}–{max(r['signature_count'] for r in portable)} exact signatures/rank; max persistent scratch {max(r['scratch_bytes'] for r in portable)/1024**3:.2f} GiB/rank. H0 retains the same allocated graph buffers but does not replay them.",'Graph discovery/capture is benchmark preparation, outside E2E/TPOT. Unseen signatures invalidate the run; this is not a deployable dynamic-shape executor claim.']
+        (PACKET/'B3_RESULTS.md').write_text('\n'.join(lines)+'\n')
     captures=[]
     for row in diagnosis['rows']:
         cap=Path(row['capture']);captures.append(json.loads((cap/'status.json').read_text()))
