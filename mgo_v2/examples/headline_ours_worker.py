@@ -28,7 +28,7 @@ def generate_live(model,rt,ids,n):
 def validate_state(rt):
  rt.h2d.synchronize();rt.arena.assert_consistent();assert not rt.controller.pending and not rt.mismatch.item()
  assert np.array_equal(rt.keys[rt.arena.main_physical[rt.rank]],rt.policy.slots[rt.rank,:rt.cap])
- state=array_hash(rt.policy.slots);roles=array_hash(rt.arena.main_physical)
+ state=array_hash(rt.policy.slots);roles=array_hash(np.concatenate(rt.arena.main_physical))
  digest=torch.tensor(list(bytes.fromhex(state+roles)),dtype=torch.uint8,device='cuda');all_digests=[torch.empty_like(digest) for _ in range(4)];dist.all_gather(all_digests,digest)
  assert all(torch.equal(digest,x) for x in all_digests)
  return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+8)
