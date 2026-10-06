@@ -3,6 +3,7 @@ from la_physical_worker import *
 from ttft_common import ROOT,GPUS,POLICIES
 from mgo_v2.pinned_h2d import PriorityH2DScheduler
 from mgo_v2.decode_runtime import DecodeOffloadRuntime
+from mgo_v2.ready_compute import expert_order
 import statistics
 
 class PrefillRuntime(LiveRuntime):
@@ -13,7 +14,7 @@ class PrefillRuntime(LiveRuntime):
  def reset(self):
   self.policy_kind={'BR':0,'CA':1,'OLD_CA':3,'LA':4}[self.args.policy]
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache,staging_backend='torch',cpu_team=self.args.staging_cpu_team)
-  super().reset();self.post_expert_barriers=0;self.breakdown=[];self.layer_fetch_counts=[];self.layer_rows=[]
+  super().reset();self.post_expert_barriers=0;self.breakdown=[];self.layer_fetch_counts=[];self.layer_rows=[];self.ready_metrics=dict(waits=0,ready_before_first_wait=0)
  def exchange(self,x,send,recv,activation_row_bytes=0,active=False):
   y=super().exchange(x,send,recv,activation_row_bytes,active)
   if self.args.phase!='COUNTERS':
@@ -24,6 +25,17 @@ class PrefillRuntime(LiveRuntime):
   for key,slot,victim,rep in e['fetches']:
    assert not rep and self.keys[slot]==victim
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
+ def compute(self,packet,e,layer):
+  # Prefill ready-first execution: preserve output/group order while selecting
+  # any expert whose H2D has already completed before blocking on a pending one.
+  mode,received,recv_eids,rw=packet;assert mode=='current'
+  groups=e['groups'];parts=[None]*len(groups)
+  for i in expert_order(groups,self.h2d,True,self.ready_metrics):
+   expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
+   w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
+   part=self.kernel(received[rows],gate,up,down)
+   self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
+  return torch.cat(parts) if parts else received.new_empty((0,2048))
  def execute(self,layer,hidden,selected,weights,probs):
   assert 0<=self.index<48 and layer==self.index
   diagnostic=self.args.phase=='DIAGNOSTIC';e=self.plan_event(layer,selected,weights,probs)
@@ -63,7 +75,7 @@ def check(rt,row,rank):
  rt.h2d.synchronize();proof=rt.proof
  observed=dict(state_hash=array_hash(rt.policy.slots[rank,:rt.cap]),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],canceled=rt.h2d.metrics['canceled'],barriers=rt.post_expert_barriers,layers=rt.index,layer_fetch_counts=rt.layer_fetch_counts)
  expected=dict(state_hash=proof['rank_state_hashes'][rank],copies=proof['copies'][rank],bytes=proof['H2D_bytes'][rank],canceled=0,barriers=48,layers=48,layer_fetch_counts=[x[rank] for x in proof['layer_fetch_counts']])
- return dict(status='PASS' if observed==expected and row['finite_logits'] else 'FAIL',observed=observed,expected=expected,expert_rows=rt.layer_rows,wire_bytes=rt.actual_wire_bytes,peer_bytes=rt.actual_peer_bytes,collective_calls=rt.actual_collective_calls,peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
+ return dict(status='PASS' if observed==expected and row['finite_logits'] else 'FAIL',observed=observed,expected=expected,expert_rows=rt.layer_rows,wire_bytes=rt.actual_wire_bytes,peer_bytes=rt.actual_peer_bytes,collective_calls=rt.actual_collective_calls,ready_metrics=dict(rt.ready_metrics),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
 
 def main(a):
  rank=int(os.environ['RANK']);assert int(os.environ['WORLD_SIZE'])==4;gpu=GPUS[rank];cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(gpu)]
