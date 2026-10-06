@@ -81,7 +81,7 @@ def analyze(path,receipt):
   for r in db.execute(f'SELECT start,end,globalTid,correlationId FROM {api_table}'):
    key=(r['globalTid'] & 0xFFFFFFFFFF000000,r['correlationId'])
    runtime.setdefault(key,(r['start'],r['end'],r['globalTid']))
- phases=('moe.metadata','moe.forward_a2a','moe.expert_compute','moe.return_a2a')
+ phases=('moe.metadata','moe.forward_a2a','moe.expert_compute','moe.post_expert_global_barrier','moe.return_a2a')
  kernels=defaultdict(list);counts=defaultdict(int);kernel_names=defaultdict(lambda:defaultdict(int));unassigned=0;decode_kernels=[];event_kernels=defaultdict(lambda:defaultdict(list))
  for r in db.execute('SELECT start,end,globalPid,correlationId,demangledName FROM CUPTI_ACTIVITY_KIND_KERNEL'):
   api=runtime.get((r['globalPid'],r['correlationId']))
@@ -94,7 +94,7 @@ def analyze(path,receipt):
   for name in phases:
    if contained(tid,name,start,end):
     kernel_name=strings.get(r['demangledName'],'<unknown>');phase=name
-    if name in ('moe.metadata','moe.forward_a2a','moe.return_a2a'):phase += '.nccl' if 'nccl' in kernel_name.lower() else '.local_gpu'
+    if name in ('moe.metadata','moe.forward_a2a','moe.post_expert_global_barrier','moe.return_a2a'):phase += '.nccl' if 'nccl' in kernel_name.lower() else '.local_gpu'
     kernels[phase].append(interval);counts[phase]+=1;kernel_names[phase][kernel_name]+=1;matched=True
     event_kernels[event][phase].append(interval)
   if not matched:unassigned+=1
