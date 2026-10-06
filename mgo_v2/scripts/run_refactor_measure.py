@@ -38,12 +38,12 @@ def run(stage,group):
   return row
  h.safe(sample(),True);env=h.env_for(group.get('environment','env1'));env.update(CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)));cache=ROOT/'compile_cache';env.update(TORCHINDUCTOR_CACHE_DIR=str(cache/'inductor'),TRITON_CACHE_DIR=str(cache/'triton'))
  if group.get('environment')=='env2':env['NCCL_DEBUG']='INFO'
- cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/b4_measure_worker.py' if group.get('b4_measure') else 'examples/b4_correctness_worker.py' if group.get('b4_correctness') else 'examples/b3_measure_worker.py' if group.get('b3_executor_study') else 'examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
+ cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/b5_measure_worker.py' if group.get('b5_measure') else 'examples/b4_measure_worker.py' if group.get('b4_measure') else 'examples/b4_correctness_worker.py' if group.get('b4_correctness') else 'examples/b3_measure_worker.py' if group.get('b3_executor_study') else 'examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
   from refactor_fingerprint import capture,sha
   state['common_stack']=capture(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}',env)
   if group.get('b3_executor_study'):
-   for name in ('examples/b3_measure_worker.py','examples/b4_correctness_worker.py','examples/b4_measure_worker.py','scripts/physical_repeat_rule.py','scripts/run_b3_measure.py'):
+   for name in ('examples/b5_measure_worker.py','scripts/run_b5_measure.py','examples/b3_measure_worker.py','examples/b4_correctness_worker.py','examples/b4_measure_worker.py','scripts/physical_repeat_rule.py','scripts/run_b3_measure.py'):
     state['common_stack']['code'][name]=sha(P/name)
  active=None;released=set();last_scan=0
  with (out/'run.log').open('w') as log:

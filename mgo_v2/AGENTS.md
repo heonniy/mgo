@@ -1,3 +1,10 @@
+**B5 OWNER EXECUTION AUTHORIZED (2026-10-06, chat):** "엉 실험해줘".
+Run C30/local B128/decode64 BR/FCA H1b post-expert barrier isolation on GPUs
+0,1,4,5 only. Canonical token/copy parity and 3072 barriers/rank are required
+before clean timing. Use the bounded two-repeat rule and separate Nsight
+captures. Stop on copy mismatch; no automatic retries or C60/R8/H2/Stage C.
+This explicit follow-up supersedes the preparation-only B5 text below.
+
 **CURRENT OWNER ALLOCATION (2026-10-06): physical GPUs 0,1,4,5 only.**
 GPUs 2,3,6,7 are allocated to other users, including when temporarily idle.
 Do not launch experiment/load workers there or terminate their processes.
