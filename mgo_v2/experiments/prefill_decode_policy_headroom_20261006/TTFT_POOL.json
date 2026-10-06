@@ -3,12 +3,18 @@
   "source_path": "/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/sources/ShareGPT_Vicuna_unfiltered/ShareGPT_V3_unfiltered_cleaned_split.json",
   "source_sha256": "35f0e213ce091ed9b9af2a1f0755e9d39f9ccec34ab281cd4ca60d70f6479ba4",
   "model": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
-  "selection": "First 2048 distinct eligible human prompts in recorded corpus order; native chat tokenization, at least512 tokens then deterministic first512 truncation.",
-  "scanned_unique_prompts": 56477,
+  "selection": "First 2048 distinct eligible conversation prefixes ending in a user turn, corpus order; same Qwen chat template, retain last512 formatted tokens.",
+  "truncation": "last512_formatted_conversation",
+  "scanned_conversation_prefixes": 3153,
+  "eligible_count": 2048,
+  "eligible_count_scope": "Distinct eligible inputs retained from scanned corpus prefix; not a full-corpus census.",
+  "original_pool_token_min": 512,
+  "original_pool_token_max": 20456,
+  "original_pool_token_mean": 1200.2802734375,
   "context": 512,
   "pool_size": 2048,
   "masked_padding": false,
   "decode_capture": false,
   "manifest_path": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/requests.json",
-  "manifest_sha256": "48aef762e87a0c076e268518510557ed47b95374eafde8522750b316e56a9910"
+  "manifest_sha256": "07c0e616fbd1ab2c1e883983f1cab5c15d1bcc2535c89f7544c8a89e5a22bdd1"
 }

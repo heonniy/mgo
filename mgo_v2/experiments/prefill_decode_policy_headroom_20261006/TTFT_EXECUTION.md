@@ -10,8 +10,10 @@ TTFT measures a model-resident cold-expert-cache prefill through first-token
 readiness, including live placement/admission and required H2D; model loading,
 request delivery and compilation are outside the timed window.
 
-The separately recorded long ShareGPT pool has 2048 distinct prompts chosen
-in corpus order with >=512 chat tokens, deterministically truncated to512.
+The separately recorded long ShareGPT pool has 2048 distinct conversation prefixes
+in corpus order with >=512 chat tokens, retaining the most recent512 tokens
+per the owner amendment1804e65. Original lengths and conversation IDs/turns
+are recorded. The unused first512 draft is preserved outside the repository.
 No masked padding and no MATH requests. Capture the frozen prefill routes once
 in bounded batches8 per assigned GPU, then reuse across all seed candidates.
 
