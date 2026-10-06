@@ -1,3 +1,12 @@
+**OWNER PURE LA/NEAR CLEAN COMPARISON COMPLETE (2026-10-07).**
+Read experiments/r4_la_near_h0_20261007/RESULTS.md. R4/C30/local B64/input512,
+decode32, H0/full-pinned V3 P2/T2, GPUs0,1,4,5 only. One clean primary per
+policy after correctness warmups. LA TTFT22.4703s, TPOT925.0067ms, E2E52.0699s;
+Near TTFT22.2399s, TPOT925.1417ms, E2E51.8436s. Decode timing is effectively
+tied in this single-shot pair; no stable advantage claim. All rank receipts
+passed; no diagnostics, further repetitions or matrix expansion. Owned model
+loads restored only on0,1,4,5; never touch2,3,6,7.
+
 **OWNER ONE-CELL BR/NEAR DIAGNOSTIC COMPLETE (2026-10-07).**
 Read experiments/r4_br_near_h0_20261007/diagnostic/RESULTS.md. Owner narrowed
 attribution to one workload and clarified BR versus Near comparison: B64/L512,

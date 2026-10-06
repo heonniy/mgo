@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "results": [
+    {
+      "status": "PASS",
+      "batch": 64,
+      "context": 512,
+      "seed": 28,
+      "executor": "H0",
+      "source": "full_pinned",
+      "runtime": "V3_OPT_PF_OVERLAP",
+      "P": 2,
+      "trigger": "T2",
+      "decode_steps": 32,
+      "generated_outputs": 33,
+      "measured_repeats": 1,
+      "baseline_policy": "LA",
+      "candidate_policy": "LA_CA_NEAR",
+      "samples": {
+        "LA": {
+          "TTFT": 22.470298217609525,
+          "TPOT": 0.925006695324555,
+          "E2E": 52.06989311333746
+        },
+        "LA_CA_NEAR": {
+          "TTFT": 22.239911458455026,
+          "TPOT": 0.9251417131745256,
+          "E2E": 51.843647793866694
+        }
+      },
+      "gains": {
+        "TTFT": 0.010252946219198367,
+        "TPOT": -0.00014596418669521327,
+        "E2E": 0.004345031378849007
+      },
+      "policy_token_differences": [
+        {
+          "different_tokens": 13,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 23,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 18,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        },
+        {
+          "different_tokens": 23,
+          "total_tokens": 2112,
+          "scope": "BF16 policy reduction order; frozen routes and teacher inputs shared"
+        }
+      ],
+      "scope": "Single-shot rerun on previous BR-adversarial selected seed; prefill policy and cache carry over into decode. No strict layer barriers, diagnostics or recapture. All timings wall-clock; independent max across ranks."
+    }
+  ],
+  "primary_policy_runs": 2,
+  "scope": "Single measurement per requested combination; no repeat stability claim."
+}
