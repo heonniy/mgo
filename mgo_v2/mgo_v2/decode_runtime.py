@@ -24,7 +24,13 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"),cpu_team=getattr(self.args,"staging_cpu_team",None),direct_pinned=getattr(self.args,"direct_pinned_source",False))
-  self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world,async_inputs=getattr(a,'async_metadata_inputs',False))
+  if getattr(a,'live_routes',False):
+   from .eviction import GateHistory
+   from .live_metadata import LiveMetadata
+   self.gate_history=GateHistory(48,128,128)
+   self.metadata=LiveMetadata(a.local_batch,self.gate_history)
+   self.event_offset=0
+  else:self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world,async_inputs=getattr(a,'async_metadata_inputs',False))
  def stage_frozen_inputs(self,horizon):
   # Benchmark input delivery is common across strategies and outside timing.
   # Only the current event is exposed to the runtime; prediction never reads
@@ -48,12 +54,20 @@ class DecodeOffloadRuntime(LiveRuntime):
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
-   if self.index<48:g=gather_global_routes(layer,selected,weights,probs)
+   live=getattr(self.args,'live_routes',False)
+   if self.index<48:
+    g=gather_global_routes(layer,selected,weights,probs)
+    if live:
+     self.gate_history.update(layer,g.routes.full_router_probs)
+     gate=(self.gate_history.sums[layer]/max(1,len(self.gate_history.rows[layer]))).astype(np.float32)
+   elif live:
+    g=self.metadata.collect(self.index,selected,probs);gate=g.gate_scores
    else:g=self.metadata.collect(self.index,selected,probs,self.arrays['gates'][self.index])
+   if not live:gate=self.arrays['gates'][self.index]
   r=g.routes;self.current_histogram=getattr(g,'histogram',None)
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
-   out,promotions,discards=self.controller.plan_current(self.index,r.selected_experts,r.routing_weights,r.origin_ranks,self.arrays['gates'][self.index])
+   out,promotions,discards=self.controller.plan_current(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)
    if self.index>=48 and self.args.phase!='MEASURE':self.controller_times.append((time.perf_counter()-start)*1000)
    targets,effective,masses,lengths,destinations,fetches,row=out
    if getattr(self.args,'physical_prefetch',False):
@@ -82,7 +96,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   if self.args.phase!='MEASURE' and self.index%768==0:print(f'{self.args.policy} event={self.index} split_controller',flush=True)
   if getattr(self.args,'unique_combine',False) and self.index>=48:
    from .unique_combine import validate_unique_layout
-   e['unique_combine_validated']=validate_unique_layout(e,len(self.arrays['decode_origins'])//self.world)
+   e['unique_combine_validated']=validate_unique_layout(e,self.metadata.batch)
    self.unique_combine_layers+=int(e['unique_combine_validated'])
   return device_layout(e)
  def prefetch_next(self):
@@ -227,6 +241,7 @@ class DecodeOffloadRuntime(LiveRuntime):
     assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
     self.actual_h2d_bytes=self.h2d.metrics['bytes']
   if self.index==48:
-   self.arena.assert_consistent();assert not self.arena.reservations and np.all(self.keys[self.cap:]<0)
+   self.arena.assert_consistent();assert not self.arena.reservations
+   if not getattr(self.args,'live_routes',False):assert np.all(self.keys[self.cap:]<0)
    self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
   return result

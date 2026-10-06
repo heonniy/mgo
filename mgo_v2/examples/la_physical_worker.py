@@ -11,13 +11,16 @@ class LiveRuntime(Runtime):
   self.cache=torch.empty((self.cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
   self.similarity=np.zeros((48,128,128),np.float32);self.policy_kind=0 if a.policy=='BR' else 4
-  self.arrays={k:np.load(a.inputs/(k+'.npy'),mmap_mode='r') for k in ['selected','weights','offsets','prefill_origins','decode_origins','gates']}
-  self.reference=json.loads((a.inputs/(a.policy+'_fetches.json')).read_text())
-  self.proof=json.loads((a.inputs/'receipt.json').read_text())['proofs'][a.policy]
-  assert hashlib.sha256((a.inputs/(a.policy+'_fetches.json')).read_bytes()).hexdigest()==self.proof['fetches_sha256']
-  self.ranges=[]
-  for org in [self.arrays['prefill_origins'],self.arrays['decode_origins']]:
-   counts=np.bincount(org,minlength=self.world);offsets=np.r_[0,np.cumsum(counts)];self.ranges.append((int(offsets[self.rank]),int(offsets[self.rank+1])))
+  if getattr(a,'live_routes',False):
+   self.arrays={};self.ranges=[];self.reference=None;self.proof=None
+  else:
+   self.arrays={k:np.load(a.inputs/(k+'.npy'),mmap_mode='r') for k in ['selected','weights','offsets','prefill_origins','decode_origins','gates']}
+   self.reference=json.loads((a.inputs/(a.policy+'_fetches.json')).read_text())
+   self.proof=json.loads((a.inputs/'receipt.json').read_text())['proofs'][a.policy]
+   assert hashlib.sha256((a.inputs/(a.policy+'_fetches.json')).read_bytes()).hexdigest()==self.proof['fetches_sha256']
+   self.ranges=[]
+   for org in [self.arrays['prefill_origins'],self.arrays['decode_origins']]:
+    counts=np.bincount(org,minlength=self.world);offsets=np.r_[0,np.cumsum(counts)];self.ranges.append((int(offsets[self.rank]),int(offsets[self.rank+1])))
   self.kernel=torch.compile(expert_kernel,dynamic=True,fullgraph=True);self.reset()
   for layer,block in enumerate(model.model.layers):block.mlp.forward=types.MethodType(self.forward_for(layer),block.mlp)
  def reset(self):
@@ -31,12 +34,15 @@ class LiveRuntime(Runtime):
    probs=torch.softmax(logits,dim=-1,dtype=torch.float32);native_weights,native_selected=torch.topk(probs,8,dim=-1)
    native_weights=(native_weights/native_weights.sum(-1,keepdim=True)).to(flat.dtype)
    if rt.valid is not None:flat=flat.index_select(0,rt.valid);probs=probs[rt.valid]
-   # Fixed exact trace avoids policy-dependent route drift; router cost remains.
-   lo=int(rt.arrays['offsets'][rt.index]);start,end=rt.ranges[0 if rt.index<48 else 1]
-   if hasattr(rt,'route_tensors'):selected,weights=rt.route_tensors[rt.index]
+   if getattr(rt.args,'live_routes',False):
+    selected,weights=native_selected,native_weights
    else:
-    selected=torch.tensor(rt.arrays['selected'][lo+start:lo+end],device='cuda',dtype=torch.int64)
-    weights=torch.tensor(rt.arrays['weights'][lo+start:lo+end],device='cuda',dtype=torch.bfloat16)
+    # Fixed exact trace avoids policy-dependent route drift; router cost remains.
+    lo=int(rt.arrays['offsets'][rt.index]);start,end=rt.ranges[0 if rt.index<48 else 1]
+    if hasattr(rt,'route_tensors'):selected,weights=rt.route_tensors[rt.index]
+    else:
+     selected=torch.tensor(rt.arrays['selected'][lo+start:lo+end],device='cuda',dtype=torch.int64)
+     weights=torch.tensor(rt.arrays['weights'][lo+start:lo+end],device='cuda',dtype=torch.bfloat16)
    result=rt.execute(layer,flat,selected,weights,probs)
    if rt.valid is not None:result=torch.zeros((shape[0]*shape[1],shape[2]),dtype=flat.dtype,device='cuda').index_copy_(0,rt.valid,result)
    return result.view(shape),logits

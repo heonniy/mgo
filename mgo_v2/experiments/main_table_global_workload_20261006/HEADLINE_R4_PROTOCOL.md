@@ -54,7 +54,7 @@ Decode: greedy, ignore EOS, exactly 64 new tokens
 KV cache: GPU resident
 CPU attention/KV offload: disabled
 Dataset: frozen ShareGPT-long manifests
-Warmup: one disjoint global batch, then retain each framework's normal cache state
+Warmup: one disjoint global batch; reset dynamic expert cache before each measured repeat (owner amendment 2026-10-07). Retain compiled code, CPU pinned backing and fixed static weight partitions. Measured prefill cache continues into decode.
 Primary repeats: three unprofiled repeats; median reported
 
 Common outer timing:

@@ -1,0 +1,92 @@
+"""Native greedy Near generation with cold expert cache and common release."""
+from refactor_measure_worker import *
+from mgo_v2.selected_runtime import create_selected_runtime,selected_options
+import psutil
+ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
+
+def begin(rt):
+ rt.h2d.synchronize();assert not rt.controller.pending
+ rt.event_offset+=rt.index;rt.index=0;rt.mismatch.zero_();rt.valid=None
+ assert rt.event_offset%48==0
+
+def generate_live(model,rt,ids,n):
+ dist.barrier();torch.cuda.synchronize()
+ release=torch.tensor([time.perf_counter_ns()+200_000_000 if dist.get_rank()==0 else 0],device='cuda',dtype=torch.int64)
+ dist.broadcast(release,0);start=int(release.item())
+ while time.perf_counter_ns()<start:time.sleep(.0001)
+ mask=torch.ones_like(ids);past=None;tokens=[];finite=torch.ones((),dtype=torch.bool,device='cuda');stamps=[]
+ with torch.inference_mode():
+  for step in range(n):
+   pos=torch.arange(mask.shape[1]-ids.shape[1],mask.shape[1],device='cuda')[None,:].expand(len(ids),-1)
+   out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
+   past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
+   torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
+   if step<n-1:ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
+ actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n
+ return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist())
+
+def validate_state(rt):
+ rt.h2d.synchronize();rt.arena.assert_consistent();assert not rt.controller.pending and not rt.mismatch.item()
+ assert np.array_equal(rt.keys[rt.arena.main_physical[rt.rank]],rt.policy.slots[rt.rank,:rt.cap])
+ state=array_hash(rt.policy.slots);roles=array_hash(rt.arena.main_physical)
+ digest=torch.tensor(list(bytes.fromhex(state+roles)),dtype=torch.uint8,device='cuda');all_digests=[torch.empty_like(digest) for _ in range(4)];dist.all_gather(all_digests,digest)
+ assert all(torch.equal(digest,x) for x in all_digests)
+ return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+8)
+
+def main(a):
+ rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
+ physical=[0,1,4,5];assert os.environ['MGO_V2_PHYSICAL_GPUS']=='0,1,4,5'
+ cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
+ for task in Path('/proc/self/task').iterdir():
+  try:os.sched_setaffinity(int(task.name),cpus)
+  except FileNotFoundError:pass
+ torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
+ dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
+ spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
+ a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[459,459,459,458];a.seed=42;a.policy='LA_CA_NEAR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts)
+ assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+2)*EB
+ from refactor_thread_affinity import configure
+ configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
+ write(a.output/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
+ for row_count in [1,2]:
+  with torch.inference_mode():
+   scratch=torch.zeros(EB//2,device='cuda',dtype=torch.bfloat16)
+   rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),scratch[:1572864].view(768,2048),scratch[1572864:3145728].view(768,2048),scratch[3145728:].view(2048,768))
+ del scratch
+ n=2 if a.smoke else 64;repeats=1 if a.smoke else 3
+ for repeat in range(repeats+1):
+  phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
+  local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
+  ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local],device='cuda')
+  # Owner amendment: retain compiled code/full pinned source, clear expert state.
+  if repeat:
+   rt.reset();rt.event_offset=0
+   from mgo_v2.eviction import GateHistory
+   from mgo_v2.live_metadata import LiveMetadata
+   rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
+   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
+  begin(rt);a.phase='COUNTERS' if repeat==0 else 'MEASURE';cache_before=validate_state(rt);calls=rt.transport.calls
+  assert np.all(rt.keys<0) and not rt.controller.pending,'expert cache not cold'
+  if rank==0:write(a.output/'phase.json',dict(system='Ours',cell=a.cell,phase=phase,repeat=repeat,smoke=a.smoke))
+  gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
+  from torch._dynamo.utils import counters
+  before=dict(counters['stats'])
+  if repeat:
+   with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
+  else:result=generate_live(model,rt,ids,n)
+  validation=validate_state(rt);assert rt.transport.calls-calls==(n-1)*48*2
+  no_compile=before==dict(counters['stats']);assert not repeat or no_compile
+  result.update(expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
+  if rank==0:
+   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
+   release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
+   row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
+   write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
+  dist.barrier()
+ rt.close()
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats))
+ dist.barrier();dist.destroy_process_group()
+if __name__=='__main__':
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())

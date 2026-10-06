@@ -1,0 +1,52 @@
+{
+  "status": "FROZEN",
+  "source": "/home/hwlee/mgo-results/prefill_decode_policy_headroom_20261006/requests.json",
+  "source_sha256": "07c0e616fbd1ab2c1e883983f1cab5c15d1bcc2535c89f7544c8a89e5a22bdd1",
+  "selection": "First eligible request per distinct source conversation in frozen pool order. Target conversations0:256; warmup256:512. Smaller cell uses first64 of each. No policy search or timing selection.",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "systems": [
+    "llama.cpp-layer",
+    "DeepSpeed ZeRO-Inference",
+    "MoE-Infinity",
+    "Ours"
+  ],
+  "ours_policy": "LA_CA_NEAR",
+  "repeats": 3,
+  "cells": [
+    {
+      "cell": "R4_C30_B16_L256_O64",
+      "local_batch": 16,
+      "global_requests": 64,
+      "input_tokens": 256,
+      "output_tokens": 64,
+      "target": {
+        "path": "/home/hwlee/mgo-results/headline_r4_20261007/manifests/R4_C30_B16_L256_O64_target.json",
+        "sha256": "0d46dd800a7dc01fdff5b72e6d6013f3c4ecbc858a3b69d0bb4231bbfd652ea1"
+      },
+      "warmup": {
+        "path": "/home/hwlee/mgo-results/headline_r4_20261007/manifests/R4_C30_B16_L256_O64_warmup.json",
+        "sha256": "408d226fa965043b8c349d237bfcd3deb282ff5b854d7b22ce6ce691b48552e5"
+      }
+    },
+    {
+      "cell": "R4_C30_B64_L512_O64",
+      "local_batch": 64,
+      "global_requests": 256,
+      "input_tokens": 512,
+      "output_tokens": 64,
+      "target": {
+        "path": "/home/hwlee/mgo-results/headline_r4_20261007/manifests/R4_C30_B64_L512_O64_target.json",
+        "sha256": "573b70b95434d51d2bf04e6de68804f33caa2d5f92835bd29cb8d9a89abf1e88"
+      },
+      "warmup": {
+        "path": "/home/hwlee/mgo-results/headline_r4_20261007/manifests/R4_C30_B64_L512_O64_warmup.json",
+        "sha256": "37540720756f18390fa7c458fbdb1b69d4042ee9c12614f5b5dcb943acfd3974"
+      }
+    }
+  ]
+}
