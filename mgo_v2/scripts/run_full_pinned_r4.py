@@ -7,8 +7,11 @@ import os,time,subprocess,signal,json
 from pathlib import Path
 
 P=Path(__file__).resolve().parents[1]
-PACKET=P/'experiments/full_pinned_r4_20261006'
-ROOT=Path(os.environ.get('MGO_FULL_PINNED_ROOT','/home/hwlee/mgo-results/full_pinned_r4_20261006'))
+EXECUTOR=os.environ.get('MGO_FULL_PINNED_EXECUTOR','H0')
+assert EXECUTOR in ('H0','H1b')
+LABEL='full_pinned_h0_20261007' if EXECUTOR=='H0' else 'full_pinned_r4_20261006'
+PACKET=P/'experiments'/LABEL
+ROOT=Path(os.environ.get('MGO_FULL_PINNED_ROOT',f'/home/hwlee/mgo-results/{LABEL}'))
 OLD=Path('/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b3/C30')
 INPUT_SOURCE=OLD/'inputs_B128_H64'
 PYTHON='/home/hwlee/sub-moe/phase01/.venv/bin/python'
@@ -102,7 +105,7 @@ def main():
   env['NCCL_CUMEM_ENABLE']='0'
   state['source_commit']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip()
   cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',
-   str(P/'examples/full_pinned_r4_worker.py'),'--inputs',str(inputs),'--output',str(ROOT)]
+   str(P/'examples'/('full_pinned_h0_worker.py' if EXECUTOR=='H0' else 'full_pinned_r4_worker.py')),'--inputs',str(inputs),'--output',str(ROOT)]
   state['command']=cmd
   with (ROOT/'run.log').open('w') as log:
    proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)

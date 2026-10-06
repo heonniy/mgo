@@ -1,3 +1,10 @@
+**OWNER FINAL RUNTIME (2026-10-07): Normal/H0 + FULL_PINNED only.**
+Use experiments/full_pinned_h0_20261007/PLAN.md. Remove H1b persistent GPU
+graph buffers from final execution. Validate H0 STAGED control versus H0
+FULL_PINNED, then freeze the selected runtime if correctness/timing pass.
+H1b A/B is historical evidence only. CPU pinned cost stays 54 GiB/rank.
+Physical validation is R4/C30/B128/H64 on 0,1,4,5; C60 is not yet measured.
+
 **OWNER FULL PINNED A/B EXECUTION (2026-10-07): e7209506.**
 Run experiments/full_pinned_r4_20261006/PLAN.md on 0,1,4,5 only.
 R4/C30/B128/decode64 BR H1b; staged vs rank-private 54 GiB pinned store.
