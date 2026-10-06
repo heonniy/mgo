@@ -1,5 +1,5 @@
 """B3 mechanism-only paired summary. Never substitute capture time for TPOT."""
-import csv, json
+import csv, json, hashlib
 from pathlib import Path
 import numpy as np
 from report_b2 import export
@@ -39,6 +39,7 @@ def report(cache='C30'):
                 sources[str(cap/filename)]=sha(cap/filename)
             if case['b3_executor']=='H1':
                 corr=json.loads((cap/f'b3_correctness_rank{rank}.json').read_text());assert corr['status']=='PASS'
+                signature_list=corr['graph'].pop('signatures');corr['graph'].update(signature_count=len(signature_list),signatures_sha256=hashlib.sha256(json.dumps(signature_list,separators=(',',':')).encode()).hexdigest())
                 correctness.append(dict(cache=cache,policy=case['policy'],rank=rank,**corr))
                 signatures.append(dict(cache=cache,policy=case['policy'],rank=rank,**json.loads((cap/f'b3_signatures_rank{rank}.json').read_text())))
         summaries.append(row)
@@ -61,7 +62,7 @@ def report(cache='C30'):
         gates[policy]=dict(host_call_reduction=host,host_loop_reduction=loop,
                           counters_and_packets_equal=bool(parity),
                           diagnostic_gate=bool(host>=.70 and loop>=.40 and parity))
-    write(PACKET/'B3_GRAPH_SIGNATURES.json',dict(rows=signatures))
+    (PACKET/'B3_GRAPH_SIGNATURES.json').write_text(json.dumps(dict(rows=signatures),separators=(',',':'))+'\n')
     write(PACKET/'B3_CORRECTNESS.json',dict(status='PASS' if all(g['counters_and_packets_equal'] for g in gates.values()) else 'FAIL',rows=correctness))
     result=dict(status='DIAGNOSTIC_PASS' if all(g['diagnostic_gate'] for g in gates.values()) else 'DIAGNOSTIC_GATE_FAIL',rows=summaries,gates=gates,
                 units='ms/step; host and GPU spans overlap. Expert/NCCL residency mean across ranks; arrival spreads max-min across ranks.',
