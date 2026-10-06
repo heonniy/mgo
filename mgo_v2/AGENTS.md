@@ -1,3 +1,12 @@
+**OWNER R8 STOP / R4 COMPLETE (2026-10-06).**
+Stop further R8 validation. All four R4 decode32 cells are complete with
+33 primary policy runs. See `experiments/strict_laca_headroom_20261006/R4_COMPLETE_RESULTS.md`
+and its complete JSON/CSV records. Preserve all repeats; no latency exclusions.
+The R8/queue FAIL receipts at owner STOP are intentional cancellation, not
+evidence of a correctness or OOM failure. Do not resume the experiment queue.
+STATIC_MOD remains on hold; no extra diagnostic passes are authorized.
+This closure supersedes the older continuation instructions below.
+
 **OWNER STATIC HOLD: STATIC_MOD execution postponed.**
 The waiting static queue was terminated before any static GPU run or full
 trace replay. Keep implementation/tests; do not resume without a new owner
