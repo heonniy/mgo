@@ -1,3 +1,10 @@
+**OWNER TTFT PRIORITY (2026-10-06): c68ecc2 execution authorized in chat.**
+Read `experiments/prefill_decode_policy_headroom_20261006/PLAN.md` and
+`TTFT_EXECUTION.md`. Owner specifies primary long-context ShareGPT only,
+exact512 valid tokens, and both CA and OLD_CA alongside BR/LA. Execute the
+TTFT/prefill track, C30/C60 x B16/B128 on0,1,4,5 only. Keep B5 separate.
+The explicit execution request supersedes plan-only/no-GPU text in PLAN.md.
+
 **B5 COMPLETE (2026-10-06), including owner-added OLD_CA.**
 Read `experiments/critical_path_admission_followup_20261006/B5_RESULTS.md`
 and `B5_OLD_CA_RESULTS.md`. C30/B128/H64 H1b post-expert barrier:
