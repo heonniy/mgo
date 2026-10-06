@@ -1,3 +1,9 @@
+**OWNER DECODE32 AMENDMENT: final validation includes TTFT/TPOT/E2E.**
+Read `experiments/strict_laca_headroom_20261006/DECODE32_AMENDMENT.md`.
+Complete existing S1 unchanged, then run selected eight cells with frozen32
+strict decode steps and all three policies (BR/LA_CA_NEAR/LA). This replaces
+TTFT-only S2. Follow decode32_status.json after the intentional S1 handoff.
+
 **OWNER STRICT HEADROOM EXECUTION (2026-10-06): latest82b093db authorized.**
 Prioritize `experiments/strict_laca_headroom_20261006/PLAN.md`: C30 strict
 TTFT, R4/R8 x B16/B64 x L256/L512, BR vs LA_CA_NEAR and selected-seed LA.
