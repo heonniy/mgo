@@ -1,9 +1,9 @@
-# Partial primary checkpoint
+# Completed primary attempt2; headline stability not passed
 
-Attempt2 has completed warmup and primary repeat1; repeats2/3 are pending.
 Raw authoritative job: /home/hwlee/mgo-results/headline_r4_20261007/infinity_B16_L256_primary2
 
-Repeat1: TTFT5.197430501s, TPOT3.063612890s, E2E198.205042574s.
-All64 requests generated64 tokens. Initial expert residency0; peak charged bytes17392730112 equals the cap. EAM3072 calls,4729595 candidate submissions,325502 priority evictions,82145 lower-priority prefetch rejections. Candidate counts are submissions across layers/steps, not distinct experts or prefetch hits. No final median, stability or cross-system gain claim yet.
+All3 repeats pass manifest/count, finite logits, EAM, priority eviction, empty cache start and per-GPU expert budget checks. Median TTFT4.883946322s (range4.868799704–5.197430501), TPOT3.063612890s (3.036429477–3.070051901), E2E198.205042574s (196.163856760–198.297216084).
 
-Repeat2 also PASS: TTFT4.883946322s, TPOT3.070051901s, E2E198.297216084s. Repeat3 running. Pair TTFT difference6.22% is unstable despite TPOT0.21% and E2E0.05%. Native greedy outputs differ in325/4096 token positions across12/64 requests (earliest difference at decode token index6). Finite-output checks passed; do not claim bitwise determinism or infer the cause from timings alone. See PARTIAL_AUDIT.json.
+TTFT spread6.5945% exceeds the5% headline gate; TPOT1.1000%, E2E1.0799%. Preserve all3 samples; this is not a stable headline row and no cross-system gain is claimed. FINAL_ATTEMPT_AUDIT.json is current; PARTIAL_AUDIT.json preserves the earlier two-sample checkpoint.
+
+Native greedy outputs are not bitwise identical across repeats (see partial audit). Candidate counts are submissions across layers/steps, not distinct experts or prefetch hits. HBM is a1Hz sampled device peak; host RSS is process RSS and not uniquely owned physical RAM.
