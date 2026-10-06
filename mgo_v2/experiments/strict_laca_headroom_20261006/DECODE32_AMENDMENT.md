@@ -29,9 +29,11 @@ Final protocol:
   maximum first-two relative difference over TTFT/TPOT/E2E and all policies:
   <=2% stop;2-5% one third for all;>5% no third and instability flags. Retain
   every valid sample, ranges, mean for two / median for three.
-- Separate full diagnostic pass per policy, with prefill/decode phase labels,
-  controller time, routing/admission/layout host time, H2D/barriers and payload
-  phases. Diagnostics are not primary timings.
+- Owner follow-up removes all24 separate diagnostic passes and phase-time
+  attribution. Keep only correctness/warmup and the bounded primary repeats.
+  Result reporting reads physical-copy validation from existing measurement
+  receipts and records TTFT/TPOT/E2E, ranges and instability. Strict execution
+  barriers are retained; only extra instrumented runs are removed.
 
 Interpretation: TPOT is measured after policy-specific prefill state and is
 not an isolated decode-policy effect. A change in decode physical H2D count

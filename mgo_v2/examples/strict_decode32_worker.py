@@ -215,17 +215,11 @@ def main(a):
    assert v['status']=='PASS' and v['no_compile'] and v['tokens_match_warm']
    write(a.output/f'{label}_measure_rank{rank}.json',dict(status='PASS',**row,validation=v));rt.close();del rt;gc.collect();dist.barrier()
    rr=[json.loads((a.output/f'{label}_measure_rank{k}.json').read_text()) for k in range(world)];samples[policy].append({m:max(x[m] for x in rr) for m in METRICS})
- for policy in POLICY_NAMES:
-  write(a.output/f'phase_rank{rank}.json',dict(stage='DIAGNOSTIC',policy=policy));rt=setup(policy,'DIAGNOSTIC');row,tokens=generation(model,rt,ids,teacher);v=validation(rt,row,rank);phases=[]
-  for x in rt.breakdown:
-   e=x.pop('events');phases.append(dict(**x,forward_cuda_ms=e[0].elapsed_time(e[1]),expert_cuda_ms=e[1].elapsed_time(e[2]),return_cuda_ms=e[3].elapsed_time(e[4])))
-  assert v['status']=='PASS' and row['argmax_hash']==warm[policy]
-  write(a.output/f'{policy}_diagnostic_rank{rank}.json',dict(status='PASS',validation=v,phases=phases,primary_timing=False));rt.close();del rt;gc.collect();dist.barrier()
  if rank==0:
   estimates={p:{m:statistics.median(x[m] for x in samples[p]) for m in METRICS} for p in POLICY_NAMES}
   differences={p:{m:abs(samples[p][0][m]-samples[p][1][m])/statistics.mean([samples[p][0][m],samples[p][1][m]]) for m in METRICS} for p in POLICY_NAMES}
   unstable={p:{m:(max(x[m] for x in samples[p])-min(x[m] for x in samples[p]))/statistics.mean(x[m] for x in samples[p])>.05 for m in METRICS} for p in POLICY_NAMES}
-  write(a.output/'result.json',dict(status='PASS',spec=spec,samples=samples,estimates=estimates,relative_difference=differences,unstable=unstable,gains={p:{m:1-estimates[p][m]/estimates['BR'][m] for m in METRICS} for p in POLICY_NAMES if p!='BR'},decode_steps=32,scope='Frozen BR-generated tokens/routes, same policy for prefill and decode; cache carryover retained. First output from prefill plus32 subsequent decode outputs. E2E/TPOT are wall time; per-metric maximum across ranks.'))
+  write(a.output/'result.json',dict(status='PASS',spec=spec,samples=samples,estimates=estimates,relative_difference=differences,unstable=unstable,gains={p:{m:1-estimates[p][m]/estimates['BR'][m] for m in METRICS} for p in POLICY_NAMES if p!='BR'},decode_steps=32,diagnostic_passes=0,scope='Frozen BR-generated tokens/routes, same policy for prefill and decode; cache carryover retained. First output from prefill plus32 subsequent decode outputs. E2E/TPOT are wall time; per-metric maximum across ranks.'))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--specs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())

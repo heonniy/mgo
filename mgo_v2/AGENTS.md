@@ -1,3 +1,7 @@
+**OWNER: omit extra diagnostic passes in decode32 final validation.**
+Do not run the24 per-policy phase diagnostic passes. Keep strict barriers,
+correctness/warmup, bounded TTFT/TPOT/E2E repeats, result report and commits.
+
 **OWNER DECODE32 AMENDMENT: final validation includes TTFT/TPOT/E2E.**
 Read `experiments/strict_laca_headroom_20261006/DECODE32_AMENDMENT.md`.
 Complete existing S1 unchanged, then run selected eight cells with frozen32
