@@ -40,6 +40,11 @@ def main():
  env=dict(os.environ,PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{P}:{P/"scripts"}:{P/"examples"}',
   CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',
   OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
+ # Use the previously established IPC baseline; NCCL is only for barriers.
+ for key in list(env):
+  if key.startswith('NCCL_'):del env[key]
+ env.update(NCCL_CUMEM_ENABLE='0',NCCL_DEBUG='INFO',NCCL_DEBUG_SUBSYS='INIT,GRAPH',NCCL_DEBUG_FILE=str(ROOT/'nccl-%h-%p.log'))
+ state['transport_env']={k:v for k,v in env.items() if k.startswith('NCCL_')}
  cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',
   str(P/'examples/quick_fetch_path_worker.py'),'--output',str(ROOT)]
  state['command']=cmd;write(ROOT/'status.json',state)

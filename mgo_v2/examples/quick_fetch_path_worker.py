@@ -116,7 +116,9 @@ def main(a):
  physical=[int(x) for x in os.environ['MGO_V2_PHYSICAL_GPUS'].split(',')];assert physical==GPUS
  assert int(os.environ['CUDA_VISIBLE_DEVICES'])==GPUS[rank],(rank,os.environ['CUDA_VISIBLE_DEVICES'])
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.20)
+ print(f'rank={rank} initializing NCCL',flush=True)
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
+ print(f'rank={rank} NCCL ready',flush=True)
  # Match runtime CPU placement if topology receipt exists.
  topo=Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json')
  cpus=None
@@ -130,8 +132,10 @@ def main(a):
  cache=torch.empty((MAX_BURST,EB//2),dtype=torch.bfloat16,device='cuda')
  # Touch all direct-pinned pages before timing.
  _=float(direct_pool[:,::4096].float().sum())
+ print(f'rank={rank} inputs ready',flush=True)
  rows=[]
  for condition,active_ranks in CONDITIONS:
+  if rank==0:print(f'condition={condition}',flush=True)
   active=rank in active_ranks
   for n in BURSTS:
    for mode in ('current_staging','direct_pinned'):
