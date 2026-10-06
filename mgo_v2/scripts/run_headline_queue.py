@@ -17,7 +17,9 @@ SMALL = 'R4_C30_B16_L256_O64'
 LARGE = 'R4_C30_B64_L512_O64'
 
 
-def jobs(after, recovery=False, deepspeed_confirmation=False):
+def jobs(after, recovery=False, deepspeed_confirmation=False, deepspeed_large_confirmation=False):
+    if deepspeed_large_confirmation:
+        return [('deepspeed_B64_L512_confirmation1', 'DeepSpeed-ZeRO-Inference', 'deepspeed', LARGE, 'base-env', 4, False, None)]
     if deepspeed_confirmation:
         return [('deepspeed_B16_L256_affinity1', 'DeepSpeed-ZeRO-Inference', 'deepspeed', SMALL, 'base-env', 4, False, None)]
     if recovery:
@@ -44,7 +46,8 @@ def state(label):
 
 
 def main(a):
-    queue = jobs(a.after, a.recovery, a.deepspeed_confirmation)
+    assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation]) <= 1
+    queue = jobs(a.after, a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation)
     if a.dry_run:
         print(json.dumps(queue, indent=2))
         return
@@ -65,7 +68,7 @@ def main(a):
         prior = state(a.after)
         if prior is None:
             # A recovery queue can wait for the last job of the active queue.
-            assert a.recovery or a.deepspeed_confirmation, 'the predecessor must already exist'
+            assert a.recovery or a.deepspeed_confirmation or a.deepspeed_large_confirmation, 'the predecessor must already exist'
             time.sleep(5)
             continue
         if prior['status'] in ('PASS', 'FAIL'):
@@ -107,4 +110,5 @@ if __name__ == '__main__':
     p.add_argument('--dry-run', action='store_true')
     p.add_argument('--recovery', action='store_true')
     p.add_argument('--deepspeed-confirmation', action='store_true')
+    p.add_argument('--deepspeed-large-confirmation', action='store_true')
     main(p.parse_args())
