@@ -14,7 +14,7 @@ def main():
  try:
   # H1 first resolves feasibility/correctness before spending new H0 captures.
   for mode,policy in [('H1','BR'),('H0','FCA'),('H1','FCA'),('H0','BR')]:
-   stage=f'B3_C30_{mode}';label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H8';out=base/label
+   stage=f'B3_C30_NODE1_{mode}';label=f'{stage}_V3_OPT_PF_OVERLAP_{policy}_B128_H8';out=base/label
    if (out/'status.json').exists():
     assert json.loads((out/'status.json').read_text())['status']=='PASS','preserve failed attempts'
    else:
