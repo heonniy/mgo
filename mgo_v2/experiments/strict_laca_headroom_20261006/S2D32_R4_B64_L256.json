@@ -1,0 +1,581 @@
+{
+  "status": "PASS",
+  "spec": {
+    "world": 4,
+    "batch": 64,
+    "context": 256,
+    "sample_seed": 181,
+    "dp_seed": 28,
+    "br_seed": 23,
+    "load_proxy_gain": 0.15072462820294819,
+    "remote_route_proxy_gain": 0.03216879370079806,
+    "BR": {
+      "sum_max_rank_rows": 7645300,
+      "remote_expert_routes": 18896108
+    },
+    "candidate": {
+      "sum_max_rank_rows": 6492965,
+      "remote_expert_routes": 18288243
+    },
+    "inputs": "/home/hwlee/mgo-results/strict_laca_headroom_20261006/inputs/R4_B64_L256_s181_d28_r23",
+    "order": 1
+  },
+  "world": 4,
+  "gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "started_unix": 1791293916.0153494,
+  "initial": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 36
+      },
+      {
+        "gpu": 1,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 32
+      },
+      {
+        "gpu": 4,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 38
+      },
+      {
+        "gpu": 5,
+        "used_mib": 4,
+        "free_mib": 81087,
+        "temperature_c": 33
+      }
+    ],
+    "host_available_bytes": 1991585619968,
+    "unix": 1791293916.333504,
+    "foreign_pids": [],
+    "collection_seconds": 0.3232686286792159
+  },
+  "source_commit": "fc595dc4d2a4ab6a452549ae52870080ecce9d96",
+  "code": {
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/single_planner.py": "9056d0669306e121b0f36b1ca374147e5c4482b216cc5ff2c1404009cef71e1c",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/compact_metadata.py": "527043d17bb30c53eec5e9dbebef22a49a880ebac1cf3f232f53ef1fa9ab8c70",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/active_peer.py": "a33334b2f2b55a37d5b53e9fa8178c53ccea80fc681297066567b1373a7ddfa3",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/__init__.py": "2fbb9e985e66e628bfc977a41df92df0bb089228f7646d0a534c3bf46e0205ef",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/decode_runtime.py": "20a827f5b2e4c75c0183f3fcfb2d77d532904c69e8c71ce7caeb435d3bc3f64b",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/model_loader.py": "87cc2850dc4ca63410f05a31c065c5cb392087acd71a435904408514e5c1d4d3",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/runtime.py": "3bb5a4017e604a173c8001cebc2d45f5c34f612c850923d704079bf463a35968",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/affinity.py": "425aa93bb3e94275769f547e9a31dcc34adde5c244a155b1619cc970e41e9e6c",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/numa.py": "c697e0e6c57e1971271e7e15c607b3228c7d95a5154349ab1fc0e73f8fff416e",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/controller_components.py": "96d7979d0edb19f7f31410509f79a8ea99827a36c23ee12ff2a91542fa30f79c",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/ready_compute.py": "6f8f2fe4ca34c995483c5483334d0d09e8571f42ef1be243212df49e89fe636b",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/types.py": "cebfb6c461c7567aa19c01d2bf0c2733e6d69b0fb32ca88f67de2a156396ec40",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/substitution.py": "9e5636d9a24f8f062343f97fd23ed9a6c0459ce6a8fa0bdfc24916adb9803690",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/staging_cpu_team.py": "40c2a8a17aa75ea7d85ff6f9aac074974a2e922d02f014911fdc6b35679dcb30",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/bootstrap.py": "8c9d2da263774fdbc302d10236dc0a04bf44c9d87d73c93b324f3001e8d7e01d",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/controller_optimized.py": "3982e7a7e54fbda0c0af1b823fd82af147005d1587d2d19cef3d9ca63c2abaa1",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/controller_plan_codec.py": "13bd94f7ad92ee8ffca74a8257da68056d0fb3b81b2762912760f75e1e131b38",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/fanout_admission.py": "17e75ace440c9201b6da7d224b63d894961a1d0e87d7ec15b851c59843ebac86",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/profiling.py": "09eaa12e21f330bfae7595795284314e94a8d46d10659269fc458f344e88afd9",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/executor.py": "04166e26831b5d8ca995c4c1d57fbd289a4c66b0030b531bd5cc2e42fc3bd43b",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/grouped_expert.py": "1301c8a57046dbebb34c8a134eb7770a2f9980461d2ff6048003274c8bdaed59",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/phase_timing.py": "0189fc1a2e508caa865782e2d678d1766e09d79b3ab98e9166ac6b57fe9efca1",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/coalesced_return.py": "790dce47d8a993086bc706497d730be66265621cfee8abfa235d65d9f378882e",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/graph_expert.py": "164450cdb6efdf69cabb334d7dd6399282332a6ba43ae1d0cac7b0de4f4c658f",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/eviction.py": "480644bf21c559a269b67a3619970f37f06246a44f82752706602379ace0ca37",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/controller_diagnostics.py": "99897080b1ccfbafbb94e6969f8fa924f1a1aa3dce7a6d773ab0731dd4e1996a",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/rank_oracle.py": "a6995879d072dc11963925e4ce8cada340d6d0ada6af690bac9974f834e41cf7",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/native.py": "1af54b48b35d48cc1c1c2e2007a265a2bb9cb9ebf9a9283039d9493fe29f1977",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/prefetch.py": "6528860a5892a2621767fabf427c471bd1a0e3be0b14f4e93c2b903bd93469a6",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/controller.py": "5c91ed1c5945fa79e591aca92c7042545b7a7b4b7777b7a3a0373804d2c4dd8c",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/admission.py": "116a1cdbcbf9fd0c717ca7df9b8fae22e935b8feb202148772fe9f0f3188ab7d",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/fused_transport.py": "773bebbdcb88bf5ae0fb4ecb332cee8f60757e66634950b402bb1cdf7cf15674",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/unique_combine.py": "97f0a17187348a67957d999dd1f5c02f19c194baa12123f67ef760f851a8b00d",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/metrics.py": "8ab32c7cb8746616401a589d72f96c3d5065d51b064389fa2ee8370167f998a9",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/communicator.py": "85e913209e05f12f82a65673473d83757b439fc1c8581a198ec849e00c6895fa",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/predictor.py": "015d1102081ef597b20ff24b9b70a4fbf8e03ddfd922d29038b4c44a13b06d03",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/pinned_h2d.py": "0736ecd7f5b13241f59feb5f5e15fd9794c5a17895768f7c10ab37d0f60a1691",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/qwen3_integration.py": "0390b8e2a790bcd2cf5dd2abd2fe6ceb36c1fcdbd65eb9564393d6043cddc8b4",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/selected_runtime.py": "e3b83826c30f85cb669800413b104624eb5a6ea6b9d1195ccde855c287f5e098",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/config.py": "7d5434264aa775a481f6bc7b850bcf591122880fba2416926e4d5223248a9c49",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/mgo_v2/cache.py": "45abe19a3b19972e0ead86fa6fdb7b15e97d81a2c021ca3c4e878f795d74dfeb",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/examples/strict_decode32_worker.py": "523f432eb04cf4b855ac231fbb0c29873e334ebf376c0f3acf8c2a9158ddf3f6",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/examples/la_physical_worker.py": "496b6718c0f81e56e62af5fef47ab6568f48b321b9563f8f2c04d86189d021a3",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/env_offload_policy.py": "5821f2fae1306132781eb8bfc35ce37b26b9e0890a8540814988ae6d0ea6e20d",
+    "/home/hwlee/mgo-policy-regime/mgo_v2/scripts/la_placement.py": "af96dc44a5546b2d97192bc82dcb34c4df67b18bae6f183284a6d4ac0531b436"
+  },
+  "pid": 2523993,
+  "boundaries": [
+    {
+      "key": "LA_r1",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844555038720,
+        "unix": 1791294327.7881167,
+        "rss_bytes": 383536099328,
+        "foreign_pids": [],
+        "collection_seconds": 0.4537646807730198
+      }
+    },
+    {
+      "key": "LA_CA_NEAR_r1",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844575932416,
+        "unix": 1791294419.3422885,
+        "rss_bytes": 383536197632,
+        "foreign_pids": [],
+        "collection_seconds": 0.4479502234607935
+      }
+    },
+    {
+      "key": "BR_r1",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844584910848,
+        "unix": 1791294510.9337163,
+        "rss_bytes": 383533330432,
+        "foreign_pids": [],
+        "collection_seconds": 0.528085745871067
+      }
+    },
+    {
+      "key": "BR_r2",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844558819328,
+        "unix": 1791294603.5206265,
+        "rss_bytes": 383541829632,
+        "foreign_pids": [],
+        "collection_seconds": 0.4441153723746538
+      }
+    },
+    {
+      "key": "LA_CA_NEAR_r2",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844551774208,
+        "unix": 1791294694.2756898,
+        "rss_bytes": 383543332864,
+        "foreign_pids": [],
+        "collection_seconds": 0.44949578400701284
+      }
+    },
+    {
+      "key": "LA_r2",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844529451008,
+        "unix": 1791294785.8270574,
+        "rss_bytes": 383543214080,
+        "foreign_pids": [],
+        "collection_seconds": 0.44435092620551586
+      }
+    },
+    {
+      "key": "LA_r3",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844511428608,
+        "unix": 1791294877.3639476,
+        "rss_bytes": 383551172608,
+        "foreign_pids": [],
+        "collection_seconds": 0.4758756970986724
+      }
+    },
+    {
+      "key": "LA_CA_NEAR_r3",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844548550656,
+        "unix": 1791294969.007766,
+        "rss_bytes": 383543099392,
+        "foreign_pids": [],
+        "collection_seconds": 0.5016224049031734
+      }
+    },
+    {
+      "key": "BR_r3",
+      "resources": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 20343,
+            "free_mib": 60747,
+            "temperature_c": 38
+          },
+          {
+            "gpu": 1,
+            "used_mib": 21469,
+            "free_mib": 59621,
+            "temperature_c": 34
+          },
+          {
+            "gpu": 4,
+            "used_mib": 23433,
+            "free_mib": 57657,
+            "temperature_c": 40
+          },
+          {
+            "gpu": 5,
+            "used_mib": 20709,
+            "free_mib": 60381,
+            "temperature_c": 35
+          }
+        ],
+        "host_available_bytes": 1844523216896,
+        "unix": 1791295060.567634,
+        "rss_bytes": 383574261760,
+        "foreign_pids": [],
+        "collection_seconds": 0.4472160506993532
+      }
+    }
+  ],
+  "result": {
+    "status": "PASS",
+    "spec": {
+      "world": 4,
+      "batch": 64,
+      "context": 256,
+      "sample_seed": 181,
+      "dp_seed": 28,
+      "br_seed": 23,
+      "load_proxy_gain": 0.15072462820294819,
+      "remote_route_proxy_gain": 0.03216879370079806,
+      "BR": {
+        "sum_max_rank_rows": 7645300,
+        "remote_expert_routes": 18896108
+      },
+      "candidate": {
+        "sum_max_rank_rows": 6492965,
+        "remote_expert_routes": 18288243
+      },
+      "inputs": "/home/hwlee/mgo-results/strict_laca_headroom_20261006/inputs/R4_B64_L256_s181_d28_r23",
+      "order": 1
+    },
+    "samples": {
+      "BR": [
+        {
+          "TTFT": 14.196074644103646,
+          "TPOT": 2.3529651070712134,
+          "E2E": 89.49002806283534
+        },
+        {
+          "TTFT": 14.014162798412144,
+          "TPOT": 2.342918468726566,
+          "E2E": 88.98641183506697
+        },
+        {
+          "TTFT": 14.024858474731445,
+          "TPOT": 2.341354992327979,
+          "E2E": 88.9481063047424
+        }
+      ],
+      "LA_CA_NEAR": [
+        {
+          "TTFT": 13.898165374994278,
+          "TPOT": 2.32420760957757,
+          "E2E": 88.27191546652466
+        },
+        {
+          "TTFT": 14.01750645134598,
+          "TPOT": 2.3214793911902234,
+          "E2E": 88.30361886601895
+        },
+        {
+          "TTFT": 13.584837746806443,
+          "TPOT": 2.328575016290415,
+          "E2E": 88.09394541475922
+        }
+      ],
+      "LA": [
+        {
+          "TTFT": 14.20457876380533,
+          "TPOT": 2.332975264493143,
+          "E2E": 88.85871867649257
+        },
+        {
+          "TTFT": 13.696616432629526,
+          "TPOT": 2.3279152562608942,
+          "E2E": 88.18898320756853
+        },
+        {
+          "TTFT": 14.251210978254676,
+          "TPOT": 2.3308566613995936,
+          "E2E": 88.83761536423117
+        }
+      ]
+    },
+    "estimates": {
+      "BR": {
+        "TTFT": 14.024858474731445,
+        "TPOT": 2.342918468726566,
+        "E2E": 88.98641183506697
+      },
+      "LA_CA_NEAR": {
+        "TTFT": 13.898165374994278,
+        "TPOT": 2.32420760957757,
+        "E2E": 88.27191546652466
+      },
+      "LA": {
+        "TTFT": 14.20457876380533,
+        "TPOT": 2.3308566613995936,
+        "E2E": 88.83761536423117
+      }
+    },
+    "relative_difference": {
+      "BR": {
+        "TTFT": 0.012896867391647108,
+        "TPOT": 0.004278912874427705,
+        "E2E": 0.00564350373703617
+      },
+      "LA_CA_NEAR": {
+        "TTFT": 0.00855011314748987,
+        "TPOT": 0.001174516658955208,
+        "E2E": 0.0003590916444243463
+      },
+      "LA": {
+        "TTFT": 0.03641151051770788,
+        "TPOT": 0.0021712624270910103,
+        "E2E": 0.00756559347336368
+      }
+    },
+    "unstable": {
+      "BR": {
+        "TTFT": false,
+        "TPOT": false,
+        "E2E": false
+      },
+      "LA_CA_NEAR": {
+        "TTFT": false,
+        "TPOT": false,
+        "E2E": false
+      },
+      "LA": {
+        "TTFT": false,
+        "TPOT": false,
+        "E2E": false
+      }
+    },
+    "gains": {
+      "LA_CA_NEAR": {
+        "TTFT": 0.00903346725141152,
+        "TPOT": 0.007986133277256502,
+        "E2E": 0.008029274962413457
+      },
+      "LA": {
+        "TTFT": -0.012814410170176593,
+        "TPOT": 0.0051481976381058114,
+        "E2E": 0.001672125752318121
+      }
+    },
+    "decode_steps": 32,
+    "diagnostic_passes": 0,
+    "scope": "Frozen BR-generated tokens/routes, same policy for prefill and decode; cache carryover retained. First output from prefill plus32 subsequent decode outputs. E2E/TPOT are wall time; per-metric maximum across ranks."
+  },
+  "finished_unix": 1791295161.15178
+}
