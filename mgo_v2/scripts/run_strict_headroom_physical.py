@@ -7,6 +7,8 @@ import os,time,subprocess,signal,json
 from pathlib import Path
 from strict_headroom_common import *
 import run_timing_stability as h
+from strict_headroom_guard import guard,cooldown
+from run_strict_headroom_pipeline import publish
 
 def gpu_list(world):
     if world==4:return R4_GPUS
@@ -28,12 +30,15 @@ def run_pair(label,row,candidate,stage):
         workload_seed=int(row['sample_seed']),dp_seed=int(row['dp_seed']),placement_seed=int(row['br_seed']),
         order=(int(row['br_seed'])+int(row['dp_seed']))&1,inputs=str(input_path(row)))
     write(out/'specs.json',[spec])
-    env=h.env_for('env1');env.update(PYTHONPATH=f'{P}:{P/"scripts"}:{P/"examples"}',
+    env=h.env_for('env1');env.update(
         CUDA_VISIBLE_DEVICES=','.join(map(str,gpus)),MGO_V2_PHYSICAL_GPUS=','.join(map(str,gpus)))
     cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',
         str(P/'examples/ttft_worker.py'),'--specs',str(out/'specs.json'),'--output',str(out),'--stage',stage]
     state=dict(status='RUNNING',label=label,world=world,gpus=gpus,spec=spec,started_unix=time.time(),command=cmd)
-    proc=None;released=set();active=None
+    state['source_commit']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip()
+    state['source_hashes']={str(p.relative_to(P)):sha(p) for p in list((P/'mgo_v2').glob('*.py'))+[P/'examples/ttft_worker.py',P/'examples/la_physical_worker.py',P/'scripts/env_offload_policy.py',P/'scripts/la_placement.py']}
+    state['initial']=cooldown(gpus)
+    proc=None;released=set();active=None;last_guard=0
     with (out/'run.log').open('w') as log:
         proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         state['pid']=proc.pid;write(out/'status.json',state)
@@ -46,10 +51,15 @@ def run_pair(label,row,candidate,stage):
                 if active is None and (out/'boundary.json').exists():
                     boundary=json.loads((out/'boundary.json').read_text());key=boundary['key']
                     if key not in released and all((out/f'{key}_ready_rank{r}.json').exists() for r in range(world)):
+                        state.setdefault('boundaries',[]).append(dict(key=key,resources=guard(gpus,proc.pid)))
+                        write(out/'status.json',state)
                         (out/f'{key}_GO').touch();released.add(key);active=key
+                if active is None and time.monotonic()-last_guard>30:
+                    guard(gpus,proc.pid);last_guard=time.monotonic()
                 time.sleep(1)
             assert proc.returncode==0,str(out/'run.log')
             result=json.loads((out/'result.json').read_text());assert result['status']=='PASS'
+            assert all(sha(P/p)==digest for p,digest in state['source_hashes'].items()), 'runtime changed during measurement'
             state.update(status='PASS',result=result)
         except BaseException as exc:
             state.update(status='FAIL',error=repr(exc))
@@ -60,6 +70,8 @@ def run_pair(label,row,candidate,stage):
             raise
         finally:
             state['finished_unix']=time.time();write(out/'status.json',state)
+            receipt=PACKET/(label+'.json');write(receipt,state)
+            publish('strict TTFT: '+label+' '+state['status'],[receipt])
     return state
 
 def main():
@@ -75,6 +87,7 @@ def main():
         for i,row in enumerate(cell):
             label=f'S1_R{world}_B{batch}_L{context}_{i}'
             result=run_pair(label,row,'LA_CA_NEAR','S1')
+            assert result['result']['results'], 'cross-policy token mismatch; preserve invalid pair and stop'
             rr=result['result']['results'][0];physical.append(dict(row=row,gain=rr['gain'],result=rr))
         winner=max(physical,key=lambda x:x['gain']);selected.append(winner['row'])
         summary.append(dict(world=world,batch=batch,context=context,status='S1_PASS',

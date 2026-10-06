@@ -1,9 +1,11 @@
 """Prepare exact strict-phase BR/LA/LA_CA_NEAR physical inputs for S0 triples."""
 import os
 os.environ['CUDA_VISIBLE_DEVICES']=''
+for key in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','NUMBA_NUM_THREADS'):os.environ[key]='1'
 import hashlib,json
 import numpy as np
 from strict_headroom_common import *
+import mgo_v2  # Initialize package before legacy controller imports.
 from env_offload_policy import Policy
 
 EB=9437184
@@ -12,6 +14,8 @@ POLICIES=(('BR',0),('LA',4),('LA_CA_NEAR',7))
 def array_hash(x):return hashlib.sha256(np.ascontiguousarray(x).tobytes()).hexdigest()
 
 def prepare(row):
+    import psutil
+    assert psutil.virtual_memory().available>256*2**30, 'host memory guard'
     world=int(row['world']);batch=int(row['batch']);context=int(row['context'])
     sample=int(row['sample_seed']);dp=int(row['dp_seed']);br=int(row['br_seed'])
     label=f'R{world}_B{batch}_L{context}_s{sample}_d{dp}_r{br}'
@@ -69,8 +73,10 @@ def prepare(row):
 def main():
     rows=json.loads((PACKET/'STRICT_HEADROOM_S0.json').read_text())['rows']
     paths=[]
-    for row in rows:
-        p=prepare(row);paths.append(p);print('prepared',p,flush=True)
+    import concurrent.futures,multiprocessing
+    with concurrent.futures.ProcessPoolExecutor(max_workers=8,mp_context=multiprocessing.get_context('spawn')) as pool:
+        for p in pool.map(prepare,rows):
+            paths.append(p);print('prepared',p,flush=True)
     write(PACKET/'STRICT_HEADROOM_INPUTS.json',dict(status='PASS',count=len(paths),paths=paths))
 
 if __name__=='__main__':main()

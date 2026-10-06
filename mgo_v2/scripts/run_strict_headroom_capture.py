@@ -2,6 +2,7 @@
 import os,time,subprocess,signal,json
 from strict_headroom_common import *
 import run_timing_stability as h
+from strict_headroom_guard import cooldown
 
 def main():
     ROOT.mkdir(parents=True,exist_ok=True)
@@ -10,7 +11,7 @@ def main():
     workers=[];logs=[];state=dict(status='RUNNING',physical_gpus=R4_GPUS,started_unix=time.time(),workers=[])
     try:
         # This runner never launches work on 2,3,6,7.
-        snap=h.sample();snap['gpus']=[g for g in snap['gpus'] if g['gpu'] in R4_GPUS]
+        snap=cooldown(R4_GPUS)
         state['initial']=snap;write(status,state)
         envbase=dict(os.environ,PYTHONPATH=f'{P}:{P/"scripts"}:{P/"examples"}')
         for gpu in R4_GPUS:

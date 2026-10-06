@@ -12,6 +12,7 @@ import numpy as np
 from numba import njit
 from strict_headroom_common import *
 from br_carep_cpu import balanced_assignment
+import mgo_v2  # Initialize package before legacy controller imports.
 from env_offload_policy import seed_rng
 from la_placement import load_locality_near_assignment
 
@@ -105,43 +106,50 @@ def evaluate_dp(demands,world):
             br_crit[seed]+=mx;br_remote[seed]+=remote
     return cand_crit,cand_remote,br_crit,br_remote
 
+def screen_cell(spec):
+    world,batch,context=spec
+    hist=hist_for(context)
+    n=world*batch;assert n<=512
+    potentials=[]
+    for sample_seed in range(SAMPLE_SEEDS):
+        ids=sample_ids(world,batch,sample_seed)
+        potentials.append((sample_score(hist,ids),sample_seed))
+    potentials.sort(reverse=True);kept=[s for _,s in potentials[:KEEP_SAMPLES]]
+    candidates=[]
+    started=time.time()
+    for sample_seed in kept:
+        ids=sample_ids(world,batch,sample_seed)
+        for dp_seed in range(DP_SEEDS):
+            shuffled=np.random.default_rng(dp_seed).permutation(ids).reshape(world,batch)
+            demands=demands_for(hist,shuffled)
+            cc,cr,bc,br=evaluate_dp(demands,world)
+            for br_seed in range(BR_SEEDS):
+                load_gain=1-float(cc)/float(bc[br_seed])
+                comm_gain=1-float(cr)/float(br[br_seed]) if br[br_seed] else 0.0
+                candidates.append(dict(world=world,batch=batch,context=context,
+                    sample_seed=sample_seed,dp_seed=dp_seed,br_seed=br_seed,
+                    load_proxy_gain=load_gain,remote_route_proxy_gain=comm_gain,
+                    BR=dict(sum_max_rank_rows=int(bc[br_seed]),remote_expert_routes=int(br[br_seed])),
+                    candidate=dict(sum_max_rank_rows=int(cc),remote_expert_routes=int(cr))))
+    candidates.sort(key=lambda x:(-x['load_proxy_gain'],-x['remote_route_proxy_gain'],
+        x['sample_seed'],x['dp_seed'],x['br_seed']))
+    top=candidates[:KEEP_TRIPLES]
+    summary=dict(world=world,batch=batch,context=context,retained_sample_seeds=kept,best=top[0],seconds=time.time()-started)
+    write(ROOT/f'screen_R{world}_B{batch}_L{context}.json',dict(status='PASS',rows=top,cell=summary))
+    return top,summary
+
 def main():
     ROOT.mkdir(parents=True,exist_ok=True);ensure_l256_pool()
-    # Compile the hot functions once before the large search.
     dummy=np.ones((48,128,4),np.int64);evaluate_dp(dummy,4)
+    for context in CONTEXTS:hist_for(context)
+    import concurrent.futures,multiprocessing
     rows=[];cell_summary=[]
-    for context in CONTEXTS:
-        hist=hist_for(context)
-        for world in WORLDS:
-            for batch in BATCHES:
-                n=world*batch;assert n<=512
-                potentials=[]
-                for sample_seed in range(SAMPLE_SEEDS):
-                    ids=sample_ids(world,batch,sample_seed)
-                    potentials.append((sample_score(hist,ids),sample_seed))
-                potentials.sort(reverse=True);kept=[s for _,s in potentials[:KEEP_SAMPLES]]
-                candidates=[]
-                started=time.time()
-                for sample_seed in kept:
-                    ids=sample_ids(world,batch,sample_seed)
-                    for dp_seed in range(DP_SEEDS):
-                        shuffled=np.random.default_rng(dp_seed).permutation(ids).reshape(world,batch)
-                        demands=demands_for(hist,shuffled)
-                        cc,cr,bc,br=evaluate_dp(demands,world)
-                        for br_seed in range(BR_SEEDS):
-                            load_gain=1-float(cc)/float(bc[br_seed])
-                            comm_gain=1-float(cr)/float(br[br_seed]) if br[br_seed] else 0.0
-                            candidates.append(dict(world=world,batch=batch,context=context,
-                                sample_seed=sample_seed,dp_seed=dp_seed,br_seed=br_seed,
-                                load_proxy_gain=load_gain,remote_route_proxy_gain=comm_gain,
-                                BR=dict(sum_max_rank_rows=int(bc[br_seed]),remote_expert_routes=int(br[br_seed])),
-                                candidate=dict(sum_max_rank_rows=int(cc),remote_expert_routes=int(cr))))
-                candidates.sort(key=lambda x:(-x['load_proxy_gain'],-x['remote_route_proxy_gain'],
-                    x['sample_seed'],x['dp_seed'],x['br_seed']))
-                top=candidates[:KEEP_TRIPLES];rows.extend(top)
-                cell_summary.append(dict(world=world,batch=batch,context=context,
-                    retained_sample_seeds=kept,best=top[0],seconds=time.time()-started))
-                write(ROOT/'screen_progress.json',dict(status='RUNNING',rows=rows,cells=cell_summary))
+    specs=[(w,b,c) for w in WORLDS for b in BATCHES for c in CONTEXTS]
+    with concurrent.futures.ProcessPoolExecutor(max_workers=8,mp_context=multiprocessing.get_context('spawn')) as pool:
+        for top,summary in pool.map(screen_cell,specs):
+            rows.extend(top);cell_summary.append(summary)
+            write(ROOT/'screen_progress.json',dict(status='RUNNING',rows=rows,cells=cell_summary))
+            print('screen cells complete',len(cell_summary),'/8',flush=True)
     out=dict(status='PASS',purpose='maximum BR-adversarial headroom; NOT average-case',
         sample_seed_range=[0,SAMPLE_SEEDS-1],dp_seed_range=[0,DP_SEEDS-1],br_seed_range=[0,BR_SEEDS-1],
         ranking='maximize critical-rank expert-row reduction vs BR, then remote expert-route reduction',

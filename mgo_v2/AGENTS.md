@@ -1,3 +1,12 @@
+**OWNER STRICT HEADROOM EXECUTION (2026-10-06): latest82b093db authorized.**
+Prioritize `experiments/strict_laca_headroom_20261006/PLAN.md`: C30 strict
+TTFT, R4/R8 x B16/B64 x L256/L512, BR vs LA_CA_NEAR and selected-seed LA.
+Owner explicitly authorizes physical GPUs0..7 for R8 on this server,
+superseding earlier R8 restrictions. R4/capture remains0,1,4,5. Check foreign
+occupancy and memory before launch; never kill unrelated processes.
+Old non-strict TTFT remains closed. Decode support is not a request to expand
+the primary TTFT matrix. Preserve bounded repeats and commit checkpoints.
+
 **OWNER TTFT STOP (2026-10-06): experiment closed at owner request.**
 Read `experiments/prefill_decode_policy_headroom_20261006/TTFT_STOPPED_RESULTS.md`.
 C30/B16, C60/B16 and C30/B128 completed S1 (24 pairs each). C60/B128

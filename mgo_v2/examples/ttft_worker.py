@@ -21,6 +21,17 @@ class PrefillRuntime(LiveRuntime):
    remote=sum(send)-send[self.rank];self.actual_wire_bytes+=remote*x[0].numel()*x.element_size() if len(x) else 0
    self.actual_peer_bytes+=remote*activation_row_bytes;self.actual_collective_calls+=1
   return y
+ def plan_event(self,layer,selected,weights,probs):
+  if self.args.phase!='DIAGNOSTIC':return super().plan_event(layer,selected,weights,probs)
+  original=self.policy.apply
+  def measured_apply(*args,**kwargs):
+   begin=time.perf_counter_ns()
+   result=original(*args,**kwargs)
+   self.controller_wall_ms=(time.perf_counter_ns()-begin)/1e6
+   return result
+  self.policy.apply=measured_apply
+  try:return super().plan_event(layer,selected,weights,probs)
+  finally:self.policy.apply=original
  def apply_fetches(self,e):
   for key,slot,victim,rep in e['fetches']:
    assert not rep and self.keys[slot]==victim
@@ -39,7 +50,10 @@ class PrefillRuntime(LiveRuntime):
  def execute(self,layer,hidden,selected,weights,probs):
   """Strict characterization substrate: no H2D/compute/communication overlap."""
   assert 0<=self.index<48 and layer==self.index
-  diagnostic=self.args.phase=='DIAGNOSTIC';e=self.plan_event(layer,selected,weights,probs)
+  diagnostic=self.args.phase=='DIAGNOSTIC'
+  plan_start=time.perf_counter_ns() if diagnostic else None
+  e=self.plan_event(layer,selected,weights,probs)
+  plan_ms=(time.perf_counter_ns()-plan_start)/1e6 if diagnostic else None
   self.layer_fetch_counts.append(len(e['fetches']));self.layer_rows.append(sum(len(g[1]) for g in e['groups']))
   dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
   fetch_begin=time.perf_counter_ns() if diagnostic else None
@@ -53,7 +67,7 @@ class PrefillRuntime(LiveRuntime):
   fetch_aligned=time.perf_counter_ns() if diagnostic else None
   self.h2d_global_barriers+=1
 
-  events=[torch.cuda.Event(enable_timing=True) for _ in range(4)] if diagnostic else None
+  events=[torch.cuda.Event(enable_timing=True) for _ in range(5)] if diagnostic else None
   if events:events[0].record()
   with nvtx_phase('moe.prefill_forward_a2a'):packet=self.dispatch(hidden,dense,e)
   if events:events[1].record()
@@ -66,9 +80,11 @@ class PrefillRuntime(LiveRuntime):
    dist.barrier();torch.cuda.current_stream().synchronize()
   compute_aligned=time.perf_counter_ns() if diagnostic else None
   self.post_expert_barriers+=1
+  if events:events[3].record()
   with nvtx_phase('moe.prefill_return_a2a'):result=self.combine(hidden,values,e,packet[0])
   if events:
-   events[3].record();self.breakdown.append(dict(
+   events[4].record();self.breakdown.append(dict(
+    routing_admission_layout_ms=plan_ms,controller_wall_ms=self.controller_wall_ms,
     layer=layer,
     h2d_local_ms=(fetch_ready-fetch_begin)/1e6,
     h2d_barrier_ms=(fetch_aligned-fetch_ready)/1e6,
@@ -148,7 +164,7 @@ def main(a):
     rt=setup(policy,'DIAGNOSTIC');row=run_prefill(model,rt,ids,mask);validation=check(rt,row,rank)
     phases=[]
     for x in rt.breakdown:
-     e=x.pop('events');phases.append(dict(**x,forward_cuda_ms=e[0].elapsed_time(e[1]),expert_cuda_ms=e[1].elapsed_time(e[2]),return_cuda_ms=e[2].elapsed_time(e[3])))
+     e=x.pop('events');phases.append(dict(**x,forward_cuda_ms=e[0].elapsed_time(e[1]),expert_cuda_ms=e[1].elapsed_time(e[2]),return_cuda_ms=e[3].elapsed_time(e[4])))
     calibration=[]
     for i in range(120):
      t=time.perf_counter_ns();dist.barrier();torch.cuda.current_stream().synchronize()
