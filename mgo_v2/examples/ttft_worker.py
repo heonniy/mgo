@@ -12,9 +12,9 @@ class PrefillRuntime(LiveRuntime):
   self.h2d=PriorityH2DScheduler(self.cache,staging_backend='torch',cpu_team=a.staging_cpu_team);self.execution_order='streaming'
   DecodeOffloadRuntime.stage_frozen_inputs(self,0)
  def reset(self):
-  self.policy_kind={'BR':0,'CA':1,'OLD_CA':3,'LA':4}[self.args.policy]
+  self.policy_kind={'BR':0,'CA':1,'OLD_CA':3,'LA':4,'LA_CA_NEAR':7}[self.args.policy]
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache,staging_backend='torch',cpu_team=self.args.staging_cpu_team)
-  super().reset();self.post_expert_barriers=0;self.breakdown=[];self.layer_fetch_counts=[];self.layer_rows=[];self.ready_metrics=dict(waits=0,ready_before_first_wait=0)
+  super().reset();self.post_expert_barriers=0;self.h2d_global_barriers=0;self.breakdown=[];self.layer_fetch_counts=[];self.layer_rows=[];self.ready_metrics=dict(waits=0,ready_before_first_wait=0)
  def exchange(self,x,send,recv,activation_row_bytes=0,active=False):
   y=super().exchange(x,send,recv,activation_row_bytes,active)
   if self.args.phase!='COUNTERS':
@@ -37,28 +37,44 @@ class PrefillRuntime(LiveRuntime):
    self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
   return torch.cat(parts) if parts else received.new_empty((0,2048))
  def execute(self,layer,hidden,selected,weights,probs):
+  """Strict characterization substrate: no H2D/compute/communication overlap."""
   assert 0<=self.index<48 and layer==self.index
   diagnostic=self.args.phase=='DIAGNOSTIC';e=self.plan_event(layer,selected,weights,probs)
   self.layer_fetch_counts.append(len(e['fetches']));self.layer_rows.append(sum(len(g[1]) for g in e['groups']))
   dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
-  events=[torch.cuda.Event(enable_timing=True) for _ in range(5)] if diagnostic else None
+  fetch_begin=time.perf_counter_ns() if diagnostic else None
   with nvtx_phase('moe.prefill_required_h2d'):self.apply_fetches(e)
+  fetch_slots=[slot for _,slot,_,_ in e['fetches']]
+  if fetch_slots:self.h2d.wait_slots(fetch_slots,host=True)
+  torch.cuda.current_stream().synchronize()
+  fetch_ready=time.perf_counter_ns() if diagnostic else None
+  with nvtx_phase('moe.prefill_h2d_global_barrier'):
+   dist.barrier();torch.cuda.current_stream().synchronize()
+  fetch_aligned=time.perf_counter_ns() if diagnostic else None
+  self.h2d_global_barriers+=1
+
+  events=[torch.cuda.Event(enable_timing=True) for _ in range(4)] if diagnostic else None
   if events:events[0].record()
   with nvtx_phase('moe.prefill_forward_a2a'):packet=self.dispatch(hidden,dense,e)
-  # Current-stream ordering from blocking collectives guarantees dispatch readiness.
   if events:events[1].record()
   with nvtx_phase('moe.prefill_expert_compute'):values=self.compute(packet,e,layer)
   if events:events[2].record()
-  begin=time.perf_counter_ns() if diagnostic else None
+  compute_begin=time.perf_counter_ns() if diagnostic else None
   with nvtx_phase('moe.prefill_post_expert_local_complete'):torch.cuda.current_stream().synchronize()
-  ready=time.perf_counter_ns() if diagnostic else None
-  with nvtx_phase('moe.prefill_post_expert_global_barrier'):dist.barrier();torch.cuda.current_stream().synchronize()
-  aligned=time.perf_counter_ns() if diagnostic else None
+  compute_ready=time.perf_counter_ns() if diagnostic else None
+  with nvtx_phase('moe.prefill_post_expert_global_barrier'):
+   dist.barrier();torch.cuda.current_stream().synchronize()
+  compute_aligned=time.perf_counter_ns() if diagnostic else None
   self.post_expert_barriers+=1
-  if events:events[3].record()
   with nvtx_phase('moe.prefill_return_a2a'):result=self.combine(hidden,values,e,packet[0])
   if events:
-   events[4].record();self.breakdown.append(dict(layer=layer,local_complete_start_ns=begin,rank_ready_ns=ready,barrier_exit_ns=aligned,events=events))
+   events[3].record();self.breakdown.append(dict(
+    layer=layer,
+    h2d_local_ms=(fetch_ready-fetch_begin)/1e6,
+    h2d_barrier_ms=(fetch_aligned-fetch_ready)/1e6,
+    compute_local_complete_ms=(compute_ready-compute_begin)/1e6,
+    compute_barrier_ms=(compute_aligned-compute_ready)/1e6,
+    events=events))
   self.index+=1;return result
  def close(self):self.h2d.close()
 
@@ -73,8 +89,8 @@ def run_prefill(model,rt,ids,mask):
 
 def check(rt,row,rank):
  rt.h2d.synchronize();proof=rt.proof
- observed=dict(state_hash=array_hash(rt.policy.slots[rank,:rt.cap]),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],canceled=rt.h2d.metrics['canceled'],barriers=rt.post_expert_barriers,layers=rt.index,layer_fetch_counts=rt.layer_fetch_counts)
- expected=dict(state_hash=proof['rank_state_hashes'][rank],copies=proof['copies'][rank],bytes=proof['H2D_bytes'][rank],canceled=0,barriers=48,layers=48,layer_fetch_counts=[x[rank] for x in proof['layer_fetch_counts']])
+ observed=dict(state_hash=array_hash(rt.policy.slots[rank,:rt.cap]),copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],canceled=rt.h2d.metrics['canceled'],barriers=rt.post_expert_barriers,h2d_barriers=rt.h2d_global_barriers,layers=rt.index,layer_fetch_counts=rt.layer_fetch_counts)
+ expected=dict(state_hash=proof['rank_state_hashes'][rank],copies=proof['copies'][rank],bytes=proof['H2D_bytes'][rank],canceled=0,barriers=48,h2d_barriers=48,layers=48,layer_fetch_counts=[x[rank] for x in proof['layer_fetch_counts']])
  return dict(status='PASS' if observed==expected and row['finite_logits'] else 'FAIL',observed=observed,expected=expected,expert_rows=rt.layer_rows,wire_bytes=rt.actual_wire_bytes,peer_bytes=rt.actual_peer_bytes,collective_calls=rt.actual_collective_calls,ready_metrics=dict(rt.ready_metrics),peak_gpu_allocated_bytes=torch.cuda.max_memory_allocated())
 
 def main(a):
@@ -132,7 +148,7 @@ def main(a):
     rt=setup(policy,'DIAGNOSTIC');row=run_prefill(model,rt,ids,mask);validation=check(rt,row,rank)
     phases=[]
     for x in rt.breakdown:
-     e=x.pop('events');phases.append(dict(**x,forward_cuda_ms=e[0].elapsed_time(e[1]),expert_required_wait_cuda_ms=e[1].elapsed_time(e[2]),return_cuda_ms=e[3].elapsed_time(e[4]),local_complete_ms=(x['rank_ready_ns']-x['local_complete_start_ns'])/1e6,barrier_ms=(x['barrier_exit_ns']-x['rank_ready_ns'])/1e6))
+     e=x.pop('events');phases.append(dict(**x,forward_cuda_ms=e[0].elapsed_time(e[1]),expert_cuda_ms=e[1].elapsed_time(e[2]),return_cuda_ms=e[2].elapsed_time(e[3])))
     calibration=[]
     for i in range(120):
      t=time.perf_counter_ns();dist.barrier();torch.cuda.current_stream().synchronize()
