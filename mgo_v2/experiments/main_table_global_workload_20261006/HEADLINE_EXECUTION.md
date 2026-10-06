@@ -2,8 +2,8 @@
 
 ## Current checkpoint
 
-Execution remains incomplete. MoE-Infinity and llama.cpp B64/L512 pass headline
-selection. Three bounded confirmations remain running/queued. OURS small and both
+Execution remains incomplete. MoE-Infinity B64/L512 and both llama.cpp cells pass headline
+selection. Two bounded confirmations remain running/queued. OURS small and both
 DeepSpeed confirmations finished but remain unstable; no further automatic repeats
 are scheduled for those cells. Preserve every sample without outlier removal.
 
@@ -12,7 +12,7 @@ are scheduled for those cells. Preserve every sample without outlier removal.
 | OURS Near | Correctness PASS; bounded confirmation remains UNSTABLE, all samples retained | Correctness PASS, timing UNSTABLE; bounded confirmation pending |
 | DeepSpeed CPU offload | Correctness PASS; bounded confirmation TTFT UNSTABLE, TPOT/E2E stable | Correctness PASS; bounded confirmation remains UNSTABLE |
 | MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
-| llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
+| llama.cpp static layers | Correctness and stability PASS; confirmation selected | Correctness and stability PASS; selected |
 
 Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.
 Current serial chain: `LLAMA_STATIC_RECOVERY_QUEUE.json` ->
