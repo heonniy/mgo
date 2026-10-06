@@ -1,0 +1,137 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "policy": "BR",
+      "ranks": [
+        {
+          "rank": 0,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.507833375,
+            "moe.post_expert_global_barrier": 39.01359525,
+            "moe.return_a2a": 93.455821625
+          },
+          "return_nccl_residency_ms_per_step": 10.599090625,
+          "barrier_nccl_residency_ms_per_step": 15.836441625,
+          "idle_barrier_reference_ms": 0.07056075,
+          "unassigned_decode_kernel_count": 19200
+        },
+        {
+          "rank": 1,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.317432,
+            "moe.post_expert_global_barrier": 94.657318375,
+            "moe.return_a2a": 77.34622775
+          },
+          "return_nccl_residency_ms_per_step": 27.126506375,
+          "barrier_nccl_residency_ms_per_step": 43.32142625,
+          "idle_barrier_reference_ms": 0.07083675,
+          "unassigned_decode_kernel_count": 19200
+        },
+        {
+          "rank": 2,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.42539825,
+            "moe.post_expert_global_barrier": 178.586133125,
+            "moe.return_a2a": 80.7927165
+          },
+          "return_nccl_residency_ms_per_step": 23.964158125,
+          "barrier_nccl_residency_ms_per_step": 156.434231875,
+          "idle_barrier_reference_ms": 0.0709215,
+          "unassigned_decode_kernel_count": 19200
+        },
+        {
+          "rank": 3,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.06751025,
+            "moe.post_expert_global_barrier": 280.08093775,
+            "moe.return_a2a": 51.465811625
+          },
+          "return_nccl_residency_ms_per_step": 53.76236575,
+          "barrier_nccl_residency_ms_per_step": 265.713368125,
+          "idle_barrier_reference_ms": 0.07082375,
+          "unassigned_decode_kernel_count": 19200
+        }
+      ],
+      "mean_rank_host_ms_per_step": {
+        "moe.post_expert_local_complete": 3.3295434687500003,
+        "moe.post_expert_global_barrier": 148.084496125,
+        "moe.return_a2a": 75.765144375
+      },
+      "mean_rank_host_fraction_of_clean_TPOT": {
+        "moe.post_expert_local_complete": 0.0022470021714897787,
+        "moe.post_expert_global_barrier": 0.0999374801620375,
+        "moe.return_a2a": 0.051131467581582865
+      },
+      "normalization_valid": true,
+      "mean_rank_idle_barrier_reference_ms_per_step": 3.397713
+    },
+    {
+      "policy": "FCA",
+      "ranks": [
+        {
+          "rank": 0,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.485694625,
+            "moe.post_expert_global_barrier": 99.94857775,
+            "moe.return_a2a": 78.43400925
+          },
+          "return_nccl_residency_ms_per_step": 19.479646875,
+          "barrier_nccl_residency_ms_per_step": 78.536744,
+          "idle_barrier_reference_ms": 0.06259825,
+          "unassigned_decode_kernel_count": 19200
+        },
+        {
+          "rank": 1,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.055866875,
+            "moe.post_expert_global_barrier": 140.247612375,
+            "moe.return_a2a": 71.4223945
+          },
+          "return_nccl_residency_ms_per_step": 26.577859125,
+          "barrier_nccl_residency_ms_per_step": 119.562750125,
+          "idle_barrier_reference_ms": 0.06244575,
+          "unassigned_decode_kernel_count": 19200
+        },
+        {
+          "rank": 2,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 3.392644875,
+            "moe.post_expert_global_barrier": 125.95252425,
+            "moe.return_a2a": 63.934459375
+          },
+          "return_nccl_residency_ms_per_step": 34.05975925,
+          "barrier_nccl_residency_ms_per_step": 105.544974875,
+          "idle_barrier_reference_ms": 0.06277275,
+          "unassigned_decode_kernel_count": 19194
+        },
+        {
+          "rank": 3,
+          "host_ms_per_step": {
+            "moe.post_expert_local_complete": 2.90231375,
+            "moe.post_expert_global_barrier": 236.874924875,
+            "moe.return_a2a": 51.830447875
+          },
+          "return_nccl_residency_ms_per_step": 46.12511525,
+          "barrier_nccl_residency_ms_per_step": 222.641603875,
+          "idle_barrier_reference_ms": 0.0625125,
+          "unassigned_decode_kernel_count": 19200
+        }
+      ],
+      "mean_rank_host_ms_per_step": {
+        "moe.post_expert_local_complete": 3.20913003125,
+        "moe.post_expert_global_barrier": 150.7559098125,
+        "moe.return_a2a": 66.40532775
+      },
+      "mean_rank_host_fraction_of_clean_TPOT": {
+        "moe.post_expert_local_complete": 0.0020799867028675105,
+        "moe.post_expert_global_barrier": 0.09771192963052162,
+        "moe.return_a2a": 0.04304038707517203
+      },
+      "normalization_valid": true,
+      "mean_rank_idle_barrier_reference_ms_per_step": 3.003951
+    }
+  ],
+  "primary_timing": false,
+  "interpretation": "First8 instrumented prefix, mean rank-local host durations. TPOT denominator is separate full64 clean measurement. Fractions are descriptive and not an additive global critical-path decomposition. Barrier includes collective overhead and scheduling; idle reference cannot be subtracted as exact imbalance."
+}

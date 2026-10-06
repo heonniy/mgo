@@ -1,0 +1,122 @@
+{
+  "status": "PASS",
+  "candidate": "H1b",
+  "samples": {
+    "BR_H1b": [
+      {
+        "E2E_wall": 105.43427017889917,
+        "TPOT": 1.485260009765625
+      },
+      {
+        "E2E_wall": 105.12130719143897,
+        "TPOT": 1.47828271484375
+      }
+    ],
+    "FCA_H1b": [
+      {
+        "E2E_wall": 113.74436439853162,
+        "TPOT": 1.581003173828125
+      },
+      {
+        "E2E_wall": 110.78682752605528,
+        "TPOT": 1.54286083984375
+      },
+      {
+        "E2E_wall": 110.65211192518473,
+        "TPOT": 1.5368450927734374
+      }
+    ]
+  },
+  "gates": {
+    "BR_H1b": {
+      "initial": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.002972735192948486,
+          "TPOT": 0.004708752712714551
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "mean_and_median",
+      "summary": {
+        "E2E_wall": {
+          "n": 2,
+          "mean": 105.27778868516907,
+          "median": 105.27778868516907,
+          "minimum": 105.12130719143897,
+          "maximum": 105.43427017889917
+        },
+        "TPOT": {
+          "n": 2,
+          "mean": 1.4817713623046875,
+          "median": 1.4817713623046875,
+          "minimum": 1.47828271484375,
+          "maximum": 1.485260009765625
+        }
+      },
+      "estimate": {
+        "E2E_wall": 105.27778868516907,
+        "TPOT": 1.4817713623046875
+      },
+      "range": {
+        "E2E_wall": [
+          105.12130719143897,
+          105.43427017889917
+        ],
+        "TPOT": [
+          1.47828271484375,
+          1.485260009765625
+        ]
+      }
+    },
+    "FCA_H1b": {
+      "initial": {
+        "status": "THIRD_REQUIRED",
+        "target_repeats": 3,
+        "relative_difference": {
+          "E2E_wall": 0.026344107000239723,
+          "TPOT": 0.024419970790944517
+        },
+        "estimator": "median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "median",
+      "summary": {
+        "E2E_wall": {
+          "n": 3,
+          "mean": 111.72776794992387,
+          "median": 110.78682752605528,
+          "minimum": 110.65211192518473,
+          "maximum": 113.74436439853162
+        },
+        "TPOT": {
+          "n": 3,
+          "mean": 1.5535697021484374,
+          "median": 1.54286083984375,
+          "minimum": 1.5368450927734374,
+          "maximum": 1.581003173828125
+        }
+      },
+      "estimate": {
+        "E2E_wall": 110.78682752605528,
+        "TPOT": 1.54286083984375
+      },
+      "range": {
+        "E2E_wall": [
+          110.65211192518473,
+          113.74436439853162
+        ],
+        "TPOT": [
+          1.5368450927734374,
+          1.581003173828125
+        ]
+      }
+    }
+  },
+  "unstable": false,
+  "rule": "Two repeats; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat. Retain every sample."
+}
