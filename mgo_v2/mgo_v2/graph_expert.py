@@ -48,6 +48,7 @@ class GraphExpertExecutor:
         # its own output before return, and replays are on one current stream.
         required = sum(n * 2048 * 2 * 2 for _, n in self.signatures)
         free, total = torch.cuda.mem_get_info()
+        free = min(free, int(total * .85) - torch.cuda.memory_reserved())
         if required > free - 12 * 1024**3:
             raise RuntimeError(f'B3 scratch budget unsafe: required={required}, free={free}')
         torch.cuda.synchronize()
@@ -57,6 +58,7 @@ class GraphExpertExecutor:
         for i, (slot, n) in enumerate(sorted(self.signatures)):
             if i % 128 == 0:
                 free, total = torch.cuda.mem_get_info()
+                free = min(free, int(total * .85) - torch.cuda.memory_reserved())
                 if free < 10 * 1024**3:
                     raise RuntimeError('B3 graph construction reached reserved VRAM headroom')
                 if progress:
