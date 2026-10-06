@@ -134,10 +134,186 @@
     "scope": "Frozen input bytes, runtime/kernel/measurement sources, predictor, CPU affinity and selected nonsecret runtime environment. Model weight files are not rehashed here."
   },
   "pid": 2166730,
+  "boundaries": [
+    {
+      "key": "OLD_CA_H1b_r1",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 49413,
+            "free_mib": 31677,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 43595,
+            "free_mib": 37495,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 4,
+            "used_mib": 35893,
+            "free_mib": 45197,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 43139,
+            "free_mib": 37951,
+            "temperature_c": 37
+          }
+        ],
+        "host_available_bytes": 1804821708800,
+        "unix": 1791268475.5462964,
+        "rss_bytes": 417626820608,
+        "foreign_pids": [],
+        "collection_seconds": 2.3949325904250145,
+        "foreign_pids_on_other_gpus": []
+      },
+      "diagnostics": {
+        "load_average": [
+          20.01513671875,
+          17.1005859375,
+          17.7314453125
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 128.76, 0",
+          "1, 1980, 2619, 128.12, 0",
+          "2, 345, 2619, 71.08, 0",
+          "3, 345, 2619, 71.79, 0",
+          "4, 1980, 2619, 128.88, 0",
+          "5, 1980, 2619, 123.35, 0",
+          "6, 345, 2619, 69.98, 0",
+          "7, 345, 2619, 72.21, 0"
+        ]
+      }
+    },
+    {
+      "key": "OLD_CA_H1b_r2",
+      "sample": {
+        "gpus": [
+          {
+            "gpu": 0,
+            "used_mib": 49413,
+            "free_mib": 31677,
+            "temperature_c": 41
+          },
+          {
+            "gpu": 1,
+            "used_mib": 43595,
+            "free_mib": 37495,
+            "temperature_c": 36
+          },
+          {
+            "gpu": 4,
+            "used_mib": 35893,
+            "free_mib": 45197,
+            "temperature_c": 43
+          },
+          {
+            "gpu": 5,
+            "used_mib": 43139,
+            "free_mib": 37951,
+            "temperature_c": 37
+          }
+        ],
+        "host_available_bytes": 1801031081984,
+        "unix": 1791268593.285376,
+        "rss_bytes": 417682149376,
+        "foreign_pids": [],
+        "collection_seconds": 1.3220183663070202,
+        "foreign_pids_on_other_gpus": [
+          2175238
+        ]
+      },
+      "diagnostics": {
+        "load_average": [
+          19.47412109375,
+          17.67138671875,
+          17.8623046875
+        ],
+        "gpu_clock_power_utilization_csv": [
+          "0, 1980, 2619, 125.07, 0",
+          "1, 1980, 2619, 123.02, 0",
+          "2, 1980, 2619, 124.46, 0",
+          "3, 345, 2619, 71.94, 0",
+          "4, 1980, 2619, 124.74, 0",
+          "5, 1980, 2619, 119.07, 0",
+          "6, 345, 2619, 70.07, 0",
+          "7, 1980, 2619, 128.17, 0"
+        ]
+      }
+    }
+  ],
   "completed": [
     "OLD_CA_H1b_r1",
     "OLD_CA_H1b_r2"
   ],
+  "result": {
+    "status": "PASS",
+    "candidate": "H1b",
+    "samples": {
+      "OLD_CA_H1b": [
+        {
+          "E2E_wall": 107.79959592968225,
+          "TPOT": 1.5129246826171876
+        },
+        {
+          "E2E_wall": 108.09140052832663,
+          "TPOT": 1.52016455078125
+        }
+      ]
+    },
+    "gates": {
+      "OLD_CA_H1b": {
+        "initial": {
+          "status": "STABLE_TWO",
+          "target_repeats": 2,
+          "relative_difference": {
+            "E2E_wall": 0.002703258620617208,
+            "TPOT": 0.004773923618429433
+          },
+          "estimator": "mean_and_median",
+          "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+        },
+        "unstable": false,
+        "estimator": "mean_and_median",
+        "summary": {
+          "E2E_wall": {
+            "n": 2,
+            "mean": 107.94549822900444,
+            "median": 107.94549822900444,
+            "minimum": 107.79959592968225,
+            "maximum": 108.09140052832663
+          },
+          "TPOT": {
+            "n": 2,
+            "mean": 1.516544616699219,
+            "median": 1.516544616699219,
+            "minimum": 1.5129246826171876,
+            "maximum": 1.52016455078125
+          }
+        },
+        "estimate": {
+          "E2E_wall": 107.94549822900444,
+          "TPOT": 1.516544616699219
+        },
+        "range": {
+          "E2E_wall": [
+            107.79959592968225,
+            108.09140052832663
+          ],
+          "TPOT": [
+            1.5129246826171876,
+            1.52016455078125
+          ]
+        }
+      }
+    },
+    "unstable": false,
+    "rule": "Two repeats; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat. Retain every sample."
+  },
   "exit_code": 0,
   "finished_unix": 1791268714.7937655
 }
