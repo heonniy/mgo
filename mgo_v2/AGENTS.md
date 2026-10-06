@@ -1,3 +1,10 @@
+**OWNER STATIC BASELINE ADDITION: all eight selected decode32 cells.**
+Read `experiments/strict_laca_headroom_20261006/STATIC_MOD_AMENDMENT.md`.
+Append STATIC_MOD (missing expert e -> logical rank e % world) after current
+three-policy final queue. Reuse frozen traces and seeds; bounded repeats,
+strict barriers, no diagnostics or repeat of existing policy measurements.
+Track static_mod_status.json. State sequential-reference timing limitation.
+
 **OWNER: omit extra diagnostic passes in decode32 final validation.**
 Do not run the24 per-policy phase diagnostic passes. Keep strict barriers,
 correctness/warmup, bounded TTFT/TPOT/E2E repeats, result report and commits.
