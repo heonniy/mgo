@@ -99,7 +99,9 @@ def main(a):
    rt.profile_thread_placement=configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  place_threads()
  if case.get('b3_executor') in ('H1','H1b'):
-  if case.get('b4_executor')=='H1b':
+  if case.get('b5_diagnostic'):
+   from b5_prepare_reference import prepare
+  elif case.get('b4_executor')=='H1b':
    from b4_prepare_reference import prepare
   else:
    from b3_prepare import prepare
@@ -108,6 +110,19 @@ def main(a):
  if case.get('b4_executor')=='H2':
   from mgo_v2.grouped_expert import GroupedExpertExecutor
   rt.grouped_executor=GroupedExpertExecutor(rt.cache,rt.kernel,batch*world*8)
+ if case.get('b5_diagnostic'):
+  # Model-resident, idle-stream barrier reference outside Nsight and timing.
+  # This includes rank scheduling and collective service, not a pure wire cost.
+  import statistics
+  torch.cuda.synchronize()
+  for _ in range(20):dist.barrier();torch.cuda.current_stream().synchronize()
+  trials=[]
+  for trial in range(2):
+   values=[]
+   for _ in range(100):
+    started=time.perf_counter_ns();dist.barrier();torch.cuda.current_stream().synchronize();values.append((time.perf_counter_ns()-started)/1e6)
+   trials.append(dict(median_ms=statistics.median(values),minimum_ms=min(values),maximum_ms=max(values),samples_ms=values))
+  write(a.output/f'b5_barrier_calibration_rank{rank}.json',dict(status='PASS',trials=trials,scope='Idle current stream, model resident, 20 warmup then 2x100 global barriers. Host duration includes scheduling and collective overhead; not pure service and not an exact subtraction from workload barrier wait.'))
  warm,expected=generate(model,rt,ids,mask,teacher,horizon);validate(rt,warm,proof,rank)
  rt.reset();place_threads();a.phase='MEASURE';rt.capture=True;rt.arm_profile();torch.manual_seed(42);gc.collect();torch.cuda.synchronize();dist.barrier()
  from torch._dynamo.utils import counters
@@ -142,6 +157,14 @@ def main(a):
   if b2_uninstall:b2_uninstall()
   if b2_recorder:b2_recorder.write(a.output/f'b2_host_rank{rank}.json')
  assert before==dict(counters['stats']) and np.array_equal(expected,tokens);validate(rt,row,proof,rank)
+ if case.get('b5_diagnostic'):
+  prior=Path('/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b4/C30')/f'B4_C30_H1b_V3_OPT_PF_OVERLAP_{a.policy}_B128_H8'
+  canonical=json.loads((prior/f'rank{rank}.json').read_text())
+  observed=dict(copies=rt.h2d.metrics['copies'],bytes=rt.h2d.metrics['bytes'],canceled=rt.h2d.metrics['canceled'],controller_counters=rt.controller.counters,transport_calls=rt.transport.calls)
+  reference=dict(copies=canonical['scheduler_metrics']['copies'],bytes=canonical['scheduler_metrics']['bytes'],canceled=canonical['scheduler_metrics']['canceled'],controller_counters=canonical['controller_counters'],transport_calls=canonical['transport_calls'])
+  passed=observed==reference and rt.post_expert_barriers==48*horizon
+  write(a.output/f'b5_capture_validation_rank{rank}.json',dict(status='PASS' if passed else 'FAIL',observed=observed,reference=reference,post_expert_barriers=rt.post_expert_barriers))
+  assert passed,'B5 diagnostic copy/barrier parity failed'
  trace_path=a.output/f'copy_trace_rank{rank}.json';write(trace_path,rt.copy_trace())
  assert len(rt.profile_communication)==48*horizon and rt.transport.calls==96*horizon
  assert sum(r['forward_wire_bytes'] for r in rt.profile_communication)==rt.transport.forward_bytes
