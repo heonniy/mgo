@@ -1,0 +1,80 @@
+{
+  "environment": "env1",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "status": "FAIL",
+  "stage": "B3_C30_H1_V3_OPT_PF_OVERLAP_BR_B128_H8",
+  "case": {
+    "label": "BR",
+    "policy": "BR",
+    "P": 2,
+    "trigger": "T2",
+    "horizon": 8,
+    "overlap": true,
+    "partial_precision": "bf16",
+    "runtime_arm": "V3_OPT_PF_OVERLAP",
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "isolated_cpu_threads": true,
+    "fixed_staging_team": true,
+    "b2_instrumentation": true,
+    "b2_allow_other_gpu_jobs": true,
+    "b3_executor": "H1",
+    "b3_cache": "C30",
+    "profile_cuda_flush_ms": 600000,
+    "profile_nsys_binary": "/home/hwlee/mgo-tools/nsight-2025.3/extracted/opt/nvidia/nsight-systems/2025.3.2/target-linux-x64/nsys",
+    "profile_nsys_version": "NVIDIA Nsight Systems version 2025.3.2.474-253236389321v0",
+    "profile_disable_device_event_trace": true
+  },
+  "started_unix": 1791251603.2730427,
+  "source_sha": "85597f38665d10cbfe574515f2bc1a853e1dbb9c",
+  "primary_timing": false,
+  "latest_resource_sample": {
+    "gpus": [
+      {
+        "gpu": 0,
+        "used_mib": 15047,
+        "free_mib": 66043,
+        "temperature_c": 40
+      },
+      {
+        "gpu": 1,
+        "used_mib": 18587,
+        "free_mib": 62503,
+        "temperature_c": 35
+      },
+      {
+        "gpu": 4,
+        "used_mib": 15161,
+        "free_mib": 65929,
+        "temperature_c": 41
+      },
+      {
+        "gpu": 5,
+        "used_mib": 16687,
+        "free_mib": 64403,
+        "temperature_c": 36
+      }
+    ],
+    "host_available_bytes": 1744164618240,
+    "unix": 1791251673.6366117,
+    "rss_bytes": 468642123776,
+    "foreign_pids": [],
+    "collection_seconds": 0.6030925763770938,
+    "foreign_pids_on_other_gpus": [
+      1878841,
+      1878911,
+      1878701,
+      1878694
+    ]
+  },
+  "pid": 1915646,
+  "error": "RuntimeError('owner STOP')",
+  "finished_unix": 1791251692.6162953
+}
