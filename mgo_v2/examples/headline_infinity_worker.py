@@ -64,7 +64,7 @@ def main(a):
   for gpu in range(4):torch.cuda.reset_peak_memory_stats(gpu)
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   streamer=ClockStreamer();finite=FiniteLogits();start=time.perf_counter_ns()
-  with torch.inference_mode():
+  with torch.no_grad():
    output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
   kv=output.past_key_values
   assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in kv.layers)
