@@ -8,7 +8,10 @@ def main(cache='C30'):
  diagnosis=PACKET/'B3_H1b_DIAGNOSTIC_RESULTS.json'
  if not diagnosis.exists():diagnosis=PACKET/'B3_DIAGNOSTIC_RESULTS.json'
  gate=json.loads(diagnosis.read_text());candidate=gate.get('candidate','H1')
- assert gate['status']=='DIAGNOSTIC_PASS','correctness/host-repair diagnosis must pass first'
+ assert gate['diagnostic_integrity_pass'],'correctness and diagnostic evidence must pass before primary timing'
+ # AGENT_TASK orders C30 clean timing before the final numerical repair gate.
+ # Host reductions remain mandatory for repair acceptance and C60, not a reason
+ # to omit the authorized C30 physical comparison.
  assert cache in ('C30','C60')
  if cache=='C60':
   decision=json.loads((PACKET/'B3_REPAIR_DECISION.json').read_text())

@@ -40,14 +40,17 @@ def run(stage,group):
  if group.get('environment')=='env2':env['NCCL_DEBUG']='INFO'
  cmd=[h.PYTHON,'-u','-m','torch.distributed.run','--standalone',f'--nproc_per_node={world}',str(P/('examples/b3_measure_worker.py' if group.get('b3_executor_study') else 'examples/policy_regime_worker.py' if group.get('policy_regime') else ('examples/refactor_paired_worker.py' if group.get('paired') else 'examples/refactor_measure_worker.py'))),'--inputs',str(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}'),'--cases',str(out/'cases.json'),'--output',str(out)]
  if group.get('paired'):
-  from refactor_fingerprint import capture
+  from refactor_fingerprint import capture,sha
   state['common_stack']=capture(ROOT/f'inputs_B{group["batch"]}_H{group["horizon"]}',env)
+  if group.get('b3_executor_study'):
+   for name in ('examples/b3_measure_worker.py','scripts/physical_repeat_rule.py','scripts/run_b3_measure.py'):
+    state['common_stack']['code'][name]=sha(P/name)
  active=None;released=set();last_scan=0
  with (out/'run.log').open('w') as log:
   proc=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;h.write(out/'status.json',state);h.write(PACKET/'status.json',state)
   try:
    while proc.poll() is None:
-    if time.time()-state['started_unix']>8*3600:raise TimeoutError('bounded eight-hour batch group')
+    if time.time()-state['started_unix']>(3600 if group.get('b3_executor_study') else 8*3600):raise TimeoutError('bounded timing group')
     if (ROOT/'STOP').exists():raise RuntimeError('owner STOP')
     if active is not None:
      files=list(out.glob(f'{active}_measure_rank*.json'))

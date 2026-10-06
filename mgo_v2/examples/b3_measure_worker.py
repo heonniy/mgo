@@ -79,7 +79,7 @@ def main(a):
    write(a.output/f'{label}_measure_rank{rank}.json',row);dist.barrier()
    samples[key].append({k:max(json.loads((a.output/f'{label}_measure_rank{r}.json').read_text())[k] for r in range(world)) for k in ['E2E_wall','TPOT']})
    if rank==0:write(a.output/'phase.json',dict(stage='MEASURE_COMPLETE',case=key,repeat=repeat,samples=samples))
- gates={key:dict(initial=decide(rows[:2]),unstable=final_unstable(rows),estimate={k:statistics.median([r[k] for r in rows]) for k in ['E2E_wall','TPOT']},range={k:[min(r[k] for r in rows),max(r[k] for r in rows)] for k in ['E2E_wall','TPOT']}) for key,rows in samples.items()}
+ gates={key:dict(initial=decide(rows[:2]),unstable=final_unstable(rows),estimator='mean_and_median' if len(rows)==2 else 'median',summary={k:dict(n=len(rows),mean=statistics.mean(r[k] for r in rows),median=statistics.median(r[k] for r in rows),minimum=min(r[k] for r in rows),maximum=max(r[k] for r in rows)) for k in ['E2E_wall','TPOT']},estimate={k:statistics.median([r[k] for r in rows]) for k in ['E2E_wall','TPOT']},range={k:[min(r[k] for r in rows),max(r[k] for r in rows)] for k in ['E2E_wall','TPOT']}) for key,rows in samples.items()}
  rt.close()
  if rank==0:write(a.output/'result.json',dict(status='PASS',candidate=candidate,samples=samples,gates=gates,unstable=any(g['unstable'] for g in gates.values()),rule='Two repeats; <=2% stop; >2% and <=5% one third; >5% unstable without extra repeat. Retain every sample.'))
  dist.barrier();dist.destroy_process_group()

@@ -48,3 +48,17 @@ H1b repeats full64 discovery and validation, including exact gather/kernel
 checks on the first decode step. Two new diagnostic captures only (BR/FCA),
 reusing this checkpoint's H0 references. Separate H1b receipts preserve H1.
 No clean timing is authorized until the diagnostic repair gate passes.
+
+## C30 execution-order clarification
+
+AGENT_TASK.md explicitly orders clean uninstrumented C30 timing (step 4)
+before evaluating the C30 repair gate (step 5). Diagnostic *integrity* means
+validated outputs/counters/kernel identity/clocks. The 70%/40% host reductions
+are final repair-acceptance criteria; they do not remove the authorized C30
+physical comparison. The earlier note above that numerical diagnostic failure
+would suppress C30 timing was too restrictive and is superseded here.
+
+Finish the C30 H0 vs final H1b clean comparison with the frozen two/conditional
+third-repeat rule. Preserve H1 diagnostic results separately. H1b already misses
+the 40% host-loop threshold, so this cannot authorize C60 even if TPOT improves.
+No retuning or further executor variant follows this C30 checkpoint.

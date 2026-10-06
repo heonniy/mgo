@@ -110,7 +110,8 @@ def report(cache='C30',candidate='H1'):
                           diagnostic_gate=bool(host>=.70 and loop>=.40 and parity))
     (PACKET/(prefix+'_GRAPH_SIGNATURES.json')).write_text(json.dumps(dict(rows=signatures),separators=(',',':'))+'\n')
     write(PACKET/(prefix+'_CORRECTNESS.json'),dict(status='PASS' if all(g['counters_and_packets_equal'] for g in gates.values()) else 'FAIL',rows=correctness))
-    result=dict(candidate=candidate,status='DIAGNOSTIC_PASS' if all(g['diagnostic_gate'] for g in gates.values()) else 'DIAGNOSTIC_GATE_FAIL',rows=summaries,gates=gates,
+    integrity=all(g['counters_and_packets_equal'] and all(x['all_h0_kernel_counts_preserved'] for x in g['kernel_identity']) for g in gates.values())
+    result=dict(candidate=candidate,diagnostic_integrity_pass=integrity,status='DIAGNOSTIC_PASS' if all(g['diagnostic_gate'] for g in gates.values()) else 'DIAGNOSTIC_GATE_FAIL',rows=summaries,gates=gates,
                 units='ms/step; host and GPU spans overlap. Expert/NCCL residency mean across ranks; arrival spreads max-min across ranks.',
                 primary_timing=False,graph_service_note='Host launch ranges include scratch copies and replay. GPU expert kernel union excludes DMA; graph scratch D2D DMA is reported separately. Neither sum is primary TPOT.',sources=sources)
     write(PACKET/(prefix+'_DIAGNOSTIC_RESULTS.json'),result)
