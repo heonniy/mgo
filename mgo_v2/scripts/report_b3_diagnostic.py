@@ -51,7 +51,15 @@ def report(cache='C30'):
         host=1-b['host_kernel_launch_ms']/a['host_kernel_launch_ms']
         loop=1-b['host_expert_loop_ms']/a['host_expert_loop_ms']
         parity=True
+        kernel_identity=[]
         for rank in range(4):
+            ax=json.loads((Path(a['capture'])/f'b2_rank{rank}_analysis.json').read_text())
+            bx=json.loads((Path(b['capture'])/f'b2_rank{rank}_analysis.json').read_text())
+            ah=ax['kernel_names']['expert_compiled_kernel'];bh=bx['kernel_names']['expert_compiled_kernel']
+            same=all(bh.get(name)==count for name,count in ah.items())
+            kernel_identity.append(dict(rank=rank,all_h0_kernel_counts_preserved=same,h0=ah,h1=bh))
+            assert same, ('Graph kernel attribution or compiled-kernel identity needs diagnosis',policy,rank,ah,bh)
+
             ar=json.loads((Path(a['capture'])/f'rank{rank}.json').read_text())
             br=json.loads((Path(b['capture'])/f'rank{rank}.json').read_text())
             for field in ('controller_counters','decode_expert_copies','decode_expert_bytes','transport_calls'):
@@ -60,7 +68,7 @@ def report(cache='C30'):
             bc=json.loads((Path(b['capture'])/f'communication_rank{rank}.json').read_text())
             parity &= ac['events']==bc['events']
         gates[policy]=dict(host_call_reduction=host,host_loop_reduction=loop,
-                          counters_and_packets_equal=bool(parity),
+                          counters_and_packets_equal=bool(parity),kernel_identity=kernel_identity,
                           diagnostic_gate=bool(host>=.70 and loop>=.40 and parity))
     (PACKET/'B3_GRAPH_SIGNATURES.json').write_text(json.dumps(dict(rows=signatures),separators=(',',':'))+'\n')
     write(PACKET/'B3_CORRECTNESS.json',dict(status='PASS' if all(g['counters_and_packets_equal'] for g in gates.values()) else 'FAIL',rows=correctness))
