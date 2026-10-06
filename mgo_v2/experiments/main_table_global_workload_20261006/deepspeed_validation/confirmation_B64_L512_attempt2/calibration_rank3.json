@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "expert_peak_bytes": 2925527040,
+  "all_parameter_peak_bytes": 3115216896,
+  "budget_bytes": 4348182528,
+  "samples": 1068,
+  "pinned_host_bytes": 15266061312,
+  "config": {
+    "train_batch_size": 256,
+    "train_micro_batch_size_per_gpu": 64,
+    "gradient_accumulation_steps": 1,
+    "bf16": {
+      "enabled": true
+    },
+    "zero_optimization": {
+      "stage": 3,
+      "offload_param": {
+        "device": "cpu",
+        "pin_memory": true
+      },
+      "stage3_max_live_parameters": 1500000000,
+      "stage3_prefetch_bucket_size": 1000000000,
+      "stage3_max_reuse_distance": 1000000000,
+      "stage3_param_persistence_threshold": 100000
+    },
+    "steps_per_print": 1000000,
+    "wall_clock_breakdown": false
+  }
+}

@@ -1,0 +1,1 @@
+Large-cell bounded confirmation warmup passes all four-rank cold-parameter, finite-logit, GPU KV,64x64 token shape and byte-cap checks. Warmup TTFT11.506106311s, TPOT5.187676927302s, E2E338.329752731s is excluded from primaries. Primary1 running. CPU ranges match the earlier large-cell run; no configuration change or final stability claim.
