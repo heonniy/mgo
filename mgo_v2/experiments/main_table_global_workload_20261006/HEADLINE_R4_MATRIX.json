@@ -1,0 +1,52 @@
+{
+  "status": "READY_FOR_PHYSICAL_EXECUTION",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "systems": [
+    {
+      "name": "llama.cpp-layer",
+      "baseline_mode": "split-mode layer"
+    },
+    {
+      "name": "DeepSpeed ZeRO-Inference",
+      "baseline_mode": "ZeRO-3 CPU parameter offload",
+      "paper_fastgen_equivalent": false
+    },
+    {
+      "name": "MoE-Infinity",
+      "baseline_mode": "stock Qwen3-MoE multi-GPU offloading"
+    },
+    {
+      "name": "Ours",
+      "baseline_mode": "H0 + rank-private full pinned + selected runtime"
+    }
+  ],
+  "cells": [
+    {
+      "budget": "C30",
+      "local_batch_label": 16,
+      "global_requests": 64,
+      "input_tokens": 256,
+      "output_tokens": 64
+    },
+    {
+      "budget": "C30",
+      "local_batch_label": 64,
+      "global_requests": 256,
+      "input_tokens": 512,
+      "output_tokens": 64
+    }
+  ],
+  "expert_budget": {
+    "slots": 1843,
+    "bytes": 17392730112,
+    "gib": 16.1982421875
+  },
+  "ours_host_pinned_gib_per_rank": 54,
+  "ours_host_pinned_gib_total": 216
+}
