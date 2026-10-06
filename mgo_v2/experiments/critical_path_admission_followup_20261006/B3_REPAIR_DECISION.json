@@ -1,0 +1,272 @@
+{
+  "candidate": "H1b",
+  "status": "REPAIR_GATE_FAIL",
+  "repair_gate": {
+    "correctness": true,
+    "diagnostic": false,
+    "diagnostic_integrity": true,
+    "compiled_host_call_reduction_at_least70": true,
+    "full_expert_host_loop_reduction_at_least40": false,
+    "no_extra_h2d_or_packet": true,
+    "stable": true,
+    "br_tpot_within_one_percent": true
+  },
+  "causal_case": null,
+  "c60_authorized": false,
+  "primary_timing_available": true,
+  "estimates_seconds": {
+    "BR_H0": {
+      "E2E_wall": 127.08989880047739,
+      "TPOT": 1.825885009765625
+    },
+    "FCA_H0": {
+      "E2E_wall": 138.62143690465018,
+      "TPOT": 1.97942724609375
+    },
+    "BR_H1b": {
+      "E2E_wall": 104.29734549671412,
+      "TPOT": 1.4684702148437498
+    },
+    "FCA_H1b": {
+      "E2E_wall": 109.41134244995192,
+      "TPOT": 1.5224759521484375
+    }
+  },
+  "timing_stability": {
+    "BR_H0": {
+      "initial": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.0003217478252910813,
+          "TPOT": 0.0005637249166814773
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "mean_and_median",
+      "summary": {
+        "E2E_wall": {
+          "n": 2,
+          "mean": 127.08989880047739,
+          "median": 127.08989880047739,
+          "minimum": 127.06945335119963,
+          "maximum": 127.11034424975514
+        },
+        "TPOT": {
+          "n": 2,
+          "mean": 1.825885009765625,
+          "median": 1.825885009765625,
+          "minimum": 1.825370361328125,
+          "maximum": 1.826399658203125
+        }
+      },
+      "estimate": {
+        "E2E_wall": 127.08989880047739,
+        "TPOT": 1.825885009765625
+      },
+      "range": {
+        "E2E_wall": [
+          127.06945335119963,
+          127.11034424975514
+        ],
+        "TPOT": [
+          1.825370361328125,
+          1.826399658203125
+        ]
+      }
+    },
+    "FCA_H0": {
+      "initial": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.004990288240795227,
+          "TPOT": 0.0050297654067091675
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "mean_and_median",
+      "summary": {
+        "E2E_wall": {
+          "n": 2,
+          "mean": 138.62143690465018,
+          "median": 138.62143690465018,
+          "minimum": 138.27555644139647,
+          "maximum": 138.9673173679039
+        },
+        "TPOT": {
+          "n": 2,
+          "mean": 1.97942724609375,
+          "median": 1.97942724609375,
+          "minimum": 1.97444921875,
+          "maximum": 1.9844052734375
+        }
+      },
+      "estimate": {
+        "E2E_wall": 138.62143690465018,
+        "TPOT": 1.97942724609375
+      },
+      "range": {
+        "E2E_wall": [
+          138.27555644139647,
+          138.9673173679039
+        ],
+        "TPOT": [
+          1.97444921875,
+          1.9844052734375
+        ]
+      }
+    },
+    "BR_H1b": {
+      "initial": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.0035039790097947075,
+          "TPOT": 0.0036348346942420024
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "mean_and_median",
+      "summary": {
+        "E2E_wall": {
+          "n": 2,
+          "mean": 104.29734549671412,
+          "median": 104.29734549671412,
+          "minimum": 104.11461764201522,
+          "maximum": 104.48007335141301
+        },
+        "TPOT": {
+          "n": 2,
+          "mean": 1.4684702148437498,
+          "median": 1.4684702148437498,
+          "minimum": 1.4658013916015624,
+          "maximum": 1.4711390380859375
+        }
+      },
+      "estimate": {
+        "E2E_wall": 104.29734549671412,
+        "TPOT": 1.4684702148437498
+      },
+      "range": {
+        "E2E_wall": [
+          104.11461764201522,
+          104.48007335141301
+        ],
+        "TPOT": [
+          1.4658013916015624,
+          1.4711390380859375
+        ]
+      }
+    },
+    "FCA_H1b": {
+      "initial": {
+        "status": "STABLE_TWO",
+        "target_repeats": 2,
+        "relative_difference": {
+          "E2E_wall": 0.004710966159225404,
+          "TPOT": 0.006869560218416695
+        },
+        "estimator": "mean_and_median",
+        "rule": "abs(T1-T2)/mean(T1,T2); E2E and TPOT only"
+      },
+      "unstable": false,
+      "estimator": "mean_and_median",
+      "summary": {
+        "E2E_wall": {
+          "n": 2,
+          "mean": 109.41134244995192,
+          "median": 109.41134244995192,
+          "minimum": 109.15362588409334,
+          "maximum": 109.66905901581049
+        },
+        "TPOT": {
+          "n": 2,
+          "mean": 1.5224759521484375,
+          "median": 1.5224759521484375,
+          "minimum": 1.51724658203125,
+          "maximum": 1.527705322265625
+        }
+      },
+      "estimate": {
+        "E2E_wall": 109.41134244995192,
+        "TPOT": 1.5224759521484375
+      },
+      "range": {
+        "E2E_wall": [
+          109.15362588409334,
+          109.66905901581049
+        ],
+        "TPOT": [
+          1.51724658203125,
+          1.527705322265625
+        ]
+      }
+    }
+  },
+  "full_ranges_seconds": {
+    "BR_H0": {
+      "E2E_wall": [
+        127.06945335119963,
+        127.11034424975514
+      ],
+      "TPOT": [
+        1.825370361328125,
+        1.826399658203125
+      ]
+    },
+    "FCA_H0": {
+      "E2E_wall": [
+        138.27555644139647,
+        138.9673173679039
+      ],
+      "TPOT": [
+        1.97444921875,
+        1.9844052734375
+      ]
+    },
+    "BR_H1b": {
+      "E2E_wall": [
+        104.11461764201522,
+        104.48007335141301
+      ],
+      "TPOT": [
+        1.4658013916015624,
+        1.4711390380859375
+      ]
+    },
+    "FCA_H1b": {
+      "E2E_wall": [
+        109.15362588409334,
+        109.66905901581049
+      ],
+      "TPOT": [
+        1.51724658203125,
+        1.527705322265625
+      ]
+    }
+  },
+  "repair_gains": {
+    "BR": {
+      "TPOT": 0.19574879743810025,
+      "E2E_wall": 0.17934197382237316
+    },
+    "FCA": {
+      "TPOT": 0.23085025976431894,
+      "E2E_wall": 0.21071845096217134
+    }
+  },
+  "fca_slowdown": {
+    "H0": 0.08409195294715421,
+    "candidate": 0.036776869396996315,
+    "relative_reduction": 0.5626588739102307
+  },
+  "c30_physical_scope_complete": true,
+  "no_oracle_authorized": true
+}

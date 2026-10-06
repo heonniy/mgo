@@ -11,7 +11,11 @@ def finalize():
     correctness_path=PACKET/('B3_H1b_CORRECTNESS.json' if candidate=='H1b' else 'B3_CORRECTNESS.json')
     clean=ROOT/'b3/C30/B3_C30_CLEAN_B128_H64/result.json'
     timings=[];gate=dict(correctness=json.loads(correctness_path.read_text())['status']=='PASS',
-                        diagnostic=diagnosis['status']=='DIAGNOSTIC_PASS')
+                        diagnostic=diagnosis['status']=='DIAGNOSTIC_PASS',
+                        diagnostic_integrity=diagnosis['diagnostic_integrity_pass'],
+                        compiled_host_call_reduction_at_least70=all(g['host_call_reduction']>=.70 for g in diagnosis['gates'].values()),
+                        full_expert_host_loop_reduction_at_least40=all(g['host_loop_reduction']>=.40 for g in diagnosis['gates'].values()),
+                        no_extra_h2d_or_packet=all(g['counters_and_packets_equal'] for g in diagnosis['gates'].values()))
     result=dict(candidate=candidate,status='DIAGNOSTIC_GATE_FAIL',repair_gate=gate,causal_case=None,c60_authorized=False,primary_timing_available=clean.exists())
     if clean.exists():
         timing=json.loads(clean.read_text());assert timing['status']=='PASS'
@@ -26,8 +30,9 @@ def finalize():
         result['repair_gains']={policy:{k:1-est[policy+'_'+candidate][k]/est[policy+'_H0'][k] for k in ('TPOT','E2E_wall')} for policy in ('BR','FCA')}
         before=est['FCA_H0']['TPOT']/est['BR_H0']['TPOT']-1
         after=est['FCA_'+candidate]['TPOT']/est['BR_'+candidate]['TPOT']-1
-        result['fca_slowdown']=dict(H0=before,H1=after)
+        result['fca_slowdown']=dict(H0=before,candidate=after,relative_reduction=(1-after/before) if before>0 else None)
         result['status']='REPAIR_PASS' if all(gate.values()) else 'REPAIR_GATE_FAIL'
+        result['c30_physical_scope_complete']=True
         if result['status']=='REPAIR_PASS' and before>0:
             # Case A also requires corresponding reduction in measured skew.
             rows=diagnosis['rows']
@@ -44,11 +49,14 @@ def finalize():
         w=csv.DictWriter(f,fieldnames=['cache','policy','executor','repeat','E2E_wall','TPOT']);w.writeheader();w.writerows(timings)
     write(PACKET/'B3_REPAIR_DECISION.json',result)
     lines=['# B3 host executor repair', '', 'Status: '+result['status'], '',
-           'R4 GPUs 0/1/4/5, C30/B128, frozen64, BF16 V3 P2/T2. Other users’ GPUs untouched.', '',
+           'R4 GPUs 0/1/4/5, C30/B128, frozen64, BF16 V3 P2/T2. Other users’ GPUs untouched.', 'Diagnostics use the fixed first8 decode-step prefix; clean primary E2E/TPOT uses all64 decode steps. Diagnostic means are not full64 timing estimates.', '',
            f'H0 is unchanged; {candidate} replays the exact expert kernel against live slot weights.',
            'Full64 discovery/capture/validation occurs before any timing; no new graph entry or compile is permitted during measurement.', '',
            '| Policy | Host call reduction | Expert host-loop reduction | Counter/packet parity |',
            '|---|---:|---:|---|']
+    if timings:
+        headline=f"Clean TPOT point-estimate reduction ({candidate} vs H0): BR {result['repair_gains']['BR']['TPOT']:.2%}, FCA {result['repair_gains']['FCA']['TPOT']:.2%}; timing stability passed: {gate['stable']}."
+        lines[4:4]=[headline,'The declared full-loop repair threshold remains binding independently of any physical gain. C60 is gated on all repair criteria.','']
     for p,g in diagnosis['gates'].items():lines.append(f"| {p} | {g['host_call_reduction']:.2%} | {g['host_loop_reduction']:.2%} | {g['counters_and_packets_equal']} |")
     if candidate=='H1b':
         original=json.loads((PACKET/'B3_DIAGNOSTIC_RESULTS.json').read_text())
@@ -73,6 +81,8 @@ def finalize():
     if clean.exists():
         sources[str(clean)]=hashlib.sha256(clean.read_bytes()).hexdigest()
         directory=clean.parent;portable=[]
+        clean_status=json.loads((directory/'status.json').read_text());assert clean_status['status']=='PASS'
+        sources[str(directory/'status.json')]=hashlib.sha256((directory/'status.json').read_bytes()).hexdigest()
         signature_packet=json.loads((PACKET/('B3_H1b_GRAPH_SIGNATURES.json' if candidate=='H1b' else 'B3_GRAPH_SIGNATURES.json')).read_text())
         for rank in range(4):
             source=directory/f'graph_signatures_rank{rank}.json';graph=json.loads(source.read_text())
@@ -101,6 +111,14 @@ def finalize():
         with path.open('rb') as f:
             for block in iter(lambda:f.read(8*1024*1024),b''):h.update(block)
         input_sources[str(path)]=h.hexdigest()
+    resource=PACKET/'B3_RESOURCE_AUDIT.json'
+    if resource.exists():
+        r=json.loads(resource.read_text());assert r['status']=='PASS'
+        lines+=['',f"Resource audit: peak worker GPU allocation {r['peak_worker_gpu_allocated_gib']:.2f} GiB; minimum recorded host available memory {r['min_recorded_primary_host_available_gib']:.2f} GiB. Primary boundary snapshots show no foreign GPU jobs. Only physical GPUs 0/1/4/5 were used; owned model inference workers were restored on those GPUs."]
+        (PACKET/'B3_RESULTS.md').write_text('\n'.join(lines)+'\n')
+    for name in ('B3_AUDIT.json','B3_RESOURCE_AUDIT.json','B3_RESULTS.md','B3_REPAIR_DECISION.json','B3_TIMING_REPEATS.csv','B3_TIMING_REPEATS.json','B3_CLEAN_GRAPH_SIGNATURES.json'):
+        path=PACKET/name
+        if path.exists():sources[str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
     write(PACKET/'B3_SOURCE_RECEIPTS.json',dict(sources=sources,diagnostic_sources=diagnosis['sources'],capture_statuses=captures,frozen_input_sha256=input_sources))
     return result
 if __name__=='__main__':print(json.dumps(finalize(),indent=2))

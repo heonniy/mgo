@@ -1,3 +1,18 @@
+**CURRENT OWNER ALLOCATION (2026-10-06): physical GPUs 0,1,4,5 only.**
+GPUs 2,3,6,7 are allocated to other users, including when temporarily idle.
+Do not launch experiment/load workers there or terminate their processes.
+This overrides older eight-GPU idle-load directives below until explicit owner
+reauthorization. Restore owned model-inference load only on 0,1,4,5.
+
+**B3 checkpoint complete (2026-10-06): C30 host executor repair study.**
+Read `experiments/critical_path_admission_followup_20261006/B3_RESULTS.md`
+and `B3_REPAIR_DECISION.json` in that packet. H1/H1b preserve full64 parity;
+C30 H0/H1b BR/FCA clean timing completed with two stable repeats each.
+TPOT improves, but the declared 40% full host-loop reduction gate is unmet.
+Stop for owner review: no automatic C60, Stage C oracle, grouped GEMM, or
+further executor tuning. H1b remains an opt-in frozen-signature experiment.
+Earlier priorities below are historical unless explicitly reactivated.
+
 **OWNER PRIORITY (2026-10-04): decode-only prefetch runtime refactoring.**
 Read `experiments/decode_prefetch_runtime_refactoring_20261004/` in this order:
 README -> INVARIANTS -> PLAN -> MILESTONES -> MEASUREMENT -> IMPLEMENTATION_MAP -> AGENT_TASK.
