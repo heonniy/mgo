@@ -19,13 +19,28 @@ def dispatch_counts(cap,rank):
   if name.startswith('b2|') and name.endswith('|expert_loop'):ranges[r['globalTid']].append((r['start'],r['end'],int(name.split('|')[1])))
  for tid in ranges:ranges[tid].sort()
  starts={tid:[a for a,b,e in rs] for tid,rs in ranges.items()};counts=defaultdict(int);all_calls=defaultdict(int)
- for r in db.execute('select start,end,globalTid,nameId from CUPTI_ACTIVITY_KIND_RUNTIME'):
-  tid=r['globalTid']
-  if tid not in ranges:continue
-  i=bisect.bisect_right(starts[tid],r['start'])-1
-  if i<0 or ranges[tid][i][1]<r['end']:continue
-  e=ranges[tid][i][2];name=strings[r['nameId']];all_calls[e]+=1
-  if 'LaunchKernel' in name or 'GraphLaunch' in name:counts[e]+=1
+ candidates=defaultdict(list);apis=defaultdict(list)
+ tables={r[0] for r in db.execute("select name from sqlite_master where type='table'")}
+ for table in ('CUPTI_ACTIVITY_KIND_RUNTIME','CUPTI_ACTIVITY_KIND_DRIVER'):
+  if table not in tables:continue
+  for r in db.execute(f'select start,end,globalTid,nameId from {table}'):
+   tid=r['globalTid']
+   if tid not in ranges:continue
+   i=bisect.bisect_right(starts[tid],r['start'])-1
+   if i<0 or ranges[tid][i][1]<r['end']:continue
+   e=ranges[tid][i][2];name=strings[r['nameId']];interval=(r['start'],r['end'])
+   apis[e].append(interval)
+   if 'LaunchKernel' in name or 'GraphLaunch' in name:candidates[e].append(interval)
+ def outer_count(intervals):
+  # Count direct Triton driver calls, but not the driver call nested inside
+  # a torch CUDA-runtime launch as a second host dispatch.
+  end=-1;count=0
+  for a,b in sorted(intervals,key=lambda x:(x[0],-x[1])):
+   if b<=end:continue
+   count+=1;end=b
+  return count
+ for e,intervals in candidates.items():counts[e]=outer_count(intervals)
+ for e,intervals in apis.items():all_calls[e]=outer_count(intervals)
  db.close();return counts,all_calls
 
 def main():
@@ -76,7 +91,7 @@ def main():
   gates[policy]=dict(parity=bool(same),host_call_reduction=1-b['host_dispatch_calls_per_step']/a['host_dispatch_calls_per_step'],host_loop_reduction=1-b['host_loop_ms_per_step']/a['host_loop_ms_per_step'],service_stage_spearman=b['service_stage_spearman'])
  h2=[r for r in summaries if r['executor']=='H2'];br=next(r for r in h2 if r['policy']=='BR');fca=next(r for r in h2 if r['policy']=='FCA')
  predicted=fca['pred_group_service_ms_per_step']-br['pred_group_service_ms_per_step'];actual=fca['observed_expert_stage_ms_per_step']-br['observed_expert_stage_ms_per_step'];waitdelta=fca['ready_wait_ms_per_step']-br['ready_wait_ms_per_step']
- gap=dict(status='DIAGNOSTIC_COMPLETE',summaries=summaries,gates=gates,delta=dict(predicted_ms_per_step=predicted,observed_ms_per_step=actual,relative_error=abs(predicted-actual)/max(abs(actual),1e-9),measured_ready_wait_delta_ms_per_step=waitdelta,residual_after_readiness_ms_per_step=actual-predicted-waitdelta),exception_applied=False,notes=['No arbitrary scale or coefficient fit to policy timing.','H1b service predictor is summed singleton grouped service, a diagnostic comparison only.','Ready-wait is separately measured host time, not automatically an additive physical critical-path correction.','Launch count is main-thread CUDA runtime kernel/graph dispatch calls within expert-loop, excluding event queries. All CUDA API calls also reported.'])
+ gap=dict(status='DIAGNOSTIC_COMPLETE',summaries=summaries,gates=gates,delta=dict(predicted_ms_per_step=predicted,observed_ms_per_step=actual,relative_error=abs(predicted-actual)/max(abs(actual),1e-9),measured_ready_wait_delta_ms_per_step=waitdelta,residual_after_readiness_ms_per_step=actual-predicted-waitdelta),exception_applied=False,notes=['No arbitrary scale or coefficient fit to policy timing.','H1b service predictor is summed singleton grouped service, a diagnostic comparison only.','Ready-wait is separately measured host time, not automatically an additive physical critical-path correction.','Launch count is main-thread CUDA runtime/driver kernel/graph dispatch calls within expert-loop, excluding event queries and deduplicating nested driver calls. All top-level CUDA API calls also reported.'])
  write(PACKET/'B4_KNOB_RUNTIME_GAP.json',gap)
  for name,data in [('B4_WAVE_STATS',waves),('B4_DIAGNOSTIC_RESULTS',rows)]:
   write(PACKET/(name+'.json'),dict(status='PASS' if parity else 'FAIL',primary_timing=False,rows=data,sources=sources))

@@ -23,12 +23,13 @@ def main():
   gains[policy]={metric:1-summary[policy+'_H2'][metric]/summary[policy+'_H1b'][metric] for metric in ('TPOT','E2E_wall')}
  common=dict(correctness=correctness['correctness_pass'],no_signature_graph_required=all(r['executor']['graph_entries']==0 for r in correctness['ranks']),br_regression_at_most_1pct=gains['BR']['TPOT']>=-.01,delta_error_at_most_25pct=mechanism['delta']['relative_error']<=.25)
  passed=all(common.values()) and all(all(g.values()) for g in gates.values())
- decision=dict(status='C30_H2_GATE_PASS' if passed else 'C30_H2_GATE_FAIL',gates=gates,common_gates=common,estimates=summary,gains=gains,mechanism=mechanism,c60_authorized=passed,oracle_authorized=False)
+ interpretation='A' if passed else ('UNSTABLE' if any(not g['timing_stable'] for g in gates.values()) else 'C' if all(g['TPOT']<=.01 for g in gains.values()) else 'B')
+ decision=dict(case=interpretation,status='C30_H2_GATE_PASS' if passed else 'C30_H2_GATE_FAIL',gates=gates,common_gates=common,estimates=summary,gains=gains,mechanism=mechanism,c60_authorized=passed,oracle_authorized=False)
  write(PACKET/'B4_REPAIR_DECISION.json',decision)
  write(PACKET/'B4_TIMING_REPEATS.json',dict(status='PASS',samples=timing,summaries=result['gates'],source_hashes={str(p):sha(p) for p in sorted(cap.glob('*_measure_rank*.json'))}))
  with (PACKET/'B4_TIMING_REPEATS.csv').open('w') as f:
   w=csv.DictWriter(f,fieldnames=list(timing[0]));w.writeheader();w.writerows(timing)
- lines=['# B4 C30 dynamic grouped executor results','',f"Decision: **{decision['status']}**. No Stage C oracle authorized.",'','R4 GPUs 0,1,4,5; C30/local B128; BF16; frozen decode64; V3 P2/T2; Env1.','', '|Policy/runtime|TPOT seconds|E2E seconds|','|---|---:|---:|']
+ lines=['# B4 C30 dynamic grouped executor results','',f"Decision: **{decision['status']}**, interpretation **{interpretation}**. No Stage C oracle authorized.",'','R4 GPUs 0,1,4,5; C30/local B128; BF16; frozen decode64; V3 P2/T2; Env1.','', '|Policy/runtime|TPOT seconds|E2E seconds|','|---|---:|---:|']
  for key,r in summary.items():lines.append(f"|{key}|{r['TPOT']:.6f}|{r['E2E_wall']:.6f}|")
  lines+=['','All valid samples retained; initial two repeats use the frozen <=2% / <=5% rule.','Full ranges and stability decisions are in B4_TIMING_REPEATS.json.','', '## Mechanism gate','']
  for policy,m in mechanism['gates'].items():lines.append(f"- {policy}: host dispatch count reduction {100*m['host_call_reduction']:.2f}%; host-loop reduction {100*m['host_loop_reduction']:.2f}%; grouped service/expert-stage Spearman {m['service_stage_spearman']}.")
