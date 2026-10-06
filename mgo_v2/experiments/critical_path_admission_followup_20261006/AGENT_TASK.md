@@ -80,8 +80,27 @@ Required order:
 
 Do not introduce grouped GEMM/Triton yet unless H1 fails and the owner explicitly authorizes another repair.
 
+### B4. Dynamic grouped-GEMM expert executor
+B3 completed at `1fc6278`. H1b improved TPOT by 19.6% (BR) / 23.1% (FCA) and reduced the FCA-vs-BR slowdown from 8.41% to 3.68%, but it still executes per-expert Python orchestration and requires 38k-42k frozen CUDA-graph signatures per rank.
+
+B4 is now owner-authorized. Read `STAGE_B4_GROUPED_GEMM_EXECUTOR.md`.
+
+Implement a dynamic ready-wave grouped-GEMM executor (H2):
+- no future-event graph discovery;
+- no per-signature CUDA-graph cache;
+- live cache-slot weights;
+- preserve H2D overlap through ready waves;
+- batch readiness and slot-use bookkeeping;
+- preserve packet/cache/admission semantics.
+
+Primary first cell: C30/B128 with BR/FCA. Compare H1b vs H2 with separate diagnostics and clean timing.
+
+The key acceptance test is not only TPOT. Quantify whether grouped service + separately measured H2D readiness predict measured rank completion substantially better than the old per-expert host path.
+
+Run C60 only if the C30 H2 gate passes.
+
 ### C/D. Exact current-layer oracle and frozen replay
-NOT authorized in this checkpoint. Do not run any oracle planning or frozen-oracle GPU replay after B3 without owner approval.
+NOT authorized in this checkpoint. Do not run any oracle planning or frozen-oracle GPU replay after B4 without owner approval.
 
 Do not read future routes.
 

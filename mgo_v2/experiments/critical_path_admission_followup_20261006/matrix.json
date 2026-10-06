@@ -1,5 +1,5 @@
 {
-  "status": "B2_COMPLETE_B3_HOST_REPAIR_AUTHORIZED",
+  "status": "B3_C30_COMPLETE_B4_GROUPED_GEMM_AUTHORIZED",
   "parent_evidence": "9c20847f7eae7631ffd41a3420c78e06cc6de55b",
   "hardware": {
     "world": 4,
@@ -213,6 +213,65 @@
       "stop_after_stage_b3": true
     },
     {
+      "id": "B4_GROUPED_GEMM_EXECUTOR",
+      "purpose": "remove per-expert host orchestration and test whether placement-visible work predicts physical rank completion",
+      "primary_setting": {
+        "cache_ratio": 0.3,
+        "local_batch": 128,
+        "decode_horizon": 64
+      },
+      "confirmation_setting": {
+        "cache_ratio": 0.6,
+        "local_batch": 128,
+        "run_only_after_primary_gate": true
+      },
+      "policies": [
+        "BR",
+        "FCA"
+      ],
+      "runtimes": [
+        "H1b_CUDA_GRAPH_PER_EXPERT",
+        "H2_DYNAMIC_GROUPED_GEMM"
+      ],
+      "h2": {
+        "no_future_signature_discovery": true,
+        "no_signature_graph_cache": true,
+        "ready_wave_execution": true,
+        "live_cache_slot_weights": true,
+        "batch_scheduler_helpers": [
+          "ready_many",
+          "record_slots_use"
+        ],
+        "grouped_ops": [
+          "gate_up",
+          "silu_mul",
+          "down",
+          "routing_weight"
+        ],
+        "preferred_backend": "triton_dynamic_grouped_gemm",
+        "fallback": "supported CUDA/PyTorch grouped GEMM only"
+      },
+      "knob_runtime_metrics": [
+        "grouped_service_vs_observed_expert_stage_spearman",
+        "grouped_service_aggregate_error",
+        "BR_to_FCA_expert_stage_delta_error",
+        "predicted_ready_skew_vs_return_entry_skew",
+        "raw_rows_baseline"
+      ],
+      "c30_gate": {
+        "correctness_parity": true,
+        "no_frozen_graph_cache": true,
+        "expert_host_call_reduction_vs_H1b_min": 0.8,
+        "expert_host_loop_reduction_vs_H1b_min": 0.25,
+        "br_tpot_regression_vs_H1b_max": 0.01,
+        "stable_primary_timing": true,
+        "grouped_service_spearman_min": 0.8,
+        "BR_to_FCA_expert_stage_delta_error_max": 0.25,
+        "delta_error_exception": "allowed only if residual is separately measured H2D readiness, not host orchestration"
+      },
+      "stop_after_stage_b4": true
+    },
+    {
       "id": "C_ORACLE",
       "action_space": "current-layer residual miss expert-to-rank assignment only",
       "future_routes": false,
@@ -264,5 +323,7 @@
   "stage_b_passed": false,
   "stage_b2_authorized": true,
   "stage_b2_result_commit": "0848cd07a7c1ca37b3764bb618b0138e74674c94",
-  "stage_b3_authorized": true
+  "stage_b3_authorized": true,
+  "stage_b3_result_commit": "1fc62786450a52099b372e69b7e47eb1544a4017",
+  "stage_b4_authorized": true
 }
