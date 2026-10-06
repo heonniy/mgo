@@ -52,7 +52,9 @@ def install(rt):
     expert,rows,cols,slot=groups[i];assert self.keys[slot]==layer*128+expert
     meta=dict(expert=int(expert),rows=len(rows),slot=int(slot),key=int(layer*128+expert))
     with rec.phase('expert_gather',**meta):
-     w=self.cache[slot];x=received[rows];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
+     x=received[rows]
+     if getattr(self,'graph_executor',None) is None:
+      w=self.cache[slot];gate=w[:1572864].view(768,2048);up=w[1572864:3145728].view(768,2048);down=w[3145728:].view(2048,768)
     with rec.phase('expert_compiled_kernel',**meta):
      part=self.graph_executor(slot,x) if getattr(self,'graph_executor',None) is not None else self.kernel(x,gate,up,down)
     with rec.phase('expert_record_use',**meta):self.h2d.record_slot_use(slot)
