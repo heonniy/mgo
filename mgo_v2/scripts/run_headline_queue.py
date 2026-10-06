@@ -52,7 +52,7 @@ def state(label):
 
 
 def main(a):
-    assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery, a.cleanup_recovery, a.llama_small_confirmation, a.ours_large_confirmation]) <= 1
+    assert sum([a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery, a.cleanup_recovery, a.llama_small_confirmation, a.ours_large_confirmation, bool(a.infinity_confirmation)]) <= 1
     queue = jobs(a.after, a.recovery, a.deepspeed_confirmation, a.deepspeed_large_confirmation, a.llama_recovery)
     if a.cleanup_recovery:
         assert not any([a.recovery,a.deepspeed_confirmation,a.deepspeed_large_confirmation,a.llama_recovery])
@@ -69,6 +69,10 @@ def main(a):
         queue = [('llama_B16_L256_confirmation1', 'llama.cpp-layer', 'llama', SMALL, 'base-env', 1, False, None)]
     if a.ours_large_confirmation:
         queue = [('ours_B64_L512_confirmation1', 'Ours', 'ours', LARGE, None, 4, False, None)]
+    if a.infinity_confirmation:
+        cell = SMALL if a.infinity_confirmation=='small' else LARGE
+        label = 'infinity_B16_L256_confirmation1' if cell==SMALL else 'infinity_B64_L512_confirmation1'
+        queue = [(label, 'MoE-Infinity-repaired', 'infinity', cell, 'infinity-env', 1, False, None)]
     if a.dry_run:
         print(json.dumps(queue, indent=2))
         return
@@ -138,4 +142,5 @@ if __name__ == '__main__':
     p.add_argument('--after-queue', type=Path)
     p.add_argument('--llama-small-confirmation', action='store_true')
     p.add_argument('--ours-large-confirmation', action='store_true')
+    p.add_argument('--infinity-confirmation', choices=['small','large'])
     main(p.parse_args())
