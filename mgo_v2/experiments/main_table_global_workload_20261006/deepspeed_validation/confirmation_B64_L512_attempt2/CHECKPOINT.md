@@ -1,1 +1,1 @@
-Warmup and first two primaries pass cold-parameter, finite-logit, GPU KV, token/request and byte-cap checks. Raw global-max clocks agree with outer metrics. Repeat2 TTFT5.692961276s, TPOT6.305955924540s, E2E402.968184522s; repeat1 TPOT4.696273745794s. Timing already unstable; slow repeat2 is retained. Interval observations are archived; they cannot establish causality. Repeat3 running; no extra repeat loop.
+Complete: see RESULTS.md, audit.json and all raw repeats. Bounded confirmation remains unstable; no sample filtering or further automatic repeats.

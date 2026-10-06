@@ -1,6 +1,6 @@
 # Main-table progress snapshot
 
-Generated UTC 2026-10-06T21:26:39.501434+00:00. This is an incomplete comparison, not the final headline table. All eight cells have completed full primary triplets; two are stable and selected. Four bounded confirmation jobs remain running/queued. OURS and DeepSpeed small-cell bounded confirmations have completed and remain unstable; no further automatic repeat is scheduled for these small cells.
+Generated UTC 2026-10-06T22:11:35.735569+00:00. This is an incomplete comparison, not the final headline table. All eight cells have completed full primary triplets; two are stable and selected. Three bounded confirmation jobs remain running/queued. OURS small-cell and both DeepSpeed bounded confirmations have completed and remain unstable; no further automatic repeat is scheduled for these cells.
 
 Scope: R4, physical GPUs0/1/4/5, C30 expert budget1843 slots (16.1982421875GiB global), identical frozen ShareGPT-long manifests, output64. B labels are requests per OURS/DeepSpeed rank; global batch is4x B. OURS=LA_CA_NEAR, H0/full-pinned.
 
@@ -16,7 +16,7 @@ All numbers are seconds. Each displayed estimate is the median of its full three
 | B16 / L256 | llama.cpp static | 37.411 | 0.255360 | 54.235 | 14.59% / 6.16% / 9.75% | UNSTABLE |
 | B64 / L512 | OURS Near | 28.007 | 1.415347 | 117.174 | 4.67% / 9.87% / 8.59% | UNSTABLE |
 | B64 / L512 | MoE-Infinity repaired | 9.650 | 3.696202 | 242.535 | 1.57% / 3.36% / 3.17% | PASS |
-| B64 / L512 | DeepSpeed CPU offload | 5.795 | 4.728005 | 303.659 | 42.24% / 7.69% / 8.43% | UNSTABLE |
+| B64 / L512 | DeepSpeed CPU offload | 7.928 | 4.825910 | 311.960 | 37.13% / 30.51% / 29.05% | UNSTABLE |
 | B64 / L512 | llama.cpp static | 334.629 | 0.404266 | 360.068 | 3.45% / 2.86% / 3.01% | PASS |
 
 ## Resource observations
@@ -31,7 +31,7 @@ GiB=2^30 bytes. HBM is the largest per-GPU1Hz NVML observation during the measur
 | B16 / L256 | llama.cpp static | 14.84 | 41.35 | unavailable |
 | B64 / L512 | OURS Near | 19.23 | 677.32 | 216.00 |
 | B64 / L512 | MoE-Infinity repaired | 59.95 | 59.82 | unavailable |
-| B64 / L512 | DeepSpeed CPU offload | 16.56 | 90.61 | 56.87 |
+| B64 / L512 | DeepSpeed CPU offload | 16.56 | 90.72 | 56.87 |
 | B64 / L512 | llama.cpp static | 18.37 | 41.95 | unavailable |
 
 Total HBM includes dense weights, activations, KV and workspaces. The common limit is expert residency, not total30GiB HBM. llama.cpp uses14 GPU expert layers/15.75GiB, conservatively below16.198GiB; host expert operation offload is disabled. DeepSpeed limits all-parameter residency, a conservative upper bound on experts.
@@ -50,7 +50,7 @@ Displayed attempt mapping:
 - B16 / L256, llama.cpp static: `llama_B16_L256_static1`.
 - B64 / L512, OURS Near: `ours_B64_L512_primary2`.
 - B64 / L512, MoE-Infinity repaired: `infinity_B64_L512_primary3`.
-- B64 / L512, DeepSpeed CPU offload: `deepspeed_B64_L512_primary1`.
+- B64 / L512, DeepSpeed CPU offload: `deepspeed_B64_L512_confirmation2`.
 - B64 / L512, llama.cpp static: `llama_B64_L512_static1`.
 
 OURS small cell: separate launches reproduce a ~45–47% first-primary TTFT premium over the later-two mean. Cold expert-cache and no-compile guards pass, so these observations do not identify the cause. The first sample is retained. The current bounded confirmation median TPOT0.769798s passes its own spread check, but TTFT/E2E keep the whole row unstable.

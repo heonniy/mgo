@@ -2,13 +2,15 @@
 
 ## Current checkpoint
 
-Execution remains incomplete. MoE-Infinity and llama.cpp B64/L512 pass headline selection. Other completed
-attempts require bounded confirmation; preserve every sample without outlier removal.
+Execution remains incomplete. MoE-Infinity and llama.cpp B64/L512 pass headline
+selection. Three bounded confirmations remain running/queued. OURS small and both
+DeepSpeed confirmations finished but remain unstable; no further automatic repeats
+are scheduled for those cells. Preserve every sample without outlier removal.
 
 | System | Local B16 / input256 | Local B64 / input512 |
 | --- | --- | --- |
 | OURS Near | Correctness PASS; bounded confirmation remains UNSTABLE, all samples retained | Correctness PASS, timing UNSTABLE; bounded confirmation pending |
-| DeepSpeed CPU offload | Correctness PASS; bounded confirmation TTFT UNSTABLE, TPOT/E2E stable | Correctness PASS, timing UNSTABLE; confirmation queued |
+| DeepSpeed CPU offload | Correctness PASS; bounded confirmation TTFT UNSTABLE, TPOT/E2E stable | Correctness PASS; bounded confirmation remains UNSTABLE |
 | MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 | llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 
