@@ -2,8 +2,8 @@
 
 ## Current checkpoint
 
-Execution remains incomplete. Completed three-repeat attempts are not yet
-stable enough for headline selection; preserve all samples without outlier removal.
+Execution remains incomplete. Only llama.cpp B64/L512 currently passes headline selection. Other completed
+attempts require bounded confirmation; preserve every sample without outlier removal.
 
 | System | Local B16 / input256 | Local B64 / input512 |
 | --- | --- | --- |
@@ -14,7 +14,8 @@ stable enough for headline selection; preserve all samples without outlier remov
 
 Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.
 Current serial chain: `LLAMA_STATIC_RECOVERY_QUEUE.json` ->
-`CLEANUP_RECOVERY_QUEUE.json` -> `LLAMA_SMALL_CONFIRMATION_QUEUE.json`.
+`CLEANUP_RECOVERY_QUEUE.json` -> `LLAMA_SMALL_CONFIRMATION_QUEUE.json` ->
+`OURS_LARGE_CONFIRMATION_QUEUE.json` -> `INFINITY_SMALL_CONFIRMATION_QUEUE.json`.
 The middle queue replaces five jobs that failed before model launch and their
 skipped dependencies. Earlier queue receipts are historical, not active schedules.
 See `queue_cleanup_recovery/README.md` for the preflight failures and bounded

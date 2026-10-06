@@ -1,11 +1,14 @@
 # Owner-authorized MoE-Infinity baseline repairs
 
-Current status: priority eviction, EAM and exact expert budgets passed native
-builds, 9 Python tests, 15 native residency tests and full-model smoke8.
-The separate measurement-harness KV lifecycle fix now passes physical
-smoke2; previous primary attempts remain superseded, not headline results.
-The serial recovery queue runs lifecycle smoke, then both main cells after
-the current independent baseline queue. Historical checkpoints follow below.
+Current status: priority eviction, EAM and exact expert budgets pass 9 Python
+checks, 15 native residency tests, GPU dispatch/chunk regressions and the
+KV-lifecycle physical smoke. Corrected B16/L256 completes all three primaries:
+median TTFT4.916002s, TPOT3.050297s, E2E197.080829s. Its TTFT spread6.73%
+requires the already queued bounded confirmation; all raw samples are retained.
+Corrected B64/L512 completes primaries1/2 with all mechanism/budget/KV guards
+passing; final repeat is running. See primary_B16_L256_attempt4 and
+primary_B64_L512_attempt3 for receipts. Prior KV-retaining attempts remain
+superseded. Historical checkpoints below describe earlier stages, not active jobs.
 Upstream MoE-Infinity: 9f819a6d43e043bded6e0692e5e58793e1623364.
 moe-store: v0.2.2, 096f51f92ca9d698907d9a79120a7819ea094266.
 
