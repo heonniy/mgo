@@ -26,6 +26,7 @@ def main():
     row=dict(policy=policy,rank=rank,event=event,step=event//48,layer=event%48,**d);event_rows.append(row)
    total={k:sum(d[k] for d in byevent.values())/32 for k in next(iter(byevent.values()))}
    total.update(policy=policy,rank=rank,physical_gpu=receipt['physical_gpu'],diagnostic_tpot_ms=receipt['TPOT']*1000,primary_tpot_ms=receipt['primary_TPOT']*1000)
+   total['forward_MB_per_step']=receipt['forward_bytes']/1e6/32;total['return_MB_per_step']=receipt['return_bytes']/1e6/32
    total['outside_moe']=total['diagnostic_tpot_ms']-total['moe'];assert total['outside_moe']>=-.1
    total['partition_sum']=sum(total[k] for k in ['expert_service','h2d_wait','payload_comm','metadata','moe_other','outside_moe'])
    assert abs(total['partition_sum']-total['diagnostic_tpot_ms'])<.01

@@ -1,3 +1,13 @@
+**OWNER ONE-CELL BR/NEAR DIAGNOSTIC COMPLETE (2026-10-07).**
+Read experiments/r4_br_near_h0_20261007/diagnostic/RESULTS.md. Owner narrowed
+attribution to one workload and clarified BR versus Near comparison: B64/L512,
+R4/C30/H0/full-pinned/decode32 on0,1,4,5. Both diagnostics passed. Near reduced
+peak expert rows18.14%, service imbalance25.00%, mean collective completion7.30%;
+explicit H2D wait was zero for both. Diagnostic TPOT gain0.50%, versus prior
+single-shot primary4.32%; do not claim exact causal attribution of that4.32%.
+All8 primary combinations remain complete. No further matrix/repeats authorized
+by this diagnostic packet. Owned model-forward loads restored on0,1,4,5 only.
+
 **OWNER EIGHT-COMBINATION R4 RERUN (2026-10-07).**
 Run experiments/r4_br_near_h0_20261007/PLAN.md: C30, local B16/B64,
 input256/512, BR/LA_CA_NEAR, decode32, H0/full-pinned V3 P2/T2. Reuse

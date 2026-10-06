@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "started_unix": 1791302905.3094423,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "source_commit": "e4bf862d8e03eebb3002b56585843cdade33f7c4",
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/br_near_phase_worker.py",
+    "--output",
+    "/home/hwlee/mgo-results/br_near_phase_probe_20261007"
+  ],
+  "pid": 2674630,
+  "result": {
+    "status": "PASS",
+    "cell": "B64_L512",
+    "policies": [
+      "BR",
+      "LA_CA_NEAR"
+    ],
+    "diagnostic_runs": 2,
+    "scope": "CUDA stream spans; instrumented, not primary timing."
+  },
+  "finished_unix": 1791303276.559872,
+  "restored_owned_idle_models": [
+    {
+      "gpu": 0,
+      "pid": 2678438
+    },
+    {
+      "gpu": 1,
+      "pid": 2678448
+    },
+    {
+      "gpu": 4,
+      "pid": 2678461
+    },
+    {
+      "gpu": 5,
+      "pid": 2678476
+    }
+  ]
+}
