@@ -2,8 +2,8 @@
 
 Current status: priority eviction, EAM and exact expert budgets passed native
 builds, 9 Python tests, 15 native residency tests and full-model smoke8.
-The separate measurement-harness KV lifecycle fix still awaits physical
-validation; previous primary attempts are superseded, not headline results.
+The separate measurement-harness KV lifecycle fix now passes physical
+smoke2; previous primary attempts remain superseded, not headline results.
 The serial recovery queue runs lifecycle smoke, then both main cells after
 the current independent baseline queue. Historical checkpoints follow below.
 Upstream MoE-Infinity: 9f819a6d43e043bded6e0692e5e58793e1623364.
@@ -45,3 +45,5 @@ Chunk build and native GPU regression PASS: rows1/17/8193 across4 producer GPUs,
 Full B16/L256 attempt2 completed all3 primaries with valid budget/cache/EAM receipts. Median TTFT4.88395s, TPOT3.06361s, E2E198.20504s. TTFT spread6.59% fails headline stability; retain all samples and require bounded stability follow-up before headline use. Larger B64/L512 is now running through the serial queue.
 
 KV lifecycle repair: found local `kv` retained a previous batch cache across the next `generate`. Big warmup peak allocated~28.77–29.02GiB/GPU versus first primary~32.14–32.39GiB/GPU corroborates the extra cache. Large attempt1 stopped after repeat2; all old MoE primary attempts are superseded for headline use. New harness deletes sequence/cache references after recording tokens, collects, synchronizes, and verifies cache/tensor weakrefs are dead. Both main cells must be rerun after a short lifecycle smoke. Independent DeepSpeed/llama/OURS queue continues.
+
+KV release smoke2 PASS: warmup and target both verify cache/tensor weakrefs released, cold expert residency0. Target EAM96calls/122114candidate submissions,7322priority evictions, global expert peak17392730112bytes and all4 per-GPU caps pass. Full unchanged main cells are now rerunning. These two-token smoke timings are not headline results.
