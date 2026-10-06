@@ -2,14 +2,14 @@
 
 ## Current checkpoint
 
-Execution remains incomplete. Only llama.cpp B64/L512 currently passes headline selection. Other completed
+Execution remains incomplete. MoE-Infinity and llama.cpp B64/L512 pass headline selection. Other completed
 attempts require bounded confirmation; preserve every sample without outlier removal.
 
 | System | Local B16 / input256 | Local B64 / input512 |
 | --- | --- | --- |
 | OURS Near | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness PASS, timing UNSTABLE; bounded confirmation pending |
 | DeepSpeed CPU offload | Correctness PASS, timing UNSTABLE; fixed-CPU confirmation queued | Correctness PASS, timing UNSTABLE; confirmation queued |
-| MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Corrected primary running |
+| MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 | llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
 
 Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.

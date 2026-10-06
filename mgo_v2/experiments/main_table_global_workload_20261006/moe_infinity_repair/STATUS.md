@@ -5,8 +5,9 @@ checks, 15 native residency tests, GPU dispatch/chunk regressions and the
 KV-lifecycle physical smoke. Corrected B16/L256 completes all three primaries:
 median TTFT4.916002s, TPOT3.050297s, E2E197.080829s. Its TTFT spread6.73%
 requires the already queued bounded confirmation; all raw samples are retained.
-Corrected B64/L512 completes primaries1/2 with all mechanism/budget/KV guards
-passing; final repeat is running. See primary_B16_L256_attempt4 and
+Corrected B64/L512 passes all three primaries and headline stability: median
+TTFT9.650225s, TPOT3.696202s, E2E242.535426s. All mechanism/budget/KV
+guards pass; selected without further repeats. See primary_B16_L256_attempt4 and
 primary_B64_L512_attempt3 for receipts. Prior KV-retaining attempts remain
 superseded. Historical checkpoints below describe earlier stages, not active jobs.
 Upstream MoE-Infinity: 9f819a6d43e043bded6e0692e5e58793e1623364.
