@@ -4,8 +4,14 @@ from pathlib import Path
 import run_full_pinned_r4 as c
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 def main(a):
+ requested_timeout=a.timeout
+ # The small native llama warmup takes483s; the large cell has8x input
+ # tokens. Allow its unchanged four batches to finish under a finite bound.
+ if a.worker=='headline_llama_worker.py' and a.cell=='R4_C30_B64_L512_O64' and not a.smoke:
+  a.timeout=max(a.timeout,14400)
  out=ROOT/a.label;assert not out.exists(),'new label required to preserve attempts';assert c.host_available()>=384*2**30
  out.mkdir(parents=True);state=dict(status='RUNNING',started=time.time(),system=a.system,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=c.P.parent,text=True).strip());stopped=[];proc=None
+ state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout)
  try:
   stopped=c.stop_target_idle();assert not c.foreign_on_targets()
   env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',TORCHINDUCTOR_COMPILE_THREADS='2',PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{c.P}:{c.P/"scripts"}:{c.P/"examples"}')

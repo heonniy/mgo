@@ -6,7 +6,7 @@ ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 TOOLS=Path('/home/hwlee/mgo-tools/headline-r4')
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
-def request(url,payload=None,timeout=3600):
+def request(url,payload=None,timeout=7200):
  data=None if payload is None else json.dumps(payload).encode()
  req=urllib.request.Request(url,data=data,headers={'Content-Type':'application/json'})
  with urllib.request.urlopen(req,timeout=timeout) as r:return json.load(r)
