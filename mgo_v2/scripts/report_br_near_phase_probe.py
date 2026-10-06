@@ -43,7 +43,7 @@ def main():
  write(PACKET/'SUMMARY.json',summary)
  for name,rows in [('RANK_COMPONENTS.csv',rank_rows),('LAYER_COMPONENTS.csv',event_rows)]:
   keys=list(dict.fromkeys(k for row in rows for k in row))
-  with (PACKET/name).open('w') as f:w=csv.DictWriter(f,fieldnames=keys);w.writeheader();w.writerows(rows)
+  with (PACKET/name).open('w') as f:w=csv.DictWriter(f,fieldnames=keys,lineterminator="\n");w.writeheader();w.writerows(rows)
  dest=PACKET/'raw';dest.mkdir(exist_ok=True);hashes={}
  for f in sorted(ROOT.iterdir()):
   if f.is_file():shutil.copy2(f,dest/f.name);hashes[f.name]=hashlib.sha256(f.read_bytes()).hexdigest()
