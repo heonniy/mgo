@@ -8,7 +8,7 @@ The requested experiment executes all eight matrix rows and preserves their outc
 
 The existing `HEADLINE_SELECTION.json` and stable-panel audit are unchanged: only PASS triplets can enter that selection. `execution_complete` does not imply `stable_headline_panel_complete`. Final completion also requires archived provenance, resource caveats, clean GPU handoff, committed reports and verified push; those are not certified by this script alone.
 
-Validation against current real receipts: six execution outcomes complete, three timing-stable, two jobs pending. Removing the prior-attempt declaration from a final unstable row is rejected; a duplicate matrix row is rejected. These were CPU-only checks without a new model run.
+Initial validation against real receipts had six outcomes complete, three timing-stable and two jobs pending. The final audit now has eight outcomes complete and three timing-stable. Removing the prior-attempt declaration from a final unstable row is rejected; a duplicate matrix row is rejected. These were CPU-only checks without a new model run.
 
 Regenerate from the repository root:
 

@@ -1,7 +1,6 @@
 {
-  "status": "PARTIAL",
-  "verified_completed_attempts": 7,
-  "pending": "infinity_B16_L256_confirmation1",
+  "status": "PASS",
+  "verified_completed_attempts": 8,
   "checks": [
     {
       "attempt": "ours_B16_L256_confirmation2",
@@ -36,6 +35,26 @@
         "resources.jsonl",
         "result.json",
         "run.log",
+        "status.json"
+      ],
+      "exact_file_match": true
+    },
+    {
+      "attempt": "infinity_B16_L256_confirmation1",
+      "archive": "mgo_v2/experiments/main_table_global_workload_20261006/moe_infinity_repair/confirmation_B16_L256_attempt1",
+      "file_count": 12,
+      "files": [
+        "config.json",
+        "initial_budget.json",
+        "phase.json",
+        "repeat0.json",
+        "repeat1.json",
+        "repeat2.json",
+        "repeat3.json",
+        "resources.jsonl",
+        "result.json",
+        "run.log",
+        "source_hashes.json",
         "status.json"
       ],
       "exact_file_match": true
@@ -219,6 +238,7 @@
     }
   ],
   "notes": [
-    "Only experiment receipt/log files were hashed; no model weights or model binaries scanned during measurement."
+    "Every final reporting attempt receipt/log file matches its original byte-for-byte.",
+    "Earlier unstable, invalid and failed attempts remain separately archived; none were overwritten."
   ]
 }

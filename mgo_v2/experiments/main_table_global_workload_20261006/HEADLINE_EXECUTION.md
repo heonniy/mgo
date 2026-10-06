@@ -1,28 +1,23 @@
 # Headline execution, 2026-10-07
 
-## Current checkpoint
+## Final checkpoint
 
-Execution remains incomplete. MoE-Infinity B64/L512 and both llama.cpp cells pass headline
-selection. One bounded confirmation remains running. Both OURS and both
-DeepSpeed confirmations finished but remain unstable; no further automatic repeats
-are scheduled for those cells. Preserve every sample without outlier removal.
+Requested execution is complete: all eight rows and scheduled bounded confirmations
+finished with valid raw measurement receipts. Three rows are timing-stable; five
+remain unstable. This is not a fully stable headline panel. No samples were removed
+and no further automatic repetitions are scheduled. Read [FINAL_RESULTS.md](FINAL_RESULTS.md)
+for the complete timing/resource table, comparison limits and exact archive links.
 
 | System | Local B16 / input256 | Local B64 / input512 |
 | --- | --- | --- |
-| OURS Near | Correctness PASS; bounded confirmation remains UNSTABLE, all samples retained | Correctness PASS; bounded confirmation remains UNSTABLE |
-| DeepSpeed CPU offload | Correctness PASS; bounded confirmation TTFT UNSTABLE, TPOT/E2E stable | Correctness PASS; bounded confirmation remains UNSTABLE |
-| MoE-Infinity repaired | Repaired primary correctness PASS, TTFT UNSTABLE; confirmation queued | Correctness and stability PASS; selected |
-| llama.cpp static layers | Correctness and stability PASS; confirmation selected | Correctness and stability PASS; selected |
+| OURS Near | Execution complete; timing UNSTABLE | Execution complete; timing UNSTABLE |
+| DeepSpeed CPU offload | Execution complete; TTFT UNSTABLE, TPOT/E2E stable | Execution complete; timing UNSTABLE |
+| MoE-Infinity repaired | Execution complete; TTFT UNSTABLE, TPOT/E2E stable | Execution complete; timing PASS |
+| llama.cpp static layers | Execution complete; timing PASS | Execution complete; timing PASS |
 
-Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.
-Current serial chain: `LLAMA_STATIC_RECOVERY_QUEUE.json` ->
-`CLEANUP_RECOVERY_QUEUE.json` -> `LLAMA_SMALL_CONFIRMATION_QUEUE.json` ->
-`OURS_LARGE_CONFIRMATION_QUEUE.json` -> `INFINITY_SMALL_CONFIRMATION_QUEUE.json`.
-The middle queue replaces five jobs that failed before model launch and their
-skipped dependencies. Earlier queue receipts are historical, not active schedules.
-See `queue_cleanup_recovery/README.md` for the preflight failures and bounded
-release wait, `llama_measurement/README.md` for the required `--no-op-offload`
-repair, and each baseline's archived audits for complete sample ranges.
+All serial queues finished, workers exited and owned model-forward loads were
+restored only on0/1/4/5. See FINAL_HANDOFF.json and EXECUTION_AUDIT.json.
+Raw receipts remain under `/home/hwlee/mgo-results/headline_r4_20261007`.
 
 The following setup narrative includes historical checkpoints; it must not be
 read as the current completion status.
