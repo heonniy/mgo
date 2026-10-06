@@ -43,6 +43,13 @@ def main(a):
  p.configure_eam_budget(budgets,9*2**20)
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
  write(a.output/'initial_budget.json',dict(budgets=budgets,stats=initial))
+ attention_checks=[0]
+ def attention_gpu(module,args,kwargs):
+  hidden=args[0] if args else kwargs['hidden_states']
+  assert hidden.is_cuda,'CPU attention is forbidden'
+  attention_checks[0]+=1
+ attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for m in model.model.modules() if type(m).__name__=='Qwen3MoeAttention']
+ assert len(attention_hooks)==48
  n=2 if a.smoke else 64;repeats=1 if a.smoke else 3;saved=None
  for repeat in range(repeats+1):
   phase='warmup' if repeat==0 else 'target'
@@ -58,7 +65,10 @@ def main(a):
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   streamer=ClockStreamer();finite=FiniteLogits();start=time.perf_counter_ns()
   with torch.inference_mode():
-   output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]))
+   output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
+  kv=output.past_key_values
+  assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in kv.layers)
+  output=output.sequences
   sync();assert finite.flag is not None and finite.flag.item()
   assert len(streamer.stamps)==n and output.shape==(len(rows),ids.shape[1]+n)
   assert torch.equal(output[:,:ids.shape[1]],ids)
@@ -74,7 +84,10 @@ def main(a):
   result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(4)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(4)],host_rss_bytes=psutil.Process().memory_info().rss)
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
-  if repeat==0:saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
+  if repeat==0:
+   assert attention_checks[0]==48*n
+   for hook in attention_hooks:hook.remove()
+   saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
  write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,primary_repeats=repeats))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())

@@ -642,7 +642,7 @@ index d9c382a..a90dfbc 100644
      def _init_io_tracking(self):
          global _io_profile_env_cache
 diff --git a/moe_infinity/runtime/model_offload.py b/moe_infinity/runtime/model_offload.py
-index 8eff424..5e0263c 100644
+index 8eff424..d78c8b5 100644
 --- a/moe_infinity/runtime/model_offload.py
 +++ b/moe_infinity/runtime/model_offload.py
 @@ -505,7 +505,7 @@ def _make_expert_tensor_map(name_id_map, config):
@@ -692,6 +692,24 @@ index 8eff424..5e0263c 100644
                  )
                  self.expert_prefetcher.configure_overlap_policy(
                      self.archer_config
+@@ -2210,6 +2232,17 @@ class OffloadEngine(object):
+         # likely one of them should be enough but just to be safe
+         self._register_hooks_recursively(model)
+ 
++        # Shared RoPE runs outside the decoder-layer topology hook. HF v5
++        # generation can supply position_ids on a different device; align
++        # both inputs without moving attention or KV computation to CPU.
++        def rotary_inputs(module, args, kwargs):
++            x = args[0] if args else kwargs["x"]
++            device = x.device if x.is_cuda else torch.device("cuda:0")
++            return copy_args_to_device(device, args), copy_kwargs_to_device(device, dict(kwargs))
++        for module in model.modules():
++            if type(module).__name__.endswith("RotaryEmbedding"):
++                self.forward_hooks.append(module.register_forward_pre_hook(rotary_inputs, with_kwargs=True))
++
+     def _generate_param_id(self):
+         param_id = self.param_id
+         self.param_id += 1
 diff --git a/tests/cpp/unit/prefetch/test_expert_residency.cpp b/tests/cpp/unit/prefetch/test_expert_residency.cpp
 index 7b6b128..d2a5a34 100644
 --- a/tests/cpp/unit/prefetch/test_expert_residency.cpp

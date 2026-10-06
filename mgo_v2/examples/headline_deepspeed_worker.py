@@ -41,18 +41,27 @@ def main(a):
  params=list(engine.module.named_parameters());assert all(hasattr(p,'ds_id') for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
- budget=17392730112//4;peak=[0];samples=[0]
- def measure_residency(*args):
-  charged=sum(p.ds_numel*p.element_size() for name,p in params if '.experts.' in name and p.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT))
-  peak[0]=max(peak[0],charged);samples[0]+=1
- hooks=[m.register_forward_pre_hook(measure_residency) for m in engine.module.modules() if type(m).__name__=='Qwen3MoeSparseMoeBlock']
- assert len(hooks)==48
+ budget=17392730112//4;peak=[0];all_peak=[0];samples=[0]
+ records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
+ def measure_residency():
+  charged=all_charged=0
+  for expert,param,nbytes in records:
+   if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
+    all_charged+=nbytes
+    if expert:charged+=nbytes
+  peak[0]=max(peak[0],charged);all_peak[0]=max(all_peak[0],all_charged);samples[0]+=1
+ # Observe every native parameter-fetch boundary, including embedding/lm_head,
+ # without attaching hooks to every individual expert Linear.
+ original_fetch=coordinator.fetch_sub_module
+ def calibrated_fetch(*args,**kwargs):
+  result=original_fetch(*args,**kwargs);measure_residency();return result
+ coordinator.fetch_sub_module=calibrated_fetch
  rows=json.loads(Path(spec['warmup']['path']).read_text())['requests']
  local_rows=rows[rank*batch:(rank+1)*batch];ids=torch.tensor([r['input_ids'][-32:] for r in local_rows],device='cuda')
  generate(engine,ids,2)
- for h in hooks:h.remove()
- assert 0<peak[0]<=budget,(peak,budget)
- write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',expert_peak_bytes=peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
+ coordinator.fetch_sub_module=original_fetch
+ assert 0<peak[0]<=all_peak[0]<=budget,(peak,all_peak,budget)
+ write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',expert_peak_bytes=peak[0],all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
  for repeat in range((1 if a.smoke else 3)+1):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests'];local_rows=rows[rank*batch:(rank+1)*batch]
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local_rows],device='cuda')
