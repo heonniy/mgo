@@ -98,7 +98,10 @@ def main(a):
    rt.profile_thread_placement=configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  place_threads()
  if case.get('b3_executor') in ('H1','H1b'):
-  from b3_prepare import prepare
+  if case.get('b4_executor')=='H1b':
+   from b4_prepare_reference import prepare
+  else:
+   from b3_prepare import prepare
   a.b3_cache=case['b3_cache'];a.b3_wrapper=case['b3_executor']=='H1b'
   prepare(rt,model,ids,mask,teacher,generate,validate,place_threads,write)
  if case.get('b4_executor')=='H2':
