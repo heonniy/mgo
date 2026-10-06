@@ -129,9 +129,9 @@ def main(a):
    rt=setup(policy,'COUNTERS');write(a.output/f'phase_rank{rank}.json',dict(stage='WARM_CORRECTNESS',key=key,policy=policy))
    row=run_prefill(model,rt,ids,mask);validation=check(rt,row,rank);warm[policy]=row
    write(a.output/f'{key}_{policy}_warm_rank{rank}.json',dict(**row,validation=validation));rt.close();del rt;gc.collect();dist.barrier()
-   assert all(json.loads((a.output/f'{key}_{policy}_warm_rank{r}.json').read_text())['validation']['status']=='PASS' for r in range(4))
+   assert all(json.loads((a.output/f'{key}_{policy}_warm_rank{r}.json').read_text())['validation']['status']=='PASS' for r in range(world))
   same_tokens=warm['BR']['argmax_hash']==warm[candidate]['argmax_hash']
-  flags=[None]*4;dist.all_gather_object(flags,same_tokens);valid=all(flags)
+  flags=[None]*world;dist.all_gather_object(flags,same_tokens);valid=all(flags)
   write(a.output/f'{key}_pair_gate_rank{rank}.json',dict(status='PASS' if valid else 'INVALID',tokens_match=flags,scope='Cross-policy first-token parity on frozen routing; no substitution or replica changes.'))
   if not valid:
    if rank==0:write(a.output/f'{key}_result.json',dict(status='INVALID',reason='cross-policy token mismatch',spec=spec))
@@ -158,7 +158,7 @@ def main(a):
     write(a.output/f'{label}_validation_rank{rank}.json',dict(**validation,no_compile=compile_ok,tokens_match_warm=tokens_ok))
     assert validation['status']=='PASS' and compile_ok and tokens_ok
     write(a.output/f'{label}_measure_rank{rank}.json',dict(status='PASS',rank=rank,policy=policy,repeat=repeat,**row,validation=validation));rt.close();del rt;gc.collect();dist.barrier()
-    samples[policy].append(max(json.loads((a.output/f'{label}_measure_rank{r}.json').read_text())['TTFT'] for r in range(4)))
+    samples[policy].append(max(json.loads((a.output/f'{label}_measure_rank{r}.json').read_text())['TTFT'] for r in range(world)))
   if a.stage=='S2':
    for policy in order:
     rt=setup(policy,'DIAGNOSTIC');row=run_prefill(model,rt,ids,mask);validation=check(rt,row,rank)

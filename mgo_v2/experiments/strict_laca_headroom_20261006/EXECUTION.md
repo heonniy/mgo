@@ -19,6 +19,8 @@ restored on0,1,4,5 after use; R8 authorization does not silently expand idle loa
 
 Execution repairs relative to82b093db:
 - Initialize controller package before legacy CPU policy imports.
+- Replace remaining four-rank correctness gathers and TTFT reductions with
+  WORLD_SIZE so R8 validates and measures every rank.
 - Preserve dependency path and add foreign-process, host/GPU memory and
   temperature gates, outside primary timing windows.
 - Parallelize independent CPU cells/cases without changing search candidates.
