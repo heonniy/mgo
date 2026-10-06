@@ -48,7 +48,7 @@ def main(a):
   hidden=args[0] if args else kwargs['hidden_states']
   assert hidden.is_cuda,'CPU attention is forbidden'
   attention_checks[0]+=1
- attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for m in model.model.modules() if type(m).__name__=='Qwen3MoeAttention']
+ attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
  assert len(attention_hooks)==48
  n=2 if a.smoke else 64;repeats=1 if a.smoke else 3;saved=None
  for repeat in range(repeats+1):
