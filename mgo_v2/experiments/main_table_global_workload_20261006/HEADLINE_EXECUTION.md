@@ -1,5 +1,29 @@
 # Headline execution, 2026-10-07
 
+## Current checkpoint
+
+Execution remains incomplete. Completed three-repeat attempts are not yet
+stable enough for headline selection; preserve all samples without outlier removal.
+
+| System | Local B16 / input256 | Local B64 / input512 |
+| --- | --- | --- |
+| OURS Near | Correctness PASS, timing UNSTABLE; confirmation queued | Preflight-only failure; new primary queued |
+| DeepSpeed CPU offload | Correctness PASS, timing UNSTABLE; fixed-CPU confirmation queued | Correctness PASS, timing UNSTABLE; confirmation queued |
+| MoE-Infinity repaired | Previous primary superseded by KV lifecycle fix; rerun queued | Previous primary superseded by KV lifecycle fix; rerun queued |
+| llama.cpp static layers | Correctness PASS, timing UNSTABLE; confirmation queued | Corrected primary job running |
+
+Live receipts are under `/home/hwlee/mgo-results/headline_r4_20261007`.
+Current serial chain: `LLAMA_STATIC_RECOVERY_QUEUE.json` ->
+`CLEANUP_RECOVERY_QUEUE.json` -> `LLAMA_SMALL_CONFIRMATION_QUEUE.json`.
+The middle queue replaces five jobs that failed before model launch and their
+skipped dependencies. Earlier queue receipts are historical, not active schedules.
+See `queue_cleanup_recovery/README.md` for the preflight failures and bounded
+release wait, `llama_measurement/README.md` for the required `--no-op-offload`
+repair, and each baseline's archived audits for complete sample ranges.
+
+The following setup narrative includes historical checkpoints; it must not be
+read as the current completion status.
+
 Owner authorizes completing all four baselines/systems, repairing execution
 blockers rather than stopping on the first failure. OURS is LA_CA_NEAR.
 Protocol source:7851e2ff. Scope remains only two R4/C30 cells, GPUs0,1,4,5,
