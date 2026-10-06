@@ -8,7 +8,7 @@ from pathlib import Path
 
 P=Path(__file__).resolve().parents[1]
 PACKET=P/'experiments/full_pinned_r4_20261006'
-ROOT=Path('/home/hwlee/mgo-results/full_pinned_r4_20261006')
+ROOT=Path(os.environ.get('MGO_FULL_PINNED_ROOT','/home/hwlee/mgo-results/full_pinned_r4_20261006'))
 OLD=Path('/home/hwlee/mgo-results/critical_path_admission_followup_20261006/b3/C30')
 INPUT_SOURCE=OLD/'inputs_B128_H64'
 PYTHON='/home/hwlee/sub-moe/phase01/.venv/bin/python'
@@ -32,7 +32,11 @@ def gpu_state():
  return sorted(rows,key=lambda x:x['gpu'])
 
 def owned_idle(pid):
- try:return str(IDLE_WORKER) in Path(f'/proc/{pid}/cmdline').read_bytes().decode().split('\0')
+ try:
+  proc=Path(f'/proc/{pid}')
+  if proc.stat().st_uid!=os.getuid():return False
+  args=proc.joinpath('cmdline').read_bytes().decode().split('\0')
+  return any(str(p) in args for p in (IDLE_WORKER,Path('/home/hwlee/mgo-policy-regime/mgo_v2/examples/model_inference_load.py')))
  except FileNotFoundError:return False
 
 def stop_target_idle():
@@ -69,6 +73,8 @@ def restore_target_idle(gpus):
   with (LOAD/f'gpu{g}.log').open('a') as log:
    p=subprocess.Popen([PYTHON,'-u',str(IDLE_WORKER)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
   ps.append(dict(gpu=g,pid=p.pid))
+ old=json.loads((LOAD/'processes.json').read_text()) if (LOAD/'processes.json').exists() else []
+ write(LOAD/'processes.json',[r for r in old if r.get('gpu') not in gpus]+ps)
  return ps
 
 def main():
@@ -90,7 +96,11 @@ def main():
   env=dict(os.environ,PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{P}:{P/"scripts"}:{P/"examples"}',
    CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',
    OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',
-   TORCHINDUCTOR_COMPILE_THREADS='2',NCCL_CUMEM_ENABLE='0')
+   TORCHINDUCTOR_COMPILE_THREADS='2')
+  for key in list(env):
+   if key.startswith('NCCL_'):del env[key]
+  env['NCCL_CUMEM_ENABLE']='0'
+  state['source_commit']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P.parent,text=True).strip()
   cmd=[PYTHON,'-u','-m','torch.distributed.run','--standalone','--nproc_per_node=4',
    str(P/'examples/full_pinned_r4_worker.py'),'--inputs',str(inputs),'--output',str(ROOT)]
   state['command']=cmd

@@ -1,3 +1,10 @@
+**OWNER FULL PINNED A/B EXECUTION (2026-10-07): e7209506.**
+Run experiments/full_pinned_r4_20261006/PLAN.md on 0,1,4,5 only.
+R4/C30/B128/decode64 BR H1b; staged vs rank-private 54 GiB pinned store.
+One correctness pass and two counterbalanced timing repeats per mode.
+Respect 384/96 GiB host-memory guards and 30-minute bound. Preserve failures.
+This supersedes the earlier no-full-pinning restriction, not the R8 stop.
+
 **QUICK FETCH COMPLETE (2026-10-06).**
 Read experiments/quick_fetch_path_20261006/RESULTS.md. All 288 active-rank
 samples preserved; GPU 0,1,4,5 only. All4/32 current 35.669 ms vs direct
