@@ -27,7 +27,7 @@ STORE=Path('/home/hwlee/mgo-results/runtime_validation_20261001/expert_store')
 EB=9437184
 MAX_BURST=32
 BURSTS=(1,8,16,32)
-REPEATS=5
+REPEATS=3
 WARMUPS=1
 # Spread keys over the model so the test is not one contiguous file region.
 KEYS=[(17+i*173)%(48*128) for i in range(MAX_BURST)]
@@ -76,10 +76,10 @@ def build_direct_pinned(experts):
  for i,tensors in enumerate(experts):copy_expert_to_stage(pool[i],tensors,'torch')
  return pool
 
-def current_once(cache,experts,n,active,rank):
+def current_once(cache,experts,n,active,rank,cpu_team):
  if not active:
   dist.barrier();dist.barrier();return None
- sched=PriorityH2DScheduler(cache,stage_count=2,profile=True,staging_backend='torch')
+ sched=PriorityH2DScheduler(cache,stage_count=2,profile=True,staging_backend='torch',cpu_team=cpu_team)
  dist.barrier();start=time.perf_counter()
  for i in range(n):sched.enqueue_demand(i,KEYS[i],experts[i])
  sched.synchronize();torch.cuda.synchronize()
@@ -95,7 +95,7 @@ def current_once(cache,experts,n,active,rank):
  sched.close()
  return dict(wall_ms=wall_ms,dma_ms=dma_ms,stage_ms=stage_ms,queue_ms=queue_ms)
 
-def direct_once(cache,pool,n,active,rank):
+def direct_once(cache,pool,n,active,rank,cpu_team):
  stream=torch.cuda.Stream()
  begins=[torch.cuda.Event(enable_timing=True) for _ in range(n)]
  ends=[torch.cuda.Event(enable_timing=True) for _ in range(n)]
@@ -137,7 +137,7 @@ def main(a):
    for mode in ('current_staging','direct_pinned'):
     fn=current_once if mode=='current_staging' else direct_once
     for rep in range(WARMUPS+REPEATS):
-     row=fn(cache,experts if mode=='current_staging' else direct_pool,n,active,rank)
+     row=fn(cache,experts if mode=='current_staging' else direct_pool,n,active,rank,cpus[1:3] if cpus else None)
      if rep>=WARMUPS and active:
       rows.append(dict(condition=condition,active_ranks=list(active_ranks),burst=n,mode=mode,
        repeat=rep-WARMUPS,rank=rank,physical_gpu=GPUS[rank],**row))
