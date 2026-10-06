@@ -1,0 +1,1 @@
+All four ranks pass warmup cold-parameter, finite-logit, GPU KV, exact16x64 token shape and all-parameter byte-cap checks. Warmup TTFT8.496384241s, TPOT4.664579290254s, E2E302.364879527s; excluded from primary results. Fixed disjoint per-rank CPU ranges match OURS on this single-NUMA-node host. Primary1 is running; no timing stability or causal improvement claim.
