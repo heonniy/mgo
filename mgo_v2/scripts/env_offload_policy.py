@@ -3,7 +3,7 @@ import numpy as np
 from numba import njit
 from br_carep_cpu import balanced_assignment,choose_slot,place,ROW_BYTES,EXPERT_BYTES
 from old_ca_fanout_policy import fanout_assignment
-from la_placement import load_assignment
+from la_placement import load_assignment,load_locality_near_assignment
 from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignment, load_fanout_assignment
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
@@ -58,7 +58,10 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
-    if policy==6:
+    if policy==7:
+        assert 1<=world<=8 and not substitution
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
+    elif policy==6:
         assert 1<=world<=8 and not substitution
         assignment=load_fanout_assignment(demand,effective,lengths,org,owner,primary,layer,experts,misses,world)
     elif policy==5:
