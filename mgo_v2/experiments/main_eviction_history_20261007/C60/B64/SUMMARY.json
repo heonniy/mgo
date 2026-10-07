@@ -1,0 +1,325 @@
+{
+  "status": "PASS",
+  "local_batch": 64,
+  "trace": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B64_L256_H256_v1/routing_trace.npz",
+  "trace_content_sha256": "91a643a072908102d519f2fd791f06b2601adef16cbcb59c8165ec5e258a1c37",
+  "prefetch": false,
+  "capacity": 3686,
+  "capacities": [
+    922,
+    922,
+    921,
+    921
+  ],
+  "source_capacities": [
+    461,
+    461,
+    461,
+    460
+  ],
+  "gate_reference_parity": null,
+  "scope": "Same frozen source trace; changed capacity is a CPU counterfactual, not physical validation",
+  "lru_equivalence": true,
+  "policies": [
+    {
+      "policy": "gate-score",
+      "prefill": {
+        "hit": 0,
+        "miss": 6112,
+        "eviction": 2426,
+        "reload": 0
+      },
+      "decode": {
+        "hit": 914066,
+        "miss": 562745,
+        "eviction": 562745,
+        "reload": 562739,
+        "hit_rate": 0.6189458231283489
+      },
+      "checkpoints": {
+        "1": {
+          "hit": 2148,
+          "miss": 1684,
+          "eviction": 1684,
+          "reload": 1684
+        },
+        "8": {
+          "hit": 26277,
+          "miss": 12831,
+          "eviction": 12831,
+          "reload": 12831
+        },
+        "16": {
+          "hit": 54678,
+          "miss": 27620,
+          "eviction": 27620,
+          "reload": 27620
+        },
+        "32": {
+          "hit": 111668,
+          "miss": 59086,
+          "eviction": 59086,
+          "reload": 59081
+        },
+        "64": {
+          "hit": 225898,
+          "miss": 125332,
+          "eviction": 125332,
+          "reload": 125327
+        },
+        "128": {
+          "hit": 455164,
+          "miss": 268014,
+          "eviction": 268014,
+          "reload": 268008
+        },
+        "256": {
+          "hit": 914066,
+          "miss": 562745,
+          "eviction": 562745,
+          "reload": 562739
+        }
+      }
+    },
+    {
+      "policy": "LFU-reset",
+      "prefill": {
+        "hit": 0,
+        "miss": 6112,
+        "eviction": 2426,
+        "reload": 0
+      },
+      "decode": {
+        "hit": 1790,
+        "miss": 1475021,
+        "eviction": 1475021,
+        "reload": 1475015,
+        "hit_rate": 0.0012120711451905491
+      },
+      "checkpoints": {
+        "1": {
+          "hit": 7,
+          "miss": 3825,
+          "eviction": 3825,
+          "reload": 3825
+        },
+        "8": {
+          "hit": 55,
+          "miss": 39053,
+          "eviction": 39053,
+          "reload": 39053
+        },
+        "16": {
+          "hit": 111,
+          "miss": 82187,
+          "eviction": 82187,
+          "reload": 82187
+        },
+        "32": {
+          "hit": 223,
+          "miss": 170531,
+          "eviction": 170531,
+          "reload": 170526
+        },
+        "64": {
+          "hit": 447,
+          "miss": 350783,
+          "eviction": 350783,
+          "reload": 350778
+        },
+        "128": {
+          "hit": 894,
+          "miss": 722284,
+          "eviction": 722284,
+          "reload": 722278
+        },
+        "256": {
+          "hit": 1790,
+          "miss": 1475021,
+          "eviction": 1475021,
+          "reload": 1475015
+        }
+      }
+    },
+    {
+      "policy": "LFU-cumulative",
+      "prefill": {
+        "hit": 0,
+        "miss": 6112,
+        "eviction": 2426,
+        "reload": 0
+      },
+      "decode": {
+        "hit": 372210,
+        "miss": 1104601,
+        "eviction": 1104601,
+        "reload": 1104595,
+        "hit_rate": 0.252036313380656
+      },
+      "checkpoints": {
+        "1": {
+          "hit": 7,
+          "miss": 3825,
+          "eviction": 3825,
+          "reload": 3825
+        },
+        "8": {
+          "hit": 2663,
+          "miss": 36445,
+          "eviction": 36445,
+          "reload": 36445
+        },
+        "16": {
+          "hit": 9370,
+          "miss": 72928,
+          "eviction": 72928,
+          "reload": 72928
+        },
+        "32": {
+          "hit": 26882,
+          "miss": 143872,
+          "eviction": 143872,
+          "reload": 143867
+        },
+        "64": {
+          "hit": 69906,
+          "miss": 281324,
+          "eviction": 281324,
+          "reload": 281319
+        },
+        "128": {
+          "hit": 163848,
+          "miss": 559330,
+          "eviction": 559330,
+          "reload": 559324
+        },
+        "256": {
+          "hit": 372210,
+          "miss": 1104601,
+          "eviction": 1104601,
+          "reload": 1104595
+        }
+      }
+    },
+    {
+      "policy": "LRU-reset",
+      "prefill": {
+        "hit": 0,
+        "miss": 6112,
+        "eviction": 2426,
+        "reload": 0
+      },
+      "decode": {
+        "hit": 7,
+        "miss": 1476804,
+        "eviction": 1476804,
+        "reload": 1476798,
+        "hit_rate": 4.739943025884829e-06
+      },
+      "checkpoints": {
+        "1": {
+          "hit": 7,
+          "miss": 3825,
+          "eviction": 3825,
+          "reload": 3825
+        },
+        "8": {
+          "hit": 7,
+          "miss": 39101,
+          "eviction": 39101,
+          "reload": 39101
+        },
+        "16": {
+          "hit": 7,
+          "miss": 82291,
+          "eviction": 82291,
+          "reload": 82291
+        },
+        "32": {
+          "hit": 7,
+          "miss": 170747,
+          "eviction": 170747,
+          "reload": 170742
+        },
+        "64": {
+          "hit": 7,
+          "miss": 351223,
+          "eviction": 351223,
+          "reload": 351218
+        },
+        "128": {
+          "hit": 7,
+          "miss": 723171,
+          "eviction": 723171,
+          "reload": 723165
+        },
+        "256": {
+          "hit": 7,
+          "miss": 1476804,
+          "eviction": 1476804,
+          "reload": 1476798
+        }
+      }
+    },
+    {
+      "policy": "LRU-cumulative",
+      "prefill": {
+        "hit": 0,
+        "miss": 6112,
+        "eviction": 2426,
+        "reload": 0
+      },
+      "decode": {
+        "hit": 7,
+        "miss": 1476804,
+        "eviction": 1476804,
+        "reload": 1476798,
+        "hit_rate": 4.739943025884829e-06
+      },
+      "checkpoints": {
+        "1": {
+          "hit": 7,
+          "miss": 3825,
+          "eviction": 3825,
+          "reload": 3825
+        },
+        "8": {
+          "hit": 7,
+          "miss": 39101,
+          "eviction": 39101,
+          "reload": 39101
+        },
+        "16": {
+          "hit": 7,
+          "miss": 82291,
+          "eviction": 82291,
+          "reload": 82291
+        },
+        "32": {
+          "hit": 7,
+          "miss": 170747,
+          "eviction": 170747,
+          "reload": 170742
+        },
+        "64": {
+          "hit": 7,
+          "miss": 351223,
+          "eviction": 351223,
+          "reload": 351218
+        },
+        "128": {
+          "hit": 7,
+          "miss": 723171,
+          "eviction": 723171,
+          "reload": 723165
+        },
+        "256": {
+          "hit": 7,
+          "miss": 1476804,
+          "eviction": 1476804,
+          "reload": 1476798
+        }
+      }
+    }
+  ]
+}

@@ -1,3 +1,8 @@
+**OWNER C60 EVICTION REPLAY COMPLETE (2026-10-07).**
+Read experiments/main_eviction_history_20261007/C60/RESULTS.md.
+Same frozen B8/B16/B64 traces, CPU-only, all3686 slots MAIN, P0,256 decode.
+All15 policy replays PASS; no GPU rerun or production policy change.
+
 **OWNER MAIN EVICTION HISTORY COMPARISON COMPLETE (2026-10-07).**
 Read experiments/main_eviction_history_20261007/PLAN.md. B8/B16/B64,
 R4/C30/input256, cold prefill then256 decode forwards. Prefetch OFF.

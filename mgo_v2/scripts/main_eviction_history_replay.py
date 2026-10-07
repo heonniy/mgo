@@ -50,7 +50,7 @@ def replay(counts,gate_trace,capacities,mode,seed=42,layers=48):
     key=layer*experts+e;freq[key]+=1;last[key]=event+1
  return metrics,slots,freq,last
 
-def run(trace,output):
+def run(trace,output,capacities_override=None):
  receipt=json.loads((trace.parent/'trace_receipt.json').read_text())
  assert receipt['status']=='PASS' and receipt['decode_forwards']==256 and not receipt['prefetch']
  with np.load(trace,allow_pickle=False) as data:
@@ -59,13 +59,16 @@ def run(trace,output):
  assert counts.dtype==np.int32 and gates.dtype==np.float32 and np.all(counts>=0) and np.isfinite(gates).all()
  assert np.all(counts[48:].sum(1)==receipt['local_batch']*4*8)
  content=hashlib.sha256(counts.tobytes()+gates.tobytes()+reference.tobytes()).hexdigest();assert content==receipt['content_sha256']
- capacities=np.array(receipt['capacities'],np.int32);output.mkdir(parents=True,exist_ok=True);rows=[];all_metrics=[];all_slots=[]
+ capacities=np.array(receipt['capacities'] if capacities_override is None else capacities_override,np.int32)
+ assert capacities.shape==(4,) and np.all(capacities>0)
+ source_capacity=bool(np.array_equal(capacities,receipt['capacities']))
+ output.mkdir(parents=True,exist_ok=True);rows=[];all_metrics=[];all_slots=[]
  for mode,name in enumerate(POLICIES):
   metrics,slots,_,_=replay(counts,gates,capacities,mode,receipt['seed'])
   assert np.array_equal(metrics[:,:2].sum(1),(counts>0).sum(1))
   assert np.all(metrics[:,3]<=metrics[:,1]) and np.all(metrics[:,2]<=metrics[:,1])
   assert int(metrics[:,1].sum()-metrics[:,2].sum())==int((slots>=0).sum())
-  if mode==0:
+  if mode==0 and source_capacity:
    assert np.array_equal(metrics,reference),'Gate source/replay event count mismatch'
    assert np.array_equal(slots,final_slots),'Gate source/replay final cache mismatch'
   per_step=metrics.reshape(257,48,4).sum(1);all_metrics.append(metrics);all_slots.append(slots)
@@ -80,7 +83,7 @@ def run(trace,output):
     if step in (1,8,16,32,64,128,256):summary['checkpoints'][str(step)]=dict(zip(fields,map(int,cum)))
   rows.append(summary)
  assert np.array_equal(all_metrics[3],all_metrics[4]) and np.array_equal(all_slots[3],all_slots[4]),'LRU reset/cumulative must be equivalent'
- result=dict(status='PASS',local_batch=receipt['local_batch'],trace=str(trace),trace_content_sha256=content,prefetch=False,capacity=sum(receipt['capacities']),gate_reference_parity=True,lru_equivalence=True,policies=rows)
+ result=dict(status='PASS',local_batch=receipt['local_batch'],trace=str(trace),trace_content_sha256=content,prefetch=False,capacity=int(capacities.sum()),capacities=list(map(int,capacities)),source_capacities=receipt['capacities'],gate_reference_parity=True if source_capacity else None,scope='Same frozen source trace; changed capacity is a CPU counterfactual, not physical validation' if not source_capacity else 'Source-capacity exact replay',lru_equivalence=True,policies=rows)
  (output/'SUMMARY.json').write_text(json.dumps(result,indent=2)+'\n');return result
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--trace',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();print(json.dumps(run(a.trace,a.output),indent=2))
+ p=argparse.ArgumentParser();p.add_argument('--trace',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--capacities',type=int,nargs=4);a=p.parse_args();print(json.dumps(run(a.trace,a.output,a.capacities),indent=2))
