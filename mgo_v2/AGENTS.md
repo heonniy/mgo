@@ -1,3 +1,9 @@
+**OWNER BR C60 PREFETCH PHYSICAL ABLATION (2026-10-07).**
+Read experiments/br_prefetch_c60_20261007/PLAN.md. Scope is six BR cells only:
+B8/B16/B64 x OFF/ON, input256/decode256. No LA/CA/FCA/Near queue.
+Same overlap in OFF/ON; one primary plus separate diagnostic each.
+Reuse model/pinned sources per batch, GPUs0/1/4/5 only.
+
 **OWNER C60 EVICTION REPLAY COMPLETE (2026-10-07).**
 Read experiments/main_eviction_history_20261007/C60/RESULTS.md.
 Same frozen B8/B16/B64 traces, CPU-only, all3686 slots MAIN, P0,256 decode.
