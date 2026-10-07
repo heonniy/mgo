@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "started": 1791382057.2899723,
+  "system": "Ours",
+  "source_commit": "547c653ed4576da3880947cfb1029fcdcc665c05",
+  "requested_timeout_seconds": 3600,
+  "effective_timeout_seconds": 3600,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py",
+    "--cell",
+    "R4_C30_B16_L256_O257",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B16_L256_H256_v1",
+    "--repeats",
+    "1",
+    "--prefill-optimized",
+    "--prefill-layout-fast",
+    "--legacy-decode-layout",
+    "--policy",
+    "BR",
+    "--capture-eviction-trace"
+  ],
+  "pid": 3831388,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "system": "Ours",
+    "policy": "BR",
+    "cell": "R4_C30_B16_L256_O257",
+    "smoke": false,
+    "primary_repeats": 1,
+    "prefill_optimized": true,
+    "headline_eligible": false
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791382414.996063,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 3835388
+    },
+    {
+      "gpu": 1,
+      "pid": 3835404
+    },
+    {
+      "gpu": 4,
+      "pid": 3835417
+    },
+    {
+      "gpu": 5,
+      "pid": 3835427
+    }
+  ]
+}
