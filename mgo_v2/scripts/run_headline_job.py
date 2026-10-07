@@ -11,6 +11,7 @@ def wait_for_gpu_release(seconds=30):
   if not occupants or time.monotonic()>=deadline:return occupants,observed
   observed.append(dict(unix=time.time(),occupants=occupants));time.sleep(1)
 def main(a):
+ llama_workers=('headline_llama_sync_worker.py','headline_llama_deepseek_sync_worker.py')
  if a.ours_final:
   assert a.worker=='headline_ours_worker.py' and a.ranks==4
   assert a.expert_executor in (None,'native') and a.policy in (None,'LA_CA_NEAR')
@@ -63,22 +64,22 @@ def main(a):
   if a.prefetch_off:
    assert a.worker=='headline_ours_worker.py';command+=['--prefetch-off']
   if a.llama_threads is not None:
-   assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
+   assert a.worker in llama_workers and a.ranks==1
    command+=['--threads',str(a.llama_threads)]
-  elif a.worker=='headline_llama_sync_worker.py':
+  elif a.worker in llama_workers:
    raise AssertionError('synchronous llama jobs must explicitly declare --llama-threads')
   if a.llama_cuda_graphs is not None:
-   assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
+   assert a.worker in llama_workers and a.ranks==1
    command+=['--cuda-graphs',a.llama_cuda_graphs]
-  elif a.worker=='headline_llama_sync_worker.py':
+  elif a.worker in llama_workers:
    raise AssertionError('synchronous llama jobs must explicitly declare --llama-cuda-graphs')
   if a.llama_graph_reuse is not None:
-   assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
+   assert a.worker in llama_workers and a.ranks==1
    command+=['--graph-reuse',a.llama_graph_reuse]
-  elif a.worker=='headline_llama_sync_worker.py':
+  elif a.worker in llama_workers:
    raise AssertionError('synchronous llama jobs must explicitly declare --llama-graph-reuse')
   if a.llama_expert_placement is not None:
-   assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
+   assert a.worker in llama_workers and a.ranks==1
    command+=['--expert-placement',a.llama_expert_placement]
   if a.prefill_optimized:
    assert a.worker=='headline_ours_worker.py';command+=['--prefill-optimized']
@@ -135,7 +136,7 @@ if __name__=='__main__':
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
  p.add_argument('--llama-cuda-graphs',choices=('on','off'))
  p.add_argument('--llama-graph-reuse',choices=('on','off'))
- p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3'))
+ p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3','balanced4'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))

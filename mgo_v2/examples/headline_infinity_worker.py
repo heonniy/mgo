@@ -35,7 +35,8 @@ def main(a):
  expert_bytes=9*2**20 if model_family=='Qwen3' else 3*2048*1408*2
  routed_layers=48 if model_family=='Qwen3' else 26
  attention_layers=48 if model_family=='Qwen3' else 27
- cfg=dict(offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store',device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
+ offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store' if model_family=='Qwen3' else '/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store'
+ cfg=dict(offload_path=offload_path,device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
  write(a.output/'config.json',cfg)
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
