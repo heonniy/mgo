@@ -10,12 +10,17 @@ PACKET = Path('/home/hwlee/mgo-results/policy_gap_c60_20261008')
 POLICIES = ('BR', 'CA_NATIVE', 'LA_CA_NEAR')
 
 
-def analyze(label):
+def analyze(label, expected_capacities=None, expected_p2p=None):
     path = ROOT / label
     result = json.loads((path / 'result.json').read_text())
     assert result['status'] == 'PASS' and result['policy_modes'] == list(POLICIES)
     assert result['prefetch'] == 'off' and result['decode_steps'] == 32
-    assert result['main_capacities'] == [920, 920, 919, 919]
+    assert result['main_capacities'] == (expected_capacities or [920, 920, 919, 919])
+    if expected_p2p is not None:
+        assert result['nccl_p2p_disable'] == ('1' if expected_p2p else None)
+        for rank in range(4):
+            source = json.loads((path / f'source_rank{rank}.json').read_text())
+            assert source['nccl_p2p_disable'] == ('1' if expected_p2p else None)
     rows = {}
     for run, policy in enumerate(POLICIES):
         primary = json.loads((path / f'run{run}.json').read_text())
