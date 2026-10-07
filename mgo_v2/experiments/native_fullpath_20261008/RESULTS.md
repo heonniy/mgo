@@ -84,3 +84,86 @@ diagnostic shape error, not an HBM or model failure. The worker now gathers
 flattened routes with explicit event lengths; a variable-length regression
 test passes. The failed receipt is preserved and a new label is used for the
 retry.
+
+## Near prefetch ON/OFF, native full path
+
+The repaired retry (`native_near_prefetch_ab_b16_v2_20261008`) passed. It uses
+one frozen B16/L256 route and teacher stream, 64 output tokens (63 decode
+forwards), native prefill/decode and the same 1,835 MAIN + 8 reserved
+prefetch slots in both modes. The only mode difference is whether P2/T2
+prefetch reservations are issued. ON/OFF/OFF/ON primaries all pass within-mode
+cache/role/controller and byte parity. All four ranks report zero explicit
+H2D waits. Times are seconds, two samples per mode; all samples retained.
+
+| Mode | TTFT samples / mean | TPOT samples / mean | E2E mean | Decode distinct MAIN hit | Mandatory demand copies | Prefetch copies | Total H2D |
+|---|---|---|---:|---:|---:|---:|---:|
+| ON | 1.429304 / 1.388430; 1.408867 | 0.549124 / 0.547434; 0.548279 | 35.950448 | 46.889% | 155,564 | 23,688 | 1,575.457 GiB |
+| OFF | 1.389885 / 1.392667; 1.391276 | 0.505583 / 0.504679; 0.505131 | 33.214548 | 38.622% | 178,834 | 0 | 1,571.783 GiB |
+
+There are 287,548 global layer-event distinct expert demands, including
+281,481 in decode, measured from the frozen routing stream outside primary
+timing. The hit-rate denominator is these distinct demands; the numerator is
+demands that do not require a mandatory MAIN fetch after any prefetch
+promotion. The whole-run effective MAIN hit rates are 45.900% ON and 37.807%
+OFF. ON saves 23,270 mandatory copies but adds 23,688 speculative copies, so
+physical H2D rises by 418 copies (3.674 GiB) and TPOT is 7.87% higher.
+23,242/23,688 prefetches are later used. High usefulness does not make them
+worthwhile here because demand H2D has no exposed wait in these passes;
+prefetch controller work and background copy contention remain possible
+contributors. The clean timing does not separate those two costs.
+
+ON and OFF produce identical outputs within each mode. OFF differs from ON
+at 28 of 4,096 generated token positions (99.316% agreement) despite frozen
+routing and teacher inputs. They use different placement/cache trajectories,
+so this is a real output difference to report. BF16 accumulation order is a
+possible cause, but this run does not isolate it. Finite logits and cache
+consistency pass in both modes.
+For this C30/B16 Near candidate, the measured setting is **prefetch OFF**.
+The main-table supervisor now selects that explicit profile; generic H0
+runtime selection remains available for historical comparisons.
+
+## BR versus Near with native and prefetch OFF
+
+`native_policy_br_near_off_b16_20261008` holds the same B16/L256 frozen
+64-output-token routing and teacher inputs, full-pinned source, compiled
+layouts, native expert executor and 1,835 MAIN slots. Only rank placement
+changes. BR/Near/Near/BR all pass. Within each mode, tokens, cache/role
+state, controller counters and bytes match exactly. The policies differ at
+40/4,096 generated token positions (99.023% agreement); this deterministic
+BF16 output difference is reported rather than discarded.
+
+| Policy | TTFT samples / mean | TPOT samples / mean | E2E mean | Decode MAIN hit | Decode peer traffic | Decode H2D |
+|---|---|---|---:|---:|---:|---:|
+| BR | 1.375111 / 1.382239; 1.378675 | 0.505403 / 0.506954; 0.506178 | 33.267919 | 38.883% | 4.021 GiB | 1,502.517 GiB |
+| Near | 1.968751 / 1.394881; 1.681816 | 0.494821 / 0.495984; 0.495402 | 32.892170 | 38.873% | 3.903 GiB | 1,502.771 GiB |
+
+Near's observed TPOT is 2.13% lower and peer traffic 2.93% lower, while
+H2D and hit rate are essentially unchanged. This supports rank placement's
+communication effect on this cell. It does not isolate communication from
+expert-compute balance as the unique cause of the TPOT change. Native expert
+group counts per rank also vary, and are not a token-row service-time measure.
+The two Near TPOT samples differ by only 0.23%, but Near TTFT includes a
+large first-sample excursion. All samples are retained and no stable TTFT
+advantage is claimed. The selected B16 main-table candidate is Near/OFF;
+other cells still need their own main-table measurements.
+
+## Final-profile unrestricted generation check
+
+The selected supervisor profile (`--ours-final`) ran one cold-cache,
+unrestricted greedy R4/C30/B16/L256/O64 target successfully on GPUs
+0, 1, 4 and 5. It selected native prefill and decode, both compiled layouts,
+Near placement and prefetch OFF on every rank. The target measured TTFT
+3.103543s, TPOT 0.491700s and E2E 34.080626s; the warmup measured
+1.440135s, 0.691065s and 44.977234s respectively and is not a primary
+sample. All four ranks passed finite logits, cold cache, cache/role consistency
+and no-recompilation checks; controller prefetch-issued count was zero.
+Receipt: `ours_final_native_near_off_b16_20261008`. The single primary does
+not establish stable TTFT or a greedy BR-versus-Near speedup. The frozen
+paired comparison above supplies the placement comparison.
+
+A fresh BR/Near frozen pair with two uninstrumented 63-decode primaries per
+policy and a separate rank-level 16-decode diagnostic also passed. It found
+BR/Near mean TPOT 0.511853/0.501073s; the return-collective completion span
+falls across every rank, while critical expert execution and H2D remain
+nearly unchanged. See [RANK_DIAGNOSIS.md](RANK_DIAGNOSIS.md) and the full
+[rank summary](RANK_DIAGNOSTIC.json) for the measurements and limits.

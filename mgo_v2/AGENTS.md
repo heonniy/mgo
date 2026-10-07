@@ -1,11 +1,18 @@
-**OWNER NATIVE FULLPATH FOLLOW-UP (2026-10-08), in progress.**
-Read experiments/native_fullpath_20261008/PLAN.md. User now requests C++
-optimization of Python-heavy TPOT and TTFT paths. Previous C++ decode-only
-executor remains the reference stage. This follow-up adds C++ MAIN-slot binding
-and opt-in prefill expert execution, with the already validated compiled decode
-layout. BR/prefetch-OFF B16/L256 and B64/L512 frozen-route comparisons pass;
-Near/P2/T2 comparison is running. Do not promote unvalidated defaults or add
-unbounded repeats. Owned GPUs0/1/4/5 only; host/HBM guards remain mandatory.
+**OWNER OURS MAIN-TABLE NATIVE FINAL (2026-10-08).**
+Read experiments/native_fullpath_20261008/PLAN.md, RESULTS.md and
+FINAL_MAIN_TABLE_RUNTIME.json. User selects native C++ expert execution,
+optimized prefill/decode layout, Near placement and prefetch OFF for future
+OURS main-table measurements. `run_headline_job.py --ours-final` applies the
+whole profile; `run_expanded_headline.py` gives new OURS rows separate native
+OFF labels and two unfiltered repeats. Historical H0 receipts and old table
+remain reference data. B16/C30 ON/OFF and BR/Near frozen64 comparisons PASS;
+B64 native prefill has no established TTFT gain. The final greedy OFF check
+passed (one target; TTFT3.103543s, TPOT0.491700s, E2E34.080626s).
+BR/Near rank-phase diagnosis passed separately: B16 TPOT0.511853→0.501073s;
+return exchange completion fell on every rank, with little change in critical
+expert compute or H2D. Read RANK_DIAGNOSIS.md; instrumented spans must not
+replace paired primary timings. Do not claim all main-table cells remeasured.
+GPUs0/1/4/5 only; host/HBM guards remain mandatory.
 
 **OWNER C++ EXPERT EXECUTOR MIGRATION COMPLETE (2026-10-08).**
 Read experiments/native_expert_executor_20261008/PLAN.md. Owner requests

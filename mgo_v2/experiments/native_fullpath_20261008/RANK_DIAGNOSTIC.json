@@ -1,0 +1,1171 @@
+{
+  "status": "PASS",
+  "source": "/home/hwlee/mgo-results/headline_r4_20261007/native_policy_br_near_off_rankdiag_b16_v3_20261008",
+  "cell": "R4_C30_B16_L256_O64",
+  "source_commit": "8c55bdf5a92173131eb4ab061a733a0348ca69b6",
+  "raw_diagnostic_sha256": {
+    "diagnostic_BR_rank0.json": "3c336bcfa90d42579cef11c7f508138dfe251e979544f6acf9bec740ff5bf1b3",
+    "diagnostic_BR_rank1.json": "0cba4098ee295612f4239e9c2ddfb811d1ddb8303eba8b8faa4705a93c714c4a",
+    "diagnostic_BR_rank2.json": "6a034158ee3b92aeb150344ac61496334cb054e0ff5d2d662c4dcdf12270804b",
+    "diagnostic_BR_rank3.json": "a56fa8772ba0d0bc6223eebef72ebc5628f029dfe6c7126517c44e7ed3798230",
+    "diagnostic_LA_CA_NEAR_rank0.json": "8024e1c952645bdc358faf9d9a1848aba308b994ea612c7c9ae35bc57ec63a14",
+    "diagnostic_LA_CA_NEAR_rank1.json": "aa5e368a0c7e0e6fb5dd95a3a334db00ae726a869e7269280fb505dcf12682cd",
+    "diagnostic_LA_CA_NEAR_rank2.json": "c2eeab28e75604db37fa5ad1ef1d98a9a0b689e18aa4d2146776493ee3c8c80d",
+    "diagnostic_LA_CA_NEAR_rank3.json": "c9d316626a4a2b25389667f8d3ff05f0f3db7633d703adc98819a4965b13b517"
+  },
+  "primary_decode_steps": 63,
+  "diagnostic_decode_prefix": 16,
+  "route_frozen": true,
+  "prefetch": "off",
+  "scope": "Uninstrumented two-repeat primary uses 63 decode forwards. One separately instrumented 16-forward frozen prefix per policy; stream spans include host gaps and peer waits and must not replace TPOT.",
+  "policies": {
+    "BR": {
+      "primary": [
+        {
+          "status": "PASS",
+          "backend": "BR",
+          "run": 0,
+          "TTFT": 1.405475147,
+          "TPOT": 0.511617126031746,
+          "E2E": 33.637354087,
+          "token_agreement_to_h0": 1.0,
+          "decode_peer_bytes": 4317894152,
+          "decode_h2d_bytes": 1613314916352,
+          "main_hit_rate": 0.380580302468315,
+          "decode_main_hit_rate": 0.3888336741552145,
+          "mandatory": 177019,
+          "prefetch_issued": 0,
+          "scope": "63 decode forwards; frozen routing and teacher inputs"
+        },
+        {
+          "status": "PASS",
+          "backend": "BR",
+          "run": 3,
+          "TTFT": 1.392516955,
+          "TPOT": 0.5120885337301587,
+          "E2E": 33.65409458,
+          "token_agreement_to_h0": 1.0,
+          "decode_peer_bytes": 4317894152,
+          "decode_h2d_bytes": 1613314916352,
+          "main_hit_rate": 0.380580302468315,
+          "decode_main_hit_rate": 0.3888336741552145,
+          "mandatory": 177019,
+          "prefetch_issued": 0,
+          "scope": "63 decode forwards; frozen routing and teacher inputs"
+        }
+      ],
+      "primary_mean_tpot_s": 0.5118528298809524,
+      "primary_mean_ttft_s": 1.3989960510000001,
+      "primary_mean_e2e_s": 33.6457243335,
+      "diagnostic_ranks": [
+        {
+          "rank": 0,
+          "gpu": 0,
+          "diagnostic_wall_s": 9.953963494,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.04748628998875216,
+            "router_gate_compute": 0.00954328600480222,
+            "moe_other": 0.05077614197909122,
+            "moe.metadata": 0.045223759964108434,
+            "moe.current_controller": 0.004159364002640355,
+            "placement_controller_cpu": 0.00848610399477184,
+            "layout_cpu": 0.0057447539949789725,
+            "layout_device_materialization": 0.012272358008660384,
+            "moe.demand_h2d": 0.0075406940067187095,
+            "moe.forward_a2a": 0.03175648998969698,
+            "forward_token_a2a_submit": 0.013128000009804963,
+            "moe.forward_complete": 0.016771060018800205,
+            "moe.expert_compute": 0.22279030601680308,
+            "moe.return_a2a": 0.026887903991621,
+            "return_token_a2a": 0.02834576203953475
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.060049244187500045,
+            "router_gate_compute": 0.010165636750000005,
+            "moe_other": 0.051396683500000005,
+            "moe.metadata": 0.046879618062500045,
+            "moe.current_controller": 0.00411442725,
+            "placement_controller_cpu": 0.008495285125000009,
+            "layout_cpu": 0.00576353275,
+            "layout_device_materialization": 0.01229527262499999,
+            "moe.demand_h2d": 0.0075268178124999995,
+            "moe.forward_a2a": 0.023509398749999993,
+            "forward_token_a2a_submit": 0.010979603000000004,
+            "moe.forward_complete": 0.011732520249999998,
+            "moe.expert_compute": 0.22249241187499993,
+            "moe.return_a2a": 0.031148129937499984,
+            "return_token_a2a": 0.007534212062500001
+          },
+          "prefix_counts": {
+            "expert_uses": 16415,
+            "token_expert_uses": 98250,
+            "main_hits": 6723,
+            "prefetch_hits": 0,
+            "demand_misses": 9692,
+            "main_hit_tokens": 68500,
+            "miss_tokens": 29750
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 676,
+              "expert_token_rows": 6355,
+              "mandatory_copies": 414
+            },
+            "2": {
+              "expert_groups": 910,
+              "expert_token_rows": 6158,
+              "mandatory_copies": 502
+            },
+            "3": {
+              "expert_groups": 974,
+              "expert_token_rows": 6161,
+              "mandatory_copies": 555
+            },
+            "4": {
+              "expert_groups": 984,
+              "expert_token_rows": 6135,
+              "mandatory_copies": 559
+            },
+            "5": {
+              "expert_groups": 966,
+              "expert_token_rows": 6078,
+              "mandatory_copies": 539
+            },
+            "6": {
+              "expert_groups": 996,
+              "expert_token_rows": 6103,
+              "mandatory_copies": 568
+            },
+            "7": {
+              "expert_groups": 1016,
+              "expert_token_rows": 6329,
+              "mandatory_copies": 581
+            },
+            "8": {
+              "expert_groups": 1065,
+              "expert_token_rows": 6203,
+              "mandatory_copies": 630
+            },
+            "9": {
+              "expert_groups": 1069,
+              "expert_token_rows": 6091,
+              "mandatory_copies": 629
+            },
+            "10": {
+              "expert_groups": 1056,
+              "expert_token_rows": 5973,
+              "mandatory_copies": 618
+            },
+            "11": {
+              "expert_groups": 1091,
+              "expert_token_rows": 6038,
+              "mandatory_copies": 655
+            },
+            "12": {
+              "expert_groups": 1087,
+              "expert_token_rows": 6089,
+              "mandatory_copies": 658
+            },
+            "13": {
+              "expert_groups": 1093,
+              "expert_token_rows": 6119,
+              "mandatory_copies": 662
+            },
+            "14": {
+              "expert_groups": 1111,
+              "expert_token_rows": 6045,
+              "mandatory_copies": 674
+            },
+            "15": {
+              "expert_groups": 1167,
+              "expert_token_rows": 6188,
+              "mandatory_copies": 732
+            },
+            "16": {
+              "expert_groups": 1154,
+              "expert_token_rows": 6185,
+              "mandatory_copies": 716
+            }
+          },
+          "primary_decode_peer_bytes_63": 1078403776,
+          "primary_decode_h2d_bytes_63": 414084759552
+        },
+        {
+          "rank": 1,
+          "gpu": 1,
+          "diagnostic_wall_s": 9.95343493,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.03439446198081712,
+            "router_gate_compute": 0.007634749988792461,
+            "moe_other": 0.04743791599635722,
+            "moe.metadata": 0.06275724598765382,
+            "moe.current_controller": 0.0040402860020985806,
+            "placement_controller_cpu": 0.00834405799629166,
+            "layout_cpu": 0.005654867996927351,
+            "layout_device_materialization": 0.011750267997384076,
+            "moe.demand_h2d": 0.007185705982148648,
+            "moe.forward_a2a": 0.02971872596838513,
+            "forward_token_a2a_submit": 0.01177503798343242,
+            "moe.forward_complete": 0.01653789400123059,
+            "moe.expert_compute": 0.21473068386316294,
+            "moe.return_a2a": 0.024595212045242048,
+            "return_token_a2a": 0.044343659996986425
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.05673726174999998,
+            "router_gate_compute": 0.009623190625000002,
+            "moe_other": 0.04955016437499999,
+            "moe.metadata": 0.06740281700000002,
+            "moe.current_controller": 0.0039976544375000065,
+            "placement_controller_cpu": 0.008365333499999999,
+            "layout_cpu": 0.005672706250000001,
+            "layout_device_materialization": 0.011781857749999994,
+            "moe.demand_h2d": 0.007170560687500001,
+            "moe.forward_a2a": 0.021471336687499985,
+            "forward_token_a2a_submit": 0.01001999812499999,
+            "moe.forward_complete": 0.010775061500000018,
+            "moe.expert_compute": 0.2141193091249999,
+            "moe.return_a2a": 0.030074785875000044,
+            "return_token_a2a": 0.007094524062499994
+          },
+          "prefix_counts": {
+            "expert_uses": 16273,
+            "token_expert_uses": 97806,
+            "main_hits": 6756,
+            "prefetch_hits": 0,
+            "demand_misses": 9517,
+            "main_hit_tokens": 68918,
+            "miss_tokens": 28888
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 696,
+              "expert_token_rows": 6227,
+              "mandatory_copies": 401
+            },
+            "2": {
+              "expert_groups": 894,
+              "expert_token_rows": 6116,
+              "mandatory_copies": 488
+            },
+            "3": {
+              "expert_groups": 952,
+              "expert_token_rows": 6127,
+              "mandatory_copies": 548
+            },
+            "4": {
+              "expert_groups": 986,
+              "expert_token_rows": 6165,
+              "mandatory_copies": 554
+            },
+            "5": {
+              "expert_groups": 957,
+              "expert_token_rows": 6237,
+              "mandatory_copies": 524
+            },
+            "6": {
+              "expert_groups": 976,
+              "expert_token_rows": 6129,
+              "mandatory_copies": 552
+            },
+            "7": {
+              "expert_groups": 995,
+              "expert_token_rows": 6031,
+              "mandatory_copies": 568
+            },
+            "8": {
+              "expert_groups": 1061,
+              "expert_token_rows": 6067,
+              "mandatory_copies": 624
+            },
+            "9": {
+              "expert_groups": 1052,
+              "expert_token_rows": 6178,
+              "mandatory_copies": 616
+            },
+            "10": {
+              "expert_groups": 1050,
+              "expert_token_rows": 6122,
+              "mandatory_copies": 608
+            },
+            "11": {
+              "expert_groups": 1089,
+              "expert_token_rows": 6099,
+              "mandatory_copies": 647
+            },
+            "12": {
+              "expert_groups": 1077,
+              "expert_token_rows": 5995,
+              "mandatory_copies": 647
+            },
+            "13": {
+              "expert_groups": 1088,
+              "expert_token_rows": 6033,
+              "mandatory_copies": 650
+            },
+            "14": {
+              "expert_groups": 1105,
+              "expert_token_rows": 6078,
+              "mandatory_copies": 668
+            },
+            "15": {
+              "expert_groups": 1156,
+              "expert_token_rows": 6011,
+              "mandatory_copies": 719
+            },
+            "16": {
+              "expert_groups": 1139,
+              "expert_token_rows": 6191,
+              "mandatory_copies": 703
+            }
+          },
+          "primary_decode_peer_bytes_63": 1079627880,
+          "primary_decode_h2d_bytes_63": 406893625344
+        },
+        {
+          "rank": 2,
+          "gpu": 4,
+          "diagnostic_wall_s": 9.953397832,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.042623691947839715,
+            "router_gate_compute": 0.008959553985157985,
+            "moe_other": 0.04838613600718979,
+            "moe.metadata": 0.051920588042587056,
+            "moe.current_controller": 0.004049532003118659,
+            "placement_controller_cpu": 0.008401379988528787,
+            "layout_cpu": 0.005729739998932931,
+            "layout_device_materialization": 0.011974632003344584,
+            "moe.demand_h2d": 0.006090133993886407,
+            "moe.forward_a2a": 0.03173552400537305,
+            "forward_token_a2a_submit": 0.011364918008446684,
+            "moe.forward_complete": 0.01553317600581794,
+            "moe.expert_compute": 0.22329190419614348,
+            "moe.return_a2a": 0.026080701997503664,
+            "return_token_a2a": 0.034748303972184695
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.06002324393749994,
+            "router_gate_compute": 0.010171146749999978,
+            "moe_other": 0.049666544499999826,
+            "moe.metadata": 0.053865642500000074,
+            "moe.current_controller": 0.004012045937500003,
+            "placement_controller_cpu": 0.008418585312499997,
+            "layout_cpu": 0.005747563499999995,
+            "layout_device_materialization": 0.0120044163125,
+            "moe.demand_h2d": 0.006040739812500002,
+            "moe.forward_a2a": 0.018330735562499992,
+            "forward_token_a2a_submit": 0.008619504999999993,
+            "moe.forward_complete": 0.008731303812500002,
+            "moe.expert_compute": 0.2197645083749999,
+            "moe.return_a2a": 0.030963237750000056,
+            "return_token_a2a": 0.007224185062499999
+          },
+          "prefix_counts": {
+            "expert_uses": 16072,
+            "token_expert_uses": 99337,
+            "main_hits": 6767,
+            "prefetch_hits": 0,
+            "demand_misses": 9305,
+            "main_hit_tokens": 71122,
+            "miss_tokens": 28215
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 667,
+              "expert_token_rows": 6008,
+              "mandatory_copies": 387
+            },
+            "2": {
+              "expert_groups": 883,
+              "expert_token_rows": 6011,
+              "mandatory_copies": 474
+            },
+            "3": {
+              "expert_groups": 948,
+              "expert_token_rows": 6135,
+              "mandatory_copies": 533
+            },
+            "4": {
+              "expert_groups": 968,
+              "expert_token_rows": 6190,
+              "mandatory_copies": 541
+            },
+            "5": {
+              "expert_groups": 945,
+              "expert_token_rows": 6192,
+              "mandatory_copies": 515
+            },
+            "6": {
+              "expert_groups": 969,
+              "expert_token_rows": 6277,
+              "mandatory_copies": 539
+            },
+            "7": {
+              "expert_groups": 992,
+              "expert_token_rows": 6120,
+              "mandatory_copies": 556
+            },
+            "8": {
+              "expert_groups": 1042,
+              "expert_token_rows": 6222,
+              "mandatory_copies": 607
+            },
+            "9": {
+              "expert_groups": 1042,
+              "expert_token_rows": 6250,
+              "mandatory_copies": 603
+            },
+            "10": {
+              "expert_groups": 1035,
+              "expert_token_rows": 6342,
+              "mandatory_copies": 593
+            },
+            "11": {
+              "expert_groups": 1071,
+              "expert_token_rows": 6268,
+              "mandatory_copies": 630
+            },
+            "12": {
+              "expert_groups": 1062,
+              "expert_token_rows": 6339,
+              "mandatory_copies": 633
+            },
+            "13": {
+              "expert_groups": 1077,
+              "expert_token_rows": 6221,
+              "mandatory_copies": 637
+            },
+            "14": {
+              "expert_groups": 1093,
+              "expert_token_rows": 6301,
+              "mandatory_copies": 658
+            },
+            "15": {
+              "expert_groups": 1149,
+              "expert_token_rows": 6328,
+              "mandatory_copies": 707
+            },
+            "16": {
+              "expert_groups": 1129,
+              "expert_token_rows": 6133,
+              "mandatory_copies": 692
+            }
+          },
+          "primary_decode_peer_bytes_63": 1080479960,
+          "primary_decode_h2d_bytes_63": 399711928320
+        },
+        {
+          "rank": 3,
+          "gpu": 5,
+          "diagnostic_wall_s": 9.953396235,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.03516373800850132,
+            "router_gate_compute": 0.007953013993101202,
+            "moe_other": 0.04701570604761981,
+            "moe.metadata": 0.06250082598999138,
+            "moe.current_controller": 0.004070380006567583,
+            "placement_controller_cpu": 0.008287503989413374,
+            "layout_cpu": 0.005638625997118639,
+            "layout_device_materialization": 0.011622368002310394,
+            "moe.demand_h2d": 0.007254720011260366,
+            "moe.forward_a2a": 0.030181766039924663,
+            "forward_token_a2a_submit": 0.011859436007216569,
+            "moe.forward_complete": 0.018357121979817745,
+            "moe.expert_compute": 0.20876754821091886,
+            "moe.return_a2a": 0.023451750024221833,
+            "return_token_a2a": 0.0487823800416663
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.05798774537499998,
+            "router_gate_compute": 0.009806581187499996,
+            "moe_other": 0.050738029500000045,
+            "moe.metadata": 0.07047803950000002,
+            "moe.current_controller": 0.0040326066875,
+            "placement_controller_cpu": 0.008307353312499993,
+            "layout_cpu": 0.0056564905000000025,
+            "layout_device_materialization": 0.01165106481249999,
+            "moe.demand_h2d": 0.0072412188749999915,
+            "moe.forward_a2a": 0.022461088687499974,
+            "forward_token_a2a_submit": 0.010413741312499999,
+            "moe.forward_complete": 0.011379703062500003,
+            "moe.expert_compute": 0.20885623187500013,
+            "moe.return_a2a": 0.029482432750000013,
+            "return_token_a2a": 0.0072624646250000055
+          },
+          "prefix_counts": {
+            "expert_uses": 15857,
+            "token_expert_uses": 97823,
+            "main_hits": 6735,
+            "prefetch_hits": 0,
+            "demand_misses": 9122,
+            "main_hit_tokens": 69695,
+            "miss_tokens": 28128
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 666,
+              "expert_token_rows": 5986,
+              "mandatory_copies": 377
+            },
+            "2": {
+              "expert_groups": 868,
+              "expert_token_rows": 6291,
+              "mandatory_copies": 464
+            },
+            "3": {
+              "expert_groups": 930,
+              "expert_token_rows": 6153,
+              "mandatory_copies": 524
+            },
+            "4": {
+              "expert_groups": 951,
+              "expert_token_rows": 6086,
+              "mandatory_copies": 525
+            },
+            "5": {
+              "expert_groups": 923,
+              "expert_token_rows": 6069,
+              "mandatory_copies": 501
+            },
+            "6": {
+              "expert_groups": 952,
+              "expert_token_rows": 6067,
+              "mandatory_copies": 528
+            },
+            "7": {
+              "expert_groups": 989,
+              "expert_token_rows": 6096,
+              "mandatory_copies": 547
+            },
+            "8": {
+              "expert_groups": 1039,
+              "expert_token_rows": 6084,
+              "mandatory_copies": 598
+            },
+            "9": {
+              "expert_groups": 1026,
+              "expert_token_rows": 6057,
+              "mandatory_copies": 592
+            },
+            "10": {
+              "expert_groups": 1022,
+              "expert_token_rows": 6139,
+              "mandatory_copies": 584
+            },
+            "11": {
+              "expert_groups": 1051,
+              "expert_token_rows": 6171,
+              "mandatory_copies": 618
+            },
+            "12": {
+              "expert_groups": 1051,
+              "expert_token_rows": 6153,
+              "mandatory_copies": 618
+            },
+            "13": {
+              "expert_groups": 1057,
+              "expert_token_rows": 6203,
+              "mandatory_copies": 624
+            },
+            "14": {
+              "expert_groups": 1082,
+              "expert_token_rows": 6152,
+              "mandatory_copies": 644
+            },
+            "15": {
+              "expert_groups": 1136,
+              "expert_token_rows": 6049,
+              "mandatory_copies": 698
+            },
+            "16": {
+              "expert_groups": 1114,
+              "expert_token_rows": 6067,
+              "mandatory_copies": 680
+            }
+          },
+          "primary_decode_peer_bytes_63": 1079382536,
+          "primary_decode_h2d_bytes_63": 392624603136
+        }
+      ],
+      "prefix_total_expert_rows": 393216,
+      "prefix_total_expert_groups": 64617,
+      "prefix_total_mandatory_copies": 37636,
+      "primary_decode_peer_bytes_63": 4317894152,
+      "primary_decode_h2d_bytes_63": 1613314916352
+    },
+    "LA_CA_NEAR": {
+      "primary": [
+        {
+          "status": "PASS",
+          "backend": "LA_CA_NEAR",
+          "run": 1,
+          "TTFT": 1.989481926,
+          "TPOT": 0.5009500560634921,
+          "E2E": 33.549335458,
+          "token_agreement_to_h0": 0.990234375,
+          "decode_peer_bytes": 4191326672,
+          "decode_h2d_bytes": 1613588594688,
+          "main_hit_rate": 0.38047882651811515,
+          "decode_main_hit_rate": 0.38872999756896276,
+          "mandatory": 177048,
+          "prefetch_issued": 0,
+          "scope": "63 decode forwards; frozen routing and teacher inputs"
+        },
+        {
+          "status": "PASS",
+          "backend": "LA_CA_NEAR",
+          "run": 2,
+          "TTFT": 1.406526688,
+          "TPOT": 0.5011955135079365,
+          "E2E": 32.981844039,
+          "token_agreement_to_h0": 0.990234375,
+          "decode_peer_bytes": 4191326672,
+          "decode_h2d_bytes": 1613588594688,
+          "main_hit_rate": 0.38047882651811515,
+          "decode_main_hit_rate": 0.38872999756896276,
+          "mandatory": 177048,
+          "prefetch_issued": 0,
+          "scope": "63 decode forwards; frozen routing and teacher inputs"
+        }
+      ],
+      "primary_mean_tpot_s": 0.5010727847857143,
+      "primary_mean_ttft_s": 1.6980043070000002,
+      "primary_mean_e2e_s": 33.265589748500005,
+      "diagnostic_ranks": [
+        {
+          "rank": 0,
+          "gpu": 0,
+          "diagnostic_wall_s": 9.858704821,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.05394453396635079,
+            "router_gate_compute": 0.010170192006276915,
+            "moe_other": 0.05181120596091211,
+            "moe.metadata": 0.03799202995002269,
+            "moe.current_controller": 0.0041970200008945545,
+            "placement_controller_cpu": 0.0094266159934923,
+            "layout_cpu": 0.005995788011234252,
+            "layout_device_materialization": 0.012247022025287132,
+            "moe.demand_h2d": 0.007542372007854296,
+            "moe.forward_a2a": 0.03119570800452497,
+            "forward_token_a2a_submit": 0.01327961601968856,
+            "moe.forward_complete": 0.01713379997247829,
+            "moe.expert_compute": 0.2229772377461196,
+            "moe.return_a2a": 0.02766000203578733,
+            "return_token_a2a": 0.019362784021534022
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.06036904956249988,
+            "router_gate_compute": 0.010226695375000004,
+            "moe_other": 0.05185104918750002,
+            "moe.metadata": 0.038739639187499994,
+            "moe.current_controller": 0.004140703312499996,
+            "placement_controller_cpu": 0.009442789437499998,
+            "layout_cpu": 0.006009148624999999,
+            "layout_device_materialization": 0.01226613968749999,
+            "moe.demand_h2d": 0.007524954374999997,
+            "moe.forward_a2a": 0.023432511437499973,
+            "forward_token_a2a_submit": 0.011071804312500008,
+            "moe.forward_complete": 0.011863114812500002,
+            "moe.expert_compute": 0.22279223131250014,
+            "moe.return_a2a": 0.03111059725000002,
+            "return_token_a2a": 0.007545601749999998
+          },
+          "prefix_counts": {
+            "expert_uses": 16457,
+            "token_expert_uses": 99633,
+            "main_hits": 6744,
+            "prefetch_hits": 0,
+            "demand_misses": 9713,
+            "main_hit_tokens": 70640,
+            "miss_tokens": 28993
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 684,
+              "expert_token_rows": 6125,
+              "mandatory_copies": 411
+            },
+            "2": {
+              "expert_groups": 913,
+              "expert_token_rows": 6194,
+              "mandatory_copies": 503
+            },
+            "3": {
+              "expert_groups": 966,
+              "expert_token_rows": 6211,
+              "mandatory_copies": 558
+            },
+            "4": {
+              "expert_groups": 992,
+              "expert_token_rows": 6289,
+              "mandatory_copies": 561
+            },
+            "5": {
+              "expert_groups": 973,
+              "expert_token_rows": 6355,
+              "mandatory_copies": 539
+            },
+            "6": {
+              "expert_groups": 997,
+              "expert_token_rows": 6266,
+              "mandatory_copies": 565
+            },
+            "7": {
+              "expert_groups": 1019,
+              "expert_token_rows": 6254,
+              "mandatory_copies": 584
+            },
+            "8": {
+              "expert_groups": 1066,
+              "expert_token_rows": 6309,
+              "mandatory_copies": 630
+            },
+            "9": {
+              "expert_groups": 1067,
+              "expert_token_rows": 6299,
+              "mandatory_copies": 629
+            },
+            "10": {
+              "expert_groups": 1059,
+              "expert_token_rows": 6248,
+              "mandatory_copies": 621
+            },
+            "11": {
+              "expert_groups": 1096,
+              "expert_token_rows": 6218,
+              "mandatory_copies": 656
+            },
+            "12": {
+              "expert_groups": 1091,
+              "expert_token_rows": 6197,
+              "mandatory_copies": 662
+            },
+            "13": {
+              "expert_groups": 1099,
+              "expert_token_rows": 6170,
+              "mandatory_copies": 661
+            },
+            "14": {
+              "expert_groups": 1110,
+              "expert_token_rows": 6177,
+              "mandatory_copies": 678
+            },
+            "15": {
+              "expert_groups": 1168,
+              "expert_token_rows": 6147,
+              "mandatory_copies": 737
+            },
+            "16": {
+              "expert_groups": 1157,
+              "expert_token_rows": 6174,
+              "mandatory_copies": 718
+            }
+          },
+          "primary_decode_peer_bytes_63": 1040248512,
+          "primary_decode_h2d_bytes_63": 414415060992
+        },
+        {
+          "rank": 1,
+          "gpu": 1,
+          "diagnostic_wall_s": 9.858452495,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.03831375997341814,
+            "router_gate_compute": 0.008703685997286827,
+            "moe_other": 0.048414913968256014,
+            "moe.metadata": 0.05855880001559854,
+            "moe.current_controller": 0.0040485219997353885,
+            "placement_controller_cpu": 0.009254811989143496,
+            "layout_cpu": 0.0057225420023314655,
+            "layout_device_materialization": 0.011731114007532599,
+            "moe.demand_h2d": 0.0073831480131484675,
+            "moe.forward_a2a": 0.0296050699617481,
+            "forward_token_a2a_submit": 0.012360822028480462,
+            "moe.forward_complete": 0.01641767801204698,
+            "moe.expert_compute": 0.21322620173543694,
+            "moe.return_a2a": 0.024093318038969285,
+            "return_token_a2a": 0.03711157601512967
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.05721324868750001,
+            "router_gate_compute": 0.00971092206250001,
+            "moe_other": 0.05005671487500017,
+            "moe.metadata": 0.06055940218750006,
+            "moe.current_controller": 0.003999993187499996,
+            "placement_controller_cpu": 0.009281311187500004,
+            "layout_cpu": 0.005741544125000001,
+            "layout_device_materialization": 0.011760917812499995,
+            "moe.demand_h2d": 0.007374153000000004,
+            "moe.forward_a2a": 0.02220446187499994,
+            "forward_token_a2a_submit": 0.010498931749999997,
+            "moe.forward_complete": 0.011164348375000004,
+            "moe.expert_compute": 0.21328027600000013,
+            "moe.return_a2a": 0.02982624537499997,
+            "return_token_a2a": 0.007147637125000006
+          },
+          "prefix_counts": {
+            "expert_uses": 16277,
+            "token_expert_uses": 97474,
+            "main_hits": 6761,
+            "prefetch_hits": 0,
+            "demand_misses": 9516,
+            "main_hit_tokens": 67727,
+            "miss_tokens": 29747
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 678,
+              "expert_token_rows": 6046,
+              "mandatory_copies": 399
+            },
+            "2": {
+              "expert_groups": 897,
+              "expert_token_rows": 5949,
+              "mandatory_copies": 485
+            },
+            "3": {
+              "expert_groups": 958,
+              "expert_token_rows": 6107,
+              "mandatory_copies": 547
+            },
+            "4": {
+              "expert_groups": 980,
+              "expert_token_rows": 6152,
+              "mandatory_copies": 550
+            },
+            "5": {
+              "expert_groups": 958,
+              "expert_token_rows": 6115,
+              "mandatory_copies": 528
+            },
+            "6": {
+              "expert_groups": 973,
+              "expert_token_rows": 6103,
+              "mandatory_copies": 557
+            },
+            "7": {
+              "expert_groups": 1004,
+              "expert_token_rows": 6056,
+              "mandatory_copies": 572
+            },
+            "8": {
+              "expert_groups": 1062,
+              "expert_token_rows": 6045,
+              "mandatory_copies": 622
+            },
+            "9": {
+              "expert_groups": 1057,
+              "expert_token_rows": 6060,
+              "mandatory_copies": 620
+            },
+            "10": {
+              "expert_groups": 1052,
+              "expert_token_rows": 6067,
+              "mandatory_copies": 609
+            },
+            "11": {
+              "expert_groups": 1085,
+              "expert_token_rows": 6082,
+              "mandatory_copies": 646
+            },
+            "12": {
+              "expert_groups": 1077,
+              "expert_token_rows": 6086,
+              "mandatory_copies": 643
+            },
+            "13": {
+              "expert_groups": 1087,
+              "expert_token_rows": 6144,
+              "mandatory_copies": 648
+            },
+            "14": {
+              "expert_groups": 1109,
+              "expert_token_rows": 6145,
+              "mandatory_copies": 669
+            },
+            "15": {
+              "expert_groups": 1158,
+              "expert_token_rows": 6153,
+              "mandatory_copies": 719
+            },
+            "16": {
+              "expert_groups": 1142,
+              "expert_token_rows": 6164,
+              "mandatory_copies": 702
+            }
+          },
+          "primary_decode_peer_bytes_63": 1050445696,
+          "primary_decode_h2d_bytes_63": 406987997184
+        },
+        {
+          "rank": 2,
+          "gpu": 4,
+          "diagnostic_wall_s": 9.858955897,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.045987257991466295,
+            "router_gate_compute": 0.009715620009461417,
+            "moe_other": 0.04897286398176217,
+            "moe.metadata": 0.0484741059429943,
+            "moe.current_controller": 0.004078591999714267,
+            "placement_controller_cpu": 0.009280731990002096,
+            "layout_cpu": 0.0057942020003683955,
+            "layout_device_materialization": 0.011943202022463075,
+            "moe.demand_h2d": 0.005974983995780336,
+            "moe.forward_a2a": 0.03193985998455897,
+            "forward_token_a2a_submit": 0.011451156012713903,
+            "moe.forward_complete": 0.015278689984697846,
+            "moe.expert_compute": 0.22136593773961086,
+            "moe.return_a2a": 0.026094418006483433,
+            "return_token_a2a": 0.028603380041196943
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.05971165606249995,
+            "router_gate_compute": 0.010214064875000001,
+            "moe_other": 0.05033690525000007,
+            "moe.metadata": 0.04906290256250002,
+            "moe.current_controller": 0.0040359858125,
+            "placement_controller_cpu": 0.009301501187500004,
+            "layout_cpu": 0.005812925562500003,
+            "layout_device_materialization": 0.011973025749999982,
+            "moe.demand_h2d": 0.0059256896875000045,
+            "moe.forward_a2a": 0.018714309187499955,
+            "forward_token_a2a_submit": 0.008770268999999995,
+            "moe.forward_complete": 0.008756740625000007,
+            "moe.expert_compute": 0.2182653803750002,
+            "moe.return_a2a": 0.030953219437500002,
+            "return_token_a2a": 0.007234981812499997
+          },
+          "prefix_counts": {
+            "expert_uses": 16060,
+            "token_expert_uses": 98875,
+            "main_hits": 6751,
+            "prefetch_hits": 0,
+            "demand_misses": 9309,
+            "main_hit_tokens": 72630,
+            "miss_tokens": 26245
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 687,
+              "expert_token_rows": 6286,
+              "mandatory_copies": 388
+            },
+            "2": {
+              "expert_groups": 884,
+              "expert_token_rows": 6287,
+              "mandatory_copies": 476
+            },
+            "3": {
+              "expert_groups": 952,
+              "expert_token_rows": 6284,
+              "mandatory_copies": 534
+            },
+            "4": {
+              "expert_groups": 963,
+              "expert_token_rows": 6254,
+              "mandatory_copies": 538
+            },
+            "5": {
+              "expert_groups": 935,
+              "expert_token_rows": 6160,
+              "mandatory_copies": 512
+            },
+            "6": {
+              "expert_groups": 973,
+              "expert_token_rows": 6165,
+              "mandatory_copies": 545
+            },
+            "7": {
+              "expert_groups": 991,
+              "expert_token_rows": 6179,
+              "mandatory_copies": 556
+            },
+            "8": {
+              "expert_groups": 1045,
+              "expert_token_rows": 6160,
+              "mandatory_copies": 610
+            },
+            "9": {
+              "expert_groups": 1033,
+              "expert_token_rows": 6081,
+              "mandatory_copies": 606
+            },
+            "10": {
+              "expert_groups": 1033,
+              "expert_token_rows": 6135,
+              "mandatory_copies": 594
+            },
+            "11": {
+              "expert_groups": 1062,
+              "expert_token_rows": 6130,
+              "mandatory_copies": 628
+            },
+            "12": {
+              "expert_groups": 1065,
+              "expert_token_rows": 6182,
+              "mandatory_copies": 634
+            },
+            "13": {
+              "expert_groups": 1071,
+              "expert_token_rows": 6167,
+              "mandatory_copies": 638
+            },
+            "14": {
+              "expert_groups": 1092,
+              "expert_token_rows": 6133,
+              "mandatory_copies": 654
+            },
+            "15": {
+              "expert_groups": 1147,
+              "expert_token_rows": 6129,
+              "mandatory_copies": 706
+            },
+            "16": {
+              "expert_groups": 1127,
+              "expert_token_rows": 6143,
+              "mandatory_copies": 690
+            }
+          },
+          "primary_decode_peer_bytes_63": 1053831440,
+          "primary_decode_h2d_bytes_63": 399683616768
+        },
+        {
+          "rank": 3,
+          "gpu": 5,
+          "diagnostic_wall_s": 9.858759137,
+          "decode_phase_stream_s_per_token": {
+            "attention_dense_residual": 0.03795865602217968,
+            "router_gate_compute": 0.008659666005754844,
+            "moe_other": 0.047835586040775764,
+            "moe.metadata": 0.059569336052983965,
+            "moe.current_controller": 0.0040820559997809995,
+            "placement_controller_cpu": 0.009128402001224459,
+            "layout_cpu": 0.005660969995893547,
+            "layout_device_materialization": 0.011584788004867737,
+            "moe.demand_h2d": 0.007117888004053384,
+            "moe.forward_a2a": 0.029895832019275922,
+            "forward_token_a2a_submit": 0.012399905993603175,
+            "moe.forward_complete": 0.018450620001181965,
+            "moe.expert_compute": 0.20779268373548984,
+            "moe.return_a2a": 0.02325004003406501,
+            "return_token_a2a": 0.04158328995201736
+          },
+          "decode_phase_cpu_s_per_token": {
+            "attention_dense_residual": 0.05780666306249998,
+            "router_gate_compute": 0.009781032000000009,
+            "moe_other": 0.05135617681249991,
+            "moe.metadata": 0.06454127800000009,
+            "moe.current_controller": 0.0040356282499999984,
+            "placement_controller_cpu": 0.009155399937499996,
+            "layout_cpu": 0.005677003437500004,
+            "layout_device_materialization": 0.01161527262500001,
+            "moe.demand_h2d": 0.007102789687499995,
+            "moe.forward_a2a": 0.022263419187500064,
+            "forward_token_a2a_submit": 0.010555333124999977,
+            "moe.forward_complete": 0.011263893000000002,
+            "moe.expert_compute": 0.2078598523124999,
+            "moe.return_a2a": 0.029255950000000024,
+            "return_token_a2a": 0.007260280312499997
+          },
+          "prefix_counts": {
+            "expert_uses": 15823,
+            "token_expert_uses": 97234,
+            "main_hits": 6714,
+            "prefetch_hits": 0,
+            "demand_misses": 9109,
+            "main_hit_tokens": 67066,
+            "miss_tokens": 30168
+          },
+          "per_step": {
+            "1": {
+              "expert_groups": 656,
+              "expert_token_rows": 6119,
+              "mandatory_copies": 377
+            },
+            "2": {
+              "expert_groups": 861,
+              "expert_token_rows": 6146,
+              "mandatory_copies": 465
+            },
+            "3": {
+              "expert_groups": 928,
+              "expert_token_rows": 5974,
+              "mandatory_copies": 522
+            },
+            "4": {
+              "expert_groups": 954,
+              "expert_token_rows": 5881,
+              "mandatory_copies": 523
+            },
+            "5": {
+              "expert_groups": 925,
+              "expert_token_rows": 5946,
+              "mandatory_copies": 502
+            },
+            "6": {
+              "expert_groups": 950,
+              "expert_token_rows": 6042,
+              "mandatory_copies": 526
+            },
+            "7": {
+              "expert_groups": 978,
+              "expert_token_rows": 6087,
+              "mandatory_copies": 547
+            },
+            "8": {
+              "expert_groups": 1034,
+              "expert_token_rows": 6062,
+              "mandatory_copies": 600
+            },
+            "9": {
+              "expert_groups": 1032,
+              "expert_token_rows": 6136,
+              "mandatory_copies": 592
+            },
+            "10": {
+              "expert_groups": 1019,
+              "expert_token_rows": 6126,
+              "mandatory_copies": 582
+            },
+            "11": {
+              "expert_groups": 1059,
+              "expert_token_rows": 6146,
+              "mandatory_copies": 618
+            },
+            "12": {
+              "expert_groups": 1044,
+              "expert_token_rows": 6111,
+              "mandatory_copies": 621
+            },
+            "13": {
+              "expert_groups": 1058,
+              "expert_token_rows": 6095,
+              "mandatory_copies": 620
+            },
+            "14": {
+              "expert_groups": 1080,
+              "expert_token_rows": 6121,
+              "mandatory_copies": 644
+            },
+            "15": {
+              "expert_groups": 1135,
+              "expert_token_rows": 6147,
+              "mandatory_copies": 696
+            },
+            "16": {
+              "expert_groups": 1110,
+              "expert_token_rows": 6095,
+              "mandatory_copies": 674
+            }
+          },
+          "primary_decode_peer_bytes_63": 1046801024,
+          "primary_decode_h2d_bytes_63": 392501919744
+        }
+      ],
+      "prefix_total_expert_rows": 393216,
+      "prefix_total_expert_groups": 64617,
+      "prefix_total_mandatory_copies": 37647,
+      "primary_decode_peer_bytes_63": 4191326672,
+      "primary_decode_h2d_bytes_63": 1613588594688
+    }
+  }
+}
