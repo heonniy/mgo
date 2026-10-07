@@ -1,4 +1,4 @@
-"""Summarize the bounded native BR/Near frozen-route rank diagnosis."""
+"""Summarize a bounded native frozen-route policy rank diagnosis."""
 import argparse
 import hashlib
 import json
@@ -15,15 +15,17 @@ def summarize(root):
     assert status["status"] == "PASS"
     result = read(root / "result.json")
     assert result["policy_compare"] and result["prefetch"] == "off"
+    pair = tuple(result.get("policy_pair") or ("BR", "LA_CA_NEAR"))
+    assert len(pair) == 2 and len(set(pair)) == 2
     primary = defaultdict(list)
     for run in range(4):
         row = read(root / f"run{run}.json")
         assert row["status"] == "PASS"
         primary[row["backend"]].append(row)
-    assert set(primary) == {"BR", "LA_CA_NEAR"}
+    assert set(primary) == set(pair)
     assert all(len(rows) == 2 for rows in primary.values())
     policies = {}
-    for policy in ("BR", "LA_CA_NEAR"):
+    for policy in pair:
         ranks = []
         for rank in range(4):
             d = read(root / f"diagnostic_{policy}_rank{rank}.json")
@@ -46,7 +48,7 @@ def summarize(root):
                 "expert_token_rows": sum(e["token_expert_uses"] for e in events if e["step"] == step),
                 "mandatory_copies": sum(e["demand_misses"] for e in events if e["step"] == step),
             } for step in range(1, 17)}
-            primary_rank = read(root / f"run{0 if policy == 'BR' else 1}_rank{rank}.json")
+            primary_rank = read(root / f"run{pair.index(policy)}_rank{rank}.json")
             ranks.append({
                 "rank": rank, "gpu": (0, 1, 4, 5)[rank],
                 "diagnostic_wall_s": d["wall_seconds"],
@@ -68,13 +70,14 @@ def summarize(root):
             "primary_decode_peer_bytes_63": sum(r["primary_decode_peer_bytes_63"] for r in ranks),
             "primary_decode_h2d_bytes_63": sum(r["primary_decode_h2d_bytes_63"] for r in ranks),
         }
-    assert policies["BR"]["prefix_total_expert_rows"] == policies["LA_CA_NEAR"]["prefix_total_expert_rows"]
+    assert policies[pair[0]]["prefix_total_expert_rows"] == policies[pair[1]]["prefix_total_expert_rows"]
     raw_hashes = {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                   for path in sorted(root.glob("diagnostic_*_rank*.json"))}
     return {
         "status": "PASS", "source": str(root), "cell": result["cell"],
         "source_commit": status["source_commit"], "raw_diagnostic_sha256": raw_hashes,
         "primary_decode_steps": result["decode_steps"], "diagnostic_decode_prefix": 16,
+        "policy_pair": list(pair),
         "route_frozen": result["route_frozen"], "prefetch": result["prefetch"],
         "scope": "Uninstrumented two-repeat primary uses 63 decode forwards. One separately instrumented 16-forward frozen prefix per policy; stream spans include host gaps and peer waits and must not replace TPOT.",
         "policies": policies,

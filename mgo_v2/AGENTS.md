@@ -1,3 +1,10 @@
+**OWNER CA VERSUS main_OURS NEAR FOLLOW-UP (2026-10-08), in progress.**
+Read experiments/native_ca_near_20261008/PLAN.md. Keep main_OURS as native
+C++ expert + compiled prefill/decode indices + Near + prefetch OFF. Compare
+CA against Near on one frozen R4/C30/B16/L256/O64 route, two clean primaries
+per policy and one separate 16-decode rank diagnostic each. GPUs0/1/4/5 only;
+do not promote CA from communication bytes alone. Restore owned model loads.
+
 **OWNER OURS MAIN-TABLE NATIVE FINAL (2026-10-08).**
 Read experiments/native_fullpath_20261008/PLAN.md, RESULTS.md and
 FINAL_MAIN_TABLE_RUNTIME.json. User selects native C++ expert execution,
