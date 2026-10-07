@@ -15,19 +15,21 @@ class ForwardPacket:
  work: object
  hidden_size: int
  dtype: torch.dtype
+ topk: int = 8
  def finish(self):
   if self.work is not None:self.work.wait();self.work=None
   self.send=None
   n=self.raw.shape[0];hb=self.hidden_size*2
   hidden=self.raw[:,:hb].contiguous().view(self.dtype).view(n,self.hidden_size)
-  weights=self.raw[:,hb:hb+16].contiguous().view(self.dtype).view(n,8)
-  ids=self.raw[:,hb+16:hb+24].contiguous()
+  weights=self.raw[:,hb:hb+2*self.topk].contiguous().view(self.dtype).view(n,self.topk)
+  ids=self.raw[:,hb+2*self.topk:hb+3*self.topk].contiguous()
   return hidden,weights,ids
 
 class FusedTokenRankTransport:
- def __init__(self,return_mode='exact'):
+ def __init__(self,return_mode='exact',topk=8):
   if return_mode not in ('exact','rank-partial'):raise ValueError(return_mode)
-  self.return_mode=return_mode;self.calls=0;self.forward_bytes=0;self.return_bytes=0;self.rank=dist.get_rank();self.before_exchange=None
+  if not 1<=topk<=8:raise ValueError(topk)
+  self.return_mode=return_mode;self.topk=topk;self.calls=0;self.forward_bytes=0;self.return_bytes=0;self.rank=dist.get_rank();self.before_exchange=None
  def exchange(self,x,send,recv,async_op=False):
   hook=self.before_exchange
   if hook is None:
@@ -45,13 +47,13 @@ class FusedTokenRankTransport:
   if hidden.dtype!=torch.bfloat16:raise ValueError('validated wire format requires BF16')
   idx=e['send_idx'];ids=e['send_eids'];weights=dense[idx[:,None],ids.clamp_min(0)]*(ids>=0)
   n=len(idx);h=hidden.shape[-1];hb=h*2
-  payload=torch.empty((n,hb+24),device=hidden.device,dtype=torch.uint8)
+  payload=torch.empty((n,hb+3*self.topk),device=hidden.device,dtype=torch.uint8)
   payload[:,:hb]=hidden[idx].contiguous().view(torch.uint8).view(n,hb)
-  payload[:,hb:hb+16]=weights.contiguous().view(torch.uint8).view(n,16)
-  payload[:,hb+16:]=ids.to(torch.uint8)
+  payload[:,hb:hb+2*self.topk]=weights.contiguous().view(torch.uint8).view(n,2*self.topk)
+  payload[:,hb+2*self.topk:]=ids.to(torch.uint8)
   raw,work=self.exchange(payload,e['send_counts'],e['recv_counts'],async_op)
-  self.forward_bytes+=(sum(e['send_counts'])-e['send_counts'][self.rank])*(hb+24)
-  return ForwardPacket(raw,payload,work,h,hidden.dtype)
+  self.forward_bytes+=(sum(e['send_counts'])-e['send_counts'][self.rank])*(hb+3*self.topk)
+  return ForwardPacket(raw,payload,work,h,hidden.dtype,self.topk)
  def combine(self,hidden,parts,e):
   if self.return_mode=='exact':
    values=torch.cat(parts) if parts else hidden.new_empty((0,hidden.shape[-1]))
