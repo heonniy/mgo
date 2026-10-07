@@ -49,6 +49,15 @@ def main(a):
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
  p.configure_eam_budget(budgets,expert_bytes)
+ if model_family!='Qwen3':
+  # DeepSeek's 16.5 MiB experts made the former full-budget speculative
+  # admission submit >11,000 transfers during a 26-layer two-token probe.
+  # Keep C30 residency and the full soft priority ranking; bound only the
+  # speculative H2D queue to two candidates per physical GPU and layer.
+  p.eam_max_speculative_per_gpu=2
+  write(a.output/'eam_policy.json',dict(max_speculative_per_gpu=2,
+       expert_budget_per_gpu=budgets,expert_bytes=expert_bytes,
+       scope='DeepSeek only; full scores remain eviction priorities'))
  if a.smoke and model_family!='Qwen3':
   # Diagnose first-use DeepSeek EAM without adding probes to table timing.
   trace_path=a.output/'deepseek_eam_trace.jsonl';trace_phase={'repeat':-1}
