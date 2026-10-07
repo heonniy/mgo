@@ -6,11 +6,12 @@ import numpy as np
 P=Path(__file__).resolve().parents[1]/'experiments/br_prefetch_c60_20261007'
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 def analyze_batch(batch):
- root=ROOT/f'br_prefetch_C60_B{batch}_H256_v1';out=P/f'B{batch}';out.mkdir(exist_ok=True);arms={};tokens={}
+ labels=json.loads((P/'RUN_LABELS.json').read_text()) if (P/'RUN_LABELS.json').exists() else {}
+ root=ROOT/labels.get(str(batch),f'br_prefetch_C60_B{batch}_H256_v1');out=P/f'B{batch}';out.mkdir(exist_ok=True);arms={};tokens={}
  for arm in ('off','on'):
   d=root/arm;primary=json.loads((d/'primary.json').read_text());assert primary['status']=='PASS'
   moe=np.zeros((4,256,48));expert=np.zeros_like(moe);expert_cpu=np.zeros_like(moe);rows=np.zeros_like(moe);groups=np.zeros_like(moe);miss=np.zeros_like(moe)
-  arrivals={name:np.full_like(moe,np.nan) for name in ('return_token_a2a','forward_token_a2a_submit')};rank_summaries=[];tokens[arm]=[]
+  arrivals={name:np.full_like(moe,np.nan) for name in ('return_token_a2a','forward_token_a2a_submit','moe.expert_compute')};rank_summaries=[];tokens[arm]=[]
   dest=out/arm;dest.mkdir(exist_ok=True)
   for name in ('primary.json','diagnostic.json'):shutil.copy2(d/name,dest/name)
   for rank in range(4):
@@ -31,7 +32,7 @@ def analyze_batch(batch):
   assert np.all(rows.sum(axis=0)==batch*4*8) and np.all(moe>0)
   assert all(np.isfinite(a).all() for a in arrivals.values())
   skew={k:dict(mean_ms=float(np.ptp(a,axis=0).mean()*1000),p50_p90_p99_ms=[float(v) for v in np.percentile(np.ptp(a,axis=0)*1000,[50,90,99])]) for k,a in arrivals.items()}
-  imbalance=dict(token_rows_max_over_mean_p50_p90=[float(v) for v in np.percentile(rows.max(0)/rows.mean(0),[50,90])],expert_count_max_over_mean_p50_p90=[float(v) for v in np.percentile(groups.max(0)/groups.mean(0),[50,90])],expert_span_max_minus_min_ms_p50_p90_p99=[float(v) for v in np.percentile(np.ptp(expert,axis=0)*1000,[50,90,99])],slowest_expert_rank_counts=np.bincount(expert.argmax(0).ravel(),minlength=4).tolist(),heaviest_token_rank_counts=np.bincount(rows.argmax(0).ravel(),minlength=4).tolist(),slowest_equals_heaviest_token_fraction=float(np.mean(expert.argmax(0)==rows.argmax(0))))
+  imbalance=dict(token_rows_max_over_mean_p50_p90=[float(v) for v in np.percentile(rows.max(0)/rows.mean(0),[50,90])],expert_count_max_over_mean_p50_p90=[float(v) for v in np.percentile(groups.max(0)/groups.mean(0),[50,90])],expert_span_max_minus_min_ms_p50_p90_p99=[float(v) for v in np.percentile(np.ptp(expert,axis=0)*1000,[50,90,99])],slowest_expert_rank_counts=np.bincount(expert.argmax(0).ravel(),minlength=4).tolist(),heaviest_token_rank_counts=np.bincount(rows.argmax(0).ravel(),minlength=4).tolist(),slowest_equals_heaviest_token_fraction=float(np.mean(expert.argmax(0)==rows.argmax(0))),slowest_equals_most_experts_fraction=float(np.mean(expert.argmax(0)==groups.argmax(0))))
   arms[arm]=dict(primary=primary,diagnostic_moe_tpot=float(moe.sum(axis=2).max(axis=0).mean()),ranks=rank_summaries,host_collective_entry_skew=skew,imbalance=imbalance)
  for rank in range(4):
   source=[json.loads((root/arm/f'source_rank{rank}.json').read_text()) for arm in ('off','on')]

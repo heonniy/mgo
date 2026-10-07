@@ -4,6 +4,7 @@ from mgo_v2.selected_runtime import _create_runtime
 from mgo_v2.decode_runtime import DecodeOffloadRuntime
 from refactor_thread_affinity import configure
 from br_prefetch_diagnostics import PrefetchDiagnostics
+from br_prefetch_records import save_phase
 
 def main(a):
  rank=int(os.environ['RANK']);assert int(os.environ['WORLD_SIZE'])==4
@@ -16,6 +17,7 @@ def main(a):
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
  assert spec['expert_slots_per_rank']==[922,922,921,921]
+ reference_root=Path(os.environ['MGO_BR_DIAGNOSTIC_REFERENCE']) if os.environ.get('MGO_BR_DIAGNOSTIC_REFERENCE') else None
  a.local_batch=spec['local_batch'];a.seed=42;a.policy='BR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=False;a.validate_decode_layout=False;a.validate_prefill_optimized=False
  model,backing,experts=load_model();pinned_experts=pool=receipt=None;results=[]
@@ -38,7 +40,15 @@ def main(a):
      w=rt.cache[slot];w.zero_();rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
   torch.cuda.synchronize()
   expected=None
-  for phase,n in (('warmup',9),('primary',257),('diagnostic',257)):
+  if reference_root is not None:
+   expected=json.loads((reference_root/arm/f'primary_rank{rank}.json').read_text())
+   assert expected['phase']=='primary' and expected['prefetch']==arm and expected['output_tokens']==257
+   write(out/f'primary_rank{rank}.json',expected)
+   if rank==0:
+    original_primary=json.loads((reference_root/arm/'primary.json').read_text());assert original_primary['batch']==a.local_batch
+    write(out/'primary.json',original_primary);results.append(original_primary)
+  phases=(('warmup',9),('diagnostic',257)) if reference_root is not None else (('warmup',9),('primary',257),('diagnostic',257))
+  for phase,n in phases:
    rt.reset();rt.event_offset=0;rt.gate_history=GateHistory(48,128,128)
    from mgo_v2.live_metadata import LiveMetadata
    rt.metadata=LiveMetadata(a.local_batch,rt.gate_history);configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
@@ -71,10 +81,10 @@ def main(a):
    if phase=='diagnostic':
     assert result['tokens']==expected['tokens'] and validation['state_hash']==expected['validation']['state_hash'] and validation['role_hash']==expected['validation']['role_hash']
     assert result['decode_bytes']==expected['decode_bytes']
-    diagnostic.update(token_cache_byte_parity=True,output=result);write(out/f'diagnostic_rank{rank}.json',diagnostic)
-   write(out/f'{phase}_rank{rank}.json',result);dist.barrier()
+    diagnostic.update(token_cache_byte_parity=True,output=result)
+   receipt_phase=save_phase(out,phase,rank,result,diagnostic if phase=='diagnostic' else None);dist.barrier()
    if rank==0:
-    rr=[json.loads((out/f'{phase}_rank{r}.json').read_text()) for r in range(4)];assert len({x['release_ns'] for x in rr})==1
+    rr=[json.loads((out/f'{receipt_phase}_rank{r}.json').read_text()) for r in range(4)];assert len({x['release_ns'] for x in rr})==1
     start=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
     summary=dict(status='PASS',batch=a.local_batch,prefetch=arm,phase=phase,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,decode_steps=n-1,decode_peer_bytes=sum(x['decode_bytes']['forward']+x['decode_bytes']['returned'] for x in rr),decode_h2d_bytes=sum(x['decode_bytes']['h2d'] for x in rr))
     write(out/f'{phase}.json',summary);print(json.dumps(summary),flush=True)
@@ -83,7 +93,7 @@ def main(a):
   rt.close()
   for block in model.model.layers:block.mlp.forward=lambda *unused:None
   del original_execute,execute,rt;gc.collect();torch.cuda.empty_cache();dist.barrier()
- if rank==0:write(a.output/'result.json',dict(status='PASS',batch=a.local_batch,results=results,scope='one primary and separate full diagnostic per arm; OFF retains identical overlap and MAIN capacity; model and pinned source reused'))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',batch=a.local_batch,primary_reference=str(reference_root) if reference_root else None,results=results,scope='one primary and separate full diagnostic per arm; OFF retains identical overlap and MAIN capacity; model and pinned source reused'))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);main(p.parse_args())
