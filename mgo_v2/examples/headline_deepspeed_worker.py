@@ -70,6 +70,13 @@ def main(a):
  coordinator=engine.optimizer.get_param_coordinator()
  budget=spec.get('expert_budget_bytes',17392730112)//4;peak=[0];all_peak=[0];samples=[0];full_scans=[0]
  records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
+ def scan_residency():
+  charged=all_charged=0
+  for expert,param,nbytes in records:
+   if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
+    all_charged+=nbytes
+    if expert:charged+=nbytes
+  return charged,all_charged
  def measure_residency():
   samples[0]+=1
   native_charged=getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
@@ -79,11 +86,7 @@ def main(a):
   # expert parameters; a complete Python scan at every fetch adds substantial
   # host work to the two-token calibration. Cross-check periodically.
   if model_family=='Qwen3' or samples[0]==1 or samples[0]%64==0:
-   charged=all_charged=0
-   for expert,param,nbytes in records:
-    if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
-     all_charged+=nbytes
-     if expert:charged+=nbytes
+   charged,all_charged=scan_residency()
    assert all_charged==native_charged,(all_charged,native_charged)
    peak[0]=max(peak[0],charged);full_scans[0]+=1
  # Enforce the exact all-parameter C30 bound at every native fetch; the
@@ -103,10 +106,18 @@ def main(a):
  write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],expert_peak_sampled=model_family!='Qwen3',all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],full_scans=full_scans[0],calibration_seconds=calibration_seconds,pinned_host_bytes=pinned,config=cfg))
  # Validate the native live-parameter counter against the complete scan above,
  # then sample that O(1) counter at fetch boundaries in primary execution.
- live_peak=[0]
+ live_peak=[0];live_samples=[0];counter_offset=[0];counter_corrections=[0];counter_full_scans=[0]
  def bounded_fetch(*args,**kwargs):
   result=original_fetch(*args,**kwargs)
-  charged=getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
+  live_samples[0]+=1
+  charged=getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2+counter_offset[0]
+  if live_samples[0]==1 or live_samples[0]%256==0 or charged<0 or charged>budget:
+   _,actual=scan_residency()
+   counter_full_scans[0]+=1
+   if actual!=charged:
+    counter_offset[0]+=actual-charged
+    counter_corrections[0]+=1
+    charged=actual
   assert 0<=charged<=budget,(charged,budget)
   live_peak[0]=max(live_peak[0],charged)
   return result
@@ -116,10 +127,12 @@ def main(a):
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local_rows],device='cuda')
   coordinator.release_and_reset_all(engine.module)
   assert all(p.ds_status==ZeroParamStatus.NOT_AVAILABLE for _,p in params)
+  counter_offset[0]=-getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
+  live_samples[0]=0;counter_corrections[0]=0;counter_full_scans[0]=0
   gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
   if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   live_peak[0]=0
-  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
+  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,parameter_counter_offset_bytes=counter_offset[0],parameter_counter_corrections=counter_corrections[0],parameter_counter_full_scans=counter_full_scans[0],kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
   write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(r['release_ns'] for r in rr))==1

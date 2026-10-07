@@ -14,11 +14,15 @@ the original local output order and combine arithmetic. A two-rank CPU check
 with disjoint expert selections produced exactly the stock local output and
 the same global call order on both ranks.
 
-The DeepSeek calibration also enforces its all-parameter C30 byte bound at
-every native fetch using DeepSpeed's O(1) live-parameter counter, with a full
+The DeepSeek calibration enforces its all-parameter C30 byte bound at every
+native fetch using DeepSpeed's O(1) live-parameter counter, with a full
 parameter scan every 64 fetches. The separately reported expert peak is a
-periodic sample, while the all-parameter peak is the exact enforced bound.
-The Qwen path retains its prior full-scan calibration.
+periodic sample. After the cache reset in the full-length run, DeepSpeed's
+counter briefly underflowed by 4 KiB. Primary timing therefore aligns that
+counter with the verified all-`NOT_AVAILABLE` reset state, cross-checks a full
+scan every 256 fetches, and corrects any drift before checking the bound.
+The measured peak and correction count are retained per rank and repeat. The
+Qwen path retains its prior full-scan calibration.
 
 The repaired four-GPU DeepSeek smoke
 `mt2_deepseek_sharegpt_b16_l512_deepspeed_smoke_v6` passed its two-token

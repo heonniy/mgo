@@ -68,6 +68,11 @@ def main():
                             for rank in range(4):
                                 row = json.loads((path / f'repeat{repeat}_rank{rank}.json').read_text())
                                 actual_ids.extend(row['request_ids'])
+                                if system == 'deepspeed':
+                                    assert 0 < row['all_parameter_peak_bytes'] <= row['parameter_budget_bytes']
+                                    if model != 'Qwen3':
+                                        assert row['parameter_counter_full_scans'] > 0
+                                        assert row['parameter_counter_corrections'] >= 0
                             assert actual_ids == expected_ids, (path.name, repeat, 'request membership/order mismatch')
                     else:
                         assert all(row['request_ids'] == expected_ids for row in samples)
