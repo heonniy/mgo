@@ -4,6 +4,7 @@ from mgo_v2.selected_runtime import _create_runtime
 from mgo_v2.native_expert import NativeExpertExecutor
 from refactor_thread_affinity import configure
 from mgo_v2.live_metadata import LiveMetadata
+from native_trace_counts import distinct_event_counts
 
 
 def generate_fixed(model,rt,ids,teacher,n):
@@ -70,15 +71,16 @@ def main(a):
  assert len(routes)==(a.decode_steps+1)*48
  active_total=active_decode=None
  if compare_prefetch:
-  local_routes=torch.stack([row[0].to(torch.uint8) for row in routes])
+  sizes=[row[0].numel() for row in routes]
+  local_routes=torch.cat([row[0].reshape(-1).to(torch.uint8) for row in routes])
   gathered=[torch.empty_like(local_routes) for _ in range(4)]
   dist.all_gather(gathered,local_routes)
-  global_routes=torch.cat(gathered,dim=1).cpu().numpy()
-  distinct=np.array([len(np.unique(row)) for row in global_routes],dtype=np.int64)
+  rank_routes=[row.cpu().numpy() for row in gathered]
+  distinct=distinct_event_counts(rank_routes,sizes)
   active_total=int(distinct.sum());active_decode=int(distinct[48:].sum())
  teacher=torch.tensor(captured['tokens'],device='cuda');route_bytes=sum(t.numel()*t.element_size() for row in routes for t in row)
  # Store a content hash, not a future-dependent controller. Only current
- # event tensors are substituted; predictor is disabled in both arms.
+ # event tensors are substituted; ON/OFF keeps predictor access causal.
  h=hashlib.sha256()
  for row in routes:
   for t in row:h.update(t.cpu().view(torch.uint8).numpy().tobytes())
