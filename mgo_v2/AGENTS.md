@@ -1,3 +1,15 @@
+**OWNER TWO-MODEL MAIN TABLE ACTIVE (2026-10-08).**
+Read `experiments/main_table_2x2_20261008/PLAN.md` and `MATRIX.json`.
+This latest owner request supersedes older policy-gap queues: complete the
+ShareGPT/LMSYS-Chat-1M × Qwen3/DeepSeek-V2-Lite × input512/1024 × local
+B16/B64 R4/C30 table for selected main_OURS, repaired MoE-Infinity,
+DeepSpeed ZeRO-Inference, and balanced synchronous llama.cpp. Keep GPU work
+on 0,1,4,5 only, one job at a time. Raw LMSYS prompts and token manifests
+stay outside Git. Verify model-specific execution and cache budgets before
+DeepSeek physical timing; the Qwen-specific 48-layer runtime is not a valid
+DeepSeek implementation. Preserve failed attempts and repair reproducible
+errors to finish the matrix.
+
 **OWNER C30/P2P-DISABLED FOLLOW-UP IN PROGRESS (2026-10-08).**
 Read experiments/policy_gap_c60_20261008/FOLLOWUP_PLAN.md. After the six
 ShareGPT C60/NVSwitch physical candidates pass, run the four unique

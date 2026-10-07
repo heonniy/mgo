@@ -1,0 +1,19 @@
+{
+  "status": "PREPARING",
+  "physical_gpus": [0, 1, 4, 5],
+  "world": 4,
+  "cache_percent": 30,
+  "datasets": ["ShareGPT", "LMSYS-Chat-1M"],
+  "models": [
+    "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+    "/home/hwlee/model/DeepSeek-V2-Lite-Chat"
+  ],
+  "input_tokens": [512, 1024],
+  "local_batch": [16, 64],
+  "output_tokens": 64,
+  "systems": ["main_OURS", "MoE-Infinity (repaired)", "DeepSpeed ZeRO-Inference", "llama.cpp synchronous balanced"],
+  "clean_repeats": 3,
+  "primary_aggregate": "median; retain all repeats and range",
+  "workload_cells": 16,
+  "system_cells": 64
+}
