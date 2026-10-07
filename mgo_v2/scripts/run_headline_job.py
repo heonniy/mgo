@@ -1,5 +1,5 @@
 """Exclusive GPU job supervisor with memory guards and resource receipts."""
-import argparse,os,time,subprocess,signal,json
+import argparse,os,time,subprocess,signal,json,hashlib
 from pathlib import Path
 import run_full_pinned_r4 as c
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
@@ -24,6 +24,9 @@ def main(a):
   a.timeout=max(a.timeout,14400)
  out=ROOT/a.label;assert not out.exists(),'new label required to preserve attempts';assert c.host_available()>=384*2**30
  out.mkdir(parents=True);state=dict(status='RUNNING',started=time.time(),system=a.system,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=c.P.parent,text=True).strip());stopped=[];proc=None
+ if a.workloads:
+  workload_path=Path(a.workloads).resolve()
+  state.update(workload_manifest=str(workload_path),workload_manifest_sha256=hashlib.sha256(workload_path.read_bytes()).hexdigest())
  state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout,
               nccl_p2p_disable=bool(a.nccl_p2p_disable),
               nccl_ib_disable=bool(a.nccl_p2p_disable))
