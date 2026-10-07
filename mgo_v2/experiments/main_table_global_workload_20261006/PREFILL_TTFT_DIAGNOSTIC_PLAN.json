@@ -1,0 +1,49 @@
+{
+  "status": "PLANNED_DIAGNOSTIC_ONLY",
+  "date": "2026-10-07",
+  "branch": "codex/main-table-global-workload-20261006",
+  "primary_cell": "R4_C30_B64_L512_O64",
+  "secondary_cell": "R4_C30_B16_L256_O64",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "runtime": "OURS Near/H0/full-pinned; use current prefill-optimized path only for attribution comparison",
+  "headline_eligible": false,
+  "question": "Explain remaining OURS prefill TTFT gap versus DeepSpeed after probability-tail/packed-transport optimization.",
+  "evidence": {
+    "historical_b64_ttft_s": 24.240569813,
+    "optimized_b64_ttft_samples_s": [
+      21.664470264,
+      20.112728112
+    ],
+    "optimized_b64_mean_ttft_s": 20.888599188,
+    "sequential_observed_reduction_percent": 13.827936599090872,
+    "deepspeed_per_rank_budget_bytes": 4348182528,
+    "deepspeed_expert_peak_bytes_per_rank": 2925527040,
+    "deepspeed_all_parameter_peak_bytes_per_rank": 3115216896
+  },
+  "phases": [
+    "router_compute",
+    "metadata_counts",
+    "metadata_selected_ids",
+    "metadata_routing_weights",
+    "metadata_probability_history",
+    "device_to_host_controller_materialization",
+    "placement_and_layout_cpu",
+    "required_h2d_service_and_exposed_wait",
+    "forward_token_a2a",
+    "expert_execution",
+    "return_a2a_and_combine",
+    "attention_dense_residual",
+    "unattributed_or_global_wait"
+  ],
+  "constraints": [
+    "diagnostic-only instrumentation; do not replace main-table timing",
+    "separate overlapping H2D service from exposed critical-path wait",
+    "no extra GPU allocation beyond physical 0,1,4,5",
+    "preserve cold dynamic expert state at measured prefill start"
+  ]
+}
