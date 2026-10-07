@@ -1,8 +1,13 @@
-**OWNER BR C60 PREFETCH PHYSICAL ABLATION (2026-10-07).**
+**OWNER BR C60 PREFETCH PHYSICAL ABLATION COMPLETE (2026-10-08).**
 Read experiments/br_prefetch_c60_20261007/PLAN.md. Scope is six BR cells only:
 B8/B16/B64 x OFF/ON, input256/decode256. No LA/CA/FCA/Near queue.
 Same overlap in OFF/ON; one primary plus separate diagnostic each.
 Reuse model/pinned sources per batch, GPUs0/1/4/5 only.
+All six primaries and separate diagnostics PASS with per-arm token/cache/byte
+parity. Read RESULTS.md, RANK_DIAGNOSTICS.md and INTERPRETATION.md. OFF is
+observationally faster in B8/B16/B64; native OFF/ON routes differ, one primary
+each, so no frozen-route causal or stability claim. No runtime default change
+or other placement run. Queue complete; owned model loads restored0/1/4/5.
 
 **OWNER C60 EVICTION REPLAY COMPLETE (2026-10-07).**
 Read experiments/main_eviction_history_20261007/C60/RESULTS.md.

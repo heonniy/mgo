@@ -1,6 +1,7 @@
 # BR prefetch / rank critical-path interpretation
 
-This document is provisional until STATUS.json is PASS for all three batches.
+All six primaries and six separate diagnostics are complete; STATUS.json is
+PASS for all three batches. No additional GPU run is queued.
 Numerical tables are in RESULTS.md and RANK_DIAGNOSTICS.md; full summaries
 include every rank rather than only the slowest or fastest rank.
 
@@ -95,6 +96,51 @@ ON copy-service p99 is 1.02–1.12ms across all ranks; OFF is 0.23–0.39ms.
 The service tail is worse under ON, but its lack of exposed ready-first
 waits means the current data does not identify H2D as the dominant blocker.
 No single physical GPU is uniformly the slow H2D rank across B8 and B16.
+
+## B64 evidence and cross-batch pattern
+
+Primary TPOT is 0.973313s OFF and 1.018808s ON (ON 4.67% slower).
+Prefetch usefulness reaches 99.89% (96,147/96,256), yet both arms have zero
+explicit ready-first waits across all ranks. Decode H2D rises only 0.019%,
+and peer payload rises 0.62%. ON adds 43.3–45.1ms/step of diagnostic
+prefetch-controller work per rank. This is consistent with paying controller
+cost without eliminating much exposed fetch wait; it is not an exact
+decomposition of the 45.5ms clean-primary difference. Tokens agree at 36.40%,
+and separate single measurements do not identify all causal effects.
+
+OFF rank 0 has 558ms/step expert span and 58ms return, versus rank 3's
+495ms expert and 129ms return. ON spans are 538/66ms and 513/103ms for
+the same ranks. Mean expert-entry skew is 0.371ms OFF / 0.466ms ON; return
+entry skew grows to 3.577ms / 3.241ms. This is upstream completion skew
+appearing as return waiting, not evidence that all return time is payload
+transfer. Communication latency/software cost remains real and unisolated.
+
+Expert CPU cost per group also differs: B64 OFF rank 0 averages 362us and
+rank 3 336us. Therefore even identical expert counts need not produce
+identical rank finish times. Token-row sizes, rank-dependent executor costs,
+host scheduling and transfer interactions have not been experimentally
+separated here; a uniform per-expert weight is only a first approximation.
+
+Across OFF batches, global token-expert rows rise from 12,288 to 98,304 per
+step (8x), while expert invocations rise from 4,006 to 5,765 (1.44x).
+Mean rank expert CPU time rises from 334ms to 503ms (1.51x), and clean TPOT
+from 644ms to 973ms (1.51x). Peer payload rises about 8x. The pattern and
+large own-thread CPU spans support per-expert executor/host work as an
+important bottleneck; they do not support a pure bandwidth explanation.
+This is cross-batch observational evidence, not an isolated kernel benchmark.
+
+## Practical conclusion within the measured scope
+
+BR with prefetch OFF is the observed faster setting in all three batches.
+No production default is changed. The outcome applies to the current
+H0/full-pinned, host-heavy executor and overlap structure. A faster executor
+could expose more H2D wait and change the value of prefetch.
+
+Load-aware finish-time placement is a better-supported direction than
+minimizing communication bytes alone: balance expert invocation costs and
+row work first, then use communication locality as a tiebreaker. This is a
+recommendation for what to validate, not a claim that any unmeasured policy
+has already won.
 
 ## Placement implication to test, not a measured winner
 

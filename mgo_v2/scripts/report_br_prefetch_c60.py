@@ -45,7 +45,7 @@ def analyze_batch(batch):
   centered=lambda a:(a-a.mean(0,keepdims=True)).ravel()
   imbalance['within_event_rank_deviation_correlations']={name:float(np.corrcoef(centered(expert_cpu),centered(a))[0,1]) for name,a in [('expert_cpu_vs_expert_count',groups),('expert_cpu_vs_token_rows',rows),('expert_cpu_vs_demand_misses',miss)]}
   controller=json.loads((d/'primary_rank0.json').read_text())['validation']['controller']
-  arms[arm]=dict(primary=primary,controller=controller,h2d_service_scope='Unprefixed service fields include prefill; decode-prefixed fields exclude initial copies using the recorded prefill byte boundary. Copy service is overlapping, not additive to TPOT',diagnostic_moe_tpot=float(moe.sum(axis=2).max(axis=0).mean()),ranks=rank_summaries,host_collective_entry_skew=skew,imbalance=imbalance)
+  arms[arm]=dict(primary=primary,diagnostic_total_tpot=json.loads((d/'diagnostic.json').read_text())['TPOT'],controller=controller,h2d_service_scope='Unprefixed service fields include prefill; decode-prefixed fields exclude initial copies using the recorded prefill byte boundary. Copy service is overlapping, not additive to TPOT',diagnostic_moe_tpot=float(moe.sum(axis=2).max(axis=0).mean()),ranks=rank_summaries,host_collective_entry_skew=skew,imbalance=imbalance)
  for rank in range(4):
   source=[json.loads((root/arm/f'source_rank{rank}.json').read_text()) for arm in ('off','on')]
   assert source[0]['options']==source[1]['options'] and source[0]['capacities']==source[1]['capacities']==[920,920,919,919]
@@ -57,10 +57,10 @@ def analyze_batch(batch):
 
 def report_all():
  results=[json.loads(p.read_text()) for p in sorted(P.glob('B*/SUMMARY.json'))]
- lines=['# BR C60 prefetch physical results','','R4, input256,256 decode steps; identical MAIN3678 +8 reserved slots, overlap, ready-first and T2 in OFF/ON. OFF leaves prefetch slots unused. One clean primary and one separate full diagnostic per arm. No attention included in diagnostic MoE metric.','','|Batch|Prefetch|Clean TPOT s|Diagnostic MoE s/token|Decode peer GiB|Decode H2D GiB|','|---|---|---:|---:|---:|---:|']
+ lines=['# BR C60 prefetch physical results','','R4, input256,256 decode steps; identical MAIN3678 +8 reserved slots, overlap, ready-first and T2 in OFF/ON. OFF leaves prefetch slots unused. One clean primary and one separate full diagnostic per arm. No attention included in diagnostic MoE metric.','','|Batch|Prefetch|Clean TPOT s|Diagnostic total TPOT s|Diagnostic MoE s/token|Decode peer GiB|Decode H2D GiB|','|---|---|---:|---:|---:|---:|---:|']
  for x in sorted(results,key=lambda x:x['batch']):
   for name in ('off','on'):
-   a=x['arms'][name];p=a['primary'];lines.append(f"|{x['batch']}|{name}|{p['TPOT']:.6f}|{a['diagnostic_moe_tpot']:.6f}|{p['decode_peer_bytes']/2**30:.3f}|{p['decode_h2d_bytes']/2**30:.3f}|")
+   a=x['arms'][name];p=a['primary'];lines.append(f"|{x['batch']}|{name}|{p['TPOT']:.6f}|{a.get('diagnostic_total_tpot',float('nan')):.6f}|{a['diagnostic_moe_tpot']:.6f}|{p['decode_peer_bytes']/2**30:.3f}|{p['decode_h2d_bytes']/2**30:.3f}|")
  lines+=['','MoE metric = mean over steps of max-rank sum of48 MLP event durations. Includes router, host gaps, collectives and peer waiting; not pure GPU kernel time. Diagnostic overhead means it must not be subtracted from clean TPOT. Peer payload counts dispatch+return remote sends once, excluding metadata and NCCL protocol overhead.','', '|Batch|ON TPOT reduction %|ON peer volume reduction %|OFF/ON token agreement %|','|---|---:|---:|---:|']
  for x in sorted(results,key=lambda x:x['batch']):lines.append(f"|{x['batch']}|{x['prefetch_tpot_gain_percent']:.2f}|{x['peer_volume_reduction_percent']:.2f}|{100*x['token_agreement_off_on']:.2f}|")
  lines+=['','Per-rank phases, CPU execution time, expert/token workload and collective CPU-entry skew are in each batch SUMMARY.json. Collective entry timestamps share the host monotonic clock; they are not NCCL GPU start timestamps. H2D service overlaps compute and cannot be added to primary TPOT. Prefetch diagnostics match their arm primary tokens/cache/bytes. One primary is descriptive, not a stability confirmation. Only BR is measured: another admission policy cannot be declared a physical winner from this packet.']
@@ -70,11 +70,11 @@ def diagnostic_tables(results):
  lines=['# Rank-level evidence (BR C60)', '',
  'R4 ranks 0/1/2/3 map to GPUs 0/1/4/5. Batch is per rank: global batch is four times the label. Every time below is from the separate diagnostic, except explicitly marked primary counters. Decode totals are divided by 256, and include all 48 layers per step. Expert span includes CPU submission/gather work and GPU completion; it is not isolated GEMM time. Return span includes peer waiting. Phase columns are selected exclusive portions, not a complete partition.', '']
  for x in sorted(results,key=lambda x:x['batch']):
-  lines += [f"## B{x['batch']}", '', '|Prefetch|Rank / GPU|Expert groups/step|Token-expert rows/step|Demand misses/step|Expert span ms/step|Expert thread CPU ms/step|Return collective ms/step|Metadata ms/step|', '|---|---|---:|---:|---:|---:|---:|---:|---:|']
+  lines += [f"## B{x['batch']}", '', '|Prefetch|Rank / GPU|Expert groups/step|Token-expert rows/step|Demand misses/step|Expert span ms/step|Expert thread CPU ms/step|Expert CPU us/group|Return collective ms/step|Metadata ms/step|', '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|']
   for name,a in x['arms'].items():
    for r in a['ranks']:
     ph=r['phase_seconds_per_token'];cpu=r['cpu_seconds_per_token']
-    lines.append(f"|{name}|{r['rank']} / {r['gpu']}|{r['expert_uses_per_token']:.1f}|{r['token_expert_rows_per_token']:.1f}|{r['demand_misses_per_token']:.1f}|{1000*ph['moe.expert_compute']:.2f}|{1000*cpu['moe.expert_compute']:.2f}|{1000*ph['return_token_a2a']:.2f}|{1000*ph['moe.metadata']:.2f}|")
+    lines.append(f"|{name}|{r['rank']} / {r['gpu']}|{r['expert_uses_per_token']:.1f}|{r['token_expert_rows_per_token']:.1f}|{r['demand_misses_per_token']:.1f}|{1000*ph['moe.expert_compute']:.2f}|{1000*cpu['moe.expert_compute']:.2f}|{1e6*cpu['moe.expert_compute']/r['expert_uses_per_token']:.2f}|{1000*ph['return_token_a2a']:.2f}|{1000*ph['moe.metadata']:.2f}|")
   lines += ['', '|Prefetch|Dispatch entry skew mean ms/layer|Expert entry skew mean ms/layer|Return entry skew mean ms/layer|Expert span spread p50 / p90 ms/layer|Slowest = most experts % (ties allowed)|Slowest = most token rows % (ties allowed)|', '|---|---:|---:|---:|---:|---:|---:|']
   for name,a in x['arms'].items():
    sk=a['host_collective_entry_skew'];im=a['imbalance'];spread=im['expert_span_max_minus_min_ms_p50_p90_p99']

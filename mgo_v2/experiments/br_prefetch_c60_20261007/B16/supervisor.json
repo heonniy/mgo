@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "started": 1791385408.8726978,
+  "system": "Ours",
+  "source_commit": "8ea54033ac61716b4c33e75f9036bb1856d81283",
+  "requested_timeout_seconds": 2400,
+  "effective_timeout_seconds": 2400,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/br_prefetch_ablation_worker.py",
+    "--cell",
+    "R4_C60_B16_L256_O257",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/br_prefetch_C60_B16_H256_v1"
+  ],
+  "pid": 3880328,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "batch": 16,
+    "primary_reference": null,
+    "results": [
+      {
+        "status": "PASS",
+        "batch": 16,
+        "prefetch": "on",
+        "phase": "primary",
+        "TTFT": 3.29038949,
+        "TPOT": 0.8139849491757812,
+        "E2E": 211.670536479,
+        "decode_steps": 256,
+        "decode_peer_bytes": 17547872472,
+        "decode_h2d_bytes": 3550145937408
+      },
+      {
+        "status": "PASS",
+        "batch": 16,
+        "prefetch": "off",
+        "phase": "primary",
+        "TTFT": 1.598076432,
+        "TPOT": 0.7532686206171875,
+        "E2E": 194.43484331,
+        "decode_steps": 256,
+        "decode_peer_bytes": 17524793728,
+        "decode_h2d_bytes": 3491663708160
+      }
+    ],
+    "scope": "one primary and separate full diagnostic per arm; OFF retains identical overlap and MAIN capacity; model and pinned source reused"
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791386435.0583823,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 3894515
+    },
+    {
+      "gpu": 1,
+      "pid": 3894529
+    },
+    {
+      "gpu": 4,
+      "pid": 3894543
+    },
+    {
+      "gpu": 5,
+      "pid": 3894555
+    }
+  ]
+}

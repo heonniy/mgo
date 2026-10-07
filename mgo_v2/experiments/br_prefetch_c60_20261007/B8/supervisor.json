@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "started": 1791384849.3601086,
+  "system": "Ours",
+  "source_commit": "7b081f38b7b74a0cce1df53a96ec8ee709a6b63c",
+  "requested_timeout_seconds": 2400,
+  "effective_timeout_seconds": 2400,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/br_prefetch_ablation_worker.py",
+    "--cell",
+    "R4_C60_B8_L256_O257",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/br_prefetch_C60_B8_H256_v2"
+  ],
+  "pid": 3872596,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "batch": 8,
+    "primary_reference": "/home/hwlee/mgo-results/headline_r4_20261007/br_prefetch_C60_B8_H256_v1",
+    "results": [
+      {
+        "status": "PASS",
+        "batch": 8,
+        "prefetch": "off",
+        "phase": "primary",
+        "TTFT": 2.593036817,
+        "TPOT": 0.6439953383085938,
+        "E2E": 167.455843424,
+        "decode_steps": 256,
+        "decode_peer_bytes": 8784366448,
+        "decode_h2d_bytes": 2174931173376
+      },
+      {
+        "status": "PASS",
+        "batch": 8,
+        "prefetch": "on",
+        "phase": "primary",
+        "TTFT": 1.444726379,
+        "TPOT": 0.7074674177460938,
+        "E2E": 182.556385322,
+        "decode_steps": 256,
+        "decode_peer_bytes": 8778204448,
+        "decode_h2d_bytes": 2425884770304
+      }
+    ],
+    "scope": "one primary and separate full diagnostic per arm; OFF retains identical overlap and MAIN capacity; model and pinned source reused"
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791385397.7539952,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 3879372
+    },
+    {
+      "gpu": 1,
+      "pid": 3879382
+    },
+    {
+      "gpu": 4,
+      "pid": 3879395
+    },
+    {
+      "gpu": 5,
+      "pid": 3879422
+    }
+  ]
+}

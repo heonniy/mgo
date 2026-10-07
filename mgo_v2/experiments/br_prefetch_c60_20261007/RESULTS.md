@@ -2,12 +2,14 @@
 
 R4, input256,256 decode steps; identical MAIN3678 +8 reserved slots, overlap, ready-first and T2 in OFF/ON. OFF leaves prefetch slots unused. One clean primary and one separate full diagnostic per arm. No attention included in diagnostic MoE metric.
 
-|Batch|Prefetch|Clean TPOT s|Diagnostic MoE s/token|Decode peer GiB|Decode H2D GiB|
-|---|---|---:|---:|---:|---:|
-|8|off|0.643995|0.688560|8.181|2025.562|
-|8|on|0.707467|0.776055|8.175|2259.281|
-|16|off|0.753269|0.837932|16.321|3251.865|
-|16|on|0.813985|0.875229|16.343|3306.331|
+|Batch|Prefetch|Clean TPOT s|Diagnostic total TPOT s|Diagnostic MoE s/token|Decode peer GiB|Decode H2D GiB|
+|---|---|---:|---:|---:|---:|---:|
+|8|off|0.643995|0.714546|0.688560|8.181|2025.562|
+|8|on|0.707467|0.801713|0.776055|8.175|2259.281|
+|16|off|0.753269|0.864035|0.837932|16.321|3251.865|
+|16|on|0.813985|0.903131|0.875229|16.343|3306.331|
+|64|off|0.973313|1.083048|1.058366|65.142|4955.985|
+|64|on|1.018808|1.136330|1.109586|65.542|4956.935|
 
 MoE metric = mean over steps of max-rank sum of48 MLP event durations. Includes router, host gaps, collectives and peer waiting; not pure GPU kernel time. Diagnostic overhead means it must not be subtracted from clean TPOT. Peer payload counts dispatch+return remote sends once, excluding metadata and NCCL protocol overhead.
 
@@ -15,5 +17,6 @@ MoE metric = mean over steps of max-rank sum of48 MLP event durations. Includes 
 |---|---:|---:|---:|
 |8|-9.86|0.07|26.40|
 |16|-8.06|-0.13|27.09|
+|64|-4.67|-0.62|36.40|
 
 Per-rank phases, CPU execution time, expert/token workload and collective CPU-entry skew are in each batch SUMMARY.json. Collective entry timestamps share the host monotonic clock; they are not NCCL GPU start timestamps. H2D service overlaps compute and cannot be added to primary TPOT. Prefetch diagnostics match their arm primary tokens/cache/bytes. One primary is descriptive, not a stability confirmation. Only BR is measured: another admission policy cannot be declared a physical winner from this packet.
