@@ -37,3 +37,8 @@ TPOT=(E2E-TTFT)/63. No asynchronous tail TPOT in this packet.
 Archive provenance and receipts; incremental commits. Fix implementation or
 budget failures before affected primaries; preserve failed attempts and continue
 independent valid jobs. Do not silently shrink batch, precision or budget.
+
+
+## llama.cpp CPU-budget amendment
+
+The synchronous llama main-table setting is now frozen at **32/32 CPU threads** with deterministic inherited CPU affinity. A separate 16/32/64 audit is defined in `LLAMA_THREAD_AUDIT.md`; thread count must be explicit. This amendment does not disable native llama graph/kernel optimizations and does not alter C30/C60 expert residency.
