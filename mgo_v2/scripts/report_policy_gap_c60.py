@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path('/home/hwlee/mgo-results/headline_r4_20261007')
-WORKLOADS = Path('/home/hwlee/mgo-results/policy_gap_c60_20261008/WORKLOADS.json')
+PACKET = Path('/home/hwlee/mgo-results/policy_gap_c60_20261008')
 POLICIES = ('BR', 'CA_NATIVE', 'LA_CA_NEAR')
 
 
@@ -48,18 +48,31 @@ def analyze(label):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--labels', nargs='+', required=True)
+    parser.add_argument('--dataset', choices=('ShareGPT', 'LMSYS'), default='ShareGPT')
     args = parser.parse_args()
+    workloads = PACKET / ('WORKLOADS.json' if args.dataset == 'ShareGPT' else 'LMSYS_WORKLOADS.json')
+    specs = {cell['cell']: cell for cell in json.loads(workloads.read_text())['cells']}
     cases = [analyze(x) for x in args.labels]
-    destination = WORKLOADS.parent / 'SHAREGPT_RESULTS.json'
-    destination.write_text(json.dumps(dict(status='PASS', cases=cases), indent=2) + '\n')
+    winners = {}
+    for batch in (8, 16, 64):
+        subset = [case for case in cases if specs[case['cell']]['local_batch'] == batch]
+        if subset:
+            winners[str(batch)] = dict(CA_NATIVE=max(subset, key=lambda case: case['ca_gain_pct']),
+                                       LA_CA_NEAR=max(subset, key=lambda case: case['near_gain_pct']))
+            winners[str(batch)] = {policy: dict(label=case['label'], observed_gain_pct=case['ca_gain_pct' if policy == 'CA_NATIVE' else 'near_gain_pct'])
+                                   for policy, case in winners[str(batch)].items()}
+    destination = PACKET / f'{args.dataset.upper()}_RESULTS.json'
+    destination.write_text(json.dumps(dict(status='PASS', dataset=args.dataset, cases=cases,
+                                           bounded_observed_winners=winners), indent=2) + '\n')
     print('|Batch|Seed|Policy|Clean TPOT s|Diagnostic MoE s/token|Peer GiB|H2D GiB|')
     print('|---:|---|---|---:|---:|---:|---:|')
     for case in cases:
-        cell = next(c for c in json.loads(WORKLOADS.read_text())['cells'] if c['cell'] == case['cell'])
+        cell = specs[case['cell']]
         for policy in POLICIES:
             p = case['policies'][policy]
             print(f"|{cell['local_batch']}|s{cell['seed']['sample_seed']}/d{cell['seed']['rank_order_seed']}|{policy}|{p['primary_tpot_s']:.6f}|{p['diagnostic_moe_tpot_s']:.6f}|{p['decode_peer_gib']:.3f}|{p['decode_h2d_gib']:.3f}|")
     print(destination)
+    print('Winners are among measured candidates only; one clean primary per policy.')
 
 
 if __name__ == '__main__':
