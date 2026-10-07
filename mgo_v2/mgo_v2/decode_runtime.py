@@ -74,6 +74,12 @@ class DecodeOffloadRuntime(LiveRuntime):
    else:g=self.metadata.collect(self.index,selected,probs,self.arrays['gates'][self.index])
    if not live:gate=self.arrays['gates'][self.index]
   r=g.routes;self.current_histogram=getattr(g,'histogram',None)
+  if getattr(self,'record_main_eviction_trace',False):
+   ids=np.asarray(r.selected_experts,dtype=np.int64);orig=np.asarray(r.origin_ranks,dtype=np.int64)
+   hist=np.bincount((ids+orig[:,None]*128).ravel(),minlength=self.world*128).reshape(self.world,128).astype(np.int32)
+   self.main_eviction_trace_histograms.append(hist)
+   self.main_eviction_trace_gates.append(np.asarray(gate,dtype=np.float32).copy())
+   self.main_eviction_trace_events.append(int(self.index))
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
    out,promotions,discards=self.controller.plan_current(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)

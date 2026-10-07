@@ -1,8 +1,11 @@
-**OWNER MAIN EVICTION HISTORY COMPARISON (2026-10-07).**
+**OWNER MAIN EVICTION HISTORY COMPARISON COMPLETE (2026-10-07).**
 Read experiments/main_eviction_history_20261007/PLAN.md. B8/B16/B64,
 R4/C30/input256, cold prefill then256 decode forwards. Prefetch OFF.
 Gate, LFU/LRU reset and cumulative; LFU counts distinct event uses.
-Capture once per batch then replay all policies on CPU. GPUs0/1/4/5 only.
+All3 captures and15 CPU replays PASS; read RESULTS.md. GPUs0/1/4/5 only.
+No further runs queued. This BR/256-step/P0 packet is the current result;
+the remote main_eviction_policy_20261007 Near/64-token packet is retained
+separately and was not executed.
 
 **OWNER BR SYNC AUDIT COMPLETE (2026-10-07).**
 Read experiments/br_sync_audit_20261007/PLAN.md. R4/C30 BR B16/B64,

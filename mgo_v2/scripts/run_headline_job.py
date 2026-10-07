@@ -68,6 +68,8 @@ def main(a):
    assert a.worker=='headline_ours_worker.py';command+=['--post-generation-diagnostic']
   if a.capture_eviction_trace:
    assert a.worker=='headline_ours_worker.py';command+=['--capture-eviction-trace']
+  if a.record_main_eviction_trace:
+   assert a.worker=='headline_ours_worker.py';command+=['--record-main-eviction-trace']
   state['command']=command
   with (out/'run.log').open('w') as log,(out/'resources.jsonl').open('w') as resources:
    proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;c.write(out/'status.json',state)
@@ -107,6 +109,7 @@ if __name__=='__main__':
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','LA_CA_NEAR'))
  p.add_argument('--post-generation-diagnostic',action='store_true')
+ p.add_argument('--record-main-eviction-trace',action='store_true')
  p.add_argument('--decode-layout-fast',action='store_true')
  p.add_argument('--legacy-decode-layout',action='store_true')
  main(p.parse_args())
