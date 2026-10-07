@@ -23,6 +23,8 @@ def main(a):
  source=P/'examples/headline_llama_sync.cpp'
  assert hashlib.sha256(source.read_bytes()).hexdigest()==build['source_sha256'],'llama sync source changed: rebuild and refresh LLAMA_BUILD.json'
  assert hashlib.sha256(binary.read_bytes()).hexdigest()==build['binary_sha256'],'llama sync binary does not match build receipt'
+ assert build.get('cmake_flags',{}).get('GGML_CUDA_GRAPHS:BOOL')=='OFF','headline llama baseline requires GGML_CUDA_GRAPHS=OFF; rebuild first'
+ assert build.get('cuda_graphs') is False and build.get('baseline_policy_eligible') is True,'stale llama build receipt'
  layers=spec['expert_slots']//128
  resident=layers*128*9*2**20
  assert resident<=spec['expert_budget_bytes']
@@ -32,12 +34,14 @@ def main(a):
  cmd=[str(binary),str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),spec['warmup']['path'],spec['target']['path'],str(a.output),str(layers),str(1 if a.smoke else a.repeats),str(int(a.smoke)),str(a.threads)]
  env=dict(os.environ)
  env['OMP_THREAD_LIMIT']=str(a.threads)
+ env['LLAMA_GRAPH_REUSE_DISABLE']='0'  # keep ordinary llama graph reuse enabled; CUDA Graphs are build-time OFF
  write(a.output/'config.json',dict(
   command=cmd,build=build,expert_budget_bytes=spec['expert_budget_bytes'],expert_resident_bytes=resident,
   gpu_expert_layers=layers,cpu_expert_layers=48-layers,synchronous_batch=True,op_offload=False,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
   affinity_policy='equal slice from the existing GPU-local fixed-affinity pools; child and llama threadpool inherit this mask',
-  source_affinity_pools=pools,omp_thread_limit=a.threads))
+  source_affinity_pools=pools,omp_thread_limit=a.threads,
+  cuda_graphs=False,llama_graph_reuse=True))
  subprocess.run(cmd,check=True,env=env)
 
  placement=json.loads((a.output/'placement_audit.json').read_text())
@@ -70,7 +74,7 @@ def main(a):
   status='PASS',system='llama.cpp-sync',cell=a.cell,smoke=a.smoke,
   primary_repeats=1 if a.smoke else a.repeats,synchronous_batch=True,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
-  placement_audit='PASS',metric_recompute='PASS'))
+  placement_audit='PASS',metric_recompute='PASS',cuda_graphs=False,llama_graph_reuse=True))
 if __name__=='__main__':
  p=argparse.ArgumentParser()
  p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True)

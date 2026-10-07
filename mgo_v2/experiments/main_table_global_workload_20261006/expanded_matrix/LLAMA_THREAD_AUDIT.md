@@ -4,7 +4,7 @@ Owner amendment, 2026-10-07. This audit exists because the synchronous llama.cpp
 
 ## Frozen main-table policy
 
-The main expanded matrix uses **32/32 CPU threads** for llama.cpp: `n_threads=32` and `n_threads_batch=32`. This choice is fixed before the new thread audit results are observed. Native graph reuse, CUDA graphs when present in the llama build, native MoE `MUL_MAT_ID`, weight repacking, split-mode=layer, and KQV/KV GPU offload remain enabled. We do not deliberately disable native optimizations to weaken the baseline.
+The main expanded matrix uses **32/32 CPU threads** for llama.cpp: `n_threads=32` and `n_threads_batch=32`. This choice is fixed before the new thread audit results are observed. Ordinary llama graph reuse remains enabled, but **CUDA Graph capture/replay is disabled at build time with `GGML_CUDA_GRAPHS=OFF`** for the revised baseline. Native MoE `MUL_MAT_ID`, weight repacking, split-mode=layer, and KQV/KV GPU offload remain enabled. This isolates CUDA-Graph acceleration without disabling the normal llama execution graph or native kernels.
 
 C30/C60 expert residency remains unchanged: 14/28 complete GPU expert layers respectively, with remaining expert tensors explicitly overridden to CPU. `op_offload=false` is retained so CPU-resident expert operations are not opportunistically executed on GPU.
 
@@ -24,7 +24,7 @@ The 16/32/64 audit requires exact generated-token parity for every corresponding
 
 ## Build/provenance guard
 
-The worker now checks both source SHA256 and binary SHA256 against `LLAMA_BUILD.json`. Any source edit therefore blocks execution until `scripts/build_headline_llama_sync.py` rebuilds the native runner and refreshes the receipt. The build receipt also records relevant CMake flags such as CUDA graph support when present in CMakeCache.
+The worker now checks both source SHA256 and binary SHA256 against `LLAMA_BUILD.json`. Any source edit therefore blocks execution until `scripts/build_headline_llama_sync.py` rebuilds the native runner and refreshes the receipt. The build script reconfigures the pinned llama.cpp tree with `-DGGML_CUDA_GRAPHS=OFF`, rebuilds the backend, and refuses to write an eligible receipt unless CMakeCache reports CUDA Graphs OFF and CUDA itself ON. The runtime worker also rejects any stale ON receipt. Ordinary llama graph reuse is explicitly kept enabled with `LLAMA_GRAPH_REUSE_DISABLE=0`.
 
 ## Scope
 

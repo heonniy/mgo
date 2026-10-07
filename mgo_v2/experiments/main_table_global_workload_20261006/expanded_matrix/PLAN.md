@@ -41,4 +41,4 @@ independent valid jobs. Do not silently shrink batch, precision or budget.
 
 ## llama.cpp CPU-budget amendment
 
-The synchronous llama main-table setting is now frozen at **32/32 CPU threads** with deterministic inherited CPU affinity. A separate 16/32/64 audit is defined in `LLAMA_THREAD_AUDIT.md`; thread count must be explicit. This amendment does not disable native llama graph/kernel optimizations and does not alter C30/C60 expert residency.
+The synchronous llama main-table setting is frozen at **32/32 CPU threads** with deterministic inherited CPU affinity. The baseline also requires **`GGML_CUDA_GRAPHS=OFF`**. Ordinary llama computation-graph reuse remains enabled (`LLAMA_GRAPH_REUSE_DISABLE=0`), as do the native MoE `MUL_MAT_ID` kernels, weight repacking, and other non-CUDA-Graph optimizations. A separate 16/32/64 audit is defined in `LLAMA_THREAD_AUDIT.md`; thread count must be explicit. C30/C60 expert residency is unchanged. Any prior llama timing produced with CUDA Graphs ON is provenance-only and is not eligible for the revised main baseline.

@@ -18,3 +18,6 @@ No repeat selection or extra repetitions. Seconds, sample standard deviation.
 TPOT range exceeds5%; do not label timing stable. Earlier main-table llama used32/64 threads without this fixed affinity, and its table selected3 of5. Changes include both thread budget and affinity, so this is not a thread-count-only causal comparison.
 No claim of full16/32/64 token parity; those other conditions were canceled.
 Original main-table results remain unchanged. No additional GPU experiments queued.
+
+
+> **Baseline policy superseded:** these two measurements used a llama.cpp build with `GGML_CUDA_GRAPHS=ON`. The revised main baseline freezes 32/32 CPU threads with the same fixed affinity but requires `GGML_CUDA_GRAPHS=OFF`. Therefore these timings are retained for provenance only and must not be reused as revised-baseline results.
