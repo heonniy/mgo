@@ -49,6 +49,27 @@ def main(a):
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
  p.configure_eam_budget(budgets,expert_bytes)
+ if a.smoke and model_family!='Qwen3':
+  # Diagnose first-use DeepSeek EAM without adding probes to table timing.
+  trace_path=a.output/'deepseek_eam_trace.jsonl';trace_phase={'repeat':-1}
+  def trace(kind,layer,**extra):
+   with trace_path.open('a') as stream:
+    stream.write(json.dumps(dict(ns=time.perf_counter_ns(),kind=kind,
+                                 layer=int(layer),repeat=trace_phase['repeat'],**extra))+'\n')
+  original_predict=engine.expert_predictor.predict_batch
+  def traced_predict(seq_ids,selected,layer):
+   trace('predict_start',layer)
+   result=original_predict(seq_ids,selected,layer)
+   trace('predict_end',layer,positive=int((result>0).sum()))
+   return result
+  engine.expert_predictor.predict_batch=traced_predict
+  original_prefetch=p.prefetch_eam
+  def traced_prefetch(layer,scores):
+   trace('prefetch_start',layer,positive=int((scores>0).sum()))
+   result=original_prefetch(layer,scores)
+   trace('prefetch_end',layer,calls=p.eam_calls,candidates=p.eam_candidates)
+   return result
+  p.prefetch_eam=traced_prefetch
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
  write(a.output/'initial_budget.json',dict(budgets=budgets,stats=initial))
  attention_checks=[0]
@@ -60,6 +81,7 @@ def main(a):
  assert len(attention_hooks)==attention_layers
  n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats;saved=None
  for repeat in range(repeats+1):
+  if a.smoke and model_family!='Qwen3':trace_phase['repeat']=repeat
   phase='warmup' if repeat==0 else 'target'
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   if a.smoke:rows=rows[:4]
