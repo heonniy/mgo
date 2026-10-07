@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "system": "llama.cpp-sync",
+  "repeat": 1,
+  "phase": "target",
+  "smoke": true,
+  "TTFT": 0.663121416,
+  "TPOT": 0.06536136800000003,
+  "E2E": 0.728482784,
+  "release_ns": 6060799353383541,
+  "token_ready_ns": [
+    6060800016504957,
+    6060800081866325
+  ],
+  "decode_step_seconds": [
+    0.065361368
+  ],
+  "tokens": [
+    [
+      38627,
+      22278
+    ],
+    [
+      24765,
+      11
+    ],
+    [
+      24765,
+      11
+    ],
+    [
+      95456,
+      0
+    ]
+  ],
+  "request_ids": [
+    0,
+    4,
+    8,
+    10
+  ],
+  "global_requests": 4,
+  "input_tokens": 32,
+  "output_tokens": 2,
+  "prefill_tokens": 128,
+  "prefill_decode_calls": 1,
+  "decode_calls": 1,
+  "decode_tokens_per_call": 4,
+  "n_batch": 2048,
+  "n_ubatch": 512,
+  "cpu_threads": 32,
+  "cpu_batch_threads": 32,
+  "expert_placement": "balanced3",
+  "gpu_expert_layer_ids": [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22,
+    26,
+    30,
+    34,
+    38,
+    42,
+    46
+  ],
+  "gpu_expert_layers_by_device": {
+    "CUDA0": 3,
+    "CUDA1": 3,
+    "CUDA2": 3,
+    "CUDA3": 3
+  },
+  "gpu_expert_layers": 12,
+  "cpu_expert_layers": 36,
+  "expert_resident_bytes": 14495514624,
+  "synchronous_batch": true,
+  "finite_logits": true,
+  "op_offload": false,
+  "offload_kqv": true,
+  "cache_start": "empty KV; static weight partition retained"
+}

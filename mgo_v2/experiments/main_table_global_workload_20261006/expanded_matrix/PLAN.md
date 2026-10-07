@@ -1,3 +1,11 @@
+## Current owner selection (2026-10-07)
+
+The owner now selects balanced3 as the llama baseline implementation. Read
+LLAMA_BASELINE.md and LLAMA_BASELINE_SELECTION.json. This supersedes legacy
+14-layer placement below. Completed main-table values are historical, not
+rewritten as balanced3. C60/B64 full-matrix work remains canceled. No new
+physical matrix run is authorized by this implementation task.
+
 # Owner expanded R4 main table, 2026-10-07
 
 Chat supersedes historical two-cell/repetition restrictions. Run four systems:

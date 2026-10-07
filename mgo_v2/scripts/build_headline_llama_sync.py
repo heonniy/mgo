@@ -1,4 +1,4 @@
-import subprocess,json,hashlib
+import subprocess,json,hashlib,shutil
 from pathlib import Path
 p=Path(__file__).resolve().parents[1]
 root=Path('/home/hwlee/mgo-tools/headline-r4/llama.cpp')
@@ -9,8 +9,9 @@ binary=build_dir/'bin/headline-llama-sync'
 # Compile CUDA Graph support once. The revised headline baseline disables CUDA
 # Graph capture/replay at runtime with GGML_CUDA_DISABLE_GRAPHS=1. Keeping the
 # support compiled in lets the single-cell A/B use the exact same binary.
-configure_cmd=['cmake','-S',str(root),'-B',str(build_dir),'-DGGML_CUDA_GRAPHS=ON']
-backend_build_cmd=['cmake','--build',str(build_dir),'--config','Release','--parallel','16']
+cmake=shutil.which('cmake') or str(root.parent/'base-env/bin/cmake')
+configure_cmd=[cmake,'-S',str(root),'-B',str(build_dir),'-DGGML_CUDA_GRAPHS=ON']
+backend_build_cmd=[cmake,'--build',str(build_dir),'--config','Release','--parallel','16']
 subprocess.run(configure_cmd,check=True)
 subprocess.run(backend_build_cmd,check=True)
 
@@ -35,7 +36,8 @@ receipt=dict(
  llama_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),
  cmake_flags=flags,cuda_graph_support=True,
  headline_cuda_graph_runtime='OFF via GGML_CUDA_DISABLE_GRAPHS=1',
- llama_graph_reuse=True,baseline_policy_eligible=True,
+ llama_graph_reuse=False,headline_llama_graph_reuse='OFF via LLAMA_GRAPH_REUSE_DISABLE=1',
+ headline_expert_placement='balanced3',baseline_policy_eligible=True,
  thread_policy='headline fixed 32/32 with deterministic affinity'
 )
 (p/'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json').write_text(json.dumps(receipt,indent=2)+'\n')

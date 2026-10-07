@@ -15,7 +15,7 @@ def main(a):
   label=f'llama_thread_audit_{a.cell}_t{t}_{a.attempt}'
   out=ROOT/label
   if not (out/'status.json').exists():
-   cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',label,'--system','llama.cpp-sync-audit','--worker','headline_llama_sync_worker.py','--cell',a.cell,'--python',BASE,'--ranks','1','--repeats',str(a.repeats),'--timeout','28800','--workloads',str(PACK/'WORKLOADS.json'),'--llama-threads',str(t)]
+   cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',label,'--system','llama.cpp-sync-audit','--worker','headline_llama_sync_worker.py','--cell',a.cell,'--python',BASE,'--ranks','1','--repeats',str(a.repeats),'--timeout','28800','--workloads',str(PACK/'WORKLOADS.json'),'--llama-threads',str(t),'--llama-cuda-graphs','on','--llama-graph-reuse','on','--llama-expert-placement','legacy_tail']
    subprocess.run(cmd,check=True)
   status=json.loads((out/'status.json').read_text());assert status['status']=='PASS'
   jobs.append((t,out))

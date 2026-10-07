@@ -1,0 +1,53 @@
+{
+  "status": "OWNER_SELECTED",
+  "implementation": "headline_llama_sync_worker.py",
+  "launcher": "scripts/run_llama_baseline.py",
+  "world": 4,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "cache_percent": 30,
+  "cpu_threads": 32,
+  "cpu_batch_threads": 32,
+  "cpu_affinity": "balanced fixed32-CPU mask from existing GPU pools",
+  "cuda_graphs": "off",
+  "graph_reuse": "off",
+  "expert_placement": "balanced3",
+  "gpu_expert_layer_ids": [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22,
+    26,
+    30,
+    34,
+    38,
+    42,
+    46
+  ],
+  "gpu_expert_layers_per_device": [
+    3,
+    3,
+    3,
+    3
+  ],
+  "static_expert_bytes_per_device": [
+    3623878656,
+    3623878656,
+    3623878656,
+    3623878656
+  ],
+  "static_expert_bytes": 14495514624,
+  "cpu_expert_layers": 36,
+  "op_offload": false,
+  "attention_and_kv": "GPU",
+  "output_tokens": 64,
+  "scope": "C30 B16/B32,input256/512; no automatic physical matrix rerun",
+  "reference": "llama_balanced3_results/RESULTS.md",
+  "numerical_note": "CPU/GPU expert reassignment changes generated outputs relative to legacy14-layer placement; do not claim token parity"
+}

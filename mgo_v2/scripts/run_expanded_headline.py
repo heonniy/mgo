@@ -8,9 +8,10 @@ def write(p,x):q=p.with_suffix('.tmp');q.write_text(json.dumps(x,indent=2)+'\n')
 def jobs():
  cells=json.loads((PACK/'WORKLOADS.json').read_text())['cells'];result=[]
  for spec in cells:
+  if spec['cache_percent']!=30 or spec['local_batch'] not in (16,32):continue  # owner-canceled C60/B64
   for worker,system,python,ranks in SYSTEMS:
    row=dict(label=f"expanded_{spec['cell']}_{worker}_v1",cell=spec['cell'],worker=f'headline_{worker}_worker.py',system=system,python=python,ranks=ranks)
-   if worker=='llama_sync':row.update(llama_threads=LLAMA_MAIN_THREADS,llama_cuda_graphs='off',llama_graph_reuse='off')
+   if worker=='llama_sync':row.update(llama_threads=LLAMA_MAIN_THREADS,llama_cuda_graphs='off',llama_graph_reuse='off',llama_expert_placement='balanced3',label=f"expanded_{spec['cell']}_{worker}_balanced3_v1")
    result.append(row)
  return result
 def main(a):
@@ -23,12 +24,12 @@ def main(a):
   if status.exists():
    old=json.loads(status.read_text());assert old['status'] in ['PASS','FAIL'],'existing active job';job['status']=old['status'];continue
   if job['worker']=='headline_llama_sync_worker.py':
-   smoke=ROOT/'expanded_llama_sync_smoke1/status.json'
+   smoke=ROOT/'llama_balanced3_R4_C30_B32_L512_O64_v1/status.json'
    if not smoke.exists() or json.loads(smoke.read_text())['status']!='PASS':job['status']='BLOCKED_SMOKE';continue
   state['current']=job['label'];write(PACK/'QUEUE.json',state)
   cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',job['label'],'--system',job['system'],'--worker',job['worker'],'--cell',job['cell'],'--python',job['python'],'--ranks',str(job['ranks']),'--repeats','5','--timeout','28800','--workloads',str(PACK/'WORKLOADS.json')]
   if job['worker']=='headline_ours_worker.py':cmd+=['--prefill-optimized','--prefill-layout-fast']
-  if job['worker']=='headline_llama_sync_worker.py':cmd+=['--llama-threads',str(job['llama_threads']),'--llama-cuda-graphs',job['llama_cuda_graphs'],'--llama-graph-reuse',job['llama_graph_reuse']]
+  if job['worker']=='headline_llama_sync_worker.py':cmd+=['--llama-threads',str(job['llama_threads']),'--llama-cuda-graphs',job['llama_cuda_graphs'],'--llama-graph-reuse',job['llama_graph_reuse'],'--llama-expert-placement',job['llama_expert_placement']]
   ret=subprocess.run(cmd,check=False);job['returncode']=ret.returncode;job['status']=json.loads(status.read_text())['status'] if status.exists() else 'FAILED_TO_START';write(PACK/'QUEUE.json',state)
   subprocess.run([PY,str(P/'scripts/report_expanded_headline.py')],check=True)
  state.update(status='FINISHED' if state['status']!='STOPPED' else 'STOPPED',finished=time.time(),current=None);write(PACK/'QUEUE.json',state)

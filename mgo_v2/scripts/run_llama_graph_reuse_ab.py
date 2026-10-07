@@ -28,7 +28,7 @@ def main():
        '--worker','headline_llama_sync_worker.py','--cell',CELL,
        '--python',BASE,'--ranks','1','--repeats',str(REPEATS),'--timeout','28800',
        '--workloads',str(PACK/'WORKLOADS.json'),
-       '--llama-threads',str(THREADS),'--llama-cuda-graphs','off','--llama-graph-reuse','off']
+       '--llama-threads',str(THREADS),'--llama-cuda-graphs','off','--llama-graph-reuse','off','--llama-expert-placement','legacy_tail']
   subprocess.run(cmd,check=True)
  status=json.loads((NEW/'status.json').read_text());assert status['status']=='PASS'
  new_cfg=json.loads((NEW/'config.json').read_text())

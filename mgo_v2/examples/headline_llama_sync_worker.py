@@ -29,6 +29,7 @@ def main(a):
  resident=layers*128*9*2**20
  assert resident<=spec['expert_budget_bytes']
  if a.expert_placement=='balanced3':
+  assert spec['cache_percent']==30,'balanced3 baseline is validated for C30 only'
   assert layers==12 and 3*128<=min(spec['expert_slots_per_rank'])
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
@@ -42,6 +43,8 @@ def main(a):
  write(a.output/'config.json',dict(
   command=cmd,build=build,expert_budget_bytes=spec['expert_budget_bytes'],expert_resident_bytes=resident,
   gpu_expert_layers=layers,cpu_expert_layers=48-layers,expert_placement=a.expert_placement,
+  static_expert_bytes_per_gpu=([3*128*9*2**20]*4 if a.expert_placement=='balanced3' else None),
+  unused_expert_budget_bytes=spec['expert_budget_bytes']-resident,
   synchronous_batch=True,op_offload=False,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
   affinity_policy='equal slice from the existing GPU-local fixed-affinity pools; child and llama threadpool inherit this mask',
@@ -60,7 +63,7 @@ def main(a):
  if a.expert_placement=='balanced3':
   assert placement['gpu_expert_layer_ids']==[2,6,10,14,18,22,26,30,34,38,42,46]
   counts=placement['gpu_expert_layers_by_device']
-  assert len(counts)==4 and sorted(counts.values())==[3,3,3,3],counts
+  assert set(counts)=={'CUDA0','CUDA1','CUDA2','CUDA3'} and sorted(counts.values())==[3,3,3,3],counts
 
  lines=[s for s in (a.output/'run.log').read_text().splitlines() if 'KV buffer size' in s]
  assert len(lines)==4 and all(re.search(r'CUDA[0-3] KV buffer',s) for s in lines),lines
@@ -93,5 +96,5 @@ if __name__=='__main__':
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
  p.add_argument('--graph-reuse',choices=('on','off'),required=True)
- p.add_argument('--expert-placement',choices=('legacy_tail','balanced3'),default='legacy_tail')
+ p.add_argument('--expert-placement',choices=('legacy_tail','balanced3'),default='balanced3')
  main(p.parse_args())

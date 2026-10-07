@@ -1,3 +1,14 @@
+**OWNER SELECTED LLAMA BALANCED3 BASELINE (2026-10-07).**
+Read `experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BASELINE.md`.
+User approves balanced3 implementation: GPU0/1/4/5 each3 expert layers,
+CPU32/32 fixed affinity, both graph mechanisms OFF, GPU attention/KV.
+Use scripts/run_llama_baseline.py; CPU/placement guards stay enabled.
+Existing80 main-table measurements and bounded follow-ups are COMPLETE.
+C60 and B64 main-table rows remain canceled. No automatic matrix rerun.
+Old legacy14-layer results remain historical; new labels identify balanced3.
+Owner selection does not imply fastest placement or token equivalence.
+Historical instructions below are superseded by this selection and scope.
+
 **OWNER EXPANDED MAIN TABLE (2026-10-07), active.**
 Read `experiments/main_table_global_workload_20261006/expanded_matrix/PLAN.md`.
 Run R4 GPUs0,1,4,5 only: local B16/B32/B64 x input256/512 x cache30/60,
