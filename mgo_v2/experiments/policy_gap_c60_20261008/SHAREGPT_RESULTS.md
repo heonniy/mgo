@@ -2,7 +2,7 @@
 
 R4 on GPUs 0,1,4,5; C60 MAIN3678 plus eight reserved P2 slots; native C++ expert execution, compiled prefill/decode metadata, full pinned CPU source, BF16 rank partials, prefetch OFF. Each case has 128 input tokens, 32 decode forwards, and one clean primary per policy after warmup. Routes and teacher inputs are frozen across BR, CA_NATIVE, and Near.
 
-| Local batch | Seed (sample/order) | Policy | Clean TPOT s/token | Diagnostic MoE s/token | Decode peer GiB | Decode H2D GiB |
+| Local batch | Seed (sample/order) | Policy | Clean TPOT s/token | MoE-block TPOT s/token (diagnostic) | Decode peer GiB | Decode H2D GiB |
 |---:|---|---|---:|---:|---:|---:|
 | 8 | 20/7 | BR | 0.432621 | 0.447359 | 1.026 | 204.346 |
 | 8 | 20/7 | CA_NATIVE | 0.437821 | 0.463323 | 0.878 | 205.910 |

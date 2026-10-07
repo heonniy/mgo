@@ -32,7 +32,7 @@ def main():
     destination.write_text(json.dumps(output, indent=2) + '\n')
     lines = ['# C30 and P2P-disabled follow-up results', '',
              'ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean primary. The MoE value comes from a separate instrumented run and excludes attention. P2P-disabled sets NCCL_P2P_DISABLE=1 inside every worker; it is a transport setting on the same NVSwitch-equipped server.', '',
-             '| Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT s | Diagnostic MoE s | Peer GiB | H2D GiB |',
+             '| Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT s/token | MoE-block TPOT s/token (diagnostic) | Peer GiB | H2D GiB |',
              '|---|---:|---:|---|---|---:|---:|---:|---:|']
     for case in cases:
         seed = f"{case['seed']['sample_seed']}/{case['seed']['rank_order_seed']}"
