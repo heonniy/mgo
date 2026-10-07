@@ -91,6 +91,7 @@ def main(a):
    from mgo_v2.live_metadata import LiveMetadata
    rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
    configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
+  a.validate_decode_layout=a.decode_layout_fast and repeat==0
   begin(rt);a.phase='COUNTERS' if repeat==0 else 'MEASURE';cache_before=validate_state(rt);calls=rt.transport.calls
   assert np.all(rt.keys<0) and not rt.controller.pending,'expert cache not cold'
   if rank==0:write(a.output/'phase.json',dict(system='Ours',cell=a.cell,phase=phase,repeat=repeat,smoke=a.smoke))
@@ -106,9 +107,12 @@ def main(a):
   if repeat and a.prefill_diagnostic:
    diagnostic=rt.phase_diagnostic.finish((result['end_ns']-result['release_ns'])/1e9)
    write(a.output/f'diagnostic_rank{rank}.json',diagnostic);rt.phase_diagnostic=None
+  if a.validate_decode_layout:
+   assert rt.decode_layout_checks==(n-1)*48
+   write(a.output/f'decode_layout_validation_rank{rank}.json',dict(status='PASS',exact_checks=rt.decode_layout_checks,scope='all warmup decode layers; integer indices and physical slot parity'))
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert not repeat or no_compile
-  result.update(prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
@@ -135,4 +139,4 @@ def main(a):
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');p.add_argument('--decode-layout-fast',action='store_true');main(p.parse_args())

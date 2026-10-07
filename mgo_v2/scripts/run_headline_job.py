@@ -57,6 +57,8 @@ def main(a):
    assert a.worker=='headline_ours_worker.py' and a.prefill_optimized;command+=['--prefill-layout-fast']
   if a.post_prefill_diagnostic:
    assert a.worker=='headline_ours_worker.py' and a.prefill_layout_fast;command+=['--post-prefill-diagnostic']
+  if a.decode_layout_fast:
+   assert a.worker=='headline_ours_worker.py';command+=['--decode-layout-fast']
   state['command']=command
   with (out/'run.log').open('w') as log,(out/'resources.jsonl').open('w') as resources:
    proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;c.write(out/'status.json',state)
@@ -93,4 +95,5 @@ if __name__=='__main__':
  p.add_argument('--llama-graph-reuse',choices=('on','off'))
  p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
+ p.add_argument('--decode-layout-fast',action='store_true')
  main(p.parse_args())

@@ -93,15 +93,25 @@ class DecodeOffloadRuntime(LiveRuntime):
     assert not promotions and not discards
     assert [list(f) for f in fetches]==self.reference[self.index]
    self.current_global_fetch_count=len(fetches)
-   fast=self.index<48 and getattr(self.args,'prefill_layout_fast',False)
+   decode_fast=self.index>=48 and getattr(self.args,'decode_layout_fast',False)
+   fast=(self.index<48 and getattr(self.args,'prefill_layout_fast',False)) or decode_fast
    if fast:
-    assert getattr(self.args,'prefill_optimized',False) and getattr(self.args,'partial_precision',None)=='bf16'
+    assert getattr(self.args,'partial_precision',None)=='bf16'
+    assert getattr(self.args,'fused',False)
+    if not decode_fast:assert getattr(self.args,'prefill_optimized',False)
    planner=plan_rank_partial_layout if fast else plan_layout
    e=planner(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
-   reference=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank) if fast and getattr(self.args,'validate_prefill_optimized',False) else None
+   validate_fast=(decode_fast and getattr(self.args,'validate_decode_layout',False)) or (fast and not decode_fast and getattr(self.args,'validate_prefill_optimized',False))
+   reference=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank) if validate_fast else None
    if not fast:e['selected']=selected.cpu().numpy()
    e.update(layer=layer,targets=targets,fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
-   e['groups']=[(expert,rows,cols,int(self.arena.main_physical[self.rank][np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0]])) for expert,rows,cols in e['groups']]
+   if decode_fast:
+    from env_offload_rank_layout import layer_physical_slots
+    slot_lookup=layer_physical_slots(self.policy.slots[self.rank],self.arena.main_physical[self.rank],layer)
+    assert all(slot_lookup[expert]>=0 for expert,_,_ in e['groups'])
+    e['groups']=[(expert,rows,cols,int(slot_lookup[expert])) for expert,rows,cols in e['groups']]
+   else:
+    e['groups']=[(expert,rows,cols,int(self.arena.main_physical[self.rank][np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0]])) for expert,rows,cols in e['groups']]
   if getattr(self.args,'debug_plan',False):
    payload=(fetches,self.policy.owner,self.policy.slots,self.arena.main_physical,self.arena.prefetch_physical)
    digest=np.frombuffer(hashlib.sha256(pickle.dumps(payload,protocol=4)).digest(),np.uint8).copy()
@@ -124,9 +134,10 @@ class DecodeOffloadRuntime(LiveRuntime):
     assert len(old['groups'])==len(packed['groups'])
     for a,b in zip(old['groups'],packed['groups']):
      assert a[0]==b[0] and a[3]==b[3] and torch.equal(a[1],b[1]) and torch.equal(a[2],b[2])
-    self.prefill_layout_checks=getattr(self,'prefill_layout_checks',0)+1
+    if decode_fast:self.decode_layout_checks=getattr(self,'decode_layout_checks',0)+1
+    else:self.prefill_layout_checks=getattr(self,'prefill_layout_checks',0)+1
     # Validation-only expert-order return needs the full reference indices.
-    return old
+    if not decode_fast:return old
    return packed
   return device_layout(e)
  def prefetch_next(self):

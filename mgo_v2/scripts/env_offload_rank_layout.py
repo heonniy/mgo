@@ -48,3 +48,15 @@ def build_rank_partial(effective,lengths,destinations,counts,rank):
    if expert<0:break
    pos=cursor[expert];rows[pos]=row;cols[pos]=col;cursor[expert]+=1
  return send_idx[:sent],send_ids[:sent],send_counts,recv_counts,starts,rows,cols
+
+@njit(cache=True,nogil=True)
+def layer_physical_slots(slots,physical,layer):
+ """One scan of current MAIN roles; rebuilt after promotions/evictions."""
+ lookup=np.full(128,-1,np.int64)
+ for slot in range(len(physical)):
+  key=slots[slot]
+  if key>=0 and key//128==layer:
+   expert=key%128
+   if lookup[expert]!=-1:raise ValueError('duplicate main expert')
+   lookup[expert]=physical[slot]
+ return lookup
