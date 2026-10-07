@@ -13,6 +13,11 @@ import time
 import types
 from pathlib import Path
 
+os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+from mgo_v2.bootstrap import pin_rank_before_cuda_import
+BOOT = pin_rank_before_cuda_import()
+
 import numpy as np
 import torch
 import torch.distributed as dist
