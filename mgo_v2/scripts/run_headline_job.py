@@ -62,6 +62,10 @@ def main(a):
    assert a.worker=='headline_ours_worker.py';command+=['--legacy-decode-layout']
   if a.decode_layout_fast:
    assert a.worker=='headline_ours_worker.py';command+=['--decode-layout-fast']
+  if a.policy:
+   assert a.worker=='headline_ours_worker.py';command+=['--policy',a.policy]
+  if a.post_generation_diagnostic:
+   assert a.worker=='headline_ours_worker.py';command+=['--post-generation-diagnostic']
   state['command']=command
   with (out/'run.log').open('w') as log,(out/'resources.jsonl').open('w') as resources:
    proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;c.write(out/'status.json',state)
@@ -98,6 +102,8 @@ if __name__=='__main__':
  p.add_argument('--llama-graph-reuse',choices=('on','off'))
  p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
+ p.add_argument('--policy',choices=('BR','LA_CA_NEAR'))
+ p.add_argument('--post-generation-diagnostic',action='store_true')
  p.add_argument('--decode-layout-fast',action='store_true')
  p.add_argument('--legacy-decode-layout',action='store_true')
  main(p.parse_args())

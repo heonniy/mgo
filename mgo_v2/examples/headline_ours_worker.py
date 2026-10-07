@@ -47,7 +47,7 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
- a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-2 for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.policy='LA_CA_NEAR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-2 for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts)
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+2)*EB
  from refactor_thread_affinity import configure
@@ -112,7 +112,7 @@ def main(a):
    write(a.output/f'decode_layout_validation_rank{rank}.json',dict(status='PASS',exact_checks=rt.decode_layout_checks,scope='all warmup decode layers; integer indices and physical slot parity'))
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert not repeat or no_compile
-  result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
@@ -120,6 +120,18 @@ def main(a):
    row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
    write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
+ if a.post_generation_diagnostic:
+  from generation_phase_diagnostics import GenerationDiagnostics
+  expected_tokens=result['tokens'];expected_state=validation
+  reset_live();begin(rt);a.phase='MEASURE'
+  if rank==0:write(a.output/'phase.json',dict(phase='post_generation_diagnostic',cell=a.cell,policy=a.policy))
+  rt.phase_diagnostic=GenerationDiagnostics(rt);rt.phase_diagnostic.install(model)
+  with torch._dynamo.config.patch(error_on_recompile=True):check=generate_live(model,rt,ids,n)
+  diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9);rt.phase_diagnostic=None
+  state=validate_state(rt)
+  assert check['tokens']==expected_tokens and state['state_hash']==expected_state['state_hash'] and state['role_hash']==expected_state['role_hash']
+  diagnostic.update(output=check,validation=state,token_and_cache_parity=True)
+  write(a.output/f'generation_diagnostic_rank{rank}.json',diagnostic)
  if a.post_prefill_diagnostic:
   assert a.prefill_layout_fast and not a.prefill_diagnostic
   expected_first=[t[0] for t in result['tokens']]
@@ -136,7 +148,7 @@ def main(a):
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
