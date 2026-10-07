@@ -2,7 +2,6 @@
 import numpy as np
 from numba import njit
 WORLD=8
-EXPERTS=128
 @njit(cache=True)
 def bitcount8(x):
     c=0
@@ -29,8 +28,9 @@ def estimate_loads(demand, owner, layer):
     loads=np.zeros(demand.shape[1],np.int64)
     totals=demand.sum(1)
     order=np.argsort(-totals)
-    base=layer*EXPERTS
-    for ii in range(EXPERTS):
+    experts=demand.shape[0]
+    base=layer*experts
+    for ii in range(experts):
         e=order[ii]
         total=totals[e]
         if total==0:
