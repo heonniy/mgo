@@ -41,9 +41,10 @@ def main(a):
  torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
  write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank CPU range matching OURS; single NUMA node'))
  deepspeed.init_distributed();assert dist.get_world_size()==4
- spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
+ spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
- cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=1_500_000_000,stage3_prefetch_bucket_size=1_000_000_000,stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
+ scale=spec.get('cache_percent',30)/30
+ cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale),stage3_prefetch_bucket_size=int(1_000_000_000*scale),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
  dschf=HfDeepSpeedConfig(cfg)
  model=AutoModelForCausalLM.from_pretrained(MODEL,torch_dtype=torch.bfloat16,attn_implementation='sdpa')
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
@@ -51,7 +52,7 @@ def main(a):
  assert all(p.dtype==torch.bfloat16 for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
- budget=17392730112//4;peak=[0];all_peak=[0];samples=[0]
+ budget=spec.get('expert_budget_bytes',17392730112)//4;peak=[0];all_peak=[0];samples=[0]
  records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
  def measure_residency():
   charged=all_charged=0
@@ -83,7 +84,7 @@ def main(a):
   live_peak[0]=max(live_peak[0],charged)
   return result
  coordinator.fetch_sub_module=bounded_fetch
- for repeat in range((1 if a.smoke else 3)+1):
+ for repeat in range((1 if a.smoke else a.repeats)+1):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests'];local_rows=rows[rank*batch:(rank+1)*batch]
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local_rows],device='cuda')
   coordinator.release_and_reset_all(engine.module)
@@ -102,4 +103,4 @@ def main(a):
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='DeepSpeed-ZeRO-Inference',cell=a.cell,smoke=a.smoke))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);main(p.parse_args())

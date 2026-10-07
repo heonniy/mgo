@@ -27,7 +27,7 @@ class ClockStreamer:
 def main(a):
  assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5' and torch.cuda.device_count()==4
  torch.set_num_threads(8);torch.manual_seed(42)
- spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
+ spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  cfg=dict(offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store',device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
  write(a.output/'config.json',cfg)
  sources={}
@@ -39,7 +39,7 @@ def main(a):
  model=MoE(MODEL,cfg);engine=model.engine;p=engine.expert_prefetcher
  assert engine.dtype==0,engine.dtype  # native BF16 enum
  assert set(p.expert_nbytes_map.values())=={9*2**20},set(p.expert_nbytes_map.values())
- budgets=[x*9*2**20 for x in [461,461,461,460]]
+ budgets=[x*9*2**20 for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
  p.configure_eam_budget(budgets,9*2**20)
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
  write(a.output/'initial_budget.json',dict(budgets=budgets,stats=initial))
@@ -50,7 +50,7 @@ def main(a):
   attention_checks[0]+=1
  attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
  assert len(attention_hooks)==48
- n=2 if a.smoke else 64;repeats=1 if a.smoke else 3;saved=None
+ n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats;saved=None
  for repeat in range(repeats+1):
   phase='warmup' if repeat==0 else 'target'
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
@@ -96,4 +96,4 @@ def main(a):
    saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
  write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,primary_repeats=repeats))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);main(p.parse_args())

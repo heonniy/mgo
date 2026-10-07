@@ -46,8 +46,8 @@ def main(a):
   except FileNotFoundError:pass
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
- spec=next(x for x in json.loads((ROOT/'WORKLOADS.json').read_text())['cells'] if x['cell']==a.cell)
- a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[459,459,459,458];a.seed=42;a.policy='LA_CA_NEAR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
+ a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-2 for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.policy='LA_CA_NEAR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts)
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+2)*EB
  from refactor_thread_affinity import configure

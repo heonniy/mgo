@@ -1,0 +1,22 @@
+{
+  "command": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_llama_sync.cpp",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/ggml/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/vendor/nlohmann",
+    "-L/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-Wl,-rpath,/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-lllama",
+    "-lggml",
+    "-lggml-base",
+    "-lggml-cpu",
+    "-o",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-sync"
+  ],
+  "source_sha256": "55ef50f22e9ffeb77b6cd9aff6ad6ac58537db70819120e5f8e767c5db662bf9",
+  "binary_sha256": "2b4a2ed7173d5b8f9f9a4bc8f8ff3863c265d3e6ba6a6583b50571a244ecf0bb",
+  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf"
+}

@@ -1,3 +1,14 @@
+**OWNER EXPANDED MAIN TABLE (2026-10-07), active.**
+Read `experiments/main_table_global_workload_20261006/expanded_matrix/PLAN.md`.
+Run R4 GPUs0,1,4,5 only: local B16/B32/B64 x input256/512 x cache30/60,
+output64, all four baselines including updated Near H0/full-pinned OURS.
+Exactly5 primaries per cell/system; fixed common stability-triplet selection,
+selected mean/sample SD plus all5 raw/unconditional summaries. No fastest-only
+or per-metric independent filtering. Synchronous native llama batch explicitly
+requested; asynchronous tail TPOT excluded. Preserve earlier4-repeat packet.
+Queue script `scripts/run_expanded_headline.py`; host guards384/96GiB.
+Never touch2,3,6,7. New request supersedes old no-matrix/no-repeat restrictions.
+
 **OWNER CPU PREFILL LAYOUT REPAIR COMPLETE (2026-10-07).**
 Read `experiments/main_table_global_workload_20261006/prefill_layout_repair/RESULTS.md`.
 The requested layout/packing fix uses exact linear Numba packet construction,
