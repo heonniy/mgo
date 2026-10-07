@@ -1,8 +1,10 @@
-**OWNER BR SYNC AUDIT (2026-10-07).**
+**OWNER BR SYNC AUDIT COMPLETE (2026-10-07).**
 Read experiments/br_sync_audit_20261007/PLAN.md. R4/C30 BR B16/B64,
 both input256/output64; one primary and one separate diagnostic each.
 Use original decode and existing optimized prefill/H0/full-pinned.
-GPUs0/1/4/5 only. No new barrier or optimized decode selection.
+GPUs0/1/4/5 only. Both primaries and separate diagnostics PASS with token/cache parity.
+Read RESULTS.md and STRUCTURE.md; no further runs queued. No new barrier or
+optimized decode selection. Cache reuse includes existing P2/T2 prefetch.
 
 **OWNER RESTORED LEGACY DECODE DEFAULT (2026-10-07).**
 Headline OURS defaults to the original decode layout again. Preserve existing

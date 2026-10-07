@@ -11,3 +11,9 @@ Report single-shot timings without a stability claim. Diagnostic stream spans
 include CPU submission gaps and peer waits, not pure kernel/network times.
 H2D service is non-additive. Preserve all raw outputs outside git and archive
 summaries plus primary receipts. No additional matrix or policy comparison.
+
+Owner follow-up: quantify decode cache reuse after prefill. Diagnostic-only
+per-layer counts separate existing MAIN hits, promoted-prefetch hits, demand
+misses and continuously retained prefill residents. Report both deduplicated
+expert-use and token-expert-use denominators; first decode and all63 steps.
+Prefetch was already enabled in the main table (P2/T2), not introduced here.
