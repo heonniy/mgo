@@ -152,7 +152,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    return packed
   return device_layout(e)
  def prefetch_next(self):
-  if self.index<48:return
+  if self.index<48 or getattr(self.args,'prefetch_off',False):return
   with nvtx_phase('moe.prefetch_controller'):
    reservations=self.controller.plan_prefetch_next(self.current_histogram)
   for rank,key,pfslot in reservations:

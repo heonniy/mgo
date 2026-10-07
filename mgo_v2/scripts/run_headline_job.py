@@ -11,6 +11,13 @@ def wait_for_gpu_release(seconds=30):
   if not occupants or time.monotonic()>=deadline:return occupants,observed
   observed.append(dict(unix=time.time(),occupants=occupants));time.sleep(1)
 def main(a):
+ if a.ours_final:
+  assert a.worker=='headline_ours_worker.py' and a.ranks==4
+  assert a.expert_executor in (None,'native') and a.policy in (None,'LA_CA_NEAR')
+  assert not a.legacy_decode_layout and not a.capture_eviction_trace
+  a.expert_executor='native';a.native_prefill=True;a.prefetch_off=True
+  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True
+  a.policy='LA_CA_NEAR'
  assert not (a.decode_layout_fast and a.legacy_decode_layout),'choose one decode layout'
  requested_timeout=a.timeout
  if a.worker=='headline_llama_worker.py' and a.cell=='R4_C30_B64_L512_O64' and not a.smoke:
@@ -37,6 +44,8 @@ def main(a):
   if a.native_prefill:
    assert a.worker=='headline_ours_worker.py' and a.expert_executor=='native' and a.prefill_optimized
    command+=['--native-prefill']
+  if a.prefetch_off:
+   assert a.worker=='headline_ours_worker.py';command+=['--prefetch-off']
   if a.llama_threads is not None:
    assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
    command+=['--threads',str(a.llama_threads)]
@@ -115,6 +124,8 @@ if __name__=='__main__':
  p.add_argument('--policy',choices=('BR','LA_CA_NEAR'))
  p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--native-prefill',action='store_true')
+ p.add_argument('--prefetch-off',action='store_true')
+ p.add_argument('--ours-final',action='store_true')
  p.add_argument('--post-generation-diagnostic',action='store_true')
  p.add_argument('--record-main-eviction-trace',action='store_true')
  p.add_argument('--decode-layout-fast',action='store_true')
