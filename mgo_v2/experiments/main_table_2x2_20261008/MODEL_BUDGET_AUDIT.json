@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "models": {
+    "Qwen3": {
+      "model_path": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+      "routed_layers": 48,
+      "routed_experts_per_layer": 128,
+      "routed_expert_count": 6144,
+      "expert_bytes": 9437184,
+      "c30_slots": 1843,
+      "c30_expert_budget_bytes": 17392730112,
+      "weight_shapes": {
+        "model.layers.0.mlp.experts.0.gate_proj.weight": [
+          768,
+          2048
+        ],
+        "model.layers.0.mlp.experts.0.up_proj.weight": [
+          768,
+          2048
+        ],
+        "model.layers.0.mlp.experts.0.down_proj.weight": [
+          2048,
+          768
+        ]
+      }
+    },
+    "DeepSeekV2Lite": {
+      "model_path": "/home/hwlee/model/DeepSeek-V2-Lite-Chat",
+      "routed_layers": 26,
+      "routed_experts_per_layer": 64,
+      "routed_expert_count": 1664,
+      "expert_bytes": 17301504,
+      "c30_slots": 499,
+      "c30_expert_budget_bytes": 8633450496,
+      "weight_shapes": {
+        "model.layers.1.mlp.experts.0.gate_proj.weight": [
+          1408,
+          2048
+        ],
+        "model.layers.1.mlp.experts.0.up_proj.weight": [
+          1408,
+          2048
+        ],
+        "model.layers.1.mlp.experts.0.down_proj.weight": [
+          2048,
+          1408
+        ]
+      }
+    }
+  }
+}
