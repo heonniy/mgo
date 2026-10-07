@@ -1,3 +1,16 @@
+**OURS DECODE LAYOUT OPTIMIZATION COMPLETE (2026-10-07).**
+Read experiments/decode_layout_compiled_20261007/RESULTS.md. Compiled exact
+rank-partial decode layout, remove unused return/selected copies, one-scan
+layer physical-slot lookup. CPU100 cases and12096 warmup GPU layer checks PASS.
+R4/C30/B32/L512/O64 fresh2+2: TPOT1.140057->0.852501s, observed25.22% gain.
+All16384 primary token positions and final cache/role/controller/H2D counts
+match. Reference timing was slower than historical main table; sequential
+comparison, not a universal25% claim. TTFT first-repeat variability remains.
+Headline OURS worker now defaults to this validated path; use
+--legacy-decode-layout for an explicit reference. Other runtime consumers
+remain opt-in via args.decode_layout_fast. No GPU controller migration yet.
+All jobs complete; no additional repeats or matrix queued. GPUs0/1/4/5 only.
+
 **OWNER SELECTED LLAMA BALANCED3 BASELINE (2026-10-07).**
 Read `experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BASELINE.md`.
 User approves balanced3 implementation: GPU0/1/4/5 each3 expert layers,

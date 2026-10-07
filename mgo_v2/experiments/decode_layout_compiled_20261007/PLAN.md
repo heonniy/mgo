@@ -20,3 +20,5 @@ Exact generated tokens, final cache/roles/controller and H2D byte/copy counters
 compared to fresh baseline. Preserve mismatches; do not call changed work a gain.
 CPU compiled work must be warmed before primary timing. Host384/96GiB guards.
 Do not claim a GPU controller or remove metadata D2H dependency in this stage.
+
+Completed: see RESULTS.md. After validation, headline OURS default promoted; explicit --legacy-decode-layout preserves reference. Other runtime entry points remain opt-in.

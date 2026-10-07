@@ -11,7 +11,7 @@ def main():
    label=f'ours_decode_layout_{mode}_B32_L512_v1';d=ROOT/label;state['current']=label;write(PACK/'STATUS.json',state)
    if not (d/'status.json').exists():
     cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',label,'--system','Ours','--worker','headline_ours_worker.py','--cell',CELL,'--repeats','2','--prefill-optimized','--prefill-layout-fast','--workloads',str(P/'experiments/main_table_global_workload_20261006/expanded_matrix/WORKLOADS.json')]
-    if mode=='compiled':cmd+=['--decode-layout-fast']
+    cmd+=['--decode-layout-fast'] if mode=='compiled' else ['--legacy-decode-layout']
     subprocess.run(cmd,check=True)
    assert json.loads((d/'status.json').read_text())['status']=='PASS'
    dirs[mode]=d

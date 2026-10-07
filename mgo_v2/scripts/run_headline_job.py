@@ -11,6 +11,7 @@ def wait_for_gpu_release(seconds=30):
   if not occupants or time.monotonic()>=deadline:return occupants,observed
   observed.append(dict(unix=time.time(),occupants=occupants));time.sleep(1)
 def main(a):
+ assert not (a.decode_layout_fast and a.legacy_decode_layout),'choose one decode layout'
  requested_timeout=a.timeout
  if a.worker=='headline_llama_worker.py' and a.cell=='R4_C30_B64_L512_O64' and not a.smoke:
   a.timeout=max(a.timeout,14400)
@@ -57,6 +58,8 @@ def main(a):
    assert a.worker=='headline_ours_worker.py' and a.prefill_optimized;command+=['--prefill-layout-fast']
   if a.post_prefill_diagnostic:
    assert a.worker=='headline_ours_worker.py' and a.prefill_layout_fast;command+=['--post-prefill-diagnostic']
+  if a.legacy_decode_layout:
+   assert a.worker=='headline_ours_worker.py';command+=['--legacy-decode-layout']
   if a.decode_layout_fast:
    assert a.worker=='headline_ours_worker.py';command+=['--decode-layout-fast']
   state['command']=command
@@ -96,4 +99,5 @@ if __name__=='__main__':
  p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--decode-layout-fast',action='store_true')
+ p.add_argument('--legacy-decode-layout',action='store_true')
  main(p.parse_args())

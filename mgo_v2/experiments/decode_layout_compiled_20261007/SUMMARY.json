@@ -1,0 +1,195 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "rank": 0,
+      "repeat": 1,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 0,
+      "repeat": 2,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 1,
+      "repeat": 1,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 1,
+      "repeat": 2,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 2,
+      "repeat": 1,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 2,
+      "repeat": 2,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 3,
+      "repeat": 1,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    },
+    {
+      "rank": 3,
+      "repeat": 2,
+      "tokens": true,
+      "requests": true,
+      "state": true,
+      "roles": true,
+      "controller": true,
+      "h2d_bytes": true,
+      "h2d_copies": true,
+      "no_compile": true
+    }
+  ],
+  "metrics": {
+    "reference": {
+      "samples": [
+        {
+          "status": "PASS",
+          "repeat": 1,
+          "TTFT": 5.20789108,
+          "TPOT": 1.111899068079365,
+          "E2E": 75.257532369,
+          "throughput": 108.85289142664527,
+          "output_tokens": 64,
+          "global_requests": 128,
+          "smoke": false
+        },
+        {
+          "status": "PASS",
+          "repeat": 2,
+          "TTFT": 3.055125542,
+          "TPOT": 1.1682153176984127,
+          "E2E": 76.652690557,
+          "throughput": 106.8716563042013,
+          "output_tokens": 64,
+          "global_requests": 128,
+          "smoke": false
+        }
+      ],
+      "statistics": {
+        "TTFT": {
+          "mean": 4.131508310999999,
+          "sample_sd": 1.522235110224506,
+          "relative_range": 0.5210604399048007
+        },
+        "TPOT": {
+          "mean": 1.140057192888889,
+          "sample_sd": 0.03982160199662294,
+          "relative_range": 0.04939774071890472
+        },
+        "E2E": {
+          "mean": 75.95511146300001,
+          "sample_sd": 0.9865258155627336,
+          "relative_range": 0.018368193543888345
+        }
+      }
+    },
+    "compiled": {
+      "samples": [
+        {
+          "status": "PASS",
+          "repeat": 1,
+          "TTFT": 4.677001817,
+          "TPOT": 0.8508143695873016,
+          "E2E": 58.278307101,
+          "throughput": 140.56688341689033,
+          "output_tokens": 64,
+          "global_requests": 128,
+          "smoke": false
+        },
+        {
+          "status": "PASS",
+          "repeat": 2,
+          "TTFT": 2.77162428,
+          "TPOT": 0.8541871546190476,
+          "E2E": 56.585415021,
+          "throughput": 144.77228799965118,
+          "output_tokens": 64,
+          "global_requests": 128,
+          "smoke": false
+        }
+      ],
+      "statistics": {
+        "TTFT": {
+          "mean": 3.7243130485,
+          "sample_sd": 1.3473053771332217,
+          "relative_range": 0.5116050966143696
+        },
+        "TPOT": {
+          "mean": 0.8525007621031746,
+          "sample_sd": 0.00238491916743207,
+          "relative_range": 0.003956342541471875
+        },
+        "E2E": {
+          "mean": 57.431861061000006,
+          "sample_sd": 1.1970554695849993,
+          "relative_range": 0.029476531819192336
+        }
+      }
+    }
+  },
+  "gain_percent": {
+    "TTFT": 9.855850015256074,
+    "TPOT": 25.222982897643085,
+    "E2E": 24.38710186216134
+  },
+  "scope": "sequential2 repeats each; all samples retained"
+}
