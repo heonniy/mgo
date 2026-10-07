@@ -31,7 +31,7 @@ static void audit_log(ggml_log_level level,const char *text,void *ud){
  (void)level;
  std::fputs(text,stderr);std::fflush(stderr);
  auto *a=static_cast<PlacementAudit *>(ud);
- static const std::regex re("tensor (blk\\.([0-9]+)\\.ffn_(up|down|gate|gate_up)_(ch|)exps[^ ]*) .*buffer type overridden to CPU");
+ static const std::regex re("tensor (blk\\.([0-9]+)\\.ffn_(up|down|gate|gate_up)_(ch|)exps[^ ]*) .*buffer type overridden to (CPU|CUDA_Host)(\\r?\\n|$)");
  std::cmatch m;
  if(std::regex_search(text,m,re)){
   std::string name=m[1].str();

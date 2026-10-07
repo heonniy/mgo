@@ -12,7 +12,7 @@ def main(a):
  if a.build:subprocess.run([PY,str(P/'scripts/build_headline_llama_sync.py')],check=True)
  jobs=[]
  for t in THREADS:
-  label=f'llama_thread_audit_{a.cell}_t{t}_v1'
+  label=f'llama_thread_audit_{a.cell}_t{t}_{a.attempt}'
   out=ROOT/label
   if not (out/'status.json').exists():
    cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',label,'--system','llama.cpp-sync-audit','--worker','headline_llama_sync_worker.py','--cell',a.cell,'--python',BASE,'--ranks','1','--repeats',str(a.repeats),'--timeout','28800','--workloads',str(PACK/'WORKLOADS.json'),'--llama-threads',str(t)]
@@ -32,4 +32,4 @@ def main(a):
  summary=dict(status='PASS',cell=a.cell,repeats=a.repeats,threads=list(THREADS),exact_token_parity_across_threads=True,placement_audit_all=True,metric_recompute_all=True,rows=rows)
  path=ROOT/f'llama_thread_audit_{a.cell}_summary.json';path.write_text(json.dumps(summary,indent=2)+'\n');print(path)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',default='R4_C30_B64_L512_O64');p.add_argument('--repeats',type=int,choices=range(1,4),default=2);p.add_argument('--build',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',default='R4_C30_B64_L512_O64');p.add_argument('--repeats',type=int,choices=range(1,4),default=2);p.add_argument('--build',action='store_true');p.add_argument('--attempt',choices=['v1','v2'],default='v1');main(p.parse_args())

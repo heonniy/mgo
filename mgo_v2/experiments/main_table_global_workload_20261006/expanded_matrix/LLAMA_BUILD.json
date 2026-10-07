@@ -16,7 +16,14 @@
     "-o",
     "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-sync"
   ],
-  "source_sha256": "55ef50f22e9ffeb77b6cd9aff6ad6ac58537db70819120e5f8e767c5db662bf9",
-  "binary_sha256": "2b4a2ed7173d5b8f9f9a4bc8f8ff3863c265d3e6ba6a6583b50571a244ecf0bb",
-  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf"
+  "source_sha256": "261c451d4d742860fd76fdda70e2a7b8d28f6777f7aa6ee1f546a4a4732a9774",
+  "binary_sha256": "ccddc527a232fb4dcabdc1f44473f285ec74f2de3be9b887b69c8f9dcda3fd01",
+  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf",
+  "cmake_flags": {
+    "GGML_CUDA:BOOL": "ON",
+    "GGML_CUDA_GRAPHS:BOOL": "ON",
+    "GGML_NATIVE:BOOL": "ON",
+    "GGML_OPENMP:BOOL": "ON"
+  },
+  "thread_policy": "runtime explicit; headline 32/32, audit 16/16 32/32 64/64"
 }
