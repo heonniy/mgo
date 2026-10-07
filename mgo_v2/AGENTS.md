@@ -1,3 +1,18 @@
+**OWNER CPU PREFILL LAYOUT REPAIR COMPLETE (2026-10-07).**
+Read `experiments/main_table_global_workload_20261006/prefill_layout_repair/RESULTS.md`.
+The requested layout/packing fix uses exact linear Numba packet construction,
+NumPy arrays and no unused expert-return indices. Enable prefill-optimized plus
+prefill-layout-fast; old reference remains available. R4/C30 B16/L256 and
+B64/L512 two clean full64-output repeats each complete on0/1/4/5. All40960
+primary generated token positions, final cache roles/state and controller
+counters match prior prefill-optimized primaries. Targeted layout/packing cost
+falls about94%; first-repeat TTFT variability remains. Separate post-primary
+one-token diagnostics retained; do not mix them into headline timings.
+Owner also asked about placement/misc optimization: inspected, not implemented.
+B64 placement is now~1.07s; specialize exact no-substitution preparation only
+in a separately validated follow-up. No automatic extra repeats or matrix.
+Owned model loads restored on0/1/4/5; do not touch2/3/6/7. Historical tasks follow.
+
 **OWNER PREFILL TTFT DIAGNOSIS COMPLETE (2026-10-07), plan e641419.**
 Read `experiments/main_table_global_workload_20261006/prefill_diagnosis/RESULTS.md`.
 B64/L512 and B16/L256 one-token cold diagnostics complete, optimized Near/H0/

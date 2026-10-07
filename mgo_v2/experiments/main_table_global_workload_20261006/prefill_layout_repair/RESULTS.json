@@ -1,0 +1,442 @@
+[
+  {
+    "cell": "B16_L256",
+    "job": "ours_B16_L256_layout_repair1",
+    "source_commit": "51aef8455498775f0401f6248d5faf3cb4b75f08",
+    "timings": {
+      "TTFT": {
+        "samples": [
+          3.279803362,
+          1.585630062
+        ],
+        "mean": 2.432716712,
+        "sample_std": 1.1979614289351912,
+        "spread_percent": 69.64120777577821
+      },
+      "TPOT": {
+        "samples": [
+          0.7668658564285714,
+          0.7572980478888889
+        ],
+        "mean": 0.7620819521587301,
+        "sample_std": 0.006765462299504077,
+        "spread_percent": 1.255482892959221
+      },
+      "E2E": {
+        "samples": [
+          51.592352317,
+          49.295407079
+        ],
+        "mean": 50.443879698,
+        "sample_std": 1.6241855538039478,
+        "spread_percent": 4.553466647988752
+      }
+    },
+    "prior_timings": {
+      "TTFT": {
+        "samples": [
+          5.070422441,
+          3.390944769
+        ],
+        "mean": 4.230683604999999,
+        "sample_std": 1.1875700507225961,
+        "spread_percent": 39.697548406009915
+      },
+      "TPOT": {
+        "samples": [
+          0.7521975166349206,
+          0.7510435572063492
+        ],
+        "mean": 0.7516205369206349,
+        "sample_std": 0.0008159725371570174,
+        "spread_percent": 0.15352952346128976
+      },
+      "E2E": {
+        "samples": [
+          52.458865989,
+          50.706688873
+        ],
+        "mean": 51.582777431,
+        "sample_std": 1.2389763205634918,
+        "spread_percent": 3.3968258462697474
+      }
+    },
+    "observed_TTFT_reduction_percent": 42.49825940363602,
+    "exact_layout_layer_rank_checks": 192,
+    "matching_primary_token_positions": 8192,
+    "state_comparisons": [
+      {
+        "rank": 0,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 0,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 1,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 1,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 2,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 2,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 3,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 3,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      }
+    ],
+    "diagnostic_components": {
+      "layout_cpu": {
+        "old_rank_mean_seconds": 1.2026981730461122,
+        "new_rank_mean_seconds": 0.09515103206038475,
+        "new_own_thread_cpu_seconds": 0.0952526095
+      },
+      "layout_device_materialization": {
+        "old_rank_mean_seconds": 0.548089879989624,
+        "new_rank_mean_seconds": 0.03799059994518757,
+        "new_own_thread_cpu_seconds": 0.03806979175
+      },
+      "placement_controller_cpu": {
+        "old_rank_mean_seconds": 0.15904097604751585,
+        "new_rank_mean_seconds": 0.1561379436850548,
+        "new_own_thread_cpu_seconds": 0.1562540825
+      },
+      "moe_other": {
+        "old_rank_mean_seconds": 0.08675484803772998,
+        "new_rank_mean_seconds": 0.03527007993857842,
+        "new_own_thread_cpu_seconds": 0.05877177775
+      },
+      "moe.current_controller": {
+        "old_rank_mean_seconds": 0.017719976027496157,
+        "new_rank_mean_seconds": 0.009487223992124202,
+        "new_own_thread_cpu_seconds": 0.00921298825
+      },
+      "moe.expert_compute": {
+        "old_rank_mean_seconds": 1.8839861288070678,
+        "new_rank_mean_seconds": 0.4951566805839538,
+        "new_own_thread_cpu_seconds": 0.4951089145
+      },
+      "required_h2d_exposed_wait": {
+        "old_rank_mean_seconds": 0.29708954381942754,
+        "new_rank_mean_seconds": 0.2949751598834992,
+        "new_own_thread_cpu_seconds": 0.2838787675
+      },
+      "attention_dense_residual": {
+        "old_rank_mean_seconds": 0.07284186375321587,
+        "new_rank_mean_seconds": 0.07358711192925693,
+        "new_own_thread_cpu_seconds": 0.0594273435
+      }
+    },
+    "diagnostic_global_TTFT": 1.627690826,
+    "archive_sha256": {
+      "pinned_rank0.json": "42ca94daeba9a94e8cf43eb91271a9567d73727ef3b1c5e30d383bc3480d577c",
+      "repeat1_rank3.json": "1c8b4c49fe0297fcefb7924adb25402e3e41e7280b69c66746d2a3b56f186597",
+      "prefill_validation_rank0.json": "7c04f418f7823b44bf52ac6900e5e34cd969f50c123c626869454fcba1570fa6",
+      "pinned_rank1.json": "713da900fac36c8aeea937d14e9ba702331261fb1fa844c1d6314c45d05412e3",
+      "repeat0_rank0.json": "5d2bf2086af6ce07fe801adfa641f9bd3876abbc1ac81f4190d3b0e779b78fa9",
+      "repeat2_rank3.json": "f2df94cdf9f0f93ac5143ce214031308f01a073a3a3456f15a1f34166d789d7d",
+      "repeat2_rank0.json": "fef69ae527b999bd16762c93d64b5bd00fbe1a16306930033d506226dfc4298d",
+      "repeat2_rank1.json": "cbf9ee62a451ad353047cfafc240ead3aa2e9f137b617040b842083aa60abcc3",
+      "post_diagnostic_rank0.json": "f09fdb0c8fa1247d1d47a641056b9ce36fcf9884421d3fb4541ac0e3ee3c0ba3",
+      "repeat2.json": "abae11c79796ae24928a649357d83f8eff2cd07fc6ff6dbd28b8f21fc8c2ad9f",
+      "repeat0.json": "75b001ca13db8ba480de128d81509b75e56e6d7f7015ad2f9b36082f1772ac7d",
+      "post_diagnostic_rank3.json": "abcf5c0e7ea6da7c55824ad722e331cdd349eaeb2b6e524786c8f1c95836668e",
+      "prefill_validation_rank2.json": "06983d432c7c410550c6e6d8cea657e149e19b364830928edfd268428b6f43bc",
+      "repeat0_rank2.json": "af1259abc24af6e0eb99d6c6404a62045f2bd157474939aedba9dc502a8fa000",
+      "repeat2_rank2.json": "ee821ada4813672fec080e6182eb4d4af0f99ed66f4fb45958be98120962d7c3",
+      "pinned_rank2.json": "3c1b5c7f1a95d45d481e900f319631f05a074333f8180da05043bcba4e5efbd7",
+      "repeat1_rank2.json": "0a3f463e83bd01c598bf327373137a2b25d8a46db266f876342cdb3c8a08f290",
+      "post_diagnostic_rank1.json": "c79a253939a40cf9ceb260deb342a6c7de29eb1d06220262b2d66a65d0ca0f86",
+      "repeat1_rank1.json": "a4cb00f0eef2bbf7abd569be16b4334c848c981eda26ff2844c1de3d7e295e71",
+      "pinned_rank3.json": "de51d9c33af339ff52139de8d50ad0d91760dd5adf33db7fbe07852262ab7480",
+      "prefill_validation_rank1.json": "e9102cde6739972af0ba96c26fb0b762607f881a3b1c1997095fc8d09a7c32b8",
+      "result.json": "d427e086c582a2c257eb139a285d90713b7982ef94f624c759653af7f8ea9fdd",
+      "repeat1.json": "7658421c7d4c5a4042867dd253aafb6dc9d8fc78c3ad67328c1175be8495a2bd",
+      "repeat0_rank1.json": "97117d6f2ecfe8040b51ac2324d07fcc7cf11266e4f869bb7e39624686926132",
+      "status.json": "693eb842fd1347a82ee11df6303f456c07c0e7eec118060ca948f63bc45fbc6a",
+      "post_diagnostic_rank2.json": "331c53bd4f7d76c555a6e8765f36e7d059a066f14882363a73f789be7b2e9037",
+      "repeat1_rank0.json": "a99276776e13b90e51539c678dc7c0bc9d106a38659b8b109d63a7d3cee56606",
+      "prefill_validation_rank3.json": "875fa4980e15c6ef723d2776bce85aeaaafda79078f26fa91e02accf049469f4",
+      "phase.json": "2454a7c671433c0cb73c0ee0ec18eb7e7b2f20c8fcd7ae6377872febbf44e89f",
+      "repeat0_rank3.json": "7c6ff7c2bd1fa088556d6e4d1b76b20f61405f5c56c9f64a559378a30d711ba6",
+      "run.log": "73b8179f34a8b08bcfff05e6c7219ccdabd631c8fb6b9ef36b56174068ca3553"
+    },
+    "min_host_available_GiB": 1422.0516395568848,
+    "max_observed_HBM_GiB": 14.2216796875,
+    "restored": [
+      {
+        "gpu": 0,
+        "pid": 3184909
+      },
+      {
+        "gpu": 1,
+        "pid": 3184920
+      },
+      {
+        "gpu": 4,
+        "pid": 3184933
+      },
+      {
+        "gpu": 5,
+        "pid": 3184945
+      }
+    ]
+  },
+  {
+    "cell": "B64_L512",
+    "job": "ours_B64_L512_layout_repair1",
+    "source_commit": "51aef8455498775f0401f6248d5faf3cb4b75f08",
+    "timings": {
+      "TTFT": {
+        "samples": [
+          5.968210499,
+          4.318692196
+        ],
+        "mean": 5.143451347499999,
+        "sample_std": 1.166385577742626,
+        "spread_percent": 32.0702616114325
+      },
+      "TPOT": {
+        "samples": [
+          1.006180221063492,
+          0.9897751633015873
+        ],
+        "mean": 0.9979776921825396,
+        "sample_std": 0.011600127589199824,
+        "spread_percent": 1.6438301066657575
+      },
+      "E2E": {
+        "samples": [
+          69.357564426,
+          66.674527484
+        ],
+        "mean": 68.016045955,
+        "sample_std": 1.8971936158622185,
+        "spread_percent": 3.9447117284282025
+      }
+    },
+    "prior_timings": {
+      "TTFT": {
+        "samples": [
+          21.664470264,
+          20.112728112
+        ],
+        "mean": 20.888599188,
+        "sample_std": 1.0972473983322057,
+        "spread_percent": 7.428655880818652
+      },
+      "TPOT": {
+        "samples": [
+          1.0282203908253968,
+          1.0324638332063492
+        ],
+        "mean": 1.0303421120158731,
+        "sample_std": 0.0030005668831457684,
+        "spread_percent": 0.4118479028921744
+      },
+      "E2E": {
+        "samples": [
+          86.442354886,
+          85.157949604
+        ],
+        "mean": 85.80015224499999,
+        "sample_std": 0.908211684694026,
+        "spread_percent": 1.496973196891801
+      }
+    },
+    "observed_TTFT_reduction_percent": 75.37675312160334,
+    "exact_layout_layer_rank_checks": 192,
+    "matching_primary_token_positions": 32768,
+    "state_comparisons": [
+      {
+        "rank": 0,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 0,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 1,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 1,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 2,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 2,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 3,
+        "repeat": 1,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      },
+      {
+        "rank": 3,
+        "repeat": 2,
+        "state_hash_equal": true,
+        "role_hash_equal": true,
+        "controller_equal": true
+      }
+    ],
+    "diagnostic_components": {
+      "layout_cpu": {
+        "old_rank_mean_seconds": 11.065628002166749,
+        "new_rank_mean_seconds": 0.6890308322906493,
+        "new_own_thread_cpu_seconds": 0.68898249675
+      },
+      "layout_device_materialization": {
+        "old_rank_mean_seconds": 4.09486988067627,
+        "new_rank_mean_seconds": 0.1821837921142578,
+        "new_own_thread_cpu_seconds": 0.182260862
+      },
+      "placement_controller_cpu": {
+        "old_rank_mean_seconds": 1.1153307480812074,
+        "new_rank_mean_seconds": 1.0660414657592772,
+        "new_own_thread_cpu_seconds": 1.06584412825
+      },
+      "moe_other": {
+        "old_rank_mean_seconds": 0.5261142233893044,
+        "new_rank_mean_seconds": 0.04168181598815136,
+        "new_own_thread_cpu_seconds": 0.28764411700000003
+      },
+      "moe.current_controller": {
+        "old_rank_mean_seconds": 0.057319688043091434,
+        "new_rank_mean_seconds": 0.011028391993604603,
+        "new_own_thread_cpu_seconds": 0.0106817375
+      },
+      "moe.expert_compute": {
+        "old_rank_mean_seconds": 1.9268686542510982,
+        "new_rank_mean_seconds": 0.532014927148819,
+        "new_own_thread_cpu_seconds": 0.52641349125
+      },
+      "required_h2d_exposed_wait": {
+        "old_rank_mean_seconds": 0.3015481836795807,
+        "new_rank_mean_seconds": 0.296948823928833,
+        "new_own_thread_cpu_seconds": 0.28358750774999997
+      },
+      "attention_dense_residual": {
+        "old_rank_mean_seconds": 0.48201784765900824,
+        "new_rank_mean_seconds": 0.4828291362897144,
+        "new_own_thread_cpu_seconds": 0.07133107075
+      }
+    },
+    "diagnostic_global_TTFT": 4.300287406,
+    "archive_sha256": {
+      "pinned_rank0.json": "862f33474da714e448e99894888827cf47b1f9cf7a5a9a02c0c655c22c45615b",
+      "repeat1_rank3.json": "85c36ab331cd2f564540e7f29d89551ff499710b5e992020ab38fbe2a250017c",
+      "prefill_validation_rank0.json": "d90608bea1b19dd8844882dba2a0dc4e7a0e0f8410ad271f9e5eccbc6ffa678c",
+      "pinned_rank1.json": "cbbc247352027b849a7dcc692de1fb998dd6d10c24d0eb093c252c7d9159e0f6",
+      "repeat0_rank0.json": "5944d4742c5121aff328e174f8caba89add451fe1054eb75e65c66b2b26f5a88",
+      "repeat2_rank3.json": "57993e926081dd96c9f0417f93e2c75e941e9a4e7e3b510f6dbeea1d0b80ed5d",
+      "repeat2_rank0.json": "7b4050b3066e401a6ecd99aa9e968350eaad4591e1be55dd09f23928fd64db4c",
+      "repeat2_rank1.json": "0f1dfdf664db335138db4b243160ff543b7b6cc2c520593ff4c0d07dd7e135b2",
+      "post_diagnostic_rank0.json": "cae3499594c5945b404f3a6a82629d77b444545c43cfbf6a50c3b970bce2986f",
+      "repeat2.json": "8d8ba9bdc83545d938e96917bf0644315543e30da4c819fb269eebbf0ab06ab5",
+      "repeat0.json": "590af9ea71d9bcf31f5d98075b4d72f780d6fa343c7f8942b8e63af8d2cc54cc",
+      "post_diagnostic_rank3.json": "407e48bbacf1670a650afa87e6d2ddb50b818b42440997a1b4c61ce9b9d311de",
+      "prefill_validation_rank2.json": "949f3f70c4ce4b6699ffc4c1ce8a1725bc33ddd351a477b7b7e1a39470d7d256",
+      "repeat0_rank2.json": "31f55e4f4741807f40e9c6bb7a386698bf18108cc2105cca4940af7767af1dd6",
+      "repeat2_rank2.json": "a06b1bca66d13be32e93f16f521c4a9ed81630aa993361ffce6a783f3cc5f27c",
+      "pinned_rank2.json": "90a600a542e0870124554efa5daa31973e4cdce1ef76c639394f1613d3c7d11f",
+      "repeat1_rank2.json": "551ee6f7d5fb576942f6d5559b5030d52f05d01dddd22eebb5f5c46a5ca4d610",
+      "post_diagnostic_rank1.json": "86800b4c4ae1c5d91c0de9de3e8d714b39c3db8657e67b5835f7c6507af18b8d",
+      "repeat1_rank1.json": "637b9a841903cd3764c5f1cbca82bad4ce9c1e555713d13afaa46e36fafb0fa8",
+      "pinned_rank3.json": "0f36c690f5021984f6ba18bcdf4235147d8b8a49ed4a6d845e060195c83c0e7a",
+      "prefill_validation_rank1.json": "726f21c70bb88e2a87966e8e8b9a82d8e32fced399f1a08fe9792cd7ef27432e",
+      "result.json": "a6462dc3a2bedd9e96baea095d21647efe72a503093cecd59881726407737379",
+      "repeat1.json": "d8abfe2396be848b4f2696757ceb86a5188fe591289faed8967d11f614a1d50b",
+      "repeat0_rank1.json": "d3f3d6157d9d78c0b894753007b54c6cdbb055a7cbff76d4fe770d65bfe1bc1d",
+      "status.json": "c309713cec3d9443ec2647dae6641ac8ed914043a01042094d588141697d3f5f",
+      "post_diagnostic_rank2.json": "6e00e354ed73ceacd55f6782d4a69d12cb3f87b3af3de53dd1f74489e8e6ac15",
+      "repeat1_rank0.json": "edbe0931d7293e3fcb139402384f0d41305f901b3686ab8a837f70abaca58a9f",
+      "prefill_validation_rank3.json": "1fa0095b330d1bdfafec495541443ad8367656d3b3ff437f1ee358075138b25f",
+      "phase.json": "4580b3fe7c9423004b569a8ce575e785408b594a7d3e2bc5933f62998571b5f7",
+      "repeat0_rank3.json": "9971bc7f8ab01bd05f2de6657a08371b1fbfaa9c551981840dad95584fa135d6",
+      "run.log": "1245f3bc8688720b3f9ca216dd1aa43b7b433f920a1e213e04656f825bd2fc3d"
+    },
+    "min_host_available_GiB": 1441.1433868408203,
+    "max_observed_HBM_GiB": 21.0751953125,
+    "restored": [
+      {
+        "gpu": 0,
+        "pid": 3180380
+      },
+      {
+        "gpu": 1,
+        "pid": 3180391
+      },
+      {
+        "gpu": 4,
+        "pid": 3180407
+      },
+      {
+        "gpu": 5,
+        "pid": 3180419
+      }
+    ]
+  }
+]
