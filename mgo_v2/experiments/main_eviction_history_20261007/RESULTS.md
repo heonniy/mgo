@@ -14,6 +14,11 @@ R4/C30, input256, empty cache before prefill; prefill retained into256 decode fo
 |16|LFU-cumulative|208652|1044336|16.65|1044336|1044320|
 |16|LRU-reset|0|1252988|0.00|1252988|1252972|
 |16|LRU-cumulative|0|1252988|0.00|1252988|1252972|
+|64|gate-score|442243|1034568|29.95|1034568|1034562|
+|64|LFU-reset|0|1476811|0.00|1476811|1476805|
+|64|LFU-cumulative|0|1476811|0.00|1476811|1476805|
+|64|LRU-reset|0|1476811|0.00|1476811|1476805|
+|64|LRU-cumulative|0|1476811|0.00|1476811|1476805|
 
 Reset deletes policy frequency/recency on eviction; cumulative preserves history across eviction and re-admission. Analytical reload history is always retained and cannot affect replacement. A hit is an active expert already resident before admission, not a prefetch or token-weighted metric. Eviction counts actual removed residents; reload counts a miss for any previously admitted expert, including prefill residents.
 
