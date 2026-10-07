@@ -1,3 +1,12 @@
+**OWNER C60 POLICY GAP STUDY IN PROGRESS (2026-10-08).**
+Read experiments/policy_gap_c60_20261008/PLAN.md. User requests main_OURS
+prefetch OFF, R4 GPUs0/1/4/5, C60, input128, 32 decode forwards, B8/B16/B64,
+BR/CA_NATIVE/LA_CA_NEAR. Nominate bounded seeds from ShareGPT and gated
+LMSYS-Chat-1M, then compare policies on common frozen physical routes.
+One primary per policy and a separate MoE diagnostic; do not confuse proxy
+seed score with physical gain. MAIN3678 + eight reserved P2 slots.
+Do not run other GPUs, prefetch ON, or older queued experiments.
+
 **OWNER NATIVE CA CONTROLLER CANDIDATE COMPLETE (2026-10-08).**
 Read experiments/native_ca_controller_20261008/{PLAN.md,RESULTS.md,RANK_DIAGNOSTIC.json}.
 Opt-in `CA_NATIVE` uses C++ min-cost flow with the same exact local-demand

@@ -41,10 +41,10 @@ def main(a):
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
  policy_comparison=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')
- assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE')
+ assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE')
  compare_policy=policy_comparison!='0'
- policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE')}.get(policy_comparison,())
- capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE') else (policy_modes[0] if compare_policy else a.policy)
+ policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR')}.get(policy_comparison,())
+ capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE') else (policy_modes[0] if compare_policy else a.policy)
  sync_ablation=os.environ.get('MGO_NATIVE_SYNC_ABLATION','0')=='1'
  assert not (compare_prefetch and compare_policy)
  if compare_prefetch:assert a.policy=='LA_CA_NEAR' and prefetch=='on'
@@ -54,6 +54,8 @@ def main(a):
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.native_prefill=True;a.validate_decode_layout=False;a.validate_prefill_optimized=False
  a.prefetch_off=prefetch=='off';a.collective_barrier_ablation=sync_ablation
  a.capacities=spec.get('expert_slots_per_rank',[461,461,461,460])
+ if os.environ.get('MGO_NATIVE_MAIN_CAPACITY','0')=='1':
+  a.capacities=[x-2 for x in a.capacities]
  options=selected_options();options.update(arena_budget=2,streaming=True,ready_first=True,trigger='T2',runtime_arm='BR_P2_OVERLAP')
  native=NativeExpertExecutor()
  model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
@@ -101,7 +103,7 @@ def main(a):
   for t in row:h.update(t.cpu().view(torch.uint8).numpy().tobytes())
  write(a.output/f'trace_rank{rank}.json',dict(route_sha256=h.hexdigest(),events=len(routes),bytes=route_bytes,teacher_tokens=captured['tokens']))
  proofs={};baseline_tokens=None;results=[]
- modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0'))
+ modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (policy_modes if policy_comparison=='TRIPLE' else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0')))
  for run,name in enumerate(modes):
   if compare_policy:a.policy=name
   rt.native_executor=native if comparing or name=='native' else None;reset();a.phase='MEASURE'
@@ -158,7 +160,7 @@ def main(a):
    write(a.output/f'diagnostic_{name}_rank{rank}.json',diagnostic)
    dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_pair=list(policy_modes),active_total=active_total,active_decode=active_decode))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_modes=list(policy_modes),active_total=active_total,active_decode=active_decode,main_capacities=a.capacities))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':
