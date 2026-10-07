@@ -3,7 +3,8 @@
 The implementation is an opt-in decode executor, not an import of the entire
 legacy coslot engine. `--expert-executor native` selects it in
 `headline_ours_worker.py` and `scripts/run_headline_job.py`. `h0` remains the
-reference/default while validation is being completed. Prefill remains H0.
+reference/default. B64 frozen64 validation is complete (see RESULTS.md);
+unrestricted greedy and prefetch ON were not compared. Prefill remains H0.
 
 It uses one C++ call for a currently ready subset, loops over ordinary
 per-expert GEMMs in C++, reads existing GPU cache weights directly, and

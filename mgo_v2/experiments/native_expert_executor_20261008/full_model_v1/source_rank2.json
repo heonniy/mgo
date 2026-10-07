@@ -1,0 +1,30 @@
+{
+  "options": {
+    "runtime_arm": "BR_P2_OVERLAP",
+    "arena_budget": 2,
+    "trigger": "T2",
+    "partial_precision": "bf16",
+    "streaming": true,
+    "ready_first": true,
+    "physical_prefetch": true,
+    "fused": true,
+    "staging_backend": "torch",
+    "unique_combine": true,
+    "async_metadata_inputs": true,
+    "expert_source": "full_pinned"
+  },
+  "capacities": [
+    920,
+    920,
+    919,
+    919
+  ],
+  "gpu": 4,
+  "prefetch": false,
+  "pinned": {
+    "bytes": 57982058496,
+    "init_seconds": 45.27193663083017,
+    "host_available_before": 1759931658240,
+    "source": "full_pinned"
+  }
+}

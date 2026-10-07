@@ -1,6 +1,7 @@
 """CPU scheduling tests: ready subsets, no wait-to-fill, stable output order."""
 import unittest
 from types import SimpleNamespace
+from unittest.mock import patch
 from mgo_v2.native_expert import NativeExpertExecutor
 
 
@@ -40,5 +41,19 @@ class NativeSchedulingTests(unittest.TestCase):
         ex.compute(rt,('current',None,None,None),dict(groups=groups),0)
         self.assertEqual(calls,[[0],[1],[2]]);self.assertEqual(waits,[])
         self.assertEqual(ex.compute(rt,('current',None,None,None),dict(groups=[]),0),[])
+
+    def test_factory_attaches_explicit_native_and_preserves_h0_default(self):
+        from mgo_v2.selected_runtime import _create_runtime
+        executor=object()
+        fake=SimpleNamespace(DecodeOffloadRuntime=lambda *args:SimpleNamespace())
+        with patch.dict('sys.modules',{'mgo_v2.decode_runtime':fake}), \
+             patch('mgo_v2.native_expert.NativeExpertExecutor',return_value=executor) as factory:
+            rt=_create_runtime(SimpleNamespace(),None,None,None,
+                dict(expert_executor='native',expert_source='staged'))
+            self.assertIs(rt.native_executor,executor)
+            factory.assert_called_once()
+            rt=_create_runtime(SimpleNamespace(),None,None,None,dict(expert_source='staged'))
+            self.assertIsNone(rt.native_executor)
+            factory.assert_called_once()
 
 if __name__=='__main__':unittest.main()

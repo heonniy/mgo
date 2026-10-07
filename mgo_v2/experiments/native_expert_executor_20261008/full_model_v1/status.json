@@ -1,0 +1,100 @@
+{
+  "status": "PASS",
+  "started": 1791389623.6478462,
+  "system": "Ours",
+  "source_commit": "823462e5e9f7e531e5aac1cbee2b07bf0a78075a",
+  "requested_timeout_seconds": 1800,
+  "effective_timeout_seconds": 1800,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/native_executor_model_worker.py",
+    "--cell",
+    "R4_C60_B64_L256_O65",
+    "--output",
+    "/home/hwlee/mgo-results/headline_r4_20261007/native_executor_B64_frozen64_20261008_v1"
+  ],
+  "pid": 3959859,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "results": [
+      {
+        "status": "PASS",
+        "backend": "h0",
+        "run": 0,
+        "TTFT": 2.815866065,
+        "TPOT": 0.91314511096875,
+        "E2E": 61.257153167,
+        "token_agreement_to_h0": 1.0,
+        "decode_peer_bytes": 17500441504,
+        "decode_h2d_bytes": 1187830038528,
+        "scope": "64 decode forwards; frozen H0 routes/weights/history and teacher inputs, not native greedy E2E"
+      },
+      {
+        "status": "PASS",
+        "backend": "native",
+        "run": 1,
+        "TTFT": 2.760859929,
+        "TPOT": 0.671118807078125,
+        "E2E": 45.712463582,
+        "token_agreement_to_h0": 1.0,
+        "decode_peer_bytes": 17500441504,
+        "decode_h2d_bytes": 1187830038528,
+        "scope": "64 decode forwards; frozen H0 routes/weights/history and teacher inputs, not native greedy E2E"
+      },
+      {
+        "status": "PASS",
+        "backend": "native",
+        "run": 2,
+        "TTFT": 2.77534619,
+        "TPOT": 0.667126825109375,
+        "E2E": 45.471462997,
+        "token_agreement_to_h0": 1.0,
+        "decode_peer_bytes": 17500441504,
+        "decode_h2d_bytes": 1187830038528,
+        "scope": "64 decode forwards; frozen H0 routes/weights/history and teacher inputs, not native greedy E2E"
+      },
+      {
+        "status": "PASS",
+        "backend": "h0",
+        "run": 3,
+        "TTFT": 2.751502295,
+        "TPOT": 0.89330090496875,
+        "E2E": 59.922760213,
+        "token_agreement_to_h0": 1.0,
+        "decode_peer_bytes": 17500441504,
+        "decode_h2d_bytes": 1187830038528,
+        "scope": "64 decode forwards; frozen H0 routes/weights/history and teacher inputs, not native greedy E2E"
+      }
+    ],
+    "route_frozen": true,
+    "production_default_changed": false
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791390063.4391162,
+  "restored": [
+    {
+      "gpu": 0,
+      "pid": 3965458
+    },
+    {
+      "gpu": 1,
+      "pid": 3965473
+    },
+    {
+      "gpu": 4,
+      "pid": 3965492
+    },
+    {
+      "gpu": 5,
+      "pid": 3965509
+    }
+  ]
+}

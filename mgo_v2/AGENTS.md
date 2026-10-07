@@ -1,8 +1,13 @@
-**OWNER C++ EXPERT EXECUTOR MIGRATION (2026-10-08), active.**
+**OWNER C++ EXPERT EXECUTOR MIGRATION COMPLETE (2026-10-08).**
 Read experiments/native_expert_executor_20261008/PLAN.md. Owner requests
 native host execution using main EP/coslot reference. Keep old H0 default
-until validated; GPUs0/1/4/5 only, bounded checks then B64 comparison. Do not
-restart prior matrices. Preserve cache ownership, H2D overlap and T2.
+as reference; GPUs0/1/4/5 only. Read RESULTS.md: B64/C60/input256/frozen64
+H0/native/native/H0 gives mean TPOT0.903223 ->0.669123s (25.92% lower).
+Same routes/teacher tokens/cache/H2D/peer bytes; predicted tokens100% match.
+Native available via --expert-executor native, default stays H0. CPU/GPU
+safety tests PASS; prefill and unrestricted greedy/prefetch ON not validated.
+No further experiment queued; owned model loads restored. Do not restart
+prior matrices. Preserve cache ownership, H2D overlap and T2.
 
 **OWNER BR C60 PREFETCH PHYSICAL ABLATION COMPLETE (2026-10-08).**
 Read experiments/br_prefetch_c60_20261007/PLAN.md. Scope is six BR cells only:

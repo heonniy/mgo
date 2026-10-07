@@ -142,12 +142,12 @@ def main(a):
    rt.record_main_eviction_trace=False
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert a.capture_eviction_trace or not repeat or no_compile
-  result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  result.update(expert_executor=a.expert_executor,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
    release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
-   row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
+   row=dict(status='PASS',expert_executor=a.expert_executor,repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
    write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
  if a.post_generation_diagnostic:
@@ -178,7 +178,7 @@ def main(a):
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
