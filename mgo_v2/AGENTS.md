@@ -1,3 +1,12 @@
+**OWNER NATIVE FULLPATH FOLLOW-UP (2026-10-08), in progress.**
+Read experiments/native_fullpath_20261008/PLAN.md. User now requests C++
+optimization of Python-heavy TPOT and TTFT paths. Previous C++ decode-only
+executor remains the reference stage. This follow-up adds C++ MAIN-slot binding
+and opt-in prefill expert execution, with the already validated compiled decode
+layout. BR/prefetch-OFF B16/L256 and B64/L512 frozen-route comparisons pass;
+Near/P2/T2 comparison is running. Do not promote unvalidated defaults or add
+unbounded repeats. Owned GPUs0/1/4/5 only; host/HBM guards remain mandatory.
+
 **OWNER C++ EXPERT EXECUTOR MIGRATION COMPLETE (2026-10-08).**
 Read experiments/native_expert_executor_20261008/PLAN.md. Owner requests
 native host execution using main EP/coslot reference. Keep old H0 default

@@ -112,7 +112,8 @@ class DecodeOffloadRuntime(LiveRuntime):
    if not fast:e['selected']=selected.cpu().numpy()
    e.update(layer=layer,targets=targets,fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
    native=getattr(self,'native_executor',None)
-   if native is not None:
+   native_for_phase=native is not None and (self.index>=48 or getattr(self.args,'native_prefill',False))
+   if native_for_phase:
     slots=native.native.bind_layer_slots(self.policy.slots[self.rank],self.arena.main_physical[self.rank],layer,[group[0] for group in e['groups']])
     e['groups']=[(expert,rows,cols,slot) for (expert,rows,cols),slot in zip(e['groups'],slots)]
    elif decode_fast:
@@ -166,7 +167,7 @@ class DecodeOffloadRuntime(LiveRuntime):
  def compute(self,packet,e,layer):
   if (self.index<48 and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
   native=getattr(self,'native_executor',None)
-  if native is not None:return native.compute(self,packet,e,layer)
+  if native is not None and (self.index>=48 or getattr(self.args,'native_prefill',False)):return native.compute(self,packet,e,layer)
   grouped=getattr(self,'grouped_executor',None)
   if grouped is not None:return grouped.compute(self,packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
