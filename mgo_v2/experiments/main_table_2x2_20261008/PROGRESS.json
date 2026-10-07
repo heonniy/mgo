@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 4,
+  "completed": 5,
   "total": 64,
   "clean_repeats": 3,
   "primary_aggregate": "median; full range and all samples retained",
@@ -119,8 +119,48 @@
       "cache_percent": 30,
       "system": "infinity",
       "cell": "Qwen3_ShareGPT_R4_C30_B16_L512_O64",
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "mt2_qwen_sharegpt_b16_l512_infinity_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "mt2_qwen_sharegpt_b16_l512_infinity_r3_v1",
+      "source_commit": "30a70a617abe11a3015f94fe445bc42eca9be39f",
+      "TTFT": {
+        "median": 5.859424268,
+        "minimum": 5.567618062,
+        "maximum": 6.088772873,
+        "mean": 5.838605067666666,
+        "stdev": 0.2612004279935256,
+        "samples": [
+          6.088772873,
+          5.859424268,
+          5.567618062
+        ]
+      },
+      "TPOT": {
+        "median": 3.208153913126984,
+        "minimum": 3.1747181446666666,
+        "maximum": 3.2083345621269843,
+        "mean": 3.197068873306878,
+        "stdev": 0.019356509540115602,
+        "samples": [
+          3.1747181446666666,
+          3.208153913126984,
+          3.2083345621269843
+        ]
+      },
+      "E2E": {
+        "median": 207.692695476,
+        "minimum": 206.096015987,
+        "maximum": 207.973120795,
+        "mean": 207.253944086,
+        "stdev": 1.012550098377556,
+        "samples": [
+          206.096015987,
+          207.973120795,
+          207.692695476
+        ]
+      }
     },
     {
       "dataset": "ShareGPT",
@@ -131,8 +171,10 @@
       "cache_percent": 30,
       "system": "llama",
       "cell": "Qwen3_ShareGPT_R4_C30_B16_L512_O64",
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "mt2_qwen_sharegpt_b16_l512_llama_r3_v1"
+      ],
+      "status": "RUNNING"
     },
     {
       "dataset": "ShareGPT",
