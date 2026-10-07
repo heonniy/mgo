@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "cell": "R4_C30_B32_L512_O64",
+  "local_batch": 32,
+  "global_requests": 128,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "cache_percent": 30,
+  "cpu_threads": 32,
+  "repeats": 2,
+  "exact_token_parity": true,
+  "same_binary": true,
+  "sole_intended_runtime_difference": "GGML_CUDA_DISABLE_GRAPHS",
+  "llama_graph_reuse": true,
+  "metrics": {
+    "TTFT": {
+      "cuda_graph_on": [
+        281.759466713,
+        281.442106636
+      ],
+      "cuda_graph_off": [
+        281.893355804,
+        281.568504256
+      ],
+      "on_mean": 281.6007866745,
+      "off_mean": 281.73093002999997,
+      "off_minus_on": 0.13014335549996758,
+      "off_over_on": 1.0004621555111293,
+      "slowdown_percent": 0.04621555111292697
+    },
+    "TPOT": {
+      "cuda_graph_on": [
+        0.7355509255079369,
+        0.7385609502698409
+      ],
+      "cuda_graph_off": [
+        0.7410910281746032,
+        0.7417424717301592
+      ],
+      "on_mean": 0.7370559378888889,
+      "off_mean": 0.7414167499523812,
+      "off_minus_on": 0.004360812063492259,
+      "off_over_on": 1.005916527958492,
+      "slowdown_percent": 0.5916527958492068
+    },
+    "E2E": {
+      "cuda_graph_on": [
+        328.09917502,
+        327.971446503
+      ],
+      "cuda_graph_off": [
+        328.582090579,
+        328.298279975
+      ],
+      "on_mean": 328.0353107615,
+      "off_mean": 328.440185277,
+      "off_minus_on": 0.40487451550001197,
+      "off_over_on": 1.001234240650984,
+      "slowdown_percent": 0.12342406509839865
+    }
+  }
+}

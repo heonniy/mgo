@@ -1,4 +1,21 @@
 {
+  "configure_command": [
+    "cmake",
+    "-S",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp",
+    "-B",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build",
+    "-DGGML_CUDA_GRAPHS=ON"
+  ],
+  "backend_build_command": [
+    "cmake",
+    "--build",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build",
+    "--config",
+    "Release",
+    "--parallel",
+    "16"
+  ],
   "command": [
     "g++",
     "-std=c++17",
@@ -25,10 +42,9 @@
     "GGML_NATIVE:BOOL": "ON",
     "GGML_OPENMP:BOOL": "ON"
   },
-  "thread_policy": "runtime explicit; headline 32/32, audit 16/16 32/32 64/64",
+  "cuda_graph_support": true,
+  "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1",
   "llama_graph_reuse": true,
   "baseline_policy_eligible": true,
-  "baseline_policy_note": "CUDA Graph support is compiled in; revised headline runs require runtime disable. ON is allowed only for the single-cell causal A/B.",
-  "cuda_graph_support": true,
-  "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1"
+  "thread_policy": "headline fixed 32/32 with deterministic affinity"
 }
