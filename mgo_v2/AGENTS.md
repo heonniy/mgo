@@ -1,3 +1,9 @@
+**OWNER C++ EXPERT EXECUTOR MIGRATION (2026-10-08), active.**
+Read experiments/native_expert_executor_20261008/PLAN.md. Owner requests
+native host execution using main EP/coslot reference. Keep old H0 default
+until validated; GPUs0/1/4/5 only, bounded checks then B64 comparison. Do not
+restart prior matrices. Preserve cache ownership, H2D overlap and T2.
+
 **OWNER BR C60 PREFETCH PHYSICAL ABLATION COMPLETE (2026-10-08).**
 Read experiments/br_prefetch_c60_20261007/PLAN.md. Scope is six BR cells only:
 B8/B16/B64 x OFF/ON, input256/decode256. No LA/CA/FCA/Near queue.
