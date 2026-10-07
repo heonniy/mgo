@@ -20,8 +20,14 @@ def main():
                 label = f"policy_gap_sharegpt_c{capacity}_{transport}_b{spec['local_batch']}_case{spec['case_id']}_20261008"
                 if transport == 'nvswitch' and capacity == 30 and spec['local_batch'] == 8:
                     label = f"policy_gap_sharegpt_c30_nvswitch_b8_case{spec['case_id']}_v2_20261008"
+                if transport == 'p2p_disabled' and capacity == 30 and spec['local_batch'] == 8 and spec['case_id'] == 0:
+                    label = 'policy_gap_sharegpt_c30_p2p_disabled_b8_case0_v2_20261008'
                 status = json.loads((ROOT / label / 'status.json').read_text())
                 assert status['status'] == 'PASS' and status['nccl_p2p_disable'] == (transport == 'p2p_disabled')
+                assert status.get('nccl_ib_disable', False) == (transport == 'p2p_disabled')
+                for rank in range(4):
+                    source = json.loads((ROOT / label / f'source_rank{rank}.json').read_text())
+                    assert source.get('nccl_ib_disable') == ('1' if transport == 'p2p_disabled' else None)
                 expected = [459, 459, 459, 458] if capacity == 30 else [920, 920, 919, 919]
                 result = analyze(label, expected, transport == 'p2p_disabled')
                 result.update(cache_percent=capacity, transport=transport,
@@ -33,7 +39,7 @@ def main():
     destination = REPO / 'FOLLOWUP_RESULTS.json'
     destination.write_text(json.dumps(output, indent=2) + '\n')
     lines = ['# C30 and P2P-disabled follow-up results', '',
-             'ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean primary. The MoE value comes from a separate instrumented run and excludes attention. P2P-disabled sets NCCL_P2P_DISABLE=1 inside every worker; it is a transport setting on the same NVSwitch-equipped server.', '',
+             'ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean primary. The MoE value comes from a separate instrumented run and excludes attention. P2P-disabled sets NCCL_P2P_DISABLE=1 and NCCL_IB_DISABLE=1 inside every worker to select SHM after the IB path failed; it is a transport setting on the same NVSwitch-equipped server.', '',
              '| Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT s/token | MoE-block TPOT s/token (diagnostic) | Peer GiB | H2D GiB |',
              '|---|---:|---:|---|---|---:|---:|---:|---:|']
     for case in cases:

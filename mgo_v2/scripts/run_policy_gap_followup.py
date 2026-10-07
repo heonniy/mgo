@@ -26,6 +26,8 @@ def main():
                 if cell['capacity_percent'] != capacity:
                     continue
                 label = f"policy_gap_sharegpt_c{capacity}_{transport}_b{cell['local_batch']}_case{cell['case_id']}_20261008"
+                if transport == 'p2p_disabled' and capacity == 30 and cell['local_batch'] == 8 and cell['case_id'] == 0:
+                    label = 'policy_gap_sharegpt_c30_p2p_disabled_b8_case0_v2_20261008'
                 path = RESULTS / label
                 if path.exists():
                     status = json.loads((path / 'status.json').read_text())

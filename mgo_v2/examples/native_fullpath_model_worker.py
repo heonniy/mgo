@@ -64,7 +64,7 @@ def main(a):
  model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
  prefetch_on=rt.prefetch_next
  if prefetch=='off':rt.prefetch_next=lambda:None
- write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE'),pinned=rt.pinned_expert_store_receipt))
+ write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE'),nccl_ib_disable=os.environ.get('NCCL_IB_DISABLE'),pinned=rt.pinned_expert_store_receipt))
  def reset():
   rt.reset();rt.event_offset=0;rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt);begin(rt);assert np.all(rt.keys<0)

@@ -25,7 +25,8 @@ def main(a):
  out=ROOT/a.label;assert not out.exists(),'new label required to preserve attempts';assert c.host_available()>=384*2**30
  out.mkdir(parents=True);state=dict(status='RUNNING',started=time.time(),system=a.system,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=c.P.parent,text=True).strip());stopped=[];proc=None
  state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout,
-              nccl_p2p_disable=bool(a.nccl_p2p_disable))
+              nccl_p2p_disable=bool(a.nccl_p2p_disable),
+              nccl_ib_disable=bool(a.nccl_p2p_disable))
  try:
   stopped=c.stop_target_idle()
   occupants,observed=wait_for_gpu_release()
@@ -35,7 +36,10 @@ def main(a):
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0';env['PYTHONFAULTHANDLER']='1'
-  if a.nccl_p2p_disable:env['NCCL_P2P_DISABLE']='1'
+  if a.nccl_p2p_disable:
+   # With P2P off, this host selects a failing NET/IB path. Keep the
+   # established same-host env2 transport on SHM by disabling IB as well.
+   env['NCCL_P2P_DISABLE']='1';env['NCCL_IB_DISABLE']='1'
   if a.workloads:env['MGO_HEADLINE_WORKLOADS']=str(Path(a.workloads).resolve())
   command=[a.python,'-u']
   if a.ranks>1:command+=['-m','torch.distributed.run','--standalone',f'--nproc_per_node={a.ranks}']
