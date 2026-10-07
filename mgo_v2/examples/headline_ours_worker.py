@@ -1,7 +1,7 @@
 """Native greedy Near generation with cold expert cache and common release."""
 from refactor_measure_worker import *
 from mgo_v2.selected_runtime import create_selected_runtime,selected_options
-import psutil
+import psutil,hashlib
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 
 def begin(rt):
@@ -92,6 +92,9 @@ def main(a):
    rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
    configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
   a.validate_decode_layout=a.decode_layout_fast and repeat==0
+  rt.record_main_eviction_trace=bool(a.record_main_eviction_trace and repeat)
+  if rt.record_main_eviction_trace:
+   rt.main_eviction_trace_histograms=[];rt.main_eviction_trace_gates=[];rt.main_eviction_trace_events=[]
   begin(rt);a.phase='COUNTERS' if repeat==0 else 'MEASURE';cache_before=validate_state(rt);calls=rt.transport.calls
   assert np.all(rt.keys<0) and not rt.controller.pending,'expert cache not cold'
   if rank==0:write(a.output/'phase.json',dict(system='Ours',cell=a.cell,phase=phase,repeat=repeat,smoke=a.smoke))
@@ -110,6 +113,26 @@ def main(a):
   if a.validate_decode_layout:
    assert rt.decode_layout_checks==(n-1)*48
    write(a.output/f'decode_layout_validation_rank{rank}.json',dict(status='PASS',exact_checks=rt.decode_layout_checks,scope='all warmup decode layers; integer indices and physical slot parity'))
+  if rt.record_main_eviction_trace:
+   hist=np.stack(rt.main_eviction_trace_histograms).astype(np.int32)
+   gates=np.stack(rt.main_eviction_trace_gates).astype(np.float32)
+   events=np.asarray(rt.main_eviction_trace_events,dtype=np.int32)
+   assert hist.shape==(48*n,4,128) and gates.shape==(48*n,128)
+   assert np.array_equal(events,np.arange(48*n,dtype=np.int32))
+   raw=hist.tobytes()+gates.tobytes()+events.tobytes()
+   digest=np.frombuffer(hashlib.sha256(raw).digest(),np.uint8).copy()
+   d=torch.tensor(digest,device='cuda');all_d=torch.empty((4,32),dtype=torch.uint8,device='cuda')
+   dist.all_gather_into_tensor(all_d.view(-1),d);assert bool((all_d==all_d[0]).all())
+   if rank==0:
+    np.savez_compressed(a.output/'main_eviction_trace.npz',histograms=hist,gates=gates,events=events)
+    write(a.output/'main_eviction_trace_meta.json',dict(
+     status='PASS',cell=a.cell,source_policy=a.policy,local_batch=a.local_batch,global_requests=4*a.local_batch,
+     input_tokens=int(ids.shape[1]),output_tokens=n,events=int(len(events)),prefill_events=48,
+     decode_events=int((n-1)*48),main_capacities=list(map(int,a.capacities)),
+     captured_runtime_prefetch_P=int(a.arena_budget),captured_runtime_trigger=a.trigger,
+     simulator_scope='MAIN-only P0 eviction replay; frozen raw demand/gate stream',
+     trace_sha256=hashlib.sha256(raw).hexdigest()))
+   rt.record_main_eviction_trace=False
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert not repeat or no_compile
   result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
@@ -151,4 +174,4 @@ def main(a):
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
