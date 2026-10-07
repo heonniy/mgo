@@ -1,4 +1,5 @@
 {
+  "name": "main_OURS",
   "status": "OWNER_SELECTED",
   "scope": "Future OURS main-table jobs launched with --ours-final",
   "rank_count": 4,
@@ -20,13 +21,15 @@
     "native_near_prefetch_ab_b16_v2_20261008",
     "native_policy_br_near_off_b16_20261008",
     "ours_final_native_near_off_b16_20261008",
-    "native_policy_br_near_off_rankdiag_b16_v3_20261008"
+    "native_policy_br_near_off_rankdiag_b16_v3_20261008",
+    "native_policy_ca_near_off_b16_20261008"
   ],
   "known_limits": [
     "B64 native prefill had no measured TTFT benefit in two BR/OFF repeats",
     "Near/OFF versus BR/OFF and ON/OFF placement data are from C30 B16 input256 only",
     "Future main-table cells need separate physical measurements",
-    "BF16 token outputs differ across placement and prefetch policies"
+    "BF16 token outputs differ across placement and prefetch policies",
+    "CA lowered peer bytes but raised TPOT versus Near in the R4 C30 B16 input256 native/off follow-up"
   ],
   "reference_runtime": "H0 plus legacy decode layout and P2/T2 remains explicitly runnable for historical comparison"
 }
