@@ -10,7 +10,7 @@ def jobs():
  for spec in cells:
   for worker,system,python,ranks in SYSTEMS:
    row=dict(label=f"expanded_{spec['cell']}_{worker}_v1",cell=spec['cell'],worker=f'headline_{worker}_worker.py',system=system,python=python,ranks=ranks)
-   if worker=='llama_sync':row['llama_threads']=LLAMA_MAIN_THREADS
+   if worker=='llama_sync':row.update(llama_threads=LLAMA_MAIN_THREADS,llama_cuda_graphs='off')
    result.append(row)
  return result
 def main(a):
@@ -28,7 +28,7 @@ def main(a):
   state['current']=job['label'];write(PACK/'QUEUE.json',state)
   cmd=[PY,str(P/'scripts/run_headline_job.py'),'--label',job['label'],'--system',job['system'],'--worker',job['worker'],'--cell',job['cell'],'--python',job['python'],'--ranks',str(job['ranks']),'--repeats','5','--timeout','28800','--workloads',str(PACK/'WORKLOADS.json')]
   if job['worker']=='headline_ours_worker.py':cmd+=['--prefill-optimized','--prefill-layout-fast']
-  if job['worker']=='headline_llama_sync_worker.py':cmd+=['--llama-threads',str(job['llama_threads'])]
+  if job['worker']=='headline_llama_sync_worker.py':cmd+=['--llama-threads',str(job['llama_threads']),'--llama-cuda-graphs',job['llama_cuda_graphs']]
   ret=subprocess.run(cmd,check=False);job['returncode']=ret.returncode;job['status']=json.loads(status.read_text())['status'] if status.exists() else 'FAILED_TO_START';write(PACK/'QUEUE.json',state)
   subprocess.run([PY,str(P/'scripts/report_expanded_headline.py')],check=True)
  state.update(status='FINISHED' if state['status']!='STOPPED' else 'STOPPED',finished=time.time(),current=None);write(PACK/'QUEUE.json',state)

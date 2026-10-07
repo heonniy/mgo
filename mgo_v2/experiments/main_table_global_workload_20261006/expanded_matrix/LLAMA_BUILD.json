@@ -26,8 +26,9 @@
     "GGML_OPENMP:BOOL": "ON"
   },
   "thread_policy": "runtime explicit; headline 32/32, audit 16/16 32/32 64/64",
-  "cuda_graphs": true,
   "llama_graph_reuse": true,
-  "baseline_policy_eligible": false,
-  "baseline_policy_note": "Stale receipt from CUDA-Graph-ON build. Run build_headline_llama_sync.py to reconfigure GGML_CUDA_GRAPHS=OFF and refresh hashes before any revised-baseline run."
+  "baseline_policy_eligible": true,
+  "baseline_policy_note": "CUDA Graph support is compiled in; revised headline runs require runtime disable. ON is allowed only for the single-cell causal A/B.",
+  "cuda_graph_support": true,
+  "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1"
 }
