@@ -33,6 +33,13 @@ def main(a):
   state['preflight_release_observations']=observed
   assert not occupants,f'GPU occupants remain after bounded cleanup wait: {occupants}'
   env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',TORCHINDUCTOR_COMPILE_THREADS='2',PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{c.P}:{c.P/"scripts"}:{c.P/"examples"}')
+  if a.ours_final or a.expert_executor=='native':
+   native_build=Path('/home/hwlee/mgo-tools/native-expert-build/bin')
+   assert (native_build/'ninja').is_file(),'native executor requires its audited ninja build tool'
+   env['PATH']=str(native_build)+os.pathsep+env['PATH']
+   env['CUDA_HOME']='/usr/local/cuda'
+   env['TORCH_CUDA_ARCH_LIST']='9.0'
+   env['MAX_JOBS']='1'
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0';env['PYTHONFAULTHANDLER']='1'
