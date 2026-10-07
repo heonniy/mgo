@@ -20,6 +20,7 @@ using json=nlohmann::ordered_json;
 struct PlacementAudit {
  std::set<std::string> cpu_expert_tensors;
  std::map<int,int> cpu_expert_layer_counts;
+ std::map<int,std::string> layer_device;
 };
 
 static int64_t ns(){return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();}
@@ -32,19 +33,26 @@ static void audit_log(ggml_log_level level,const char *text,void *ud){
  std::fputs(text,stderr);std::fflush(stderr);
  auto *a=static_cast<PlacementAudit *>(ud);
  static const std::regex re("tensor (blk\\.([0-9]+)\\.ffn_(up|down|gate|gate_up)_(ch|)exps[^ ]*) .*buffer type overridden to (CPU|CUDA_Host)(\\r?\\n|$)");
+ static const std::regex re_layer("layer\\s+([0-9]+) assigned to device ([^,\\s]+)");
  std::cmatch m;
  if(std::regex_search(text,m,re)){
   std::string name=m[1].str();
   int layer=std::stoi(m[2].str());
   if(a->cpu_expert_tensors.insert(name).second)a->cpu_expert_layer_counts[layer]++;
  }
+ if(std::regex_search(text,m,re_layer)){
+  int layer=std::stoi(m[1].str());
+  if(layer>=0 && layer<48)a->layer_device[layer]=m[2].str();
+ }
 }
 
 int main(int argc,char **argv){try{
- require(argc==9,"model warmup target out gpu_expert_layers repeats smoke cpu_threads");
+ require(argc==9||argc==10,"model warmup target out gpu_expert_layers repeats smoke cpu_threads [expert_placement]");
  std::string out=argv[4];
  int layers=std::stoi(argv[5]),repeats=std::stoi(argv[6]),threads=std::stoi(argv[8]);
  bool smoke=std::stoi(argv[7]);
+ std::string placement_mode=argc==10?argv[9]:"legacy_tail";
+ require(placement_mode=="legacy_tail"||placement_mode=="balanced3","expert_placement must be legacy_tail or balanced3");
  require(threads==16||threads==32||threads==64,"cpu_threads must be 16, 32, or 64");
  auto warm=read(argv[2])["requests"],target=read(argv[3])["requests"];
  int count=smoke?4:target.size(),len=smoke?32:target[0]["input_ids"].size(),n=smoke?2:64;
@@ -54,8 +62,16 @@ int main(int argc,char **argv){try{
  llama_log_set(audit_log,&placement);
  ggml_backend_load_all();llama_backend_init();
 
+ std::set<int> gpu_expert_layer_ids;
+ if(placement_mode=="legacy_tail"){
+  for(int i=48-layers;i<48;i++)gpu_expert_layer_ids.insert(i);
+ }else{
+  require(layers==12,"balanced3 requires exactly 12 GPU expert layers");
+  const int ids[]={2,6,10,14,18,22,26,30,34,38,42,46};
+  gpu_expert_layer_ids.insert(std::begin(ids),std::end(ids));
+ }
  std::vector<std::string> patterns;
- for(int i=0;i<48-layers;i++)patterns.push_back("blk\\."+std::to_string(i)+"\\.ffn_(up|down|gate|gate_up)_(ch|)exps");
+ for(int i=0;i<48;i++)if(!gpu_expert_layer_ids.count(i))patterns.push_back("blk\\."+std::to_string(i)+"\\.ffn_(up|down|gate|gate_up)_(ch|)exps");
  std::vector<llama_model_tensor_buft_override> overrides;
  for(auto &s:patterns)overrides.push_back({s.c_str(),ggml_backend_cpu_buffer_type()});
  overrides.push_back({nullptr,nullptr});
@@ -70,15 +86,33 @@ int main(int argc,char **argv){try{
  if((int)placement.cpu_expert_tensors.size()!=expected_cpu_tensors)throw std::runtime_error("CPU expert override count mismatch");
  for(int i=0;i<48;i++){
   int actual=placement.cpu_expert_layer_counts.count(i)?placement.cpu_expert_layer_counts.at(i):0;
-  int expected=i<cpu_layers?3:0;
+  int expected=gpu_expert_layer_ids.count(i)?0:3;
   if(actual!=expected)throw std::runtime_error("CPU expert layer placement mismatch");
+ }
+ std::map<std::string,int> gpu_experts_by_device;
+ json layer_device=json::object(),gpu_layer_ids=json::array(),gpu_by_device=json::object();
+ for(auto &[layer,dev]:placement.layer_device)layer_device[std::to_string(layer)]=dev;
+ for(int layer:gpu_expert_layer_ids){
+  if(!placement.layer_device.count(layer))throw std::runtime_error("missing layer-to-device audit");
+  gpu_experts_by_device[placement.layer_device.at(layer)]++;
+  gpu_layer_ids.push_back(layer);
+ }
+ for(auto &[dev,cnt]:gpu_experts_by_device)gpu_by_device[dev]=cnt;
+ if(placement_mode=="balanced3"){
+  require(placement.layer_device.size()==48,"balanced3 requires audited ownership for all 48 transformer layers");
+  require(gpu_experts_by_device.size()==4,"balanced3 must span exactly four CUDA devices");
+  for(auto &[dev,cnt]:gpu_experts_by_device)require(cnt==3,"balanced3 placement is not 3/3/3/3 on actual layer owners");
  }
  const int64_t expert_layer_bytes=int64_t(128)*9*1024*1024;
  json layer_counts=json::object();
  for(auto &[layer,cnt]:placement.cpu_expert_layer_counts)layer_counts[std::to_string(layer)]=cnt;
  write(out+"/placement_audit.json",{
   {"status","PASS"},
-  {"verification","llama loader debug callback: exact CPU tensor overrides"},
+  {"verification","llama loader debug callback: exact CPU tensor overrides plus layer ownership"},
+  {"expert_placement",placement_mode},
+  {"gpu_expert_layer_ids",gpu_layer_ids},
+  {"layer_device",layer_device},
+  {"gpu_expert_layers_by_device",gpu_by_device},
   {"cpu_expert_layers",cpu_layers},
   {"gpu_expert_layers",layers},
   {"cpu_expert_tensor_count",(int)placement.cpu_expert_tensors.size()},
@@ -148,6 +182,9 @@ int main(int argc,char **argv){try{
    {"prefill_tokens",total},{"prefill_decode_calls",prefill_calls},{"decode_calls",n-1},{"decode_tokens_per_call",count},
    {"n_batch",(int)cp.n_batch},{"n_ubatch",(int)cp.n_ubatch},
    {"cpu_threads",threads},{"cpu_batch_threads",threads},
+   {"expert_placement",placement_mode},
+   {"gpu_expert_layer_ids",gpu_layer_ids},
+   {"gpu_expert_layers_by_device",gpu_by_device},
    {"gpu_expert_layers",layers},{"cpu_expert_layers",cpu_layers},
    {"expert_resident_bytes",int64_t(layers)*expert_layer_bytes},
    {"synchronous_batch",true},{"finite_logits",true},
