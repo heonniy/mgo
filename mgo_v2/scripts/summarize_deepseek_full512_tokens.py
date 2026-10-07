@@ -45,6 +45,7 @@ def main():
     systems['DeepSpeed']['repeat_1_3_full64_agreement'] = sum(a[rid] == c[rid] for rid in ids)
     output = dict(status='PASS', model='DeepSeek-V2-Lite-Chat', dataset='ShareGPT',
                   local_batch=16, input_tokens=512, reference='stock Transformers BF16, same 16 requests and input length',
+                  comparison_scope='First 16 target requests only; stock reference uses batch 16 while the distributed systems process global batch 64. Token disagreement alone does not establish an implementation defect.',
                   reference_job=REFERENCE.parent.name, systems=systems,
                   raw_token_ids='retained outside Git in guarded job directories')
     (REPORT / 'DEEPSEEK_FULL512_TOKEN_CHECK.json').write_text(json.dumps(output, indent=2) + '\n')

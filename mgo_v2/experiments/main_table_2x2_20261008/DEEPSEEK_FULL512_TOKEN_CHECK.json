@@ -5,6 +5,7 @@
   "local_batch": 16,
   "input_tokens": 512,
   "reference": "stock Transformers BF16, same 16 requests and input length",
+  "comparison_scope": "First 16 target requests only; stock reference uses batch 16 while the distributed systems process global batch 64. Token disagreement alone does not establish an implementation defect.",
   "reference_job": "mt2_deepseek_sharegpt_b16_l512_stock512_reference_v1",
   "systems": {
     "main_OURS": {
