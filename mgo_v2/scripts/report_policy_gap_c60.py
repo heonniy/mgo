@@ -57,10 +57,12 @@ def main():
     for batch in (8, 16, 64):
         subset = [case for case in cases if specs[case['cell']]['local_batch'] == batch]
         if subset:
-            winners[str(batch)] = dict(CA_NATIVE=max(subset, key=lambda case: case['ca_gain_pct']),
-                                       LA_CA_NEAR=max(subset, key=lambda case: case['near_gain_pct']))
-            winners[str(batch)] = {policy: dict(label=case['label'], observed_gain_pct=case['ca_gain_pct' if policy == 'CA_NATIVE' else 'near_gain_pct'])
-                                   for policy, case in winners[str(batch)].items()}
+            winners[str(batch)] = {}
+            for policy, key in [('CA_NATIVE', 'ca_gain_pct'), ('LA_CA_NEAR', 'near_gain_pct')]:
+                best = max(subset, key=lambda case: case[key])
+                largest = max(subset, key=lambda case: abs(case[key]))
+                winners[str(batch)][policy] = dict(best_candidate=dict(label=best['label'], observed_gain_pct=best[key]),
+                                                   largest_absolute_gap=dict(label=largest['label'], signed_gain_pct=largest[key]))
     destination = PACKET / f'{args.dataset.upper()}_RESULTS.json'
     destination.write_text(json.dumps(dict(status='PASS', dataset=args.dataset, cases=cases,
                                            bounded_observed_winners=winners), indent=2) + '\n')
