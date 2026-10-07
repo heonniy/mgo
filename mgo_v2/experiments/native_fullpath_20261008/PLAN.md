@@ -30,3 +30,16 @@ Validation sequence:
 
 Existing full-pinned memory preflight and 96-GiB host stop remain mandatory.
 The supervisor restores model inference loads on owned GPUs after each job.
+
+Owner follow-up: quantify the current C30/B16 cache misses and whether P2/T2
+prefetch helps. Use the native full path and one frozen 64-output-token Near
+trace. Run ON/OFF/OFF/ON from cold cache with the same 1,835 MAIN slots and
+eight reserved prefetch slots in both arms. Count distinct active experts per
+layer outside timing; report MAIN hit rate, mandatory demand copies,
+prefetch copies, total PCIe H2D bytes, TTFT and TPOT. Keep both repeats and
+do not infer ON/OFF benefit from BR versus Near measurements.
+
+Then compare BR and Near on that same frozen input with prefetch OFF and the
+native executor, two clean repeats each. This isolates rank placement from
+prefetch and from the H0/native executor difference. Do not silently change
+the selected production policy based on a single cell.
