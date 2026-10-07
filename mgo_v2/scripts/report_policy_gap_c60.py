@@ -26,9 +26,11 @@ def analyze(label):
         for rank in range(4):
             diag = json.loads((path / f'diagnostic_{policy}_rank{rank}.json').read_text())
             assert diag['token_prefix_parity'] and diag['decode_steps'] == 32
-            for event in diag['moe_events']:
-                if 1 <= event['step'] <= 32:
-                    moe[rank, event['step'] - 1, event['layer']] = event['stream_seconds']
+            for segment in diag['segments']:
+                event_index = segment['event_index']
+                if 48 <= event_index < 48 * 33 and segment['phase'] != 'attention_dense_residual':
+                    step, layer = divmod(event_index - 48, 48)
+                    moe[rank, step, layer] += segment['stream_seconds']
             assert np.all(moe[rank] > 0)
             rank_rows.append(dict(rank=rank, moe_seconds_per_decode=float(moe[rank].sum() / 32),
                                   cache_events=len(diag['decode_cache_events'])))
