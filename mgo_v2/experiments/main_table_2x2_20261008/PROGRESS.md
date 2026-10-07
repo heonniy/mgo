@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **6/64**.
+Validated rows: **7/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention.
 
@@ -24,7 +24,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | Qwen3 | 64 | 1024 | llama.cpp balanced | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | main_OURS | 0.650 [0.617, 0.887] | 0.287 [0.285, 0.294] | 18.833 [18.747, 19.112] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
-| ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING |
+| ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 1.673 [1.643, 1.749] | 1.247 [1.241, 1.248] | 80.292 [79.848, 80.295] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | 145.843 [145.516, 146.156] | 0.414 [0.413, 0.414] | 171.831 [171.575, 172.217] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | main_OURS | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
@@ -70,3 +70,5 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | MoE-Infinity (repaired) | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | llama.cpp balanced | — | — | — | PENDING |
+
+DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.

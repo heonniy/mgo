@@ -52,6 +52,15 @@ def main():
                     samples = [json.loads((path / f'repeat{i}.json').read_text()) for i in (1, 2, 3)]
                     assert all(row['status'] == 'PASS' for row in samples)
                     assert all(row['output_tokens'] == 64 and row['global_requests'] == cell['global_requests'] for row in samples)
+                    if system == 'infinity':
+                        expected_calls = (48 if model == 'Qwen3' else 26) * 64
+                        assert all(row['eam_calls'] == expected_calls for row in samples)
+                        if model != 'Qwen3':
+                            policy = json.loads((path / 'eam_policy.json').read_text())
+                            capacity_slots = sum(policy['expert_budget_per_gpu']) // policy['expert_bytes']
+                            assert policy['min_free_expert_slots'] > capacity_slots
+                            assert all(row['eam_candidates'] == 0 for row in samples)
+                            case['baseline_adaptation'] = 'EAM eviction priorities on; speculative prefetch off after native expert-wait stall'
                     expected_ids = [row['request_id'] for row in json.loads(Path(cell['target']['path']).read_text())['requests']]
                     if system in ('ours', 'deepspeed'):
                         for repeat in (1, 2, 3):
@@ -90,6 +99,7 @@ def main():
         lines.append(f'| {case["dataset"]} | {case["model"]} | {case["local_batch"]} | '
                      f'{case["input_tokens"]} | {DISPLAY[case["system"]]} | {value("TTFT")} | '
                      f'{value("TPOT")} | {value("E2E")} | {case["status"]} |')
+    lines.extend(['', 'DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.'])
     (REPO / 'PROGRESS.md').write_text('\n'.join(lines) + '\n')
     print(f'{completed}/64 validated rows')
 
