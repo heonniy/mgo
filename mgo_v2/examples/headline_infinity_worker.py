@@ -28,6 +28,13 @@ def main(a):
  assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5' and torch.cuda.device_count()==4
  torch.set_num_threads(8);torch.manual_seed(42)
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
+ model_path=spec.get('model_path',MODEL)
+ assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
+ model_family=spec.get('model','Qwen3')
+ assert (model_family=='Qwen3')==(model_path==MODEL)
+ expert_bytes=9*2**20 if model_family=='Qwen3' else 3*2048*1408*2
+ routed_layers=48 if model_family=='Qwen3' else 26
+ attention_layers=48 if model_family=='Qwen3' else 27
  cfg=dict(offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store',device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
  write(a.output/'config.json',cfg)
  sources={}
@@ -36,11 +43,11 @@ def main(a):
   for file in root.rglob('*'):
    if file.suffix in ('.py','.so'):sources[str(file)]=hashlib.sha256(file.read_bytes()).hexdigest()
  write(a.output/'source_hashes.json',sources)
- model=MoE(MODEL,cfg);engine=model.engine;p=engine.expert_prefetcher
+ model=MoE(model_path,cfg);engine=model.engine;p=engine.expert_prefetcher
  assert engine.dtype==0,engine.dtype  # native BF16 enum
- assert set(p.expert_nbytes_map.values())=={9*2**20},set(p.expert_nbytes_map.values())
- budgets=[x*9*2**20 for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
- p.configure_eam_budget(budgets,9*2**20)
+ assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
+ budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
+ p.configure_eam_budget(budgets,expert_bytes)
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
  write(a.output/'initial_budget.json',dict(budgets=budgets,stats=initial))
  attention_checks=[0]
@@ -49,7 +56,7 @@ def main(a):
   assert hidden.is_cuda,'CPU attention is forbidden'
   attention_checks[0]+=1
  attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
- assert len(attention_hooks)==48
+ assert len(attention_hooks)==attention_layers
  n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats;saved=None
  for repeat in range(repeats+1):
   phase='warmup' if repeat==0 else 'target'
@@ -80,7 +87,7 @@ def main(a):
   assert kv_ref() is None and all(ref() is None for ref in kv_tensors),'previous batch KV retained'
   live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
   assert not tracer.trace
-  stats=dict(p.archer_engine.get_expert_policy_stats());assert p.eam_calls==48*n
+  stats=dict(p.archer_engine.get_expert_policy_stats());assert p.eam_calls==routed_layers*n
   assert stats['capacity_bytes']==sum(budgets)
   for gpu,budget in enumerate(budgets):
    assert 0 <= stats[f'gpu_{gpu}_peak_charged_bytes'] <= budget
@@ -91,7 +98,7 @@ def main(a):
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
   if repeat==0:
-   assert attention_checks[0]==48*n
+   assert attention_checks[0]==attention_layers*n
    for hook in attention_hooks:hook.remove()
    saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
  write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,primary_repeats=repeats))

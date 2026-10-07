@@ -42,11 +42,15 @@ def main(a):
  write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank CPU range matching OURS; single NUMA node'))
  deepspeed.init_distributed();assert dist.get_world_size()==4
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
+ model_path=spec.get('model_path',MODEL)
+ assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
+ model_family=spec.get('model','Qwen3')
+ assert (model_family=='Qwen3')==(model_path==MODEL)
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
- scale=spec.get('cache_percent',30)/30
+ scale=spec.get('expert_budget_bytes',17392730112)/17392730112
  cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale),stage3_prefetch_bucket_size=int(1_000_000_000*scale),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
  dschf=HfDeepSpeedConfig(cfg)
- model=AutoModelForCausalLM.from_pretrained(MODEL,torch_dtype=torch.bfloat16,attn_implementation='sdpa')
+ model=AutoModelForCausalLM.from_pretrained(model_path,torch_dtype=torch.bfloat16,attn_implementation='sdpa',local_files_only=True)
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
  params=list(engine.module.named_parameters());assert all(hasattr(p,'ds_id') for _,p in params)
  assert all(p.dtype==torch.bfloat16 for _,p in params)
@@ -73,7 +77,7 @@ def main(a):
  generate(engine,ids,2)
  coordinator.fetch_sub_module=original_fetch
  assert 0<peak[0]<=all_peak[0]<=budget,(peak,all_peak,budget)
- write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',expert_peak_bytes=peak[0],all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
+ write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
  # Validate the native live-parameter counter against the complete scan above,
  # then sample that O(1) counter at fetch boundaries in primary execution.
  live_peak=[0]
