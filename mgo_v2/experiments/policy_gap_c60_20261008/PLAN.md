@@ -9,3 +9,5 @@ Measure primary TPOT by the maximum rank completion timestamp for each boundary,
 The user-facing single **first-dispatch→last-return elapsed** is the unnormalized contiguous interval from decode step 0/layer 0's earliest dispatch to decode step 31/layer 47's latest return/combine. It includes attention/controller/H2D between layers and steps, so report it as a whole-decode envelope, not EP-only time. Keep the sum of EP layer windows separately to show how much of that envelope falls inside EP windows. The clean TPOT alone uses per-token units; diagnostic envelope and all window/breakdown totals use seconds over the complete 32-step decode.
 
 Resource guards: supervisor preflight host available ≥384 GiB, abort below 96 GiB, GPU memory fraction 0.85, only owner GPUs 0,1,4,5. Stop and restore only owner idle model loads. LMSYS-Chat-1M is gated; prepare its manifest only after authorized access is available. Do not substitute an unofficial mirror.
+
+Final scope amendment: the user chose to skip LMSYS-Chat-1M. The completed physical results and conclusions cover ShareGPT only; no LMSYS measurements or cross-dataset claims are included.

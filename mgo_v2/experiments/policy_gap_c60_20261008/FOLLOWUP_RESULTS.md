@@ -1,6 +1,6 @@
 # C30 and P2P-disabled follow-up results
 
-ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean full-TPOT primary (attention included). Diagnostic values come from a separate instrumented run. P2P-disabled sets NCCL_P2P_DISABLE=1 and NCCL_IB_DISABLE=1 inside every worker to select SHM after the IB path failed; it is a transport setting on the same NVSwitch-equipped server.
+ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean full-TPOT primary (attention included). Diagnostic values come from a separate instrumented run. P2P-disabled sets NCCL_P2P_DISABLE=1 and NCCL_IB_DISABLE=1 inside every worker to select SHM after the IB path failed; it is a transport setting on the same NVSwitch-equipped server. LMSYS-Chat-1M was skipped at the user’s request; the final dataset scope is ShareGPT only.
 
 | Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT ms/token | Diagnostic full decode s | First dispatch→last return s | EP layer windows s | Expert compute s | Dispatch/return s | Arrival/other s | Peer GiB | H2D GiB |
 |---|---:|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
