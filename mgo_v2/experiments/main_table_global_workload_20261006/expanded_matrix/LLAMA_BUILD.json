@@ -33,8 +33,8 @@
     "-o",
     "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-sync"
   ],
-  "source_sha256": "261c451d4d742860fd76fdda70e2a7b8d28f6777f7aa6ee1f546a4a4732a9774",
-  "binary_sha256": "ccddc527a232fb4dcabdc1f44473f285ec74f2de3be9b887b69c8f9dcda3fd01",
+  "source_sha256": "1acc1335db2d1b8f0dfb31d4c0dc6b295df63bc75b7a52b60b75252536c5f520",
+  "binary_sha256": "f0404c3c05d72e65b5480f23b56b3f12433292a52540edf749ff959a2bdb4d8e",
   "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf",
   "cmake_flags": {
     "GGML_CUDA:BOOL": "ON",
@@ -44,9 +44,7 @@
   },
   "cuda_graph_support": true,
   "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1",
-  "llama_graph_reuse": false,
+  "llama_graph_reuse": true,
   "baseline_policy_eligible": true,
-  "thread_policy": "headline fixed 32/32 with deterministic affinity",
-  "headline_llama_graph_reuse": "OFF via LLAMA_GRAPH_REUSE_DISABLE=1",
-  "baseline_policy_note": "Revised baseline: CPU32/32, CUDA Graph runtime OFF, ordinary llama graph reuse OFF. CUDA graph support stays compiled for same-binary diagnostics."
+  "thread_policy": "headline fixed 32/32 with deterministic affinity"
 }

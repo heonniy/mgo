@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "cell": "R4_C30_B32_L512_O64",
+  "local_batch": 32,
+  "global_requests": 128,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "cache_percent": 30,
+  "cpu_threads": 32,
+  "cuda_graphs": "off",
+  "graph_reuse": "off",
+  "op_offload": false,
+  "expert_placement": "balanced3",
+  "gpu_expert_layers": 12,
+  "cpu_expert_layers": 36,
+  "gpu_expert_layer_ids": [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22,
+    26,
+    30,
+    34,
+    38,
+    42,
+    46
+  ],
+  "gpu_expert_layers_by_device": {
+    "CUDA0": 3,
+    "CUDA1": 3,
+    "CUDA2": 3,
+    "CUDA3": 3
+  },
+  "static_gpu_expert_bytes": 14495514624,
+  "c30_budget_bytes": 17392730112,
+  "unused_c30_bytes": 2897215488,
+  "repeats": 2,
+  "TTFT": [
+    290.226560043,
+    290.266566609
+  ],
+  "TPOT": [
+    0.7793939125714288,
+    0.7803611217460314
+  ],
+  "E2E": [
+    339.328376535,
+    339.429317279
+  ],
+  "TTFT_mean": 290.246563326,
+  "TPOT_mean": 0.7798775171587301,
+  "E2E_mean": 339.378846907
+}
