@@ -88,7 +88,11 @@ def main(a):
   assert kv_ref() is None and all(ref() is None for ref in kv_tensors),'previous batch KV retained'
   live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
   assert not tracer.trace
-  stats=dict(p.archer_engine.get_expert_policy_stats());assert p.eam_calls==routed_layers*n
+  stats=dict(p.archer_engine.get_expert_policy_stats())
+  write(a.output/f'eam_probe_repeat{repeat}.json',dict(actual_calls=p.eam_calls,
+       expected_calls=routed_layers*n,model_family=model_family,
+       candidate_count=p.eam_candidates,stats=stats))
+  assert p.eam_calls==routed_layers*n,(p.eam_calls,routed_layers*n)
   assert stats['capacity_bytes']==sum(budgets)
   for gpu,budget in enumerate(budgets):
    assert 0 <= stats[f'gpu_{gpu}_peak_charged_bytes'] <= budget
