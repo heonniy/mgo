@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "model": "DeepSeek-V2-Lite-Chat",
+  "dataset": "ShareGPT",
+  "local_batch": 16,
+  "input_tokens": 512,
+  "reference": "stock Transformers BF16, same 16 requests and input length",
+  "reference_job": "mt2_deepseek_sharegpt_b16_l512_stock512_reference_v1",
+  "systems": {
+    "main_OURS": {
+      "job": "mt2_deepseek_sharegpt_b16_l512_ours_r3_v1",
+      "first_token_agreement": 16,
+      "two_token_agreement": 16,
+      "requests": 16
+    },
+    "DeepSpeed": {
+      "job": "mt2_deepseek_sharegpt_b16_l512_deepspeed_r3_v2",
+      "first_token_agreement": 16,
+      "two_token_agreement": 16,
+      "requests": 16,
+      "repeat_1_2_full64_agreement": 11,
+      "repeat_2_3_full64_agreement": 11,
+      "repeat_1_3_full64_agreement": 12
+    },
+    "MoE-Infinity": {
+      "job": "mt2_deepseek_sharegpt_b16_l512_infinity_r3_v1",
+      "first_token_agreement": 12,
+      "two_token_agreement": 11,
+      "requests": 16
+    },
+    "llama.cpp": {
+      "job": "mt2_deepseek_sharegpt_b16_l512_llama_r3_v1",
+      "first_token_agreement": 11,
+      "two_token_agreement": 10,
+      "requests": 16
+    }
+  },
+  "raw_token_ids": "retained outside Git in guarded job directories"
+}
