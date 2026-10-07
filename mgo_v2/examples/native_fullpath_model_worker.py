@@ -33,13 +33,16 @@ def main(a):
  torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
- a.local_batch=spec['local_batch'];a.seed=42;a.policy='BR';a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ a.local_batch=spec['local_batch'];a.seed=42;a.policy=os.environ.get('MGO_NATIVE_POLICY','BR');a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ assert a.policy in ('BR','LA_CA_NEAR')
+ prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.validate_decode_layout=False;a.validate_prefill_optimized=False
  a.capacities=spec.get('expert_slots_per_rank',[461,461,461,460])
  options=selected_options();options.update(arena_budget=2,streaming=True,ready_first=True,trigger='T2',runtime_arm='BR_P2_OVERLAP')
  native=NativeExpertExecutor()
- model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options);rt.prefetch_next=lambda:None
- write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=False,pinned=rt.pinned_expert_store_receipt))
+ model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
+ if prefetch=='off':rt.prefetch_next=lambda:None
+ write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,pinned=rt.pinned_expert_store_receipt))
  def reset():
   rt.reset();rt.event_offset=0;rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt);begin(rt);assert np.all(rt.keys<0)
@@ -94,7 +97,7 @@ def main(a):
    results.append(row);write(a.output/f'run{run}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,policy=a.policy))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':

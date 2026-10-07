@@ -22,7 +22,10 @@ Validation sequence:
    Run H0/native/native/H0 with clean cold cache each time, prefetch disabled
    identically, and report TTFT, TPOT, E2E, all samples, token agreement,
    cache/role/controller parity, H2D/peer bytes and peak GPU/host memory.
-4. Only promote a faster validated path. Do not infer that Python itself
+4. Repeat a bounded B16/L256 comparison with Near policy and P2/T2 prefetch
+   enabled in both arms. This covers the selected overlap path that the
+   initial BR/prefetch-OFF comparison does not exercise.
+5. Only promote a faster validated path. Do not infer that Python itself
    accounts for the whole gain: C++ also changes expert FFN dispatch.
 
 Existing full-pinned memory preflight and 96-GiB host stop remain mandatory.
