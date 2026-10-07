@@ -36,3 +36,22 @@ def pack_layouts(events,device='cuda'):
    e['coslot_groups']=[(expert,view(rows),slot) for expert,rows,slot in e['coslot_groups']]
    e['coslot_return_order']=view(e['coslot_return_order'])
  return layouts
+
+
+def pack_rank_partial_layout(event,device='cuda'):
+ """One contiguous index transfer; no Python-list round trip or unused returns."""
+ if not event.get('rank_partial_layout'):raise ValueError('rank-partial layout required')
+ pieces=[];size=0
+ def reserve(array):
+  nonlocal size
+  array=np.asarray(array,dtype=np.int64)
+  result=(size,array.size,array.shape);size+=array.size;pieces.append(array.reshape(-1));return result
+ send_idx=reserve(event['send_idx']);send_eids=reserve(event['send_eids']);targets=reserve(event['targets'])
+ groups=[(expert,reserve(rows),reserve(cols),slot) for expert,rows,cols,slot in event['groups']]
+ packed=np.concatenate(pieces)
+ storage=torch.from_numpy(packed).to(device)
+ def view(spec):
+  start,size,shape=spec
+  return storage[start:start+size].view(shape)
+ result=dict(event,send_idx=view(send_idx),send_eids=view(send_eids),targets=view(targets),groups=[(expert,view(rows),view(cols),slot) for expert,rows,cols,slot in groups],layout_index_bytes=int(packed.nbytes))
+ return result

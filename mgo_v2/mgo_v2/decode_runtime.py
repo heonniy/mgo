@@ -8,6 +8,8 @@ import numpy as np
 import torch
 import torch.distributed as dist
 from la_physical_worker import LiveRuntime,EB,device_layout,nvtx_phase,plan_layout,PinnedH2DCache
+from env_offload_layout import plan_rank_partial_layout
+from env_offload_tensors import pack_rank_partial_layout
 from .runtime import gather_global_routes
 from .controller import DecodePrefetchController
 from .predictor import TransitionPredictor
@@ -91,8 +93,14 @@ class DecodeOffloadRuntime(LiveRuntime):
     assert not promotions and not discards
     assert [list(f) for f in fetches]==self.reference[self.index]
    self.current_global_fetch_count=len(fetches)
-   e=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
-   e.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
+   fast=self.index<48 and getattr(self.args,'prefill_layout_fast',False)
+   if fast:
+    assert getattr(self.args,'prefill_optimized',False) and getattr(self.args,'partial_precision',None)=='bf16'
+   planner=plan_rank_partial_layout if fast else plan_layout
+   e=planner(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank)
+   reference=plan_layout(effective,lengths,destinations,r.origin_ranks,g.counts,self.rank) if fast and getattr(self.args,'validate_prefill_optimized',False) else None
+   if not fast:e['selected']=selected.cpu().numpy()
+   e.update(layer=layer,targets=targets,fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
    e['groups']=[(expert,rows,cols,int(self.arena.main_physical[self.rank][np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0]])) for expert,rows,cols in e['groups']]
   if getattr(self.args,'debug_plan',False):
    payload=(fetches,self.policy.owner,self.policy.slots,self.arena.main_physical,self.arena.prefetch_physical)
@@ -105,6 +113,21 @@ class DecodeOffloadRuntime(LiveRuntime):
    from .unique_combine import validate_unique_layout
    e['unique_combine_validated']=validate_unique_layout(e,self.metadata.batch)
    self.unique_combine_layers+=int(e['unique_combine_validated'])
+  if e.get('rank_partial_layout'):
+   packed=pack_rank_partial_layout(e)
+   if reference is not None:
+    reference.update(layer=layer,targets=targets,selected=selected.cpu().numpy(),fetches=e['fetches'])
+    reference['groups']=[(expert,rows,cols,int(self.arena.main_physical[self.rank][np.flatnonzero(self.policy.slots[self.rank]==layer*128+expert)[0]])) for expert,rows,cols in reference['groups']]
+    old=device_layout(reference)
+    assert old['send_counts']==packed['send_counts'] and old['recv_counts']==packed['recv_counts']
+    for field in ('send_idx','send_eids','targets'):assert torch.equal(old[field],packed[field]),field
+    assert len(old['groups'])==len(packed['groups'])
+    for a,b in zip(old['groups'],packed['groups']):
+     assert a[0]==b[0] and a[3]==b[3] and torch.equal(a[1],b[1]) and torch.equal(a[2],b[2])
+    self.prefill_layout_checks=getattr(self,'prefill_layout_checks',0)+1
+    # Validation-only expert-order return needs the full reference indices.
+    return old
+   return packed
   return device_layout(e)
  def prefetch_next(self):
   if self.index<48:return

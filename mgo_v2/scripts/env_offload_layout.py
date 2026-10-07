@@ -84,3 +84,21 @@ def add_coslot_layout(event,world):
   coslot_return_recv_counts=coslot_send_counts,
  )
  return e
+
+
+def plan_rank_partial_layout(effective, lengths, destinations, origins, counts, rank):
+ """Exact peer/token/expert packet order without global sorting or list copies."""
+ from env_offload_rank_layout import build_rank_partial
+ counts=np.asarray(counts,dtype=np.int64)
+ if not np.array_equal(origins,np.repeat(np.arange(len(counts)),counts)):
+  raise ValueError('rank-contiguous gathered routes required')
+ if effective.shape!=destinations.shape or effective.shape!=(sum(counts),8):
+  raise ValueError('expected eight route slots per global token')
+ if np.any(lengths<0) or np.any(lengths>8):raise ValueError('invalid effective lengths')
+ if np.any(effective<0) or np.any(effective>=128):
+  # Unused route slots may be sentinel values; only live slots are constrained.
+  valid=np.arange(8)[None,:]<lengths[:,None]
+  if np.any((effective[valid]<0)|(effective[valid]>=128)):raise ValueError('expert out of range')
+ send_idx,send_eids,send_counts,recv_counts,starts,rows,cols=build_rank_partial(effective,lengths,destinations,counts,rank)
+ groups=[(e,rows[starts[e]:starts[e+1]],cols[starts[e]:starts[e+1]]) for e in range(128) if starts[e+1]>starts[e]]
+ return dict(send_counts=send_counts.tolist(),recv_counts=recv_counts.tolist(),send_idx=send_idx,send_eids=send_eids,groups=groups,rank_partial_layout=True)

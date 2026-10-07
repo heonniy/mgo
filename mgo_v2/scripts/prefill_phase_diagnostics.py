@@ -67,6 +67,8 @@ class PrefillDiagnostics:
   dr.gather_global_routes=gather;self.undo.append(lambda:setattr(dr,'gather_global_routes',original))
   self.wrap(self.rt.controller,'plan_current','placement_controller_cpu')
   self.wrap(dr,'plan_layout','layout_cpu')
+  self.wrap(dr,'plan_rank_partial_layout','layout_cpu')
+  self.wrap(dr,'pack_rank_partial_layout','layout_device_materialization')
   self.wrap(dr,'device_layout','layout_device_materialization')
   self.wrap(self.rt.h2d,'wait_slots','required_h2d_exposed_wait')
   self.wrap(dist,'barrier','global_barrier_wait')

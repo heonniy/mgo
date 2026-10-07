@@ -37,6 +37,7 @@ def validate_state(rt):
 
 def main(a):
  assert not a.prefill_diagnostic or a.prefill_optimized
+ assert not a.prefill_layout_fast or a.prefill_optimized
  rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
  physical=[0,1,4,5];assert os.environ['MGO_V2_PHYSICAL_GPUS']=='0,1,4,5'
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
@@ -74,8 +75,9 @@ def main(a):
   a.validate_prefill_optimized=True;begin(rt)
   check=generate_live(model,rt,ids,1);state=validate_state(rt)
   assert rt.prefill_metadata_checks==48 and len(rt.prefill_numerics)==48
+  assert not a.prefill_layout_fast or rt.prefill_layout_checks==48
   assert rt.transport.calls==48*3
-  write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
+  write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,layout_exact_checks=getattr(rt,'prefill_layout_checks',0),per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
   a.validate_prefill_optimized=False;reset_live()
  n=1 if a.prefill_diagnostic else (2 if a.smoke else 64);repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
  for repeat in range(repeats+1):
@@ -106,7 +108,7 @@ def main(a):
    write(a.output/f'diagnostic_rank{rank}.json',diagnostic);rt.phase_diagnostic=None
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert not repeat or no_compile
-  result.update(prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  result.update(prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
@@ -114,8 +116,23 @@ def main(a):
    row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
    write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
+ if a.post_prefill_diagnostic:
+  assert a.prefill_layout_fast and not a.prefill_diagnostic
+  expected_first=[t[0] for t in result['tokens']]
+  reset_live();begin(rt);a.phase='MEASURE'
+  if rank==0:write(a.output/'phase.json',dict(phase='post_prefill_diagnostic',cell=a.cell))
+  from prefill_phase_diagnostics import PrefillDiagnostics
+  rt.phase_diagnostic=PrefillDiagnostics(rt);rt.phase_diagnostic.install(model)
+  from torch._dynamo.utils import counters
+  before=dict(counters['stats'])
+  with torch._dynamo.config.patch(error_on_recompile=True):check=generate_live(model,rt,ids,1)
+  diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9);rt.phase_diagnostic=None
+  assert before==dict(counters['stats']) and [t[0] for t in check['tokens']]==expected_first
+  assert rt.transport.calls==96
+  diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
+  write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');main(p.parse_args())
