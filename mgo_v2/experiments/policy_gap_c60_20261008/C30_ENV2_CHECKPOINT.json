@@ -1,0 +1,390 @@
+{
+  "status": "PASS",
+  "note": "One clean timing sample per policy; separate instrumented MoE diagnostic; P2P and IB disabled, SHM smoke passed",
+  "cases": [
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b8_case0_v2_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s20_d7",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.45155749565625,
+          "diagnostic_moe_tpot_s": 0.46581708079158857,
+          "decode_peer_gib": 1.023757740855217,
+          "decode_h2d_gib": 576.791015625,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.460138134960027,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.46095506893262067,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4620998681204073,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4658170807915885,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.45814371659375,
+          "diagnostic_moe_tpot_s": 0.4730570752324129,
+          "decode_peer_gib": 0.8660629019141197,
+          "decode_h2d_gib": 578.8740234375,
+          "token_agreement_to_br": 0.9981060606060606,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.46632077084376944,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4689608569004923,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4701084739525977,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4728898341695822,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.44459827946875,
+          "diagnostic_moe_tpot_s": 0.44874362391008615,
+          "decode_peer_gib": 0.985108770430088,
+          "decode_h2d_gib": 576.931640625,
+          "token_agreement_to_br": 0.9952651515151515,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.44146133477184774,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.445147573892551,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4438085600055565,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.44862369584260886,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.4585564409529406,
+      "near_gain_pct": 1.541158380592511
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b8_case1_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.43644972621875,
+          "diagnostic_moe_tpot_s": 0.4515031381365552,
+          "decode_peer_gib": 1.0211714506149292,
+          "decode_h2d_gib": 521.05078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.44204848191557544,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4420273199041112,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.44779384371104247,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4514613541554718,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.44301752103125,
+          "diagnostic_moe_tpot_s": 0.4586940158290745,
+          "decode_peer_gib": 0.8851004466414452,
+          "decode_h2d_gib": 523.40625,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4494493980639236,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4488630552377799,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.454100493264028,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.45867790584034085,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.42511757965625,
+          "diagnostic_moe_tpot_s": 0.4380438420907885,
+          "decode_peer_gib": 0.9884143248200417,
+          "decode_h2d_gib": 521.3232421875,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4263617448885052,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.42531023797726086,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.43058211586780093,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4380438420907885,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.504822759175739,
+      "near_gain_pct": 2.5964380045962687
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b16_case0_20261008",
+      "cell": "ShareGPT_R4_C30_B16_L128_O33_s22_d3",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.52341818496875,
+          "diagnostic_moe_tpot_s": 0.5349653015466029,
+          "decode_peer_gib": 2.0429550409317017,
+          "decode_h2d_gib": 812.07421875,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5237009322849118,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5339668180609878,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5289373258355045,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5340324184401325,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.5298400339375,
+          "diagnostic_moe_tpot_s": 0.5453857558168529,
+          "decode_peer_gib": 1.7699789926409721,
+          "decode_h2d_gib": 814.18359375,
+          "token_agreement_to_br": 0.9886363636363635,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5339448631799824,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5450612648657188,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5363510762219521,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5429255948849168,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.51261332975,
+          "diagnostic_moe_tpot_s": 0.5226593410508649,
+          "decode_peer_gib": 1.9619230479002,
+          "decode_h2d_gib": 812.53125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.508667065199872,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5205237822483832,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.511800558906587,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5223466789621598,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.2269059717773034,
+      "near_gain_pct": 2.0642873192102007
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b64_case1_20261008",
+      "cell": "ShareGPT_R4_C30_B64_L128_O33_s20_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.5947257330625,
+          "diagnostic_moe_tpot_s": 0.6105101550636318,
+          "decode_peer_gib": 8.17444471269846,
+          "decode_h2d_gib": 1051.7080078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5962074109023305,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6055596991174461,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5980211509567235,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6103758289972829,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.6048338705625,
+          "diagnostic_moe_tpot_s": 0.6241755313254617,
+          "decode_peer_gib": 7.472175091505051,
+          "decode_h2d_gib": 1052.7451171875,
+          "token_agreement_to_br": 0.9898200757575758,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.610133931078497,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6216011520253305,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.6142643840347883,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6239407143741992,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.585696128625,
+          "diagnostic_moe_tpot_s": 0.6020233070345857,
+          "decode_peer_gib": 8.008631370961666,
+          "decode_h2d_gib": 1051.4970703125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5828007659815848,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5971581860601436,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.584080597064778,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6019641259795462,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.6996300879648985,
+      "near_gain_pct": 1.5182804334029187
+    }
+  ]
+}
