@@ -23,7 +23,7 @@ def main():
   assert all(r['status']=='PASS' and r['output_tokens']==64 and not r['smoke'] for r in rows)
   report.append(dict(cell=job['cell'],system=job['system'],raw=str(out),source_commit=state['source_commit'],**select(rows)))
  (P/'RESULTS.json').write_text(json.dumps(report,indent=2)+'\n')
- lines=['# Expanded R4 results (partial until all48 finish)','', 'One common triplet minimizes maximum relative range over TTFT/TPOT/E2E. Selection is descriptive; excluded values remain valid observations. Seconds, sample standard deviation.','', '|Cell|System|Selected repeats|TTFT|TPOT|E2E|Selected spread/status|','|---|---|---|---|---|---|---|']
+ lines=[f"# Expanded R4 results ({len(report)}/{len(queue['jobs'])} authorized rows complete)",'', 'One common triplet minimizes maximum relative range over TTFT/TPOT/E2E. Selection is descriptive; excluded values remain valid observations. Seconds, sample standard deviation.','', '|Cell|System|Selected repeats|TTFT|TPOT|E2E|Selected spread/status|','|---|---|---|---|---|---|---|']
  for r in report:
   values=[f"{r['selected'][k]['mean']:.6f} ± {r['selected'][k]['sample_sd']:.6f}" for k in METRICS]
   lines.append('|'+ '|'.join([r['cell'],r['system'],str(r['selected_ids']),*values,f"{r['selected_max_relative_range']:.2%} {r['stability']}"])+'|')
@@ -35,5 +35,5 @@ def main():
   for k,v in r['all_five'].items():lines.append(f"- {k}, all5 mean±SD: {v['mean']:.6f} ± {v['sample_sd']:.6f}; range [{v['min']:.6f}, {v['max']:.6f}]")
   lines+=['',f"Raw receipts: {r['raw']}",'']
  (P/'RESULTS.md').write_text('\n'.join(lines)+'\n')
- print(f'{len(report)}/48 complete')
+ print(f"{len(report)}/{len(queue['jobs'])} complete")
 if __name__=='__main__':main()
