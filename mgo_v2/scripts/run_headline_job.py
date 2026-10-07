@@ -41,6 +41,11 @@ def main(a):
    command+=['--cuda-graphs',a.llama_cuda_graphs]
   elif a.worker=='headline_llama_sync_worker.py':
    raise AssertionError('synchronous llama jobs must explicitly declare --llama-cuda-graphs')
+  if a.llama_graph_reuse is not None:
+   assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
+   command+=['--graph-reuse',a.llama_graph_reuse]
+  elif a.worker=='headline_llama_sync_worker.py':
+   raise AssertionError('synchronous llama jobs must explicitly declare --llama-graph-reuse')
   if a.prefill_optimized:
    assert a.worker=='headline_ours_worker.py';command+=['--prefill-optimized']
   if a.prefill_diagnostic:
@@ -82,5 +87,6 @@ if __name__=='__main__':
  p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6))
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
  p.add_argument('--llama-cuda-graphs',choices=('on','off'))
+ p.add_argument('--llama-graph-reuse',choices=('on','off'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  main(p.parse_args())

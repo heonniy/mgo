@@ -34,7 +34,7 @@ def main(a):
  cmd=[str(binary),str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),spec['warmup']['path'],spec['target']['path'],str(a.output),str(layers),str(1 if a.smoke else a.repeats),str(int(a.smoke)),str(a.threads)]
  env=dict(os.environ)
  env['OMP_THREAD_LIMIT']=str(a.threads)
- env['LLAMA_GRAPH_REUSE_DISABLE']='0'  # ordinary llama computation-graph reuse stays enabled
+ env['LLAMA_GRAPH_REUSE_DISABLE']='1' if a.graph_reuse=='off' else '0'
  if a.cuda_graphs=='off':env['GGML_CUDA_DISABLE_GRAPHS']='1'
  else:env.pop('GGML_CUDA_DISABLE_GRAPHS',None)
  write(a.output/'config.json',dict(
@@ -43,7 +43,7 @@ def main(a):
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
   affinity_policy='equal slice from the existing GPU-local fixed-affinity pools; child and llama threadpool inherit this mask',
   source_affinity_pools=pools,omp_thread_limit=a.threads,
-  cuda_graph_support=True,cuda_graphs_runtime=a.cuda_graphs,llama_graph_reuse=True))
+  cuda_graph_support=True,cuda_graphs_runtime=a.cuda_graphs,llama_graph_reuse=(a.graph_reuse=='on')))
  subprocess.run(cmd,check=True,env=env)
 
  placement=json.loads((a.output/'placement_audit.json').read_text())
@@ -76,11 +76,12 @@ def main(a):
   status='PASS',system='llama.cpp-sync',cell=a.cell,smoke=a.smoke,
   primary_repeats=1 if a.smoke else a.repeats,synchronous_batch=True,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
-  placement_audit='PASS',metric_recompute='PASS',cuda_graph_support=True,cuda_graphs_runtime=a.cuda_graphs,llama_graph_reuse=True))
+  placement_audit='PASS',metric_recompute='PASS',cuda_graph_support=True,cuda_graphs_runtime=a.cuda_graphs,llama_graph_reuse=(a.graph_reuse=='on')))
 if __name__=='__main__':
  p=argparse.ArgumentParser()
  p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True)
  p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=5)
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
+ p.add_argument('--graph-reuse',choices=('on','off'),required=True)
  main(p.parse_args())
