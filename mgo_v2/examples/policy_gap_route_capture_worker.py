@@ -5,6 +5,8 @@ import json
 import os
 from pathlib import Path
 
+os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
+
 import numpy as np
 import torch
 import torch.distributed as dist
@@ -33,6 +35,7 @@ def main(args):
     torch.cuda.set_per_process_memory_fraction(.85, device=device)
     torch.set_num_threads(2)
     torch.manual_seed(42)
+    torch.use_deterministic_algorithms(True)
     torch.backends.cuda.matmul.allow_tf32 = False
     dist.init_process_group('nccl', device_id=device)
     model = AutoModelForCausalLM.from_pretrained(MODEL, local_files_only=True, dtype=torch.bfloat16,
