@@ -33,9 +33,10 @@ def validate_state(rt):
  state=array_hash(rt.policy.slots);roles=array_hash(np.concatenate(rt.arena.main_physical))
  digest=torch.tensor(list(bytes.fromhex(state+roles)),dtype=torch.uint8,device='cuda');all_digests=[torch.empty_like(digest) for _ in range(4)];dist.all_gather(all_digests,digest)
  assert all(torch.equal(digest,x) for x in all_digests)
- return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+8)
+ return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+rt.world*rt.args.arena_budget)
 
 def main(a):
+ assert not a.capture_eviction_trace or (a.policy=='BR' and a.repeats==1 and not a.smoke and not a.post_generation_diagnostic and not a.decode_layout_fast)
  assert not a.prefill_diagnostic or a.prefill_optimized
  assert not a.prefill_layout_fast or a.prefill_optimized
  rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
@@ -47,9 +48,9 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
- a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-2 for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
- model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts)
- assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+2)*EB
+ a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-(0 if a.capture_eviction_trace else 2) for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None)
+ assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+a.arena_budget)*EB
  from refactor_thread_affinity import configure
  configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  write(a.output/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
@@ -67,7 +68,7 @@ def main(a):
   from mgo_v2.live_metadata import LiveMetadata
   rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
- if a.prefill_optimized and not a.prefill_diagnostic:
+ if a.prefill_optimized and not a.prefill_diagnostic and not a.capture_eviction_trace:
   if rank==0:write(a.output/'phase.json',dict(phase='prefill_validation',cell=a.cell))
   rows=json.loads(Path(spec['warmup']['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
@@ -79,8 +80,8 @@ def main(a):
   assert rt.transport.calls==48*3
   write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,layout_exact_checks=getattr(rt,'prefill_layout_checks',0),per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
   a.validate_prefill_optimized=False;reset_live()
- n=1 if a.prefill_diagnostic else (2 if a.smoke else 64);repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
- for repeat in range(repeats+1):
+ n=257 if a.capture_eviction_trace else (1 if a.prefill_diagnostic else (2 if a.smoke else 64));repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
+ for repeat in ((1,) if a.capture_eviction_trace else range(repeats+1)):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local],device='cuda')
@@ -101,7 +102,12 @@ def main(a):
   if repeat and a.prefill_diagnostic:
    from prefill_phase_diagnostics import PrefillDiagnostics
    rt.phase_diagnostic=PrefillDiagnostics(rt);rt.phase_diagnostic.install(model)
-  if repeat:
+  if a.capture_eviction_trace:
+   from main_eviction_trace import RoutingCapture
+   capture=RoutingCapture(rt,n*48);capture.install()
+   result=generate_live(model,rt,ids,n)
+   capture.finish(a.output)
+  elif repeat:
    with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
   else:result=generate_live(model,rt,ids,n)
   if repeat and a.prefill_diagnostic:
@@ -111,7 +117,7 @@ def main(a):
    assert rt.decode_layout_checks==(n-1)*48
    write(a.output/f'decode_layout_validation_rank{rank}.json',dict(status='PASS',exact_checks=rt.decode_layout_checks,scope='all warmup decode layers; integer indices and physical slot parity'))
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
-  no_compile=before==dict(counters['stats']);assert not repeat or no_compile
+  no_compile=before==dict(counters['stats']);assert a.capture_eviction_trace or not repeat or no_compile
   result.update(decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
@@ -148,7 +154,7 @@ def main(a):
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())

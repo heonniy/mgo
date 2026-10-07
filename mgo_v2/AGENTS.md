@@ -1,3 +1,9 @@
+**OWNER MAIN EVICTION HISTORY COMPARISON (2026-10-07).**
+Read experiments/main_eviction_history_20261007/PLAN.md. B8/B16/B64,
+R4/C30/input256, cold prefill then256 decode forwards. Prefetch OFF.
+Gate, LFU/LRU reset and cumulative; LFU counts distinct event uses.
+Capture once per batch then replay all policies on CPU. GPUs0/1/4/5 only.
+
 **OWNER BR SYNC AUDIT COMPLETE (2026-10-07).**
 Read experiments/br_sync_audit_20261007/PLAN.md. R4/C30 BR B16/B64,
 both input256/output64; one primary and one separate diagnostic each.
