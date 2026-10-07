@@ -1,6 +1,8 @@
 #include <torch/extension.h>
 #include <c10/cuda/CUDAGuard.h>
 #include <ATen/ops/index.h>
+#include <pybind11/numpy.h>
+#include <algorithm>
 #include <vector>
 
 at::Tensor silu_product_cuda(const at::Tensor&, const at::Tensor&);
@@ -43,6 +45,37 @@ std::vector<at::Tensor> execute_wave(
   return outputs;
 }
 
+// Replace one NumPy full-slot search per active expert with one native scan.
+// The arena owns the mapping; this routine only resolves it for this layer.
+std::vector<int64_t> bind_layer_slots(
+    pybind11::array_t<int32_t, pybind11::array::c_style | pybind11::array::forcecast> keys,
+    pybind11::array_t<int32_t, pybind11::array::c_style | pybind11::array::forcecast> physical,
+    int64_t layer, const std::vector<int64_t>& experts) {
+  auto k = keys.unchecked<1>();
+  auto p = physical.unchecked<1>();
+  TORCH_CHECK(k.shape(0) >= p.shape(0), "physical slots exceed logical keys");
+  TORCH_CHECK(layer >= 0 && layer < 48, "invalid layer");
+  int64_t lookup[128];
+  std::fill(std::begin(lookup), std::end(lookup), -1);
+  for (pybind11::ssize_t i = 0; i < p.shape(0); ++i) {
+    int64_t key = k(i);
+    if (key >= layer * 128 && key < (layer + 1) * 128) {
+      int64_t expert = key - layer * 128;
+      TORCH_CHECK(lookup[expert] < 0, "duplicate main expert key");
+      lookup[expert] = p(i);
+    }
+  }
+  std::vector<int64_t> result;
+  result.reserve(experts.size());
+  for (auto expert : experts) {
+    TORCH_CHECK(expert >= 0 && expert < 128 && lookup[expert] >= 0,
+                "group expert missing from MAIN roles");
+    result.push_back(lookup[expert]);
+  }
+  return result;
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("execute_wave", &execute_wave, pybind11::call_guard<pybind11::gil_scoped_release>());
+  m.def("bind_layer_slots", &bind_layer_slots);
 }
