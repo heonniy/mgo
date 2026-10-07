@@ -28,7 +28,13 @@ def analyze_batch(batch):
     s,l=divmod(i,48);phase=e['phase'];totals[phase]+=e['stream_seconds'];cpu[phase]+=e['cpu_ns']/1e9
     if phase=='moe.expert_compute':expert[rank,s,l]+=e['stream_seconds'];expert_cpu[rank,s,l]+=e['cpu_ns']/1e9
     if phase in arrivals and np.isnan(arrivals[phase][rank,s,l]):arrivals[phase][rank,s,l]=e['host_timestamp_ns']/1e9
-   copy=np.array([e['service_seconds'] for e in x['h2d_copies']]);rank_summaries.append(dict(rank=rank,gpu=[0,1,4,5][rank],moe_seconds_per_token=float(moe[rank].sum()/256),phase_seconds_per_token={k:v/256 for k,v in totals.items()},cpu_seconds_per_token={k:v/256 for k,v in cpu.items()},expert_uses_per_token=float(groups[rank].sum()/256),token_expert_rows_per_token=float(rows[rank].sum()/256),demand_misses_per_token=float(miss[rank].sum()/256),h2d_service_seconds=float(copy.sum()),h2d_copy_ms_p50_p90_p99=[float(v) for v in np.percentile(copy*1000,[50,90,99])],primary_ready_metrics=pr['ready_metrics']))
+   byte_size=x['h2d_copies'][0]['bytes'];prefill_bytes=x['output']['prefill_bytes']['h2d']
+   assert prefill_bytes%byte_size==0 and all(e['bytes']==byte_size for e in x['h2d_copies'])
+   # Trace append and byte counter update share the scheduler lock. Prefill
+   # drains required copies, with no speculative submissions, before boundary.
+   decode_copy=x['h2d_copies'][prefill_bytes//byte_size:]
+   assert sum(e['bytes'] for e in decode_copy)==pr['decode_bytes']['h2d']
+   copy=np.array([e['service_seconds'] for e in x['h2d_copies']]);rank_summaries.append(dict(rank=rank,gpu=[0,1,4,5][rank],moe_seconds_per_token=float(moe[rank].sum()/256),phase_seconds_per_token={k:v/256 for k,v in totals.items()},cpu_seconds_per_token={k:v/256 for k,v in cpu.items()},expert_uses_per_token=float(groups[rank].sum()/256),token_expert_rows_per_token=float(rows[rank].sum()/256),demand_misses_per_token=float(miss[rank].sum()/256),h2d_service_seconds=float(copy.sum()),h2d_copy_ms_p50_p90_p99=[float(v) for v in np.percentile(copy*1000,[50,90,99])],primary_ready_metrics=pr['ready_metrics'],primary_decode_bytes=pr['decode_bytes'],decode_h2d_service_seconds=sum(e['service_seconds'] for e in decode_copy),decode_h2d_copy_ms_p50_p90_p99=np.percentile([e['service_seconds']*1000 for e in decode_copy],[50,90,99]).tolist()))
   assert np.all(rows.sum(axis=0)==batch*4*8) and np.all(moe>0)
   assert all(np.isfinite(a).all() for a in arrivals.values())
   skew={k:dict(mean_ms=float(np.ptp(a,axis=0).mean()*1000),p50_p90_p99_ms=[float(v) for v in np.percentile(np.ptp(a,axis=0)*1000,[50,90,99])]) for k,a in arrivals.items()}
@@ -39,7 +45,7 @@ def analyze_batch(batch):
   centered=lambda a:(a-a.mean(0,keepdims=True)).ravel()
   imbalance['within_event_rank_deviation_correlations']={name:float(np.corrcoef(centered(expert_cpu),centered(a))[0,1]) for name,a in [('expert_cpu_vs_expert_count',groups),('expert_cpu_vs_token_rows',rows),('expert_cpu_vs_demand_misses',miss)]}
   controller=json.loads((d/'primary_rank0.json').read_text())['validation']['controller']
-  arms[arm]=dict(primary=primary,controller=controller,h2d_service_scope='Full diagnostic generation including prefill; copy service is overlapping, not additive to TPOT',diagnostic_moe_tpot=float(moe.sum(axis=2).max(axis=0).mean()),ranks=rank_summaries,host_collective_entry_skew=skew,imbalance=imbalance)
+  arms[arm]=dict(primary=primary,controller=controller,h2d_service_scope='Unprefixed service fields include prefill; decode-prefixed fields exclude initial copies using the recorded prefill byte boundary. Copy service is overlapping, not additive to TPOT',diagnostic_moe_tpot=float(moe.sum(axis=2).max(axis=0).mean()),ranks=rank_summaries,host_collective_entry_skew=skew,imbalance=imbalance)
  for rank in range(4):
   source=[json.loads((root/arm/f'source_rank{rank}.json').read_text()) for arm in ('off','on')]
   assert source[0]['options']==source[1]['options'] and source[0]['capacities']==source[1]['capacities']==[920,920,919,919]
@@ -79,8 +85,15 @@ def diagnostic_tables(results):
    if c is None:continue
    useful=f"{100*c['useful']/c['issued']:.2f}" if c['issued'] else 'N/A'
    lines.append(f"|{name}|{c['issued']}|{c['useful']}|{c['wasted']}|{useful}|{c['mandatory']}|{c['promotion_victim_reloads']}|{sum(r['primary_ready_metrics']['waits'] for r in a['ranks'])}|")
-  lines += ['', 'Controller counters are global primary counters including prefill; the speculative mechanism is used during decode. Useful is consumed prefetch, not a net saved-copy count. Promotion-victim reloads are events, not proof that all are additional misses caused by prefetch. Ready-first waits count calls taking an explicit not-ready path; zero does not mean H2D takes zero time.', '']
- lines += ['## Interpretation boundaries', '', 'OFF and ON use identical MAIN and reserved capacities, streaming, ready-first and T2 synchronization. Only speculative prefetch submission is disabled in OFF. Native generated tokens differ across arms, so subsequent routing can differ. Detailed diagnostics reproduce their own primary tokens/cache/bytes. No frozen-route counterfactual or repeated timing confirmation is claimed.', '', 'H2D service distributions in SUMMARY.json include prefill and decode; copy-stream times overlap other work. Demand-H2D submission time is not DMA duration. Do not add service time to TPOT or subtract diagnostic MoE time from clean TPOT.', '', 'Placement recommendations must distinguish per-expert executor overhead, token-row work, exposed fetch dependency, and peer waiting. BR is the only measured placement; these observations cannot establish a measured LA/CA/FCA/Near winner.']
+  lines += ['', 'Controller counters are global primary counters including prefill; the speculative mechanism is used during decode. Useful is consumed prefetch, not a net saved-copy count. Promotion-victim reloads are events, not proof that all are additional misses caused by prefetch. Ready-first waits count calls taking an explicit not-ready path; zero does not mean H2D takes zero time.', '', '|Prefetch|Rank|Primary decode peer GiB|Primary decode H2D GiB|Decode H2D service p50 / p90 / p99 ms per copy|', '|---|---:|---:|---:|---:|']
+  for name,a in x['arms'].items():
+   for r in a['ranks']:
+    b=r.get('primary_decode_bytes')
+    if b is None:continue
+    q=r['decode_h2d_copy_ms_p50_p90_p99']
+    lines.append(f"|{name}|{r['rank']}|{(b['forward']+b['returned'])/2**30:.3f}|{b['h2d']/2**30:.3f}|{q[0]:.3f} / {q[1]:.3f} / {q[2]:.3f}|")
+  lines += ['', 'Decode H2D percentiles exclude the initial copies using the recorded prefill byte boundary; their byte sum is checked against primary decode H2D bytes. They measure copy service, not queue delay or exposed critical-path wait.', '']
+ lines += ['## Interpretation boundaries', '', 'OFF and ON use identical MAIN and reserved capacities, streaming, ready-first and T2 synchronization. Only speculative prefetch submission is disabled in OFF. Native generated tokens differ across arms, so subsequent routing can differ. Detailed diagnostics reproduce their own primary tokens/cache/bytes. No frozen-route counterfactual or repeated timing confirmation is claimed.', '', 'Unprefixed H2D service fields in SUMMARY.json include prefill; decode-prefixed fields exclude it. Copy-stream times overlap other work. Demand-H2D submission time is not DMA duration. Do not add service time to TPOT or subtract diagnostic MoE time from clean TPOT.', '', 'Placement recommendations must distinguish per-expert executor overhead, token-row work, exposed fetch dependency, and peer waiting. BR is the only measured placement; these observations cannot establish a measured LA/CA/FCA/Near winner.']
  (P/'RANK_DIAGNOSTICS.md').write_text('\n'.join(lines)+'\n')
 if __name__=='__main__':
  import argparse

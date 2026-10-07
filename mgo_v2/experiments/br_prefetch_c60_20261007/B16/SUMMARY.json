@@ -1,0 +1,703 @@
+{
+  "status": "PASS",
+  "identical_capacity_overlap_verified": true,
+  "batch": 16,
+  "arms": {
+    "off": {
+      "primary": {
+        "status": "PASS",
+        "batch": 16,
+        "prefetch": "off",
+        "phase": "primary",
+        "TTFT": 1.598076432,
+        "TPOT": 0.7532686206171875,
+        "E2E": 194.43484331,
+        "decode_steps": 256,
+        "decode_peer_bytes": 17524793728,
+        "decode_h2d_bytes": 3491663708160
+      },
+      "controller": {
+        "issued": 0,
+        "useful": 0,
+        "wasted": 0,
+        "promotions": 0,
+        "promotion_evictions": 0,
+        "promotion_victim_reloads": 0,
+        "mandatory": 376056,
+        "quota_violations": 0
+      },
+      "h2d_service_scope": "Unprefixed service fields include prefill; decode-prefixed fields exclude initial copies using the recorded prefill byte boundary. Copy service is overlapping, not additive to TPOT",
+      "diagnostic_moe_tpot": 0.8379316662624479,
+      "ranks": [
+        {
+          "rank": 0,
+          "gpu": 0,
+          "moe_seconds_per_token": 0.8221226829811931,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.04440980713082724,
+            "router_gate_compute": 0.008197377000455168,
+            "moe_other": 0.056206561743051914,
+            "moe.metadata": 0.0550569055990781,
+            "moe.current_controller": 0.010512430250098929,
+            "placement_controller_cpu": 0.008897583874786523,
+            "layout_cpu": 0.029719316620379764,
+            "layout_device_materialization": 0.04171540158288559,
+            "moe.demand_h2d": 0.005310060500138234,
+            "moe.forward_a2a": 0.032415604860710316,
+            "forward_token_a2a_submit": 0.011421739377081398,
+            "moe.forward_complete": 0.03929989339323951,
+            "moe.expert_compute": 0.44443127617798517,
+            "moe.return_a2a": 0.030647271881105883,
+            "return_token_a2a": 0.04579084234789474
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.062031996933593604,
+            "router_gate_compute": 0.01012382344921873,
+            "moe_other": 0.08452256778906246,
+            "moe.metadata": 0.06576387486328134,
+            "moe.current_controller": 0.01044935860156254,
+            "placement_controller_cpu": 0.008910975683593735,
+            "layout_cpu": 0.029745075777343786,
+            "layout_device_materialization": 0.04172345618749995,
+            "moe.demand_h2d": 0.00523031742578125,
+            "moe.forward_a2a": 0.019623320402343797,
+            "forward_token_a2a_submit": 0.009228173113281253,
+            "moe.forward_complete": 0.00864244440625,
+            "moe.expert_compute": 0.42949662029687524,
+            "moe.return_a2a": 0.034653555128906444,
+            "return_token_a2a": 0.007488079085937508
+          },
+          "expert_uses_per_token": 1229.75390625,
+          "token_expert_rows_per_token": 5915.7421875,
+          "demand_misses_per_token": 379.30078125,
+          "h2d_service_seconds": 23.538978370532394,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.22838400304317474,
+            0.29734399914741516,
+            0.39027808099985084
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 316344
+          },
+          "primary_decode_bytes": {
+            "forward": 2205275320,
+            "returned": 2158854144,
+            "h2d": 916360003584
+          },
+          "decode_h2d_service_seconds": 23.246076290339232,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.22886399924755096,
+            0.29791998863220215,
+            0.39056000113487244
+          ]
+        },
+        {
+          "rank": 1,
+          "gpu": 1,
+          "moe_seconds_per_token": 0.8352590582258999,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.030310374380855105,
+            "router_gate_compute": 0.00583300899958701,
+            "moe_other": 0.05195517426191914,
+            "moe.metadata": 0.07663667951268138,
+            "moe.current_controller": 0.010001233501839953,
+            "placement_controller_cpu": 0.008637620127236012,
+            "layout_cpu": 0.028309380996972427,
+            "layout_device_materialization": 0.0393162772014037,
+            "moe.demand_h2d": 0.005820428626437175,
+            "moe.forward_a2a": 0.0301565548822999,
+            "forward_token_a2a_submit": 0.012622180749487726,
+            "moe.forward_complete": 0.041028024999454,
+            "moe.expert_compute": 0.4075681343749162,
+            "moe.return_a2a": 0.027732299258852202,
+            "return_token_a2a": 0.08810969304153717
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.05970443592968712,
+            "router_gate_compute": 0.009885069902343785,
+            "moe_other": 0.08596439485156303,
+            "moe.metadata": 0.11138494702734374,
+            "moe.current_controller": 0.009951438734375054,
+            "placement_controller_cpu": 0.008659454007812494,
+            "layout_cpu": 0.028360014058593896,
+            "layout_device_materialization": 0.03936441541406229,
+            "moe.demand_h2d": 0.0058343217226562525,
+            "moe.forward_a2a": 0.022356361328125105,
+            "forward_token_a2a_submit": 0.01049555607421875,
+            "moe.forward_complete": 0.009572388300781266,
+            "moe.expert_compute": 0.4070605831210915,
+            "moe.return_a2a": 0.03358285248828139,
+            "return_token_a2a": 0.007164521425781242
+          },
+          "expert_uses_per_token": 1224.62890625,
+          "token_expert_rows_per_token": 6330.328125,
+          "demand_misses_per_token": 367.1171875,
+          "h2d_service_seconds": 18.449677667751907,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.1878719925880432,
+            0.21646399796009064,
+            0.2730544000864028
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 315029
+          },
+          "primary_decode_bytes": {
+            "forward": 2197949960,
+            "returned": 2201612288,
+            "h2d": 886925426688
+          },
+          "decode_h2d_service_seconds": 18.15654995588958,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.18774400651454926,
+            0.21673600375652313,
+            0.273824006319046
+          ]
+        },
+        {
+          "rank": 2,
+          "gpu": 4,
+          "moe_seconds_per_token": 0.8376925830803812,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.02775591700707374,
+            "router_gate_compute": 0.005469926249672435,
+            "moe_other": 0.05174158135286821,
+            "moe.metadata": 0.08112608038331393,
+            "moe.current_controller": 0.010150954999593528,
+            "placement_controller_cpu": 0.008712588002992542,
+            "layout_cpu": 0.027657669499982197,
+            "layout_device_materialization": 0.03825556281674648,
+            "moe.demand_h2d": 0.005858843875932512,
+            "moe.forward_a2a": 0.02992884801380015,
+            "forward_token_a2a_submit": 0.012753480501822182,
+            "moe.forward_complete": 0.04055479478347124,
+            "moe.expert_compute": 0.401864382506349,
+            "moe.return_a2a": 0.02783753063104822,
+            "return_token_a2a": 0.09436563278746382
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.06159998253906226,
+            "router_gate_compute": 0.009973563601562511,
+            "moe_other": 0.08618557842578031,
+            "moe.metadata": 0.11605069561328181,
+            "moe.current_controller": 0.010102911882812475,
+            "placement_controller_cpu": 0.008730275773437459,
+            "layout_cpu": 0.027708239500000054,
+            "layout_device_materialization": 0.03830160470703137,
+            "moe.demand_h2d": 0.005855583882812489,
+            "moe.forward_a2a": 0.02257930905859369,
+            "forward_token_a2a_submit": 0.010577470707031168,
+            "moe.forward_complete": 0.00952763134375003,
+            "moe.expert_compute": 0.4020528255820325,
+            "moe.return_a2a": 0.03423706339062514,
+            "return_token_a2a": 0.00730751292578128
+          },
+          "expert_uses_per_token": 1214.72265625,
+          "token_expert_rows_per_token": 6291.09765625,
+          "demand_misses_per_token": 355.3984375,
+          "h2d_service_seconds": 17.165721102222804,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.17987200617790222,
+            0.21395200490951538,
+            0.23097760006785403
+          ],
+          "primary_ready_metrics": {
+            "waits": 1,
+            "ready_before_first_wait": 312476
+          },
+          "primary_decode_bytes": {
+            "forward": 2179063880,
+            "returned": 2209349632,
+            "h2d": 858613874688
+          },
+          "decode_h2d_service_seconds": 16.889604366093874,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.17983999848365784,
+            0.21404799818992615,
+            0.23119999468326569
+          ]
+        },
+        {
+          "rank": 3,
+          "gpu": 5,
+          "moe_seconds_per_token": 0.8334473041854799,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.03231105100014997,
+            "router_gate_compute": 0.006250976623836302,
+            "moe_other": 0.050786883140862764,
+            "moe.metadata": 0.07349016697332267,
+            "moe.current_controller": 0.010059514246837296,
+            "placement_controller_cpu": 0.008627961001213422,
+            "layout_cpu": 0.027239614265272202,
+            "layout_device_materialization": 0.03836273980978857,
+            "moe.demand_h2d": 0.004843838000233519,
+            "moe.forward_a2a": 0.031239166616685226,
+            "forward_token_a2a_submit": 0.010623549377371077,
+            "moe.forward_complete": 0.04360032669064845,
+            "moe.expert_compute": 0.4177091349502995,
+            "moe.return_a2a": 0.02746869912343434,
+            "return_token_a2a": 0.0814230991015212
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.06072126007031256,
+            "router_gate_compute": 0.009754950132812528,
+            "moe_other": 0.08592244156250012,
+            "moe.metadata": 0.10408033370312511,
+            "moe.current_controller": 0.010006990671874999,
+            "placement_controller_cpu": 0.008646156636718728,
+            "layout_cpu": 0.027292231796874986,
+            "layout_device_materialization": 0.03841408636328118,
+            "moe.demand_h2d": 0.004774191519531249,
+            "moe.forward_a2a": 0.018052992433593887,
+            "forward_token_a2a_submit": 0.008507918531250016,
+            "moe.forward_complete": 0.008259429414062491,
+            "moe.expert_compute": 0.40576878170703135,
+            "moe.return_a2a": 0.033057299578124706,
+            "return_token_a2a": 0.007204595960937472
+          },
+          "expert_uses_per_token": 1199.4921875,
+          "token_expert_rows_per_token": 6038.83203125,
+          "demand_misses_per_token": 343.45703125,
+          "h2d_service_seconds": 21.23458406484127,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.2234880030155182,
+            0.29740801453590393,
+            0.38444799184799194
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 308571
+          },
+          "primary_decode_bytes": {
+            "forward": 2205703800,
+            "returned": 2166984704,
+            "h2d": 829764403200
+          },
+          "decode_h2d_service_seconds": 20.958442752942442,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.2240000069141388,
+            0.2979840040206909,
+            0.38470399379730225
+          ]
+        }
+      ],
+      "host_collective_entry_skew": {
+        "return_token_a2a": {
+          "mean_ms": 2.956719165240429,
+          "p50_p90_p99_ms": [
+            2.711124252527952,
+            4.687307216227058,
+            9.094688640907401
+          ]
+        },
+        "forward_token_a2a_submit": {
+          "mean_ms": 1.0942371663228794,
+          "p50_p90_p99_ms": [
+            0.29518548399209976,
+            0.7883411832153805,
+            2.3715744446963063
+          ]
+        },
+        "moe.expert_compute": {
+          "mean_ms": 0.3404789951370428,
+          "p50_p90_p99_ms": [
+            0.336336437612772,
+            0.5160894244909286,
+            0.7027486339211464
+          ]
+        }
+      },
+      "imbalance": {
+        "token_rows_max_over_mean_p50_p90": [
+          1.2265625,
+          1.4164062500000085
+        ],
+        "expert_count_max_over_mean_p50_p90": [
+          1.1376146788990826,
+          1.2452830188679245
+        ],
+        "expert_span_max_minus_min_ms_p50_p90_p99": [
+          2.471391916275024,
+          4.250537538528443,
+          8.244633636474608
+        ],
+        "slowest_expert_rank_counts": [
+          5222,
+          2343,
+          1637,
+          3086
+        ],
+        "heaviest_token_rank_counts": [
+          2234,
+          4115,
+          3114,
+          2825
+        ],
+        "slowest_equals_heaviest_token_fraction": 0.530029296875,
+        "slowest_equals_most_experts_fraction": 0.7811686197916666,
+        "slowest_in_max_expert_count_ties_fraction": 0.8297526041666666,
+        "slowest_in_max_token_rows_ties_fraction": 0.5345865885416666,
+        "within_event_rank_deviation_correlations": {
+          "expert_cpu_vs_expert_count": 0.8892990959426242,
+          "expert_cpu_vs_token_rows": 0.6432326088189608,
+          "expert_cpu_vs_demand_misses": 0.17516373124030826
+        }
+      }
+    },
+    "on": {
+      "primary": {
+        "status": "PASS",
+        "batch": 16,
+        "prefetch": "on",
+        "phase": "primary",
+        "TTFT": 3.29038949,
+        "TPOT": 0.8139849491757812,
+        "E2E": 211.670536479,
+        "decode_steps": 256,
+        "decode_peer_bytes": 17547872472,
+        "decode_h2d_bytes": 3550145937408
+      },
+      "controller": {
+        "issued": 96256,
+        "useful": 89688,
+        "wasted": 6568,
+        "promotions": 89688,
+        "promotion_evictions": 89688,
+        "promotion_victim_reloads": 81878,
+        "mandatory": 285997,
+        "quota_violations": 0
+      },
+      "h2d_service_scope": "Unprefixed service fields include prefill; decode-prefixed fields exclude initial copies using the recorded prefill byte boundary. Copy service is overlapping, not additive to TPOT",
+      "diagnostic_moe_tpot": 0.8752292037084699,
+      "ranks": [
+        {
+          "rank": 0,
+          "gpu": 0,
+          "moe_seconds_per_token": 0.8676830276846885,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.03744178726682259,
+            "router_gate_compute": 0.007048972373580899,
+            "moe_other": 0.05632613763441812,
+            "moe.metadata": 0.0631813361169772,
+            "moe.current_controller": 0.01183484087354729,
+            "placement_controller_cpu": 0.015968488121812684,
+            "layout_cpu": 0.031151516245678006,
+            "layout_device_materialization": 0.040097391979303204,
+            "moe.demand_h2d": 0.005060311623776229,
+            "moe.forward_a2a": 0.029823803999221157,
+            "forward_token_a2a_submit": 0.011484875626687405,
+            "moe.forward_complete": 0.03543147230835172,
+            "moe.prefetch_controller": 0.043004894382935345,
+            "moe.expert_compute": 0.4266581602990627,
+            "moe.return_a2a": 0.028855571998843785,
+            "return_token_a2a": 0.05975713729189029
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.06039779071484357,
+            "router_gate_compute": 0.009802129648437474,
+            "moe_other": 0.08502419441406404,
+            "moe.metadata": 0.07967248113671901,
+            "moe.current_controller": 0.011767810390625084,
+            "placement_controller_cpu": 0.016001909558593826,
+            "layout_cpu": 0.030586621249999908,
+            "layout_device_materialization": 0.040112296339843846,
+            "moe.demand_h2d": 0.005021983742187483,
+            "moe.forward_a2a": 0.020990886140624974,
+            "forward_token_a2a_submit": 0.009751097835937474,
+            "moe.forward_complete": 0.008148641558593767,
+            "moe.prefetch_controller": 0.04284244064453126,
+            "moe.expert_compute": 0.4197904028437496,
+            "moe.return_a2a": 0.03379237265234399,
+            "return_token_a2a": 0.007289849250000014
+          },
+          "expert_uses_per_token": 1226.93359375,
+          "token_expert_rows_per_token": 5952.390625,
+          "demand_misses_per_token": 291.30078125,
+          "h2d_service_seconds": 23.01325980961323,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.19977599382400513,
+            0.2706240117549896,
+            1.0133878183364866
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 315622
+          },
+          "primary_decode_bytes": {
+            "forward": 2207257040,
+            "returned": 2172170240,
+            "h2d": 930855518208
+          },
+          "decode_h2d_service_seconds": 22.720278209596874,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.20102399587631226,
+            0.27190399169921875,
+            1.015880947113037
+          ]
+        },
+        {
+          "rank": 1,
+          "gpu": 1,
+          "moe_seconds_per_token": 0.8692149144746364,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.035772806877964525,
+            "router_gate_compute": 0.006823586248865456,
+            "moe_other": 0.054310055497460145,
+            "moe.metadata": 0.06530872663413205,
+            "moe.current_controller": 0.011409375377850601,
+            "placement_controller_cpu": 0.015694404618145277,
+            "layout_cpu": 0.030106497124536002,
+            "layout_device_materialization": 0.038440148306079225,
+            "moe.demand_h2d": 0.004546784626458249,
+            "moe.forward_a2a": 0.030049405635832152,
+            "forward_token_a2a_submit": 0.010752869747811896,
+            "moe.forward_complete": 0.037942134735160005,
+            "moe.prefetch_controller": 0.042016618248330154,
+            "moe.expert_compute": 0.42994884565845104,
+            "moe.return_a2a": 0.028285541750228498,
+            "return_token_a2a": 0.061725879984442164
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.05930572714843784,
+            "router_gate_compute": 0.009728639390625002,
+            "moe_other": 0.0839322217343742,
+            "moe.metadata": 0.0832845528906253,
+            "moe.current_controller": 0.011345125894531167,
+            "placement_controller_cpu": 0.015744070957031255,
+            "layout_cpu": 0.029502457703125068,
+            "layout_device_materialization": 0.038487617871093824,
+            "moe.demand_h2d": 0.004519191121093752,
+            "moe.forward_a2a": 0.0189132821914062,
+            "forward_token_a2a_submit": 0.008767117343749943,
+            "moe.forward_complete": 0.008016732660156277,
+            "moe.prefetch_controller": 0.04167306079687495,
+            "moe.expert_compute": 0.41868703399609297,
+            "moe.return_a2a": 0.03332241557031259,
+            "return_token_a2a": 0.00704617292968752
+          },
+          "expert_uses_per_token": 1223.35546875,
+          "token_expert_rows_per_token": 6285.05859375,
+          "demand_misses_per_token": 279.53125,
+          "h2d_service_seconds": 24.951304419636728,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.22467200458049774,
+            0.30105599761009216,
+            1.1188499462604522
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 314703
+          },
+          "primary_decode_bytes": {
+            "forward": 2202037000,
+            "returned": 2194583552,
+            "h2d": 902421282816
+          },
+          "decode_h2d_service_seconds": 24.65817081950605,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.22521600127220154,
+            0.30182400345802307,
+            1.1195152211189277
+          ]
+        },
+        {
+          "rank": 2,
+          "gpu": 4,
+          "moe_seconds_per_token": 0.8715090349800885,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.03337439985529764,
+            "router_gate_compute": 0.006483364502229962,
+            "moe_other": 0.054349013376326756,
+            "moe.metadata": 0.06963778421445749,
+            "moe.current_controller": 0.011622517501666001,
+            "placement_controller_cpu": 0.015843185372999873,
+            "layout_cpu": 0.029738611130160318,
+            "layout_device_materialization": 0.037526992512517586,
+            "moe.demand_h2d": 0.004632914375382847,
+            "moe.forward_a2a": 0.030086008516363894,
+            "forward_token_a2a_submit": 0.010801405502308629,
+            "moe.forward_complete": 0.03666968738219311,
+            "moe.prefetch_controller": 0.04184271900055682,
+            "moe.expert_compute": 0.42122524029947744,
+            "moe.return_a2a": 0.028442960268097645,
+            "return_token_a2a": 0.0708526108596703
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.06154878473437486,
+            "router_gate_compute": 0.00980758543359377,
+            "moe_other": 0.08497090845312451,
+            "moe.metadata": 0.09046220910546905,
+            "moe.current_controller": 0.011569483210937571,
+            "placement_controller_cpu": 0.015885337816406216,
+            "layout_cpu": 0.02920173212890629,
+            "layout_device_materialization": 0.03757380691796876,
+            "moe.demand_h2d": 0.004605689148437494,
+            "moe.forward_a2a": 0.019822752027343814,
+            "forward_token_a2a_submit": 0.008990960546874961,
+            "moe.forward_complete": 0.007694393390624995,
+            "moe.prefetch_controller": 0.041583528179687405,
+            "moe.expert_compute": 0.4126842554218748,
+            "moe.return_a2a": 0.03403947929296896,
+            "return_token_a2a": 0.0071997392734374725
+          },
+          "expert_uses_per_token": 1211.67578125,
+          "token_expert_rows_per_token": 6261.25,
+          "demand_misses_per_token": 267.36328125,
+          "h2d_service_seconds": 22.36103043578565,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.213919997215271,
+            0.2863360047340393,
+            1.1066988587379454
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 311703
+          },
+          "primary_decode_bytes": {
+            "forward": 2188898320,
+            "returned": 2194329600,
+            "h2d": 873024454656
+          },
+          "decode_h2d_service_seconds": 22.08496086780727,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.21420800685882568,
+            0.2871040105819702,
+            1.1083788919448851
+          ]
+        },
+        {
+          "rank": 3,
+          "gpu": 5,
+          "moe_seconds_per_token": 0.8744816285967827,
+          "phase_seconds_per_token": {
+            "attention_dense_residual": 0.030177314515532853,
+            "router_gate_compute": 0.005885787749721176,
+            "moe_other": 0.052267752373135815,
+            "moe.metadata": 0.07417826851154623,
+            "moe.current_controller": 0.011377630372349788,
+            "placement_controller_cpu": 0.01562981762897104,
+            "layout_cpu": 0.028893119735294143,
+            "layout_device_materialization": 0.0371997401668923,
+            "moe.demand_h2d": 0.004584191124173247,
+            "moe.forward_a2a": 0.02943933010888215,
+            "forward_token_a2a_submit": 0.010830130374466597,
+            "moe.forward_complete": 0.038758350568212425,
+            "moe.prefetch_controller": 0.041723366500635226,
+            "moe.expert_compute": 0.4093062637047847,
+            "moe.return_a2a": 0.026702209876020917,
+            "return_token_a2a": 0.08617958397953761
+          },
+          "cpu_seconds_per_token": {
+            "attention_dense_residual": 0.060054608574218855,
+            "router_gate_compute": 0.009524024566406318,
+            "moe_other": 0.08569184960937606,
+            "moe.metadata": 0.10750231673828127,
+            "moe.current_controller": 0.011316387441406154,
+            "placement_controller_cpu": 0.015674310339843765,
+            "layout_cpu": 0.02833468097656242,
+            "layout_device_materialization": 0.03724699461718726,
+            "moe.demand_h2d": 0.004562968152343761,
+            "moe.forward_a2a": 0.0192503881914062,
+            "forward_token_a2a_submit": 0.00904677609765623,
+            "moe.forward_complete": 0.007653963261718737,
+            "moe.prefetch_controller": 0.04158329727343767,
+            "moe.expert_compute": 0.40126009905078214,
+            "moe.return_a2a": 0.032558856023437416,
+            "return_token_a2a": 0.0070912630859375275
+          },
+          "expert_uses_per_token": 1196.296875,
+          "token_expert_rows_per_token": 6077.30078125,
+          "demand_misses_per_token": 255.28515625,
+          "h2d_service_seconds": 21.32748649789393,
+          "h2d_copy_ms_p50_p90_p99": [
+            0.213919997215271,
+            0.28438401222229004,
+            1.0639884483814244
+          ],
+          "primary_ready_metrics": {
+            "waits": 0,
+            "ready_before_first_wait": 307753
+          },
+          "primary_decode_bytes": {
+            "forward": 2201373680,
+            "returned": 2187223040,
+            "h2d": 843844681728
+          },
+          "decode_h2d_service_seconds": 21.053016257569194,
+          "decode_h2d_copy_ms_p50_p90_p99": [
+            0.21420800685882568,
+            0.2854207932949069,
+            1.0663372755050653
+          ]
+        }
+      ],
+      "host_collective_entry_skew": {
+        "return_token_a2a": {
+          "mean_ms": 2.668676206288486,
+          "p50_p90_p99_ms": [
+            2.4303635582327843,
+            4.296520818024875,
+            8.739093132317048
+          ]
+        },
+        "forward_token_a2a_submit": {
+          "mean_ms": 1.0231331839349878,
+          "p50_p90_p99_ms": [
+            0.28506480157375336,
+            0.6673047319054606,
+            2.318865777924641
+          ]
+        },
+        "moe.expert_compute": {
+          "mean_ms": 0.3466574491236922,
+          "p50_p90_p99_ms": [
+            0.3164438530802727,
+            0.5277142859995367,
+            1.1789347324520287
+          ]
+        }
+      },
+      "imbalance": {
+        "token_rows_max_over_mean_p50_p90": [
+          1.21875,
+          1.40625
+        ],
+        "expert_count_max_over_mean_p50_p90": [
+          1.1333333333333333,
+          1.2427184466019416
+        ],
+        "expert_span_max_minus_min_ms_p50_p90_p99": [
+          2.2043201923370366,
+          3.9143809318542484,
+          7.460320196151725
+        ],
+        "slowest_expert_rank_counts": [
+          3504,
+          3629,
+          2870,
+          2285
+        ],
+        "heaviest_token_rank_counts": [
+          2404,
+          3785,
+          3461,
+          2638
+        ],
+        "slowest_equals_heaviest_token_fraction": 0.579345703125,
+        "slowest_equals_most_experts_fraction": 0.87939453125,
+        "slowest_in_max_expert_count_ties_fraction": 0.9373372395833334,
+        "slowest_in_max_token_rows_ties_fraction": 0.5835774739583334,
+        "within_event_rank_deviation_correlations": {
+          "expert_cpu_vs_expert_count": 0.9175116995075018,
+          "expert_cpu_vs_token_rows": 0.6680794417766868,
+          "expert_cpu_vs_demand_misses": 0.15508604374950974
+        }
+      }
+    }
+  },
+  "token_agreement_off_on": 0.27085359922178986,
+  "prefetch_tpot_gain_percent": -8.060382033283965,
+  "peer_volume_reduction_percent": -0.13169195802360534,
+  "scope": "one clean primary per arm; diagnostic MoE is a separate instrumented measurement; native BF16 routes may differ between arms"
+}
