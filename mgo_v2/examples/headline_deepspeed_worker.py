@@ -17,10 +17,11 @@ def release():
  while time.perf_counter_ns()<start:time.sleep(.0001)
  return start
 
-def generate(engine,ids,n):
+def generate(engine,ids,n,progress=None):
  start=release();mask=torch.ones_like(ids);past=None;tokens=[];stamps=[];finite=torch.ones((),device='cuda',dtype=torch.bool)
  with torch.no_grad():
   for step in range(n):
+   if progress is not None:progress(step)
    out=engine(input_ids=ids,attention_mask=mask,past_key_values=past,use_cache=True,logits_to_keep=1)
    past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
@@ -51,35 +52,55 @@ def main(a):
  cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale),stage3_prefetch_bucket_size=int(1_000_000_000*scale),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
  dschf=HfDeepSpeedConfig(cfg)
  model=AutoModelForCausalLM.from_pretrained(model_path,torch_dtype=torch.bfloat16,attn_implementation='sdpa',local_files_only=True)
+ if model_family!='Qwen3':
+  from deepseek_moe_loop import install_compact_deepseek_moe
+  assert install_compact_deepseek_moe(model)==26
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='engine_initialization',cell=a.cell))
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='budget_calibration',cell=a.cell))
+ if a.smoke and model_family!='Qwen3':
+  # Smoke-only layer checkpoints separate slow forward progress from a wait.
+  for layer_index,layer in enumerate(engine.module.model.layers):
+   def mark_layer(module,args,layer_index=layer_index):
+    write(a.output/f'layer_progress_rank{rank}.json',dict(layer=layer_index,unix=time.time()))
+   layer.register_forward_pre_hook(mark_layer)
  params=list(engine.module.named_parameters());assert all(hasattr(p,'ds_id') for _,p in params)
  assert all(p.dtype==torch.bfloat16 for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
- budget=spec.get('expert_budget_bytes',17392730112)//4;peak=[0];all_peak=[0];samples=[0]
+ budget=spec.get('expert_budget_bytes',17392730112)//4;peak=[0];all_peak=[0];samples=[0];full_scans=[0]
  records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
  def measure_residency():
-  charged=all_charged=0
-  for expert,param,nbytes in records:
-   if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
-    all_charged+=nbytes
-    if expert:charged+=nbytes
-  assert all_charged == getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
-  peak[0]=max(peak[0],charged);all_peak[0]=max(all_peak[0],all_charged);samples[0]+=1
- # Observe every native parameter-fetch boundary, including embedding/lm_head,
- # without attaching hooks to every individual expert Linear.
+  samples[0]+=1
+  native_charged=getattr(coordinator,'_PartitionedParameterCoordinator__n_available_params')*2
+  assert 0<=native_charged<=budget,(native_charged,budget)
+  all_peak[0]=max(all_peak[0],native_charged)
+  # The native counter is O(1) at every fetch. DeepSeek has thousands of
+  # expert parameters; a complete Python scan at every fetch adds substantial
+  # host work to the two-token calibration. Cross-check periodically.
+  if model_family=='Qwen3' or samples[0]==1 or samples[0]%64==0:
+   charged=all_charged=0
+   for expert,param,nbytes in records:
+    if param.ds_status in (ZeroParamStatus.AVAILABLE,ZeroParamStatus.INFLIGHT):
+     all_charged+=nbytes
+     if expert:charged+=nbytes
+   assert all_charged==native_charged,(all_charged,native_charged)
+   peak[0]=max(peak[0],charged);full_scans[0]+=1
+ # Enforce the exact all-parameter C30 bound at every native fetch; the
+ # separately reported DeepSeek expert peak is a periodic sample.
  original_fetch=coordinator.fetch_sub_module
  def calibrated_fetch(*args,**kwargs):
   result=original_fetch(*args,**kwargs);measure_residency();return result
  coordinator.fetch_sub_module=calibrated_fetch
  rows=json.loads(Path(spec['warmup']['path']).read_text())['requests']
  local_rows=rows[rank*batch:(rank+1)*batch];ids=torch.tensor([r['input_ids'][-32:] for r in local_rows],device='cuda')
- generate(engine,ids,2)
+ if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='calibration_generate',cell=a.cell,smoke=a.smoke))
+ calibration_start=time.perf_counter()
+ generate(engine,ids,2,progress=(lambda step:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='calibration_generate',step=step,cell=a.cell,smoke=a.smoke)) if rank==0 else None))
+ calibration_seconds=time.perf_counter()-calibration_start
  coordinator.fetch_sub_module=original_fetch
- assert 0<peak[0]<=all_peak[0]<=budget,(peak,all_peak,budget)
- write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],pinned_host_bytes=pinned,config=cfg))
+ assert 0<all_peak[0]<=budget and 0<=peak[0]<=all_peak[0],(peak,all_peak,budget)
+ write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],expert_peak_sampled=model_family!='Qwen3',all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],full_scans=full_scans[0],calibration_seconds=calibration_seconds,pinned_host_bytes=pinned,config=cfg))
  # Validate the native live-parameter counter against the complete scan above,
  # then sample that O(1) counter at fetch boundaries in primary execution.
  live_peak=[0]
