@@ -16,7 +16,7 @@ def between(text,left,right):
 
 
 def test_post_expert_barrier_order_and_plumbing():
-    execute=between(RUNTIME," def execute(self,*args):","  if self.index==48:")
+    execute=RUNTIME[RUNTIME.index(" def execute(self,*args):"):]
     expert=execute.index("with nvtx_phase('moe.expert_compute')")
     local=execute.index("with nvtx_phase('moe.post_expert_local_complete')")
     barrier=execute.index("with nvtx_phase('moe.post_expert_global_barrier')")

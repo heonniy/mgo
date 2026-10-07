@@ -1,0 +1,497 @@
+{
+  "status": "PASS",
+  "cell": "R4_C30_B16_L256_O64",
+  "trace_sha256": {
+    "0": "5caec90123bbe8e744742955ce115987fcb3c4b101737e808c328ef7407fbaf8",
+    "1": "e612b25e584a1566cccdfd40a7ceedd35e227f288a7b5e446d6d9ffad0eef25c",
+    "2": "7e167dc894d3d9f681b4544615cabba136201edd97c5fb1716bca4a285f3e015",
+    "3": "eda5b08d492ec33d9f12960241b3d827c0385e6e50c7548472819609b2b7487a"
+  },
+  "definition": "Uninstrumented 63-decode primary TPOT; separate 16-decode diagnostic. Critical ms/decode sums the maximum rank span per layer. Collective-path spans begin after the ablation barrier and include NCCL launch/completion and residual host/peer waiting, not wire-only kernel latency.",
+  "modes": {
+    "normal": {
+      "source": "/home/hwlee/mgo-results/headline_r4_20261007/ablation_ours_br_ca_normal_b16_20261008",
+      "source_commit": "67f41c2e165fbca2cdb43af3fcbd51da4e2f021c",
+      "policies": {
+        "BR": {
+          "primary": [
+            {
+              "status": "PASS",
+              "backend": "BR",
+              "run": 0,
+              "TTFT": 2.013346433,
+              "TPOT": 0.5073392958095239,
+              "E2E": 33.975722069,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 1.0,
+              "decode_peer_bytes": 4318395328,
+              "decode_h2d_bytes": 1614145388544,
+              "main_hit_rate": 0.3805983198920031,
+              "decode_main_hit_rate": 0.3888489889840532,
+              "mandatory": 177108,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            },
+            {
+              "status": "PASS",
+              "backend": "BR",
+              "run": 3,
+              "TTFT": 1.384251328,
+              "TPOT": 0.5088861083650794,
+              "E2E": 33.444076155,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 1.0,
+              "decode_peer_bytes": 4318395328,
+              "decode_h2d_bytes": 1614145388544,
+              "main_hit_rate": 0.3805983198920031,
+              "decode_main_hit_rate": 0.3888489889840532,
+              "mandatory": 177108,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            }
+          ],
+          "mean_tpot_s": 0.5081127020873016,
+          "mean_ttft_s": 1.6987988805,
+          "decode_peer_bytes": 4318395328,
+          "decode_h2d_bytes": 1614145388544,
+          "native_waves_per_rank": {
+            "0": [
+              6224,
+              6156
+            ],
+            "1": [
+              6392,
+              6126
+            ],
+            "2": [
+              6206,
+              6081
+            ],
+            "3": [
+              6278,
+              6073
+            ]
+          },
+          "diagnostic_critical_ms_per_decode": {
+            "forward_collective_path": 32.560043985024095,
+            "return_collective_path": 70.80605392251164,
+            "dispatch_barrier_wait": 0.0,
+            "return_barrier_wait": 0.0,
+            "exposed_h2d_wait": 0.0,
+            "expert": 246.7113097757101,
+            "controller": 8.691431996412575,
+            "pre_return_local_pack": 32.90634200547356
+          },
+          "diagnostic_rank_ms_per_decode": {
+            "0": {
+              "forward_collective_path": 28.0485499817878,
+              "return_collective_path": 32.69746399112046,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 222.189387999475,
+              "controller": 8.526129987090826,
+              "pre_return_local_pack": 26.09227000665851
+            },
+            "1": {
+              "forward_collective_path": 28.022312029264867,
+              "return_collective_path": 38.47910398989916,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 219.55604954063892,
+              "controller": 8.37244599731639,
+              "pre_return_local_pack": 25.33250400412362
+            },
+            "2": {
+              "forward_collective_path": 27.7757780039683,
+              "return_collective_path": 29.97827989421785,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 226.45808424055576,
+              "controller": 8.428741994779557,
+              "pre_return_local_pack": 26.596862025675364
+            },
+            "3": {
+              "forward_collective_path": 28.91608597803861,
+              "return_collective_path": 52.204866003245115,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 207.51059595495462,
+              "controller": 8.450751999858767,
+              "pre_return_local_pack": 23.629402004764415
+            }
+          },
+          "diagnostic_sha256": {
+            "0": "f0bf2f75d1259acdc32a05f6f785ca2564cb59e2d28cba0c254dab9c383f5ff9",
+            "1": "3a0deb4fa4c073b60b7e410e0d51add323c95748d9770f865cefb11fb9bc8df8",
+            "2": "a6465d8096d7a9f1404e6412fa7ff34f97283351880dfe94600bdf147a16d8a3",
+            "3": "c71650e3d93db376d7dda03d0d713cd345da11d5f969230235303f40ccd753c6"
+          }
+        },
+        "CA": {
+          "primary": [
+            {
+              "status": "PASS",
+              "backend": "CA",
+              "run": 1,
+              "TTFT": 1.76107675,
+              "TPOT": 0.5205974117936508,
+              "E2E": 34.558713693,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 0.991943359375,
+              "decode_peer_bytes": 3785226224,
+              "decode_h2d_bytes": 1617674895360,
+              "main_hit_rate": 0.3792903257395063,
+              "decode_main_hit_rate": 0.38751263993253937,
+              "mandatory": 177482,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            },
+            {
+              "status": "PASS",
+              "backend": "CA",
+              "run": 2,
+              "TTFT": 1.44404766,
+              "TPOT": 0.5194314543174604,
+              "E2E": 34.168229282,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 0.991943359375,
+              "decode_peer_bytes": 3785226224,
+              "decode_h2d_bytes": 1617674895360,
+              "main_hit_rate": 0.3792903257395063,
+              "decode_main_hit_rate": 0.38751263993253937,
+              "mandatory": 177482,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            }
+          ],
+          "mean_tpot_s": 0.5200144330555556,
+          "mean_ttft_s": 1.602562205,
+          "decode_peer_bytes": 3785226224,
+          "decode_h2d_bytes": 1617674895360,
+          "native_waves_per_rank": {
+            "0": [
+              6172,
+              6398
+            ],
+            "1": [
+              6151,
+              6149
+            ],
+            "2": [
+              6093,
+              6099
+            ],
+            "3": [
+              6215,
+              6141
+            ]
+          },
+          "diagnostic_critical_ms_per_decode": {
+            "forward_collective_path": 33.341984011698514,
+            "return_collective_path": 75.24716188013554,
+            "dispatch_barrier_wait": 0.0,
+            "return_barrier_wait": 0.0,
+            "exposed_h2d_wait": 0.0,
+            "expert": 246.8092838525772,
+            "controller": 14.349506001919508,
+            "pre_return_local_pack": 32.91100799012929
+          },
+          "diagnostic_rank_ms_per_decode": {
+            "0": {
+              "forward_collective_path": 28.87346201436594,
+              "return_collective_path": 39.47701991908252,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 218.28966590762138,
+              "controller": 14.105172025039792,
+              "pre_return_local_pack": 25.847338001825847
+            },
+            "1": {
+              "forward_collective_path": 28.27875797310844,
+              "return_collective_path": 42.27241598255932,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 218.3136956244707,
+              "controller": 13.918376000598073,
+              "pre_return_local_pack": 24.643823983962648
+            },
+            "2": {
+              "forward_collective_path": 30.31298000784591,
+              "return_collective_path": 29.60880997031927,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 224.10009595006704,
+              "controller": 14.003801994025707,
+              "pre_return_local_pack": 26.943050021422096
+            },
+            "3": {
+              "forward_collective_path": 29.77944399928674,
+              "return_collective_path": 55.67906195949763,
+              "dispatch_barrier_wait": 0.0,
+              "return_barrier_wait": 0.0,
+              "exposed_h2d_wait": 0.0,
+              "expert": 206.71925443410873,
+              "controller": 13.992805998772383,
+              "pre_return_local_pack": 23.171907978714444
+            }
+          },
+          "diagnostic_sha256": {
+            "0": "1fcdc09053e00e88445b3c049cf877b6dbf078bb549ca14c8a599af15b584832",
+            "1": "5e1787e5c61448cd7b667dabdf18daa8eaff61bbe059f1db10a8104b69187c02",
+            "2": "d9d1fb996394358acc1af066ff35c71fc5d21dc85d034306e6ffa1cc09f1c8da",
+            "3": "c6665de8bfd5aa428f42c3e942a763f934d6f669b0e17479edc00ea4fa745d3b"
+          }
+        }
+      }
+    },
+    "ablation_OURS": {
+      "source": "/home/hwlee/mgo-results/headline_r4_20261007/ablation_ours_br_ca_sync_b16_20261008",
+      "source_commit": "67f41c2e165fbca2cdb43af3fcbd51da4e2f021c",
+      "policies": {
+        "BR": {
+          "primary": [
+            {
+              "status": "PASS",
+              "backend": "BR",
+              "run": 0,
+              "TTFT": 1.997607505,
+              "TPOT": 0.6051890316984128,
+              "E2E": 40.124516502,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 1.0,
+              "decode_peer_bytes": 4318395328,
+              "decode_h2d_bytes": 1614145388544,
+              "main_hit_rate": 0.3805983198920031,
+              "decode_main_hit_rate": 0.3888489889840532,
+              "mandatory": 177108,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            },
+            {
+              "status": "PASS",
+              "backend": "BR",
+              "run": 3,
+              "TTFT": 1.393022023,
+              "TPOT": 0.6054337352698412,
+              "E2E": 39.535347345,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 1.0,
+              "decode_peer_bytes": 4318395328,
+              "decode_h2d_bytes": 1614145388544,
+              "main_hit_rate": 0.3805983198920031,
+              "decode_main_hit_rate": 0.3888489889840532,
+              "mandatory": 177108,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            }
+          ],
+          "mean_tpot_s": 0.605311383484127,
+          "mean_ttft_s": 1.695314764,
+          "decode_peer_bytes": 4318395328,
+          "decode_h2d_bytes": 1614145388544,
+          "native_waves_per_rank": {
+            "0": [
+              3072,
+              3072
+            ],
+            "1": [
+              3072,
+              3072
+            ],
+            "2": [
+              3072,
+              3072
+            ],
+            "3": [
+              3072,
+              3072
+            ]
+          },
+          "diagnostic_critical_ms_per_decode": {
+            "forward_collective_path": 10.666260006371886,
+            "return_collective_path": 4.683199995663017,
+            "dispatch_barrier_wait": 30.808903962373734,
+            "return_barrier_wait": 66.44116991385818,
+            "exposed_h2d_wait": 109.64749006181955,
+            "expert": 231.88172210752964,
+            "controller": 8.899159993045032,
+            "pre_return_local_pack": 33.76167203346267
+          },
+          "diagnostic_rank_ms_per_decode": {
+            "0": {
+              "forward_collective_path": 10.463835997041315,
+              "return_collective_path": 4.3248679977841675,
+              "dispatch_barrier_wait": 17.353102018125355,
+              "return_barrier_wait": 29.012735939584672,
+              "exposed_h2d_wait": 93.71497619152069,
+              "expert": 211.1474146321416,
+              "controller": 8.687876000069082,
+              "pre_return_local_pack": 31.88212800701149
+            },
+            "1": {
+              "forward_collective_path": 9.89319598954171,
+              "return_collective_path": 4.368626004084945,
+              "dispatch_barrier_wait": 9.344765995629132,
+              "return_barrier_wait": 36.701235964894295,
+              "exposed_h2d_wait": 108.53313403204083,
+              "expert": 204.38354391604662,
+              "controller": 8.516468011308461,
+              "pre_return_local_pack": 30.86957001022529
+            },
+            "2": {
+              "forward_collective_path": 10.140608001034707,
+              "return_collective_path": 4.296861991286278,
+              "dispatch_barrier_wait": 28.755737967789173,
+              "return_barrier_wait": 31.82929794024676,
+              "exposed_h2d_wait": 84.38182186894119,
+              "expert": 208.88362385332584,
+              "controller": 8.58952798973769,
+              "pre_return_local_pack": 31.45280798187014
+            },
+            "3": {
+              "forward_collective_path": 9.541729995980859,
+              "return_collective_path": 4.3016280005685985,
+              "dispatch_barrier_wait": 20.362533997744322,
+              "return_barrier_wait": 48.004077966324985,
+              "exposed_h2d_wait": 98.90303797274828,
+              "expert": 195.15727180242538,
+              "controller": 8.478477988857776,
+              "pre_return_local_pack": 29.4972680156352
+            }
+          },
+          "diagnostic_sha256": {
+            "0": "4927d4b46a06c0f737549dbd9f94a07abd0a7667eb1adbfbc7f0688eee01d7d4",
+            "1": "ed41d522ebd435ab5e30de711e133fe6c2e4c8635598421967312111547409c8",
+            "2": "5a7379bc4af63c1ed0421ca8dae6ce4d62f0c86de093c99424606c43a69303a4",
+            "3": "c044750b9ec7878f65a8eeeefe959e7a8237995209d290058ea4cca3adb3e7f4"
+          }
+        },
+        "CA": {
+          "primary": [
+            {
+              "status": "PASS",
+              "backend": "CA",
+              "run": 1,
+              "TTFT": 1.75249866,
+              "TPOT": 0.6212062319523809,
+              "E2E": 40.888491273,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 0.991943359375,
+              "decode_peer_bytes": 3785226224,
+              "decode_h2d_bytes": 1617674895360,
+              "main_hit_rate": 0.3792903257395063,
+              "decode_main_hit_rate": 0.38751263993253937,
+              "mandatory": 177482,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            },
+            {
+              "status": "PASS",
+              "backend": "CA",
+              "run": 2,
+              "TTFT": 1.445478601,
+              "TPOT": 0.6164355504126984,
+              "E2E": 40.280918277,
+              "reference_backend": "BR",
+              "token_agreement_to_reference": 0.991943359375,
+              "decode_peer_bytes": 3785226224,
+              "decode_h2d_bytes": 1617674895360,
+              "main_hit_rate": 0.3792903257395063,
+              "decode_main_hit_rate": 0.38751263993253937,
+              "mandatory": 177482,
+              "prefetch_issued": 0,
+              "scope": "63 decode forwards; frozen routing and teacher inputs"
+            }
+          ],
+          "mean_tpot_s": 0.6188208911825397,
+          "mean_ttft_s": 1.5989886305,
+          "decode_peer_bytes": 3785226224,
+          "decode_h2d_bytes": 1617674895360,
+          "native_waves_per_rank": {
+            "0": [
+              3072,
+              3072
+            ],
+            "1": [
+              3072,
+              3072
+            ],
+            "2": [
+              3072,
+              3072
+            ],
+            "3": [
+              3072,
+              3072
+            ]
+          },
+          "diagnostic_critical_ms_per_decode": {
+            "forward_collective_path": 10.61353399651125,
+            "return_collective_path": 4.8988420008681715,
+            "dispatch_barrier_wait": 25.405084000900388,
+            "return_barrier_wait": 72.4556861417368,
+            "exposed_h2d_wait": 101.09876212850213,
+            "expert": 236.279699832201,
+            "controller": 14.495075977407396,
+            "pre_return_local_pack": 33.91575599974021
+          },
+          "diagnostic_rank_ms_per_decode": {
+            "0": {
+              "forward_collective_path": 10.328966008499265,
+              "return_collective_path": 4.587137999013066,
+              "dispatch_barrier_wait": 10.983783998526633,
+              "return_barrier_wait": 35.37006599549204,
+              "exposed_h2d_wait": 94.96910614147782,
+              "expert": 209.67478989809752,
+              "controller": 14.219275993295014,
+              "pre_return_local_pack": 31.51805601688102
+            },
+            "1": {
+              "forward_collective_path": 10.28796799806878,
+              "return_collective_path": 4.533506006468087,
+              "dispatch_barrier_wait": 15.682562000118198,
+              "return_barrier_wait": 39.89587995968759,
+              "exposed_h2d_wait": 92.61841599270701,
+              "expert": 206.24895369261503,
+              "controller": 14.083234001882374,
+              "pre_return_local_pack": 30.64298800576944
+            },
+            "2": {
+              "forward_collective_path": 10.166184009052813,
+              "return_collective_path": 4.396395992022008,
+              "dispatch_barrier_wait": 22.01776402350515,
+              "return_barrier_wait": 34.17577002663165,
+              "exposed_h2d_wait": 84.4726981036365,
+              "expert": 211.00399175286293,
+              "controller": 14.104811996221542,
+              "pre_return_local_pack": 31.724389972048808
+            },
+            "3": {
+              "forward_collective_path": 9.443629996385425,
+              "return_collective_path": 4.373072003014386,
+              "dispatch_barrier_wait": 16.631125985644758,
+              "return_barrier_wait": 52.729564108885825,
+              "exposed_h2d_wait": 97.22866596095264,
+              "expert": 195.65041783452034,
+              "controller": 14.076154003851116,
+              "pre_return_local_pack": 29.178330008406192
+            }
+          },
+          "diagnostic_sha256": {
+            "0": "572cf74bef241197d3b53e95fa8a2554b7650bffcb00c4804e0391195f03396a",
+            "1": "68477df07679203d778458187c302ae48d48a0d33df57a345ad482247f86a763",
+            "2": "899527cc47de7d4bb181fa4f6a1a2e29bf9dcede2135c6cf4ad581c2077f77bc",
+            "3": "3f1b6c4f9c4518fc4cd5b6c15a0e952289fde78008bd05de4782ecff437f7857"
+          }
+        }
+      }
+    }
+  }
+}

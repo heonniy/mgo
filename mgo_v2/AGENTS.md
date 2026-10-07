@@ -985,11 +985,13 @@ Order of work:
 
 Never report performance from a run that still uses the old RPC expert path or
 has two residency controllers active.
-**OWNER ABLATION_OURS COMMUNICATION BARRIERS (2026-10-08), active.**
-Read experiments/ablation_ours_comm_barrier_20261008/PLAN.md. Keep selected
-main_OURS unchanged. Compare BR/CA with and without opt-in decode-only
-all-rank rendezvous immediately before dispatch and return token A2A, after
-local packet preparation and required H2D/expert completion. GPUs0/1/4/5 only.
-Two clean primary repeats per policy/mode plus separate prefix diagnostics;
-verify identical frozen route hashes and barrier counts. Do not interpret
-diagnostic current-stream spans as wire-only times.
+**OWNER ABLATION_OURS COMMUNICATION BARRIERS COMPLETE (2026-10-08).**
+Read experiments/ablation_ours_comm_barrier_20261008/{PLAN.md,RESULTS.md,RESULTS.json}.
+Selected main_OURS remains unchanged. Opt-in decode-only barriers immediately
+before both token A2A calls passed on GPUs0/1/4/5. Normal/ablated BR/CA
+two-repeat frozen64 primaries and separate prefix16 diagnostics passed, with
+identical route hashes, token/cache/byte receipts and barrier counts. CA
+reduces peer bytes12.35% but worsens primary TPOT in both modes; post-barrier
+collective-path cost is nearly unchanged, while controller and return-rank
+readiness are worse. Diagnostic spans are not wire-only times. Jobs complete,
+owned inference loads restored; do not automatically rerun or promote ablation.
