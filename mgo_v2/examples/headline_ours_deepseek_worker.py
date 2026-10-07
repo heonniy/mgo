@@ -124,7 +124,7 @@ class DeepSeekRuntime:
             with torch.no_grad():
                 logits = torch.nn.functional.linear(hidden.float(), module.gate.weight.float())
                 probs = torch.softmax(logits, dim=-1)
-            return rt.execute(layer, hidden, selected, weights, probs)
+            return rt.execute(layer, hidden, selected, weights.to(torch.bfloat16), probs)
 
         return forward
 
@@ -145,7 +145,8 @@ class DeepSeekRuntime:
                                 np.zeros((EXPERTS, self.world), np.int32))
         targets, effective, _, lengths, destinations, fetches, _ = out
         event = plan_rank_partial_layout(effective, lengths, destinations,
-                                         routes.origin_ranks, gathered.counts, self.rank)
+                                         routes.origin_ranks, gathered.counts, self.rank,
+                                         experts=EXPERTS)
         event['targets'] = targets
         slots = self.native_executor.native.bind_layer_slots(
             self.policy.slots[self.rank, :self.cap], np.arange(self.cap, dtype=np.int32),
