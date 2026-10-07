@@ -56,7 +56,9 @@ def main():
                    ours_first_token_agreement=sum(a[0] == b[0] for a, b in zip(actual_ours, reference)),
                    llama_first_token_agreement=sum(a[0] == b[0] for a, b in zip(actual_llama, reference)))
     args.output.write_text(json.dumps(receipt, indent=2) + '\n')
-    print(json.dumps(receipt), flush=True)
+    print(json.dumps({k: receipt[k] for k in
+                      ('status', 'ours_first_token_agreement',
+                       'llama_first_token_agreement')}), flush=True)
 
 
 if __name__ == '__main__':
