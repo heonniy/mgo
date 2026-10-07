@@ -32,6 +32,9 @@ def main(a):
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
   except FileNotFoundError:pass
+ # The rank bootstrap supplies an explicit "0". For the normal NVSwitch
+ # control, restore the user's requested unset state before NCCL initializes.
+ if os.environ.get('NCCL_P2P_DISABLE')=='0':os.environ.pop('NCCL_P2P_DISABLE')
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42)
  torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))

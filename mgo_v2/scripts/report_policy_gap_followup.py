@@ -18,6 +18,8 @@ def main():
                 if spec['capacity_percent'] != capacity:
                     continue
                 label = f"policy_gap_sharegpt_c{capacity}_{transport}_b{spec['local_batch']}_case{spec['case_id']}_20261008"
+                if transport == 'nvswitch' and capacity == 30 and spec['local_batch'] == 8 and spec['case_id'] == 0:
+                    label = 'policy_gap_sharegpt_c30_nvswitch_b8_case0_v2_20261008'
                 status = json.loads((ROOT / label / 'status.json').read_text())
                 assert status['status'] == 'PASS' and status['nccl_p2p_disable'] == (transport == 'p2p_disabled')
                 expected = [459, 459, 459, 458] if capacity == 30 else [920, 920, 919, 919]

@@ -4,4 +4,6 @@ After all ShareGPT C60/NVSwitch candidates pass, use the policy-specific best ob
 
 Queue order: C30/NVSwitch default for B8/B16/B64 selected seeds; C30/P2P-disabled for the same seeds; then C60/P2P-disabled. The P2P-disabled setting must set `NCCL_P2P_DISABLE=1` in the actual child process after the supervisor clears inherited NCCL variables. Default NVSwitch runs leave this variable unset. Record the effective value in the rank source and result receipts. These are transport settings on the same physical server, not a different non-NVLink machine.
 
+The first C30/NVSwitch B8 case started with the existing rank-bootstrap explicit `NCCL_P2P_DISABLE=0`. That enables P2P, but is not the requested unset control. The worker now removes the bootstrap `0` before NCCL initialization; keep the first attempt as a trial and remeasure it under a `_v2` label. Only the unset `_v2` receipt belongs in the final table.
+
 C30 uses 1835 MAIN slots plus eight reserved P2 slots; C60 uses 3678 MAIN plus eight reserved. Both leave P2 unused with prefetch OFF. GPUs 0,1,4,5 only. Supervisor guards host and HBM memory and restores only owned idle model loads. Pair each policy to BR within exactly the same seed/capacity/transport cell. Do not treat one-shot differences as a noise distribution or infer a universal optimum from the bounded seed selection.
