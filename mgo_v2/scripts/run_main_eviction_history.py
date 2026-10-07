@@ -1,7 +1,7 @@
 """Serial guarded trace captures, then deterministic five-policy CPU replays."""
 import os,json,subprocess,time,shutil
 from pathlib import Path
-from main_eviction_replay import run
+from main_eviction_history_replay import run
 P=Path(__file__).resolve().parents[1];PACK=P/'experiments/main_eviction_history_20261007';ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007');PY='/home/hwlee/sub-moe/phase01/.venv/bin/python'
 def write(p,x):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(x,indent=2)+'\n');q.replace(p)

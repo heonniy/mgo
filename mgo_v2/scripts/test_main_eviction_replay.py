@@ -1,6 +1,6 @@
 """Analytical history semantics and exact BR/Gate replay tests."""
 import numpy as np
-from main_eviction_replay import replay
+from main_eviction_history_replay import replay
 import mgo_v2
 from env_offload_policy import Policy
 
