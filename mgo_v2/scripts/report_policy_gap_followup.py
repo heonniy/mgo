@@ -39,15 +39,15 @@ def main():
     destination = REPO / 'FOLLOWUP_RESULTS.json'
     destination.write_text(json.dumps(output, indent=2) + '\n')
     lines = ['# C30 and P2P-disabled follow-up results', '',
-             'ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean primary. The MoE value comes from a separate instrumented run and excludes attention. P2P-disabled sets NCCL_P2P_DISABLE=1 and NCCL_IB_DISABLE=1 inside every worker to select SHM after the IB path failed; it is a transport setting on the same NVSwitch-equipped server.', '',
-             '| Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT s/token | MoE-block TPOT s/token (diagnostic) | Peer GiB | H2D GiB |',
-             '|---|---:|---:|---|---|---:|---:|---:|---:|']
+             'ShareGPT, R4 GPUs0/1/4/5, input128,32 decode forwards, native main_OURS path, prefetch OFF, cold cache after warmup. The four unique seed cases were selected by the best observed C60/NVSwitch clean gain for each policy and batch; B8 has two seeds. Each row has one clean full-TPOT primary (attention included). The EP value comes from a separate instrumented run and includes only expert execution and dispatch/return scopes. P2P-disabled sets NCCL_P2P_DISABLE=1 and NCCL_IB_DISABLE=1 inside every worker to select SHM after the IB path failed; it is a transport setting on the same NVSwitch-equipped server.', '',
+             '| Transport | C | B/rank | Seed sample/order | Policy | Clean TPOT s/token | Paired diagnostic total s/token | EP span s/token | Expert compute s/token | Expert comm s/token | Peer GiB | H2D GiB |',
+             '|---|---:|---:|---|---|---:|---:|---:|---:|---:|---:|---:|']
     for case in cases:
         seed = f"{case['seed']['sample_seed']}/{case['seed']['rank_order_seed']}"
         for policy in POLICIES:
             row = case['policies'][policy]
-            lines.append(f"| {case['transport']} | {case['cache_percent']} | {case['local_batch']} | {seed} | {policy} | {row['primary_tpot_s']:.6f} | {row['diagnostic_moe_tpot_s']:.6f} | {row['decode_peer_gib']:.3f} | {row['decode_h2d_gib']:.3f} |")
-    lines += ['', 'Policy effects must be computed within each same-seed, same-cache, same-transport group. C60/NVSwitch reference rows are in SHAREGPT_RESULTS.md. The diagnostic uses current-stream MLP spans including host gaps and peer waits, so it is not pure GPU compute and must not be subtracted from clean TPOT. One timing sample per policy does not establish statistical stability.', '']
+            lines.append(f"| {case['transport']} | {case['cache_percent']} | {case['local_batch']} | {seed} | {policy} | {row['primary_tpot_s']:.6f} | {row['diagnostic_total_tpot_s']:.6f} | {row['diagnostic_ep_tpot_s']:.6f} | {row['diagnostic_ep_compute_tpot_s']:.6f} | {row['diagnostic_ep_comm_tpot_s']:.6f} | {row['decode_peer_gib']:.3f} | {row['decode_h2d_gib']:.3f} |")
+    lines += ['', 'Policy effects must be computed within each same-seed, same-cache, same-transport group using clean TPOT. C60/NVSwitch reference rows are in SHAREGPT_RESULTS.md. Diagnostic total and EP span come from the same instrumented run: select each decode step\'s slowest rank using its complete phase span, then take that rank\'s forward dispatch/finish, expert execution, and return partial/combine scopes. Controller, routing metadata, attention, and explicit H2D scopes are excluded. Current-stream spans can still include host gaps, peer waits, and implicit H2D dependencies; they are not pure kernel or network service. Never subtract EP span from clean TPOT. One timing sample per policy does not establish statistical stability.', '']
     (REPO / 'FOLLOWUP_RESULTS.md').write_text('\n'.join(lines))
     print(f'PASS {len(cases)} cases {destination}', flush=True)
 
