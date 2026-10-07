@@ -43,3 +43,11 @@ Then compare BR and Near on that same frozen input with prefetch OFF and the
 native executor, two clean repeats each. This isolates rank placement from
 prefetch and from the H0/native executor difference. Do not silently change
 the selected production policy based on a single cell.
+
+Owner diagnostic follow-up: after uninstrumented BR/Near primary comparisons,
+run one separate phase-diagnostic pass per policy on the same frozen-route
+prefix. Keep prefetch OFF, native prefill/decode and identical teacher tokens.
+Compare rank-level expert token rows, controller/metadata, demand H2D,
+forward/return communication and expert-compute completion spans. Diagnostic
+timing is not a primary TPOT sample; CUDA current-stream spans include host
+submission and peer waits, while copy-stream service overlaps other work.

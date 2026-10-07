@@ -12,6 +12,7 @@ def generate_fixed(model,rt,ids,teacher,n):
  release=torch.tensor([time.perf_counter_ns()+200_000_000 if dist.get_rank()==0 else 0],device='cuda',dtype=torch.int64)
  dist.broadcast(release,0);start=int(release.item())
  while time.perf_counter_ns()<start:time.sleep(.0001)
+ if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.start()
  mask=torch.ones_like(ids);past=None;tokens=[];finite=torch.ones((),dtype=torch.bool,device='cuda');stamps=[]
  with torch.inference_mode():
   for step in range(n):
@@ -20,6 +21,7 @@ def generate_fixed(model,rt,ids,teacher,n):
    past=out.past_key_values;tokens.append(out.logits[:,-1].argmax(-1));finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
    if step<n-1:ids=teacher[:,step:step+1];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
+ if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.stop()
  actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n
  return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist())
 
@@ -123,6 +125,27 @@ def main(a):
    row=dict(status='PASS',backend=name,run=run,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/a.decode_steps,E2E=(end-start)/1e9,token_agreement_to_h0=float(np.mean([r['token_agreement_to_h0'] for r in rr])),decode_peer_bytes=sum(r['decode_bytes']['forward']+r['decode_bytes']['returned'] for r in rr),decode_h2d_bytes=sum(r['decode_bytes']['h2d'] for r in rr),main_hit_rate=rr[0]['hit']['main_hit_rate'] if comparing else None,decode_main_hit_rate=rr[0]['hit']['decode_main_hit_rate'] if comparing else None,mandatory=rr[0]['hit']['mandatory'] if comparing else None,prefetch_issued=rr[0]['validation']['controller']['issued'] if comparing else None,scope=f'{a.decode_steps} decode forwards; frozen routing and teacher inputs')
    results.append(row);write(a.output/f'run{run}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
+ diagnostic_prefix=int(os.environ.get('MGO_NATIVE_POLICY_DIAGNOSTIC','0'))
+ if diagnostic_prefix:
+  assert compare_policy and 1<=diagnostic_prefix<=a.decode_steps
+  from generation_phase_diagnostics import GenerationDiagnostics
+  for name in ('BR','LA_CA_NEAR'):
+   a.policy=name;rt.native_executor=native;rt.prefetch_next=lambda:None;reset();a.phase='MEASURE'
+   def frozen_diagnostic(layer,hidden,selected,weights,probs):
+    sel,wei,pro=routes[rt.index]
+    return original(layer,hidden,sel,wei,pro)
+   rt.execute=frozen_diagnostic
+   rt.phase_diagnostic=GenerationDiagnostics(rt);rt.phase_diagnostic.install(model)
+   if rank==0:write(a.output/'phase.json',dict(phase='policy_diagnostic',backend=name,decode_steps=diagnostic_prefix))
+   gc.collect();torch.cuda.synchronize()
+   with torch._dynamo.config.patch(error_on_recompile=True):check=generate_fixed(model,rt,target,teacher,diagnostic_prefix+1)
+   diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9)
+   rt.phase_diagnostic=None;rt.execute=original
+   expected=next(json.loads((a.output/f'run{run}_rank{rank}.json').read_text()) for run,mode in enumerate(modes) if mode==name)
+   assert check['tokens']==[row[:diagnostic_prefix+1] for row in expected['tokens']]
+   diagnostic.update(policy=name,decode_steps=diagnostic_prefix,token_prefix_parity=True,validation=validate_state(rt),output=dict(release_ns=check['release_ns'],first_ns=check['first_ns'],end_ns=check['end_ns'],token_ready_ns=check['token_ready_ns']))
+   write(a.output/f'diagnostic_{name}_rank{rank}.json',diagnostic)
+   dist.barrier()
  rt.close()
  if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,policy=a.policy,prefetch_compare=compare_prefetch,policy_compare=compare_policy,active_total=active_total,active_decode=active_decode))
  dist.barrier();dist.destroy_process_group()
