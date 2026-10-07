@@ -1,0 +1,1770 @@
+{
+  "status": "PASS",
+  "scope": "12 selected-seed physical cases; each has one clean full-TPOT primary and separate paired EP diagnostic for BR/CA_NATIVE/Near",
+  "cases": [
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_nvswitch_b8_case0_v2_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s20_d7",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.447685152625,
+          "diagnostic_total_tpot_s": 0.49473665590625,
+          "diagnostic_full_decode_s": 15.831572989,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.826540637786,
+          "diagnostic_phase_total_tpot_s": 0.49489124990301203,
+          "diagnostic_nonattention_tpot_s": 0.4538468469191502,
+          "diagnostic_attention_tpot_s": 0.041044402983861805,
+          "diagnostic_nonattention_share_pct": 91.70637933244817,
+          "diagnostic_ep_tpot_s": 0.31361383992474295,
+          "diagnostic_ep_compute_tpot_s": 0.1975359889343381,
+          "diagnostic_ep_comm_tpot_s": 0.11607785099040484,
+          "diagnostic_ep_share_pct": 63.37025356302106,
+          "diagnostic_ep_critical_path_tpot_s": 0.33327611852272543,
+          "diagnostic_ep_critical_compute_tpot_s": 0.21563297981023788,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10190006800316041,
+          "diagnostic_ep_critical_other_tpot_s": 0.01574307070932713,
+          "decode_peer_gib": 1.023757740855217,
+          "decode_h2d_gib": 576.791015625,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.45233036783479474,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4568863419054251,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4522159630245951,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4626508529480707,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.4542539604375,
+          "diagnostic_total_tpot_s": 0.5053737811875,
+          "diagnostic_full_decode_s": 16.171960998,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 16.167115420082858,
+          "diagnostic_phase_total_tpot_s": 0.5054065989839582,
+          "diagnostic_nonattention_tpot_s": 0.46985566197262235,
+          "diagnostic_attention_tpot_s": 0.03555093701133592,
+          "diagnostic_nonattention_share_pct": 92.96587399475877,
+          "diagnostic_ep_tpot_s": 0.32086716588941633,
+          "diagnostic_ep_compute_tpot_s": 0.19448195194453,
+          "diagnostic_ep_comm_tpot_s": 0.12638521394488633,
+          "diagnostic_ep_share_pct": 63.48693636657498,
+          "diagnostic_ep_critical_path_tpot_s": 0.3369616451057768,
+          "diagnostic_ep_critical_compute_tpot_s": 0.22622972394526003,
+          "diagnostic_ep_critical_comm_tpot_s": 0.0979588939663372,
+          "diagnostic_ep_critical_other_tpot_s": 0.012773027194179568,
+          "decode_peer_gib": 0.8660629019141197,
+          "decode_h2d_gib": 578.8740234375,
+          "token_agreement_to_br": 0.9981060606060606,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.462634983763186,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.46820487390503696,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4649415343796281,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4740595981193983,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.43642136396875,
+          "diagnostic_total_tpot_s": 0.48919892653125,
+          "diagnostic_full_decode_s": 15.654365649,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.649506949525586,
+          "diagnostic_phase_total_tpot_s": 0.4893240040775636,
+          "diagnostic_nonattention_tpot_s": 0.4403634551050709,
+          "diagnostic_attention_tpot_s": 0.04896054897249269,
+          "diagnostic_nonattention_share_pct": 89.99424745884082,
+          "diagnostic_ep_tpot_s": 0.30605759806878635,
+          "diagnostic_ep_compute_tpot_s": 0.19849393802508714,
+          "diagnostic_ep_comm_tpot_s": 0.1075636600436992,
+          "diagnostic_ep_share_pct": 62.5470231418021,
+          "diagnostic_ep_critical_path_tpot_s": 0.3238091567009328,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2124904989488423,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09736817801481812,
+          "diagnostic_ep_critical_other_tpot_s": 0.013950479737272413,
+          "decode_peer_gib": 0.985108770430088,
+          "decode_h2d_gib": 576.931640625,
+          "token_agreement_to_br": 0.9952651515151515,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4379094529810027,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4450101918867222,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.43792180309764805,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.45288353611179627,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.4672829272947219,
+      "near_gain_pct": 2.5160067494320204,
+      "cache_percent": 30,
+      "transport": "nvswitch",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 7,
+        "proxy_locality_gain": 75.41666666666667
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s20_d7"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_nvswitch_b8_case1_v2_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.43752626603125,
+          "diagnostic_total_tpot_s": 0.4865976299375,
+          "diagnostic_full_decode_s": 15.571124158,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.566325725130458,
+          "diagnostic_phase_total_tpot_s": 0.4866652703448926,
+          "diagnostic_nonattention_tpot_s": 0.4506184433221715,
+          "diagnostic_attention_tpot_s": 0.03604682702272112,
+          "diagnostic_nonattention_share_pct": 92.593096483508,
+          "diagnostic_ep_tpot_s": 0.30704617229074943,
+          "diagnostic_ep_compute_tpot_s": 0.1839418202415109,
+          "diagnostic_ep_comm_tpot_s": 0.12310435204923852,
+          "diagnostic_ep_share_pct": 63.09186025810929,
+          "diagnostic_ep_critical_path_tpot_s": 0.32301353411083195,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2146487360857427,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09581280502816662,
+          "diagnostic_ep_critical_other_tpot_s": 0.012551992996922619,
+          "decode_peer_gib": 1.0211714506149292,
+          "decode_h2d_gib": 521.05078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4417303779566137,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4503557322504785,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.44611913596438535,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.45284940184032163,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.44327529471875,
+          "diagnostic_total_tpot_s": 0.49448689690625,
+          "diagnostic_full_decode_s": 15.823580701,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.81871377115401,
+          "diagnostic_phase_total_tpot_s": 0.49455657995698127,
+          "diagnostic_nonattention_tpot_s": 0.4546251870199194,
+          "diagnostic_attention_tpot_s": 0.039931392937061896,
+          "diagnostic_nonattention_share_pct": 91.9258190962629,
+          "diagnostic_ep_tpot_s": 0.30978308109182395,
+          "diagnostic_ep_compute_tpot_s": 0.18790750909224152,
+          "diagnostic_ep_comm_tpot_s": 0.12187557199958246,
+          "diagnostic_ep_share_pct": 62.638552118499824,
+          "diagnostic_ep_critical_path_tpot_s": 0.32675810685429824,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2165360771752894,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09704030300350859,
+          "diagnostic_ep_critical_other_tpot_s": 0.013181726675500244,
+          "decode_peer_gib": 0.8851004466414452,
+          "decode_h2d_gib": 523.40625,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4497165969593771,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4581179389537283,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.45420459339507213,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.46110949478417024,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.429957856,
+          "diagnostic_total_tpot_s": 0.4758817113125,
+          "diagnostic_full_decode_s": 15.228214762,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.223445792316257,
+          "diagnostic_phase_total_tpot_s": 0.4760371159438437,
+          "diagnostic_nonattention_tpot_s": 0.4302457969498137,
+          "diagnostic_attention_tpot_s": 0.04579131899403001,
+          "diagnostic_nonattention_share_pct": 90.38072506106188,
+          "diagnostic_ep_tpot_s": 0.29516126495628847,
+          "diagnostic_ep_compute_tpot_s": 0.18727803494781253,
+          "diagnostic_ep_comm_tpot_s": 0.10788323000847594,
+          "diagnostic_ep_share_pct": 62.003834379819146,
+          "diagnostic_ep_critical_path_tpot_s": 0.30924240815031373,
+          "diagnostic_ep_critical_compute_tpot_s": 0.20306622196733953,
+          "diagnostic_ep_critical_comm_tpot_s": 0.0955576770171756,
+          "diagnostic_ep_critical_other_tpot_s": 0.010618509165798635,
+          "decode_peer_gib": 0.9884143248200417,
+          "decode_h2d_gib": 521.3232421875,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4243230850368855,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4332738160224617,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.427781328805555,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.43785250184177854,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.3139848127630804,
+      "near_gain_pct": 1.7298184403652273,
+      "cache_percent": 30,
+      "transport": "nvswitch",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 14,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 75.27083333333333
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s14_d5"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_nvswitch_b16_case0_20261008",
+      "cell": "ShareGPT_R4_C30_B16_L128_O33_s22_d3",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.52398525209375,
+          "diagnostic_total_tpot_s": 0.56669532853125,
+          "diagnostic_full_decode_s": 18.134250513,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.129325999679406,
+          "diagnostic_phase_total_tpot_s": 0.5667684951021439,
+          "diagnostic_nonattention_tpot_s": 0.5268522961394337,
+          "diagnostic_attention_tpot_s": 0.03991619896271004,
+          "diagnostic_nonattention_share_pct": 92.95723045517617,
+          "diagnostic_ep_tpot_s": 0.3738784681678517,
+          "diagnostic_ep_compute_tpot_s": 0.24912599614262582,
+          "diagnostic_ep_comm_tpot_s": 0.12475247202522587,
+          "diagnostic_ep_share_pct": 65.96669917237915,
+          "diagnostic_ep_critical_path_tpot_s": 0.39228330873208356,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2755324587076903,
+          "diagnostic_ep_critical_comm_tpot_s": 0.1028570590429008,
+          "diagnostic_ep_critical_other_tpot_s": 0.013893790981492512,
+          "decode_peer_gib": 2.0429550409317017,
+          "decode_h2d_gib": 812.07421875,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5226002710128377,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5306528161942843,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5234862666487606,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5325517180345559,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.529815875125,
+          "diagnostic_total_tpot_s": 0.57630067209375,
+          "diagnostic_full_decode_s": 18.441621507,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.436659000886298,
+          "diagnostic_phase_total_tpot_s": 0.5763711429802643,
+          "diagnostic_nonattention_tpot_s": 0.5394416179586332,
+          "diagnostic_attention_tpot_s": 0.03692952502163098,
+          "diagnostic_nonattention_share_pct": 93.59275260890438,
+          "diagnostic_ep_tpot_s": 0.3771107659821864,
+          "diagnostic_ep_compute_tpot_s": 0.24640328197553754,
+          "diagnostic_ep_comm_tpot_s": 0.1307074840066489,
+          "diagnostic_ep_share_pct": 65.42846056314433,
+          "diagnostic_ep_critical_path_tpot_s": 0.3975509096427351,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2772027270942926,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10290235308103729,
+          "diagnostic_ep_critical_other_tpot_s": 0.01744582946740519,
+          "decode_peer_gib": 1.7699789926409721,
+          "decode_h2d_gib": 814.18359375,
+          "token_agreement_to_br": 0.9886363636363635,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5333571667005599,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5424656500248166,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5305501751705888,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5432230099265289,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.5131528873125,
+          "diagnostic_total_tpot_s": 0.55930035984375,
+          "diagnostic_full_decode_s": 17.897611515,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 17.8922302504689,
+          "diagnostic_phase_total_tpot_s": 0.5595185729651857,
+          "diagnostic_nonattention_tpot_s": 0.5142491329567856,
+          "diagnostic_attention_tpot_s": 0.04526944000840012,
+          "diagnostic_nonattention_share_pct": 91.90921585167526,
+          "diagnostic_ep_tpot_s": 0.3631669639008469,
+          "diagnostic_ep_compute_tpot_s": 0.24726706696674228,
+          "diagnostic_ep_comm_tpot_s": 0.11589989693410463,
+          "diagnostic_ep_share_pct": 64.90704356358228,
+          "diagnostic_ep_critical_path_tpot_s": 0.3805168435652839,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2661762409806252,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10135683201794746,
+          "diagnostic_ep_critical_other_tpot_s": 0.012983770566711338,
+          "decode_peer_gib": 1.9619230479002,
+          "decode_h2d_gib": 812.53125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.508552031352141,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.517842680072812,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5076326618733947,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5198784557537584,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.1127456370101596,
+      "near_gain_pct": 2.067303371223883,
+      "cache_percent": 30,
+      "transport": "nvswitch",
+      "local_batch": 16,
+      "seed": {
+        "sample_seed": 22,
+        "rank_order_seed": 3,
+        "proxy_locality_gain": 111.0
+      },
+      "source_cell": "ShareGPT_R4_C60_B16_L128_O33_s22_d3"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_nvswitch_b64_case1_20261008",
+      "cell": "ShareGPT_R4_C30_B64_L128_O33_s20_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.59873676328125,
+          "diagnostic_total_tpot_s": 0.64446544646875,
+          "diagnostic_full_decode_s": 20.622894287,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.61766077185001,
+          "diagnostic_phase_total_tpot_s": 0.6445362160086007,
+          "diagnostic_nonattention_tpot_s": 0.6025907450295418,
+          "diagnostic_attention_tpot_s": 0.04194547097905888,
+          "diagnostic_nonattention_share_pct": 93.4921467658073,
+          "diagnostic_ep_tpot_s": 0.434920523043198,
+          "diagnostic_ep_compute_tpot_s": 0.3038198179900646,
+          "diagnostic_ep_comm_tpot_s": 0.13110070505313343,
+          "diagnostic_ep_share_pct": 67.47805821316244,
+          "diagnostic_ep_critical_path_tpot_s": 0.45458040785112513,
+          "diagnostic_ep_critical_compute_tpot_s": 0.32285095190256835,
+          "diagnostic_ep_critical_comm_tpot_s": 0.11432697800447933,
+          "diagnostic_ep_critical_other_tpot_s": 0.017402477944077486,
+          "decode_peer_gib": 8.17444471269846,
+          "decode_h2d_gib": 1051.7080078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5987369341933445,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6062860109716784,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.6038891736123405,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6113424871535973,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.61087948115625,
+          "diagnostic_total_tpot_s": 0.663446840375,
+          "diagnostic_full_decode_s": 21.230298892,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 21.224534110989314,
+          "diagnostic_phase_total_tpot_s": 0.6635569416964572,
+          "diagnostic_nonattention_tpot_s": 0.625504254676438,
+          "diagnostic_attention_tpot_s": 0.03805268702001922,
+          "diagnostic_nonattention_share_pct": 94.26534715728641,
+          "diagnostic_ep_tpot_s": 0.4432457428314956,
+          "diagnostic_ep_compute_tpot_s": 0.3021654039546847,
+          "diagnostic_ep_comm_tpot_s": 0.14108033887681087,
+          "diagnostic_ep_share_pct": 66.7984486302394,
+          "diagnostic_ep_critical_path_tpot_s": 0.4631567475257407,
+          "diagnostic_ep_critical_compute_tpot_s": 0.3310899289548397,
+          "diagnostic_ep_critical_comm_tpot_s": 0.11367703493312001,
+          "diagnostic_ep_critical_other_tpot_s": 0.01838978363778099,
+          "decode_peer_gib": 7.472175091505051,
+          "decode_h2d_gib": 1052.7451171875,
+          "token_agreement_to_br": 0.9898200757575758,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.6193294550595383,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6274575929650528,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.625060753946018,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.631443715913134,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.5861806475,
+          "diagnostic_total_tpot_s": 0.64372626484375,
+          "diagnostic_full_decode_s": 20.599240475,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.59393023177378,
+          "diagnostic_phase_total_tpot_s": 0.6439492337118353,
+          "diagnostic_nonattention_tpot_s": 0.6001877227362856,
+          "diagnostic_attention_tpot_s": 0.043761510975549756,
+          "diagnostic_nonattention_share_pct": 93.20419860998969,
+          "diagnostic_ep_tpot_s": 0.4304693007362657,
+          "diagnostic_ep_compute_tpot_s": 0.30167971677333116,
+          "diagnostic_ep_comm_tpot_s": 0.12878958396293455,
+          "diagnostic_ep_share_pct": 66.84832875022862,
+          "diagnostic_ep_critical_path_tpot_s": 0.4486686240853737,
+          "diagnostic_ep_critical_compute_tpot_s": 0.3234514160454273,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10890320302243345,
+          "diagnostic_ep_critical_other_tpot_s": 0.016314005017512963,
+          "decode_peer_gib": 8.008631370961666,
+          "decode_h2d_gib": 1051.4970703125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5930494480321358,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6007019648595306,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5971863097043242,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6082302157092054,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -2.0280561708712286,
+      "near_gain_pct": 2.097101188916295,
+      "cache_percent": 30,
+      "transport": "nvswitch",
+      "local_batch": 64,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 219.25000000000009
+      },
+      "source_cell": "ShareGPT_R4_C60_B64_L128_O33_s20_d5"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b8_case0_v2_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s20_d7",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.45155749565625,
+          "diagnostic_total_tpot_s": 0.50043597659375,
+          "diagnostic_full_decode_s": 16.013951251,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 16.009183612843657,
+          "diagnostic_phase_total_tpot_s": 0.5005254681724547,
+          "diagnostic_nonattention_tpot_s": 0.46139357713039497,
+          "diagnostic_attention_tpot_s": 0.03913189104205958,
+          "diagnostic_nonattention_share_pct": 92.18183818199297,
+          "diagnostic_ep_tpot_s": 0.3196919090488809,
+          "diagnostic_ep_compute_tpot_s": 0.1999038780629635,
+          "diagnostic_ep_comm_tpot_s": 0.11978803098591742,
+          "diagnostic_ep_share_pct": 63.87125718420624,
+          "diagnostic_ep_critical_path_tpot_s": 0.3358983599837432,
+          "diagnostic_ep_critical_compute_tpot_s": 0.21737079200893641,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10415507898334181,
+          "diagnostic_ep_critical_other_tpot_s": 0.014372488991464956,
+          "decode_peer_gib": 1.023757740855217,
+          "decode_h2d_gib": 576.791015625,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.460138134960027,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.46095506893262067,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4620998681204073,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4658170807915885,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.45814371659375,
+          "diagnostic_total_tpot_s": 0.50728864425,
+          "diagnostic_full_decode_s": 16.233236616,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 16.22844879669707,
+          "diagnostic_phase_total_tpot_s": 0.5073406639302775,
+          "diagnostic_nonattention_tpot_s": 0.46981353596197006,
+          "diagnostic_attention_tpot_s": 0.03752712796830747,
+          "diagnostic_nonattention_share_pct": 92.60316969714363,
+          "diagnostic_ep_tpot_s": 0.32197620401115273,
+          "diagnostic_ep_compute_tpot_s": 0.19657863602787257,
+          "diagnostic_ep_comm_tpot_s": 0.12539756798328017,
+          "diagnostic_ep_share_pct": 63.46351217283877,
+          "diagnostic_ep_critical_path_tpot_s": 0.33751137050191393,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2265934608615935,
+          "diagnostic_ep_critical_comm_tpot_s": 0.0977392359712394,
+          "diagnostic_ep_critical_other_tpot_s": 0.013178673669081074,
+          "decode_peer_gib": 0.8660629019141197,
+          "decode_h2d_gib": 578.8740234375,
+          "token_agreement_to_br": 0.9981060606060606,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.46632077084376944,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4689608569004923,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4701084739525977,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4728898341695822,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.44459827946875,
+          "diagnostic_total_tpot_s": 0.49067704278125,
+          "diagnostic_full_decode_s": 15.701665369,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.696799519517873,
+          "diagnostic_phase_total_tpot_s": 0.4907970539126472,
+          "diagnostic_nonattention_tpot_s": 0.4436782899164391,
+          "diagnostic_attention_tpot_s": 0.047118763996208145,
+          "diagnostic_nonattention_share_pct": 90.39954220984497,
+          "diagnostic_ep_tpot_s": 0.306857139925356,
+          "diagnostic_ep_compute_tpot_s": 0.19897910394892093,
+          "diagnostic_ep_comm_tpot_s": 0.10787803597643505,
+          "diagnostic_ep_share_pct": 62.52220494786647,
+          "diagnostic_ep_critical_path_tpot_s": 0.3216865317279609,
+          "diagnostic_ep_critical_compute_tpot_s": 0.21371979377046227,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09640741100953892,
+          "diagnostic_ep_critical_other_tpot_s": 0.011559326947959733,
+          "decode_peer_gib": 0.985108770430088,
+          "decode_h2d_gib": 576.931640625,
+          "token_agreement_to_br": 0.9952651515151515,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.44146133477184774,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.445147573892551,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4438085600055565,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.44862369584260886,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.4585564409529406,
+      "near_gain_pct": 1.541158380592511,
+      "cache_percent": 30,
+      "transport": "p2p_disabled",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 7,
+        "proxy_locality_gain": 75.41666666666667
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s20_d7"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b8_case1_20261008",
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.43644972621875,
+          "diagnostic_total_tpot_s": 0.483358877125,
+          "diagnostic_full_decode_s": 15.467484068,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.458373246372103,
+          "diagnostic_phase_total_tpot_s": 0.4833925940616828,
+          "diagnostic_nonattention_tpot_s": 0.44635720403711454,
+          "diagnostic_attention_tpot_s": 0.03703539002456818,
+          "diagnostic_nonattention_share_pct": 92.33844488319934,
+          "diagnostic_ep_tpot_s": 0.3050580980195082,
+          "diagnostic_ep_compute_tpot_s": 0.1841266690529883,
+          "diagnostic_ep_comm_tpot_s": 0.12093142896651989,
+          "diagnostic_ep_share_pct": 63.1077310176129,
+          "diagnostic_ep_critical_path_tpot_s": 0.32158962361635546,
+          "diagnostic_ep_critical_compute_tpot_s": 0.20946959174424412,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09764106700156117,
+          "diagnostic_ep_critical_other_tpot_s": 0.014478964870550176,
+          "decode_peer_gib": 1.0211714506149292,
+          "decode_h2d_gib": 521.05078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.44204848191557544,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4420273199041112,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.44779384371104247,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4514613541554718,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.44301752103125,
+          "diagnostic_total_tpot_s": 0.490299506875,
+          "diagnostic_full_decode_s": 15.68958422,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.684292647604615,
+          "diagnostic_phase_total_tpot_s": 0.49035673008701997,
+          "diagnostic_nonattention_tpot_s": 0.4537949160642165,
+          "diagnostic_attention_tpot_s": 0.03656181402280344,
+          "diagnostic_nonattention_share_pct": 92.54383354413937,
+          "diagnostic_ep_tpot_s": 0.3075956590592105,
+          "diagnostic_ep_compute_tpot_s": 0.18377667504362763,
+          "diagnostic_ep_comm_tpot_s": 0.12381898401558283,
+          "diagnostic_ep_share_pct": 62.72895632626961,
+          "diagnostic_ep_critical_path_tpot_s": 0.3258617342496048,
+          "diagnostic_ep_critical_compute_tpot_s": 0.20023929519206288,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10984168698705617,
+          "diagnostic_ep_critical_other_tpot_s": 0.01578075207048577,
+          "decode_peer_gib": 0.8851004466414452,
+          "decode_h2d_gib": 523.40625,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4494493980639236,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4488630552377799,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.454100493264028,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.45867790584034085,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.42511757965625,
+          "diagnostic_total_tpot_s": 0.47411323459375,
+          "diagnostic_full_decode_s": 15.171623507,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.166402373365012,
+          "diagnostic_phase_total_tpot_s": 0.4742098538743157,
+          "diagnostic_nonattention_tpot_s": 0.42964450189736814,
+          "diagnostic_attention_tpot_s": 0.04456535197694757,
+          "diagnostic_nonattention_share_pct": 90.60218769963411,
+          "diagnostic_ep_tpot_s": 0.29343557289318417,
+          "diagnostic_ep_compute_tpot_s": 0.18488793388009073,
+          "diagnostic_ep_comm_tpot_s": 0.10854763901309343,
+          "diagnostic_ep_share_pct": 61.8788434056784,
+          "diagnostic_ep_critical_path_tpot_s": 0.3085336910283256,
+          "diagnostic_ep_critical_compute_tpot_s": 0.1989892970882356,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09684264898521361,
+          "diagnostic_ep_critical_other_tpot_s": 0.012701744954876436,
+          "decode_peer_gib": 0.9884143248200417,
+          "decode_h2d_gib": 521.3232421875,
+          "token_agreement_to_br": 0.9914772727272727,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4263617448885052,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.42531023797726086,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.43058211586780093,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4380438420907885,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.504822759175739,
+      "near_gain_pct": 2.5964380045962687,
+      "cache_percent": 30,
+      "transport": "p2p_disabled",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 14,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 75.27083333333333
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s14_d5"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b16_case0_20261008",
+      "cell": "ShareGPT_R4_C30_B16_L128_O33_s22_d3",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.52341818496875,
+          "diagnostic_total_tpot_s": 0.5692692114375,
+          "diagnostic_full_decode_s": 18.216614766,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.21110829659574,
+          "diagnostic_phase_total_tpot_s": 0.5693060514438184,
+          "diagnostic_nonattention_tpot_s": 0.5295483783699674,
+          "diagnostic_attention_tpot_s": 0.03975767307385103,
+          "diagnostic_nonattention_share_pct": 93.01646750934378,
+          "diagnostic_ep_tpot_s": 0.37483118631632534,
+          "diagnostic_ep_compute_tpot_s": 0.2493288653716445,
+          "diagnostic_ep_comm_tpot_s": 0.12550232094468083,
+          "diagnostic_ep_share_pct": 65.84001441153052,
+          "diagnostic_ep_critical_path_tpot_s": 0.39105440017816506,
+          "diagnostic_ep_critical_compute_tpot_s": 0.27711446399241685,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10140048100863351,
+          "diagnostic_ep_critical_other_tpot_s": 0.012539455177114663,
+          "decode_peer_gib": 2.0429550409317017,
+          "decode_h2d_gib": 812.07421875,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5237009322849118,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5339668180609878,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5289373258355045,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5340324184401325,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.5298400339375,
+          "diagnostic_total_tpot_s": 0.57834037753125,
+          "diagnostic_full_decode_s": 18.506892081,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.50137206081823,
+          "diagnostic_phase_total_tpot_s": 0.5784032460657109,
+          "diagnostic_nonattention_tpot_s": 0.5410988730769459,
+          "diagnostic_attention_tpot_s": 0.037304372988764954,
+          "diagnostic_nonattention_share_pct": 93.5504558035404,
+          "diagnostic_ep_tpot_s": 0.3766232080247137,
+          "diagnostic_ep_compute_tpot_s": 0.24713454699888826,
+          "diagnostic_ep_comm_tpot_s": 0.12948866102582543,
+          "diagnostic_ep_share_pct": 65.11429709056759,
+          "diagnostic_ep_critical_path_tpot_s": 0.3930657445204875,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2768643838018179,
+          "diagnostic_ep_critical_comm_tpot_s": 0.1027859390246449,
+          "diagnostic_ep_critical_other_tpot_s": 0.013415421694024683,
+          "decode_peer_gib": 1.7699789926409721,
+          "decode_h2d_gib": 814.18359375,
+          "token_agreement_to_br": 0.9886363636363635,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5339448631799824,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5450612648657188,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5363510762219521,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5429255948849168,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.51261332975,
+          "diagnostic_total_tpot_s": 0.56162967590625,
+          "diagnostic_full_decode_s": 17.972149629,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 17.96674771030633,
+          "diagnostic_phase_total_tpot_s": 0.5617660199358506,
+          "diagnostic_nonattention_tpot_s": 0.5159220520427188,
+          "diagnostic_attention_tpot_s": 0.045843967893131776,
+          "diagnostic_nonattention_share_pct": 91.8393127625685,
+          "diagnostic_ep_tpot_s": 0.3639818580318242,
+          "diagnostic_ep_compute_tpot_s": 0.24710161508992312,
+          "diagnostic_ep_comm_tpot_s": 0.11688024294190108,
+          "diagnostic_ep_share_pct": 64.79243049862434,
+          "diagnostic_ep_critical_path_tpot_s": 0.3813421635652898,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2650716930031777,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10185700292768887,
+          "diagnostic_ep_critical_other_tpot_s": 0.014413467634423294,
+          "decode_peer_gib": 1.9619230479002,
+          "decode_h2d_gib": 812.53125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.508667065199872,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5205237822483832,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.511800558906587,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5223466789621598,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.2269059717773034,
+      "near_gain_pct": 2.0642873192102007,
+      "cache_percent": 30,
+      "transport": "p2p_disabled",
+      "local_batch": 16,
+      "seed": {
+        "sample_seed": 22,
+        "rank_order_seed": 3,
+        "proxy_locality_gain": 111.0
+      },
+      "source_cell": "ShareGPT_R4_C60_B16_L128_O33_s22_d3"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c30_p2p_disabled_b64_case1_20261008",
+      "cell": "ShareGPT_R4_C30_B64_L128_O33_s20_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.5947257330625,
+          "diagnostic_total_tpot_s": 0.640577315875,
+          "diagnostic_full_decode_s": 20.498474108,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.492736701979506,
+          "diagnostic_phase_total_tpot_s": 0.6406341960315695,
+          "diagnostic_nonattention_tpot_s": 0.6016543900334073,
+          "diagnostic_attention_tpot_s": 0.03897980599816219,
+          "diagnostic_nonattention_share_pct": 93.91543469898673,
+          "diagnostic_ep_tpot_s": 0.43321821007569083,
+          "diagnostic_ep_compute_tpot_s": 0.3011731501370668,
+          "diagnostic_ep_comm_tpot_s": 0.13204505993862403,
+          "diagnostic_ep_share_pct": 67.62333524486766,
+          "diagnostic_ep_critical_path_tpot_s": 0.44936077793201123,
+          "diagnostic_ep_critical_compute_tpot_s": 0.32804541409015653,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10599775902088732,
+          "diagnostic_ep_critical_other_tpot_s": 0.015317604820967378,
+          "decode_peer_gib": 8.17444471269846,
+          "decode_h2d_gib": 1051.7080078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5962074109023305,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6055596991174461,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5980211509567235,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6103758289972829,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.6048338705625,
+          "diagnostic_total_tpot_s": 0.6542642328125,
+          "diagnostic_full_decode_s": 20.93645545,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.93060329668931,
+          "diagnostic_phase_total_tpot_s": 0.6543447371173243,
+          "diagnostic_nonattention_tpot_s": 0.6176391751219708,
+          "diagnostic_attention_tpot_s": 0.03670556199535349,
+          "diagnostic_nonattention_share_pct": 94.39048563956399,
+          "diagnostic_ep_tpot_s": 0.4368139551322674,
+          "diagnostic_ep_compute_tpot_s": 0.29861710613965986,
+          "diagnostic_ep_comm_tpot_s": 0.13819684899260753,
+          "diagnostic_ep_share_pct": 66.75593618382636,
+          "diagnostic_ep_critical_path_tpot_s": 0.4554573094942179,
+          "diagnostic_ep_critical_compute_tpot_s": 0.33072239319980146,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10690942500607344,
+          "diagnostic_ep_critical_other_tpot_s": 0.017825491288343067,
+          "decode_peer_gib": 7.472175091505051,
+          "decode_h2d_gib": 1052.7451171875,
+          "token_agreement_to_br": 0.9898200757575758,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.610133931078497,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6216011520253305,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.6142643840347883,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6239407143741992,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.585696128625,
+          "diagnostic_total_tpot_s": 0.6334872028125,
+          "diagnostic_full_decode_s": 20.27159049,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.265695976050388,
+          "diagnostic_phase_total_tpot_s": 0.6335860111447691,
+          "diagnostic_nonattention_tpot_s": 0.5880677141218766,
+          "diagnostic_attention_tpot_s": 0.045518297022892514,
+          "diagnostic_nonattention_share_pct": 92.8157667274488,
+          "diagnostic_ep_tpot_s": 0.42238188911433094,
+          "diagnostic_ep_compute_tpot_s": 0.3021626020669937,
+          "diagnostic_ep_comm_tpot_s": 0.12021928704733728,
+          "diagnostic_ep_share_pct": 66.6652801174015,
+          "diagnostic_ep_critical_path_tpot_s": 0.4394960237678892,
+          "diagnostic_ep_critical_compute_tpot_s": 0.31792588801682,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10681276802538195,
+          "diagnostic_ep_critical_other_tpot_s": 0.014757367725687328,
+          "decode_peer_gib": 8.008631370961666,
+          "decode_h2d_gib": 1051.4970703125,
+          "token_agreement_to_br": 0.9910037878787878,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5828007659815848,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5971581860601436,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.584080597064778,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6019641259795462,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.6996300879648985,
+      "near_gain_pct": 1.5182804334029187,
+      "cache_percent": 30,
+      "transport": "p2p_disabled",
+      "local_batch": 64,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 219.25000000000009
+      },
+      "source_cell": "ShareGPT_R4_C60_B64_L128_O33_s20_d5"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c60_p2p_disabled_b8_case0_20261008",
+      "cell": "ShareGPT_R4_C60_B8_L128_O33_s20_d7",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.4327760685,
+          "diagnostic_total_tpot_s": 0.479364834625,
+          "diagnostic_full_decode_s": 15.339674708,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.334700513671667,
+          "diagnostic_phase_total_tpot_s": 0.47950121822920483,
+          "diagnostic_nonattention_tpot_s": 0.44362272318861506,
+          "diagnostic_attention_tpot_s": 0.035878495040589764,
+          "diagnostic_nonattention_share_pct": 92.51753829258477,
+          "diagnostic_ep_tpot_s": 0.2978288651867479,
+          "diagnostic_ep_compute_tpot_s": 0.18574414520338178,
+          "diagnostic_ep_comm_tpot_s": 0.1120847199833661,
+          "diagnostic_ep_share_pct": 62.11222283993941,
+          "diagnostic_ep_critical_path_tpot_s": 0.31255930754110395,
+          "diagnostic_ep_critical_compute_tpot_s": 0.20753778211399912,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09209874700161164,
+          "diagnostic_ep_critical_other_tpot_s": 0.012922778425493199,
+          "decode_peer_gib": 1.025655373930931,
+          "decode_h2d_gib": 204.345703125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4360616510555919,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4371953628714764,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4450093940268053,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4491040762816847,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.4432368515,
+          "diagnostic_total_tpot_s": 0.49295347675,
+          "diagnostic_full_decode_s": 15.774511256,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.769440711146256,
+          "diagnostic_phase_total_tpot_s": 0.49298988305165403,
+          "diagnostic_nonattention_tpot_s": 0.4551993830370848,
+          "diagnostic_attention_tpot_s": 0.03779050001456927,
+          "diagnostic_nonattention_share_pct": 92.33442686883502,
+          "diagnostic_ep_tpot_s": 0.3093455070128548,
+          "diagnostic_ep_compute_tpot_s": 0.19151228301227094,
+          "diagnostic_ep_comm_tpot_s": 0.11783322400058388,
+          "diagnostic_ep_share_pct": 62.74885502679626,
+          "diagnostic_ep_critical_path_tpot_s": 0.322817871930425,
+          "diagnostic_ep_critical_compute_tpot_s": 0.22430335895717146,
+          "diagnostic_ep_critical_comm_tpot_s": 0.08645656597206834,
+          "diagnostic_ep_critical_other_tpot_s": 0.01205794700118518,
+          "decode_peer_gib": 0.8777165114879608,
+          "decode_h2d_gib": 205.91015625,
+          "token_agreement_to_br": 0.9962121212121212,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4486956527516886,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4487044971853029,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4653368788660373,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.4689668459937166,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.42485593134375,
+          "diagnostic_total_tpot_s": 0.47762729515625,
+          "diagnostic_full_decode_s": 15.284073445,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.278909928919019,
+          "diagnostic_phase_total_tpot_s": 0.47774987116706324,
+          "diagnostic_nonattention_tpot_s": 0.4388493321412389,
+          "diagnostic_attention_tpot_s": 0.0389005390258244,
+          "diagnostic_nonattention_share_pct": 91.85755112172049,
+          "diagnostic_ep_tpot_s": 0.2938023641489562,
+          "diagnostic_ep_compute_tpot_s": 0.18772137805074451,
+          "diagnostic_ep_comm_tpot_s": 0.10608098609821173,
+          "diagnostic_ep_share_pct": 61.49711007378109,
+          "diagnostic_ep_critical_path_tpot_s": 0.3075712686507128,
+          "diagnostic_ep_critical_compute_tpot_s": 0.21321763283014297,
+          "diagnostic_ep_critical_comm_tpot_s": 0.08340250801231014,
+          "diagnostic_ep_critical_other_tpot_s": 0.010951127808259735,
+          "decode_peer_gib": 0.9959359914064407,
+          "decode_h2d_gib": 203.87109375,
+          "token_agreement_to_br": 0.9971590909090909,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4313379669942442,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4362207911214209,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.44121204486334314,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.44618630120075253,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -2.4171352718871386,
+      "near_gain_pct": 1.8300774309682022,
+      "cache_percent": 60,
+      "transport": "p2p_disabled",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 7,
+        "proxy_locality_gain": 75.41666666666667
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s20_d7"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c60_p2p_disabled_b8_case1_20261008",
+      "cell": "ShareGPT_R4_C60_B8_L128_O33_s14_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.41689358265625,
+          "diagnostic_total_tpot_s": 0.4728544079375,
+          "diagnostic_full_decode_s": 15.131341054,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.126518471663994,
+          "diagnostic_phase_total_tpot_s": 0.47296128466734083,
+          "diagnostic_nonattention_tpot_s": 0.43645087169916225,
+          "diagnostic_attention_tpot_s": 0.03651041296817857,
+          "diagnostic_nonattention_share_pct": 92.28046477549249,
+          "diagnostic_ep_tpot_s": 0.29128124479495454,
+          "diagnostic_ep_compute_tpot_s": 0.17839648080617188,
+          "diagnostic_ep_comm_tpot_s": 0.11288476398878267,
+          "diagnostic_ep_share_pct": 61.586699427169464,
+          "diagnostic_ep_critical_path_tpot_s": 0.30573715494338455,
+          "diagnostic_ep_critical_compute_tpot_s": 0.20124249226227403,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09151551000535255,
+          "diagnostic_ep_critical_other_tpot_s": 0.01297915267575796,
+          "decode_peer_gib": 1.0236659198999405,
+          "decode_h2d_gib": 160.4970703125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4297624051456296,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.43205344901600623,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.4365614950720338,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.44338630081638986,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.42945210975,
+          "diagnostic_total_tpot_s": 0.48912095434375,
+          "diagnostic_full_decode_s": 15.651870539,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 15.646767420911413,
+          "diagnostic_phase_total_tpot_s": 0.48916369885671884,
+          "diagnostic_nonattention_tpot_s": 0.4528172178756431,
+          "diagnostic_attention_tpot_s": 0.036346480981075735,
+          "diagnostic_nonattention_share_pct": 92.56966919948775,
+          "diagnostic_ep_tpot_s": 0.3053729578202765,
+          "diagnostic_ep_compute_tpot_s": 0.18378855285421014,
+          "diagnostic_ep_comm_tpot_s": 0.12158440496606636,
+          "diagnostic_ep_share_pct": 62.42755922690073,
+          "diagnostic_ep_critical_path_tpot_s": 0.3170176978917136,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2226801211461425,
+          "diagnostic_ep_critical_comm_tpot_s": 0.08462965202791384,
+          "diagnostic_ep_critical_other_tpot_s": 0.009707924717657261,
+          "decode_peer_gib": 0.8935862332582474,
+          "decode_h2d_gib": 162.3427734375,
+          "token_agreement_to_br": 0.9933712121212122,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4407674948652348,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4621180391293747,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.45624984393182966,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.46424161603572434,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.41719137175,
+          "diagnostic_total_tpot_s": 0.4663044570625,
+          "diagnostic_full_decode_s": 14.921742626,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 14.91671545126748,
+          "diagnostic_phase_total_tpot_s": 0.4664020049872488,
+          "diagnostic_nonattention_tpot_s": 0.4288410900386225,
+          "diagnostic_attention_tpot_s": 0.0375609149486263,
+          "diagnostic_nonattention_share_pct": 91.9466652057696,
+          "diagnostic_ep_tpot_s": 0.28335095905512575,
+          "diagnostic_ep_compute_tpot_s": 0.17854048305004835,
+          "diagnostic_ep_comm_tpot_s": 0.10481047600507737,
+          "diagnostic_ep_share_pct": 60.7525173616851,
+          "diagnostic_ep_critical_path_tpot_s": 0.29859094544186215,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2014368441142142,
+          "diagnostic_ep_critical_comm_tpot_s": 0.08416988603817299,
+          "diagnostic_ep_critical_other_tpot_s": 0.012984215289474976,
+          "decode_peer_gib": 0.9901436194777489,
+          "decode_h2d_gib": 159.9169921875,
+          "token_agreement_to_br": 0.9886363636363638,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.4242634228921743,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.4303978090923265,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.42283319690697685,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.43391755811882465,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -3.012405951114183,
+      "near_gain_pct": -0.07143048157580711,
+      "cache_percent": 60,
+      "transport": "p2p_disabled",
+      "local_batch": 8,
+      "seed": {
+        "sample_seed": 14,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 75.27083333333333
+      },
+      "source_cell": "ShareGPT_R4_C60_B8_L128_O33_s14_d5"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c60_p2p_disabled_b16_case0_20261008",
+      "cell": "ShareGPT_R4_C60_B16_L128_O33_s22_d3",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.5101407955,
+          "diagnostic_total_tpot_s": 0.560067233375,
+          "diagnostic_full_decode_s": 17.922151468,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 17.917006403661937,
+          "diagnostic_phase_total_tpot_s": 0.5601363103013791,
+          "diagnostic_nonattention_tpot_s": 0.5241031862892196,
+          "diagnostic_attention_tpot_s": 0.03603312401215954,
+          "diagnostic_nonattention_share_pct": 93.56707941451393,
+          "diagnostic_ep_tpot_s": 0.36344857630319893,
+          "diagnostic_ep_compute_tpot_s": 0.23162537524104118,
+          "diagnostic_ep_comm_tpot_s": 0.13182320106215775,
+          "diagnostic_ep_share_pct": 64.88573756406666,
+          "diagnostic_ep_critical_path_tpot_s": 0.37833915291352793,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2666613285243511,
+          "diagnostic_ep_critical_comm_tpot_s": 0.09895129702205305,
+          "diagnostic_ep_critical_other_tpot_s": 0.012726527367123805,
+          "decode_peer_gib": 2.0499028265476227,
+          "decode_h2d_gib": 370.2216796875,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.519058920012445,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5255568992048211,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5170682652926917,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5268018691272591,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.52414752878125,
+          "diagnostic_total_tpot_s": 0.57388814334375,
+          "diagnostic_full_decode_s": 18.364420587,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.359106312376653,
+          "diagnostic_phase_total_tpot_s": 0.5739022591211687,
+          "diagnostic_nonattention_tpot_s": 0.5364138601204613,
+          "diagnostic_attention_tpot_s": 0.03748839900070743,
+          "diagnostic_nonattention_share_pct": 93.46780773121293,
+          "diagnostic_ep_tpot_s": 0.3732908100600471,
+          "diagnostic_ep_compute_tpot_s": 0.23810539296269417,
+          "diagnostic_ep_comm_tpot_s": 0.13518541709735293,
+          "diagnostic_ep_share_pct": 65.04431793519632,
+          "diagnostic_ep_critical_path_tpot_s": 0.38851284170923217,
+          "diagnostic_ep_critical_compute_tpot_s": 0.2743870909661055,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10078985006792936,
+          "diagnostic_ep_critical_other_tpot_s": 0.013335900675197344,
+          "decode_peer_gib": 1.804098129272461,
+          "decode_h2d_gib": 371.2587890625,
+          "token_agreement_to_br": 0.9928977272727273,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5349586657825711,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5432036180120122,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5284232992941034,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.5439019180560936,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.51089639834375,
+          "diagnostic_total_tpot_s": 0.5628451334375,
+          "diagnostic_full_decode_s": 18.01104427,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 18.005681677253,
+          "diagnostic_phase_total_tpot_s": 0.5629734380989175,
+          "diagnostic_nonattention_tpot_s": 0.5209428021256899,
+          "diagnostic_attention_tpot_s": 0.04203063597322762,
+          "diagnostic_nonattention_share_pct": 92.53417068571491,
+          "diagnostic_ep_tpot_s": 0.3617313441299484,
+          "diagnostic_ep_compute_tpot_s": 0.23883503908663986,
+          "diagnostic_ep_comm_tpot_s": 0.12289630504330852,
+          "diagnostic_ep_share_pct": 64.25371423409682,
+          "diagnostic_ep_critical_path_tpot_s": 0.3781613138112094,
+          "diagnostic_ep_critical_compute_tpot_s": 0.25652002988755707,
+          "diagnostic_ep_critical_comm_tpot_s": 0.10657567897095578,
+          "diagnostic_ep_critical_other_tpot_s": 0.015065604952696576,
+          "decode_peer_gib": 1.965894304215908,
+          "decode_h2d_gib": 370.08984375,
+          "token_agreement_to_br": 0.9900568181818181,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5197364490417895,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5253882182463567,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5174221367253922,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.530952049293679,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -2.7456602970796995,
+      "near_gain_pct": -0.14811652987081203,
+      "cache_percent": 60,
+      "transport": "p2p_disabled",
+      "local_batch": 16,
+      "seed": {
+        "sample_seed": 22,
+        "rank_order_seed": 3,
+        "proxy_locality_gain": 111.0
+      },
+      "source_cell": "ShareGPT_R4_C60_B16_L128_O33_s22_d3"
+    },
+    {
+      "status": "PASS",
+      "label": "policy_gap_sharegpt_c60_p2p_disabled_b64_case1_20261008",
+      "cell": "ShareGPT_R4_C60_B64_L128_O33_s20_d5",
+      "policies": {
+        "BR": {
+          "primary_tpot_s": 0.5757210699375,
+          "diagnostic_total_tpot_s": 0.63576644853125,
+          "diagnostic_full_decode_s": 20.344526353,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.338941241767415,
+          "diagnostic_phase_total_tpot_s": 0.6358881429137764,
+          "diagnostic_nonattention_tpot_s": 0.5986184039411238,
+          "diagnostic_attention_tpot_s": 0.037269738972652705,
+          "diagnostic_nonattention_share_pct": 94.13894733091348,
+          "diagnostic_ep_tpot_s": 0.42364152696111707,
+          "diagnostic_ep_compute_tpot_s": 0.2837257529348135,
+          "diagnostic_ep_comm_tpot_s": 0.13991577402630356,
+          "diagnostic_ep_share_pct": 66.6220201905166,
+          "diagnostic_ep_critical_path_tpot_s": 0.4389577304746374,
+          "diagnostic_ep_critical_compute_tpot_s": 0.31613483697921035,
+          "diagnostic_ep_critical_comm_tpot_s": 0.1077077679564245,
+          "diagnostic_ep_critical_other_tpot_s": 0.015115125539002492,
+          "decode_peer_gib": 8.218916662037373,
+          "decode_h2d_gib": 543.7705078125,
+          "token_agreement_to_br": 1.0,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5960106806962795,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5970653399016883,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5965001559410157,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6043510610568992,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "CA_NATIVE": {
+          "primary_tpot_s": 0.583910576375,
+          "diagnostic_total_tpot_s": 0.6492386205625,
+          "diagnostic_full_decode_s": 20.775635858,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.76997111646204,
+          "diagnostic_phase_total_tpot_s": 0.6493078588155695,
+          "diagnostic_nonattention_tpot_s": 0.6158631747742984,
+          "diagnostic_attention_tpot_s": 0.0334446840412711,
+          "diagnostic_nonattention_share_pct": 94.84917923182402,
+          "diagnostic_ep_tpot_s": 0.4327924777722219,
+          "diagnostic_ep_compute_tpot_s": 0.28089681670814753,
+          "diagnostic_ep_comm_tpot_s": 0.15189566106407437,
+          "diagnostic_ep_share_pct": 66.65443393241803,
+          "diagnostic_ep_critical_path_tpot_s": 0.4479955857990024,
+          "diagnostic_ep_critical_compute_tpot_s": 0.3232325527146459,
+          "diagnostic_ep_critical_comm_tpot_s": 0.1083047649989021,
+          "diagnostic_ep_critical_other_tpot_s": 0.016458268085454444,
+          "decode_peer_gib": 7.438323765993118,
+          "decode_h2d_gib": 545.1767578125,
+          "token_agreement_to_br": 0.9923058712121211,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.6090879182011486,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.6118615947941654,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.6131876002460777,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6186371766580778,
+              "cache_events": 1536
+            }
+          ]
+        },
+        "LA_CA_NEAR": {
+          "primary_tpot_s": 0.577901906,
+          "diagnostic_total_tpot_s": 0.637126086,
+          "diagnostic_full_decode_s": 20.388034752,
+          "diagnostic_decode_dispatch_to_return_elapsed_s": 20.378115420278757,
+          "diagnostic_phase_total_tpot_s": 0.6372078040764318,
+          "diagnostic_nonattention_tpot_s": 0.5998561220438787,
+          "diagnostic_attention_tpot_s": 0.03735168203255307,
+          "diagnostic_nonattention_share_pct": 94.13822589842718,
+          "diagnostic_ep_tpot_s": 0.4210363349461695,
+          "diagnostic_ep_compute_tpot_s": 0.2823874309659004,
+          "diagnostic_ep_comm_tpot_s": 0.13864890398026908,
+          "diagnostic_ep_share_pct": 66.07520062570781,
+          "diagnostic_ep_critical_path_tpot_s": 0.43746849970105284,
+          "diagnostic_ep_critical_compute_tpot_s": 0.3046405162289739,
+          "diagnostic_ep_critical_comm_tpot_s": 0.11626962001854554,
+          "diagnostic_ep_critical_other_tpot_s": 0.016558363453533446,
+          "decode_peer_gib": 8.009756177663803,
+          "decode_h2d_gib": 544.2626953125,
+          "token_agreement_to_br": 0.991595643939394,
+          "ranks": [
+            {
+              "rank": 0,
+              "moe_seconds_per_decode": 0.5949427708629228,
+              "cache_events": 1536
+            },
+            {
+              "rank": 1,
+              "moe_seconds_per_decode": 0.5994891249484717,
+              "cache_events": 1536
+            },
+            {
+              "rank": 2,
+              "moe_seconds_per_decode": 0.5929900332350662,
+              "cache_events": 1536
+            },
+            {
+              "rank": 3,
+              "moe_seconds_per_decode": 0.6047061138565841,
+              "cache_events": 1536
+            }
+          ]
+        }
+      },
+      "ca_gain_pct": -1.4224781522046648,
+      "near_gain_pct": -0.3788008076092586,
+      "cache_percent": 60,
+      "transport": "p2p_disabled",
+      "local_batch": 64,
+      "seed": {
+        "sample_seed": 20,
+        "rank_order_seed": 5,
+        "proxy_locality_gain": 219.25000000000009
+      },
+      "source_cell": "ShareGPT_R4_C60_B64_L128_O33_s20_d5"
+    }
+  ]
+}
