@@ -995,3 +995,11 @@ reduces peer bytes12.35% but worsens primary TPOT in both modes; post-barrier
 collective-path cost is nearly unchanged, while controller and return-rank
 readiness are worse. Diagnostic spans are not wire-only times. Jobs complete,
 owned inference loads restored; do not automatically rerun or promote ablation.
+**OWNER NATIVE CA CONTROLLER CANDIDATE (2026-10-08), active.**
+Read experiments/native_ca_controller_20261008/PLAN.md. New opt-in
+`CA_NATIVE` replaces expanded-slot Hungarian assignment with exact-quota
+C++ min-cost flow under the same local-demand objective. Tie assignments can
+differ. CPU objective/quota tests first, then two frozen R4/C30/B16/L256/O64
+primaries per CA mode and separate controller diagnostics. GPUs0/1/4/5 only;
+keep selected Near main_OURS unchanged, restore owned model loads and do not
+promote `CA_NATIVE` without physical evidence.

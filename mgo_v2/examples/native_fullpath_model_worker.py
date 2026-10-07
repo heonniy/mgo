@@ -37,14 +37,14 @@ def main(a):
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=spec['local_batch'];a.seed=42;a.policy=os.environ.get('MGO_NATIVE_POLICY','BR');a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
- assert a.policy in ('BR','CA','LA_CA_NEAR')
+ assert a.policy in ('BR','CA','CA_NATIVE','LA_CA_NEAR')
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
  policy_comparison=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')
- assert policy_comparison in ('0','1','CA_NEAR','BR_CA')
+ assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE')
  compare_policy=policy_comparison!='0'
- policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA')}.get(policy_comparison,())
- capture_policy='LA_CA_NEAR' if policy_comparison=='BR_CA' else (policy_modes[0] if compare_policy else a.policy)
+ policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE')}.get(policy_comparison,())
+ capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE') else (policy_modes[0] if compare_policy else a.policy)
  sync_ablation=os.environ.get('MGO_NATIVE_SYNC_ABLATION','0')=='1'
  assert not (compare_prefetch and compare_policy)
  if compare_prefetch:assert a.policy=='LA_CA_NEAR' and prefetch=='on'

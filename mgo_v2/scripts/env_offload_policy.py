@@ -130,4 +130,10 @@ class Policy:
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
         seed_rng(seed)
     def apply(self,event,selected,weights,origins,gate_scores,future):
-        return step(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates)
+        if self.policy==8:
+            # Compile a CA-only copy of the unchanged replay kernel with the
+            # native quota solver. Keep the cached legacy JIT path untouched.
+            from native_ca_assignment import fast_ca_step
+            planner=fast_ca_step(step)
+        else:planner=step
+        return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates)
