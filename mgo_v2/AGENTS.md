@@ -1,3 +1,14 @@
+**OWNER PREFILL TTFT DIAGNOSIS COMPLETE (2026-10-07), plan e641419.**
+Read `experiments/main_table_global_workload_20261006/prefill_diagnosis/RESULTS.md`.
+B64/L512 and B16/L256 one-token cold diagnostics complete, optimized Near/H0/
+full-pinned, GPUs0/1/4/5 only. In B64, CPU layout construction plus device-index
+materialization accounts for73.01% of critical-rank diagnostic TTFT; own-thread
+CPU measurements corroborate host work. First-token parity and all guards pass.
+H2D service remains non-additive; no headline timing replacement or production
+repair. Next candidate is CPU layout/index representation, not automatically
+more overlap/grouped GEMM. Preserve all raw traces and prior unstable timing.
+Owned model loads restored on0/1/4/5; do not touch2/3/6/7. Historical tasks follow.
+
 **OWNER PREFILL OPTIMIZATION FOLLOW-UP COMPLETE (2026-10-07).**
 Read `experiments/main_table_global_workload_20261006/prefill_optimized/RESULTS.md`.
 Opt-in exact Gate-tail metadata plus packed forward/BF16 rank-partial return
