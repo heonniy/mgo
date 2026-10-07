@@ -121,7 +121,7 @@ if __name__=='__main__':
  p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
- p.add_argument('--policy',choices=('BR','LA_CA_NEAR'))
+ p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))
  p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--native-prefill',action='store_true')
  p.add_argument('--prefetch-off',action='store_true')

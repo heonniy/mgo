@@ -1,3 +1,13 @@
+**OWNER NATIVE CA CONTROLLER CANDIDATE COMPLETE (2026-10-08).**
+Read experiments/native_ca_controller_20261008/{PLAN.md,RESULTS.md,RANK_DIAGNOSTIC.json}.
+Opt-in `CA_NATIVE` uses C++ min-cost flow with the same exact local-demand
+objective and hard rank quotas as CA, but equal-objective tie assignments can
+change. CPU parity tests and two-repeat frozen R4/C30/B16/L256/O64 physical
+comparison PASS on GPUs0/1/4/5: CA TPOT0.524254→0.519423s, controller
+diagnostic14.251→12.179ms/token. Peer/H2D bytes change slightly; token
+agreement is99.023%. Keep selected Near main_OURS unchanged. Native CA is
+opt-in; do not automatically expand/repeat this packet. Owned loads restored.
+
 **OWNER CA VERSUS main_OURS NEAR FOLLOW-UP COMPLETE (2026-10-08).**
 Read experiments/native_ca_near_20261008/PLAN.md. Keep main_OURS as native
 C++ expert + compiled prefill/decode indices + Near + prefetch OFF. The one
@@ -995,11 +1005,3 @@ reduces peer bytes12.35% but worsens primary TPOT in both modes; post-barrier
 collective-path cost is nearly unchanged, while controller and return-rank
 readiness are worse. Diagnostic spans are not wire-only times. Jobs complete,
 owned inference loads restored; do not automatically rerun or promote ablation.
-**OWNER NATIVE CA CONTROLLER CANDIDATE (2026-10-08), active.**
-Read experiments/native_ca_controller_20261008/PLAN.md. New opt-in
-`CA_NATIVE` replaces expanded-slot Hungarian assignment with exact-quota
-C++ min-cost flow under the same local-demand objective. Tie assignments can
-differ. CPU objective/quota tests first, then two frozen R4/C30/B16/L256/O64
-primaries per CA mode and separate controller diagnostics. GPUs0/1/4/5 only;
-keep selected Near main_OURS unchanged, restore owned model loads and do not
-promote `CA_NATIVE` without physical evidence.
