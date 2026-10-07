@@ -32,6 +32,8 @@ def main(a):
   if a.ranks>1:command+=['-m','torch.distributed.run','--standalone',f'--nproc_per_node={a.ranks}']
   command +=[str(c.P/'examples'/a.worker),'--cell',a.cell,'--output',str(out)]+(['--smoke'] if a.smoke else [])
   if a.repeats is not None:command+=['--repeats',str(a.repeats)]
+  if a.expert_executor is not None:
+   assert a.worker=='headline_ours_worker.py';command+=['--expert-executor',a.expert_executor]
   if a.llama_threads is not None:
    assert a.worker=='headline_llama_sync_worker.py' and a.ranks==1
    command+=['--threads',str(a.llama_threads)]
@@ -108,6 +110,7 @@ if __name__=='__main__':
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','LA_CA_NEAR'))
+ p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--post-generation-diagnostic',action='store_true')
  p.add_argument('--record-main-eviction-trace',action='store_true')
  p.add_argument('--decode-layout-fast',action='store_true')

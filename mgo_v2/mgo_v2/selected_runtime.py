@@ -56,6 +56,13 @@ def selected_options(selection_path=None, arm=None):
 
 
 def _create_runtime(args, model, backing, experts, options):
+    backend = options.get('expert_executor', 'h0')
+    if backend not in ('h0', 'native'):
+        raise ValueError('expert_executor must be h0 or native')
+    native = None
+    if backend == 'native':
+        from .native_expert import NativeExpertExecutor
+        native = NativeExpertExecutor()
     for name, value in options.items():
         setattr(args, name, value)
     from .decode_runtime import DecodeOffloadRuntime
@@ -77,6 +84,7 @@ def _create_runtime(args, model, backing, experts, options):
         receipt = dict(bytes=required, init_seconds=time.perf_counter()-started,
                        host_available_before=available, source='full_pinned')
     runtime = DecodeOffloadRuntime(args, model, backing, experts)
+    runtime.native_executor = native
     runtime.pinned_expert_pool = pool
     runtime.pinned_expert_store_receipt = receipt
     return runtime
@@ -85,6 +93,7 @@ def _create_runtime(args, model, backing, experts, options):
 def create_explicit_runtime(args, model, backing, experts, case):
     """Construct an explicit experimental arm using the default's same path."""
     options = arm_options(case['runtime_arm'], case['P'], case['trigger'])
+    options['expert_executor'] = case.get('expert_executor', 'h0')
     options['expert_source']=case.get('expert_source','staged')
     if options['expert_source'] not in ('staged','full_pinned'):
         raise ValueError('Unknown expert source')
@@ -110,4 +119,5 @@ def create_selected_runtime(args, model, backing, experts, *, selection_path=Non
     and its pool is retained by the runtime for the lifetime of queued copies.
     """
     options = selected_options(selection_path, arm)
+    options['expert_executor'] = getattr(args, 'expert_executor', 'h0')
     return _create_runtime(args, model, backing, experts, options)
