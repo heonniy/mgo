@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "cell": "R4_C30_B32_L512_O64",
+  "local_batch": 32,
+  "global_requests": 128,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "cache_percent": 30,
+  "cpu_threads": 32,
+  "repeats": 2,
+  "cuda_graphs": "OFF in both arms",
+  "reference_graph_reuse": "ON",
+  "new_graph_reuse": "OFF",
+  "same_binary": true,
+  "exact_token_parity": true,
+  "sole_intended_runtime_difference": "LLAMA_GRAPH_REUSE_DISABLE",
+  "metrics": {
+    "TTFT": {
+      "cuda_off_reuse_on": [
+        281.893355804,
+        281.568504256
+      ],
+      "both_off": [
+        281.37326094,
+        281.41031194
+      ],
+      "reuse_on_mean": 281.73093002999997,
+      "both_off_mean": 281.39178644000003,
+      "both_off_minus_reuse_on": -0.3391435899999351,
+      "slowdown_percent": -0.12037854344350007
+    },
+    "TPOT": {
+      "cuda_off_reuse_on": [
+        0.7410910281746032,
+        0.7417424717301592
+      ],
+      "both_off": [
+        0.7451846814126979,
+        0.7440209891111113
+      ],
+      "reuse_on_mean": 0.7414167499523812,
+      "both_off_mean": 0.7446028352619045,
+      "both_off_minus_reuse_on": 0.0031860853095233566,
+      "slowdown_percent": 0.42972934044556155
+    },
+    "E2E": {
+      "cuda_off_reuse_on": [
+        328.582090579,
+        328.298279975
+      ],
+      "both_off": [
+        328.319895869,
+        328.283634254
+      ],
+      "reuse_on_mean": 328.440185277,
+      "both_off_mean": 328.30176506149996,
+      "both_off_minus_reuse_on": -0.13842021550004802,
+      "slowdown_percent": -0.04214472579940898
+    }
+  }
+}
