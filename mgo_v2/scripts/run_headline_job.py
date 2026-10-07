@@ -37,7 +37,7 @@ def main(a):
   state['preflight_release_observations']=observed
   assert not occupants,f'GPU occupants remain after bounded cleanup wait: {occupants}'
   env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',OMP_NUM_THREADS='2',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',TORCHINDUCTOR_COMPILE_THREADS='2',PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{c.P}:{c.P/"scripts"}:{c.P/"examples"}')
-  if a.ours_final or a.expert_executor=='native':
+  if a.ours_final or a.expert_executor=='native' or a.worker=='headline_ours_deepseek_worker.py':
    native_build=Path('/home/hwlee/mgo-tools/native-expert-build/bin')
    assert (native_build/'ninja').is_file(),'native executor requires its audited ninja build tool'
    env['PATH']=str(native_build)+os.pathsep+env['PATH']
@@ -47,6 +47,8 @@ def main(a):
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0';env['PYTHONFAULTHANDLER']='1'
+  if a.worker=='headline_ours_deepseek_worker.py':
+   env['NUMBA_CACHE_DIR']='/tmp/mgo-main-table-deepseek-numba-v1'
   if a.nccl_p2p_disable:
    # With P2P off, this host selects a failing NET/IB path. Keep the
    # established same-host env2 transport on SHM by disabling IB as well.
