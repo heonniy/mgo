@@ -1,5 +1,5 @@
 """Owner-repaired BF16 MoE-Infinity, native requests and cold expert cache."""
-import argparse,copy,gc,hashlib,json,os,time,weakref
+import argparse,copy,faulthandler,gc,hashlib,json,os,time,weakref
 from pathlib import Path
 import torch,psutil
 from moe_infinity import MoE
@@ -60,6 +60,7 @@ def main(a):
        scope='DeepSeek only; full scores remain eviction priorities'))
  if a.smoke and model_family!='Qwen3':
   # Diagnose first-use DeepSeek EAM without adding probes to table timing.
+  faulthandler.dump_traceback_later(45,repeat=True)
   trace_path=a.output/'deepseek_eam_trace.jsonl';trace_phase={'repeat':-1}
   def trace(kind,layer,**extra):
    with trace_path.open('a') as stream:
