@@ -38,7 +38,11 @@ def main(a):
  assert a.policy in ('BR','LA_CA_NEAR')
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
+ compare_policy=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')=='1'
+ assert not (compare_prefetch and compare_policy)
  if compare_prefetch:assert a.policy=='LA_CA_NEAR' and prefetch=='on'
+ if compare_policy:assert a.policy=='BR' and prefetch=='off'
+ comparing=compare_prefetch or compare_policy
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.native_prefill=True;a.validate_decode_layout=False;a.validate_prefill_optimized=False
  a.capacities=spec.get('expert_slots_per_rank',[461,461,461,460])
  options=selected_options();options.update(arena_budget=2,streaming=True,ready_first=True,trigger='T2',runtime_arm='BR_P2_OVERLAP')
@@ -54,13 +58,15 @@ def main(a):
   rows=json.loads(Path(spec[kind]['path']).read_text())['requests'][rank*a.local_batch:(rank+1)*a.local_batch]
   return torch.tensor([r['input_ids'] for r in rows],device='cuda')
  warm=inputs('warmup');target=inputs('target')
- warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else [('h0',None),('native',native)]
+ warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else ([('BR',native),('LA_CA_NEAR',native)] if compare_policy else [('h0',None),('native',native)])
  for name,executor in warm_modes:
+  if compare_policy:a.policy=name
   rt.native_executor=executor;reset()
   if compare_prefetch:rt.prefetch_next=prefetch_on if name=='prefetch_on' else lambda:None
   if rank==0:write(a.output/'phase.json',dict(phase='warmup',backend=name))
   generate_live(model,rt,warm,min(4,a.decode_steps+1));validate_state(rt)
- rt.native_executor=None;reset();routes=[];original=rt.execute
+ if compare_policy:a.policy='BR'
+ rt.native_executor=native if compare_policy else None;reset();routes=[];original=rt.execute
  if compare_prefetch:rt.prefetch_next=prefetch_on
  def capture(layer,hidden,selected,weights,probs):
   routes.append((selected.detach().clone(),weights.detach().clone(),probs.detach().clone()))
@@ -70,7 +76,7 @@ def main(a):
  captured=generate_live(model,rt,target,a.decode_steps+1);validate_state(rt);rt.execute=original
  assert len(routes)==(a.decode_steps+1)*48
  active_total=active_decode=None
- if compare_prefetch:
+ if comparing:
   sizes=[row[0].numel() for row in routes]
   local_routes=torch.cat([row[0].reshape(-1).to(torch.uint8) for row in routes])
   gathered=[torch.empty_like(local_routes) for _ in range(4)]
@@ -86,9 +92,10 @@ def main(a):
   for t in row:h.update(t.cpu().view(torch.uint8).numpy().tobytes())
  write(a.output/f'trace_rank{rank}.json',dict(route_sha256=h.hexdigest(),events=len(routes),bytes=route_bytes,teacher_tokens=captured['tokens']))
  proofs={};baseline_tokens=None;results=[]
- modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else ('h0','native','native','h0')
+ modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (('BR','LA_CA_NEAR','LA_CA_NEAR','BR') if compare_policy else ('h0','native','native','h0'))
  for run,name in enumerate(modes):
-  rt.native_executor=native if compare_prefetch or name=='native' else None;reset();a.phase='MEASURE'
+  if compare_policy:a.policy=name
+  rt.native_executor=native if comparing or name=='native' else None;reset();a.phase='MEASURE'
   if compare_prefetch:rt.prefetch_next=prefetch_on if name=='prefetch_on' else lambda:None
   boundary={};before_waves=native.waves;before_groups=native.groups
   def frozen(layer,hidden,selected,weights,probs):
@@ -107,17 +114,17 @@ def main(a):
   if name in proofs:assert current==proofs[name],'same-mode logical/byte parity failed'
   else:proofs[name]=current
   if name=='h0':assert np.array_equal(np.asarray(result['tokens']),baseline_tokens)
-  hit=dict(active_distinct=active_total,active_decode_distinct=active_decode,mandatory=validation['controller']['mandatory'],mandatory_decode=validation['controller']['mandatory']-boundary['mandatory'],main_hit_rate=1-validation['controller']['mandatory']/active_total,decode_main_hit_rate=1-(validation['controller']['mandatory']-boundary['mandatory'])/active_decode) if compare_prefetch else None
+  hit=dict(active_distinct=active_total,active_decode_distinct=active_decode,mandatory=validation['controller']['mandatory'],mandatory_decode=validation['controller']['mandatory']-boundary['mandatory'],main_hit_rate=1-validation['controller']['mandatory']/active_total,decode_main_hit_rate=1-(validation['controller']['mandatory']-boundary['mandatory'])/active_decode) if comparing else None
   result.update(status='PASS',rank=rank,backend=name,run=run,validation=validation,decode_bytes=byte_counts,hit=hit,no_compile=True,token_agreement_to_h0=float(np.mean(np.asarray(result['tokens'])==baseline_tokens)),native_waves=native.waves-before_waves,native_groups=native.groups-before_groups,ready_metrics=dict(rt.ready_metrics),frozen_parity=True)
   write(a.output/f'run{run}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'run{run}_rank{r}.json').read_text()) for r in range(4)];start=rr[0]['release_ns'];assert len({r['release_ns'] for r in rr})==1
    first=max(r['first_ns'] for r in rr);end=max(r['end_ns'] for r in rr)
-   row=dict(status='PASS',backend=name,run=run,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/a.decode_steps,E2E=(end-start)/1e9,token_agreement_to_h0=float(np.mean([r['token_agreement_to_h0'] for r in rr])),decode_peer_bytes=sum(r['decode_bytes']['forward']+r['decode_bytes']['returned'] for r in rr),decode_h2d_bytes=sum(r['decode_bytes']['h2d'] for r in rr),main_hit_rate=rr[0]['hit']['main_hit_rate'] if compare_prefetch else None,decode_main_hit_rate=rr[0]['hit']['decode_main_hit_rate'] if compare_prefetch else None,mandatory=rr[0]['hit']['mandatory'] if compare_prefetch else None,prefetch_issued=rr[0]['validation']['controller']['issued'] if compare_prefetch else None,scope=f'{a.decode_steps} decode forwards; frozen H0 prefill/decode routes and teacher inputs')
+   row=dict(status='PASS',backend=name,run=run,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/a.decode_steps,E2E=(end-start)/1e9,token_agreement_to_h0=float(np.mean([r['token_agreement_to_h0'] for r in rr])),decode_peer_bytes=sum(r['decode_bytes']['forward']+r['decode_bytes']['returned'] for r in rr),decode_h2d_bytes=sum(r['decode_bytes']['h2d'] for r in rr),main_hit_rate=rr[0]['hit']['main_hit_rate'] if comparing else None,decode_main_hit_rate=rr[0]['hit']['decode_main_hit_rate'] if comparing else None,mandatory=rr[0]['hit']['mandatory'] if comparing else None,prefetch_issued=rr[0]['validation']['controller']['issued'] if comparing else None,scope=f'{a.decode_steps} decode forwards; frozen routing and teacher inputs')
    results.append(row);write(a.output/f'run{run}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,policy=a.policy,prefetch_compare=compare_prefetch,active_total=active_total,active_decode=active_decode))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,policy=a.policy,prefetch_compare=compare_prefetch,policy_compare=compare_policy,active_total=active_total,active_decode=active_decode))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':
