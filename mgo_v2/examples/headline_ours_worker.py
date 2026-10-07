@@ -14,6 +14,7 @@ def generate_live(model,rt,ids,n):
  release=torch.tensor([time.perf_counter_ns()+200_000_000 if dist.get_rank()==0 else 0],device='cuda',dtype=torch.int64)
  dist.broadcast(release,0);start=int(release.item())
  while time.perf_counter_ns()<start:time.sleep(.0001)
+ if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.start()
  mask=torch.ones_like(ids);past=None;tokens=[];finite=torch.ones((),dtype=torch.bool,device='cuda');stamps=[]
  with torch.inference_mode():
   for step in range(n):
@@ -22,6 +23,7 @@ def generate_live(model,rt,ids,n):
    past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
    if step<n-1:ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
+ if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.stop()
  actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n
  return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist())
 
@@ -34,6 +36,7 @@ def validate_state(rt):
  return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+8)
 
 def main(a):
+ assert not a.prefill_diagnostic or a.prefill_optimized
  rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
  physical=[0,1,4,5];assert os.environ['MGO_V2_PHYSICAL_GPUS']=='0,1,4,5'
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
@@ -63,7 +66,7 @@ def main(a):
   from mgo_v2.live_metadata import LiveMetadata
   rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
- if a.prefill_optimized:
+ if a.prefill_optimized and not a.prefill_diagnostic:
   if rank==0:write(a.output/'phase.json',dict(phase='prefill_validation',cell=a.cell))
   rows=json.loads(Path(spec['warmup']['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
@@ -74,7 +77,7 @@ def main(a):
   assert rt.transport.calls==48*3
   write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
   a.validate_prefill_optimized=False;reset_live()
- n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats
+ n=1 if a.prefill_diagnostic else (2 if a.smoke else 64);repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
  for repeat in range(repeats+1):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
@@ -92,9 +95,15 @@ def main(a):
   gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
   from torch._dynamo.utils import counters
   before=dict(counters['stats'])
+  if repeat and a.prefill_diagnostic:
+   from prefill_phase_diagnostics import PrefillDiagnostics
+   rt.phase_diagnostic=PrefillDiagnostics(rt);rt.phase_diagnostic.install(model)
   if repeat:
    with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
   else:result=generate_live(model,rt,ids,n)
+  if repeat and a.prefill_diagnostic:
+   diagnostic=rt.phase_diagnostic.finish((result['end_ns']-result['release_ns'])/1e9)
+   write(a.output/f'diagnostic_rank{rank}.json',diagnostic);rt.phase_diagnostic=None
   validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
   no_compile=before==dict(counters['stats']);assert not repeat or no_compile
   result.update(prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy='LA_CA_NEAR',rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
@@ -102,11 +111,11 @@ def main(a):
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
    release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
-   row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
+   row=dict(status='PASS',repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
    write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',policy='LA_CA_NEAR',cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not a.prefill_diagnostic))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4),default=3);p.add_argument('--prefill-optimized',action='store_true');main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,4),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');main(p.parse_args())
