@@ -1,3 +1,11 @@
+**OWNER RESTORED LEGACY DECODE DEFAULT (2026-10-07).**
+Headline OURS defaults to the original decode layout again. Preserve existing
+prefill optimizations, Near/H0 and full-pinned store. Compiled decode remains
+an explicit --decode-layout-fast experiment only; do not enable or rerun it
+without a new owner request. Prior results are historical, not a selected
+runtime recommendation. No new experiment or GPU migration is queued.
+This supersedes the default promotion described below.
+
 **OURS DECODE LAYOUT OPTIMIZATION COMPLETE (2026-10-07).**
 Read experiments/decode_layout_compiled_20261007/RESULTS.md. Compiled exact
 rank-partial decode layout, remove unused return/selected copies, one-scan
