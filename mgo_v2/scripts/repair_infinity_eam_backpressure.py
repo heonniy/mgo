@@ -20,6 +20,14 @@ ANCHOR = '''        for score, tensor_id in candidates:
 REPLACEMENT = '''        speculative_limit = getattr(self, "eam_max_speculative_per_gpu", None)
         if speculative_limit is not None and speculative_limit < 1:
             raise ValueError("EAM speculative limit must be positive")
+        min_free_slots = getattr(self, "eam_min_free_expert_slots", None)
+        if min_free_slots is not None:
+            if min_free_slots < 0:
+                raise ValueError("EAM minimum free slots must be nonnegative")
+            policy = engine.get_expert_policy_stats()
+            free_slots = max(0, (policy["capacity_bytes"] - policy["current_accounted_bytes"]) // self.eam_expert_bytes)
+            if free_slots < min_free_slots:
+                candidates = []
         for score, tensor_id in candidates:
             gpu = self.eam_homes[tensor_id]
             if used[gpu] + self.eam_expert_bytes > self.eam_budget[gpu]:
@@ -43,12 +51,24 @@ def main():
     if REPLACEMENT in source:
         action = 'ALREADY_APPLIED'
     else:
-        if source.count(ANCHOR) != 1:
+        previous = REPLACEMENT.replace('''        min_free_slots = getattr(self, "eam_min_free_expert_slots", None)
+        if min_free_slots is not None:
+            if min_free_slots < 0:
+                raise ValueError("EAM minimum free slots must be nonnegative")
+            policy = engine.get_expert_policy_stats()
+            free_slots = max(0, (policy["capacity_bytes"] - policy["current_accounted_bytes"]) // self.eam_expert_bytes)
+            if free_slots < min_free_slots:
+                candidates = []
+''', '')
+        if source.count(previous) == 1:
+            source = source.replace(previous, REPLACEMENT)
+        elif source.count(ANCHOR) == 1:
+            source = source.replace(ANCHOR, REPLACEMENT)
+        else:
             raise RuntimeError('unexpected EAM admission source')
-        if backup.exists() and backup.read_bytes() != before:
-            raise RuntimeError('EAM upstream backup differs from installed source')
-        backup.write_bytes(before)
-        TARGET.write_text(source.replace(ANCHOR, REPLACEMENT))
+        if not backup.exists():
+            backup.write_bytes(before)
+        TARGET.write_text(source)
         action = 'APPLIED'
     after = TARGET.read_bytes()
     assert after.decode().count(REPLACEMENT) == 1

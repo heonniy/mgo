@@ -55,9 +55,17 @@ def main(a):
   # Keep C30 residency and the full soft priority ranking; bound only the
   # speculative H2D queue to two candidates per physical GPU and layer.
   p.eam_max_speculative_per_gpu=2
+  # DeepSeek's native expert completion stalls after target prefill when
+  # speculative tasks are submitted, even with headroom backpressure. The
+  # bounded baseline retains EAM eviction priorities but admits no speculative
+  # transfers until that native dispatcher interaction is repaired.
+  no_speculative_slots=sum(budgets)//expert_bytes+1
+  min_free_slots=int(os.environ.get('MGO_DEEPSEEK_EAM_MIN_FREE_SLOTS',str(no_speculative_slots)))
+  p.eam_min_free_expert_slots=min_free_slots
   write(a.output/'eam_policy.json',dict(max_speculative_per_gpu=2,
+       min_free_expert_slots=min_free_slots,
        expert_budget_per_gpu=budgets,expert_bytes=expert_bytes,
-       scope='DeepSeek only; full scores remain eviction priorities'))
+       scope='DeepSeek only; EAM scores remain eviction priorities; default speculative admission is disabled after native wait stall'))
  if a.smoke and model_family!='Qwen3':
   # Diagnose first-use DeepSeek EAM without adding probes to table timing.
   faulthandler.dump_traceback_later(45,repeat=True)
@@ -73,11 +81,33 @@ def main(a):
    trace('predict_end',layer,positive=int((result>0).sum()))
    return result
   engine.expert_predictor.predict_batch=traced_predict
+  executor=engine.expert_executor;active_layer={'value':-1}
+  original_dispatch=executor.dispatch_local
+  def traced_dispatch(layer,*args,**kwargs):
+   active_layer['value']=layer
+   trace('dispatch_start',layer)
+   result=original_dispatch(layer,*args,**kwargs)
+   trace('dispatch_end',layer)
+   return result
+  executor.dispatch_local=traced_dispatch
+  original_wait=executor.wait_dispatch_local
+  def traced_wait():
+   layer=active_layer['value']
+   trace('wait_start',layer)
+   result=original_wait()
+   trace('wait_end',layer)
+   return result
+  executor.wait_dispatch_local=traced_wait
   original_prefetch=p.prefetch_eam
   def traced_prefetch(layer,scores):
    trace('prefetch_start',layer,positive=int((scores>0).sum()))
    result=original_prefetch(layer,scores)
-   trace('prefetch_end',layer,calls=p.eam_calls,candidates=p.eam_candidates)
+   policy=dict(p.archer_engine.get_expert_policy_stats())
+   trace('prefetch_end',layer,calls=p.eam_calls,candidates=p.eam_candidates,
+         resident_bytes=policy.get('resident_bytes'),
+         transition_reserved_bytes=policy.get('transition_reserved_bytes'),
+         workspace_bytes=policy.get('workspace_bytes'),
+         rejected_prefetch=policy.get('priority_prefetch_rejections'))
    return result
   p.prefetch_eam=traced_prefetch
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
