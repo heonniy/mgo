@@ -9,6 +9,9 @@ class GenerationDiagnostics(PrefillDiagnostics):
  def mark(self):
   super().mark()
   self.rows[-1].update(event_index=self.rt.index,step=self.rt.index//48,layer=self.rt.index%48)
+ def install(self,model):
+  super().install(model)
+  self.wrap(self.rt.h2d,'wait_for_slot','required_h2d_exposed_wait')
  def finish(self,wall_seconds):
   # Drain background prefetch outside the measured diagnostic boundary.
   self.rt.h2d.synchronize()
