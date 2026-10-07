@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "test": "scripts/test_main_eviction_replay.py",
+  "checks": [
+    "LFU reset/cumulative analytical divergence",
+    "reset deletes policy history",
+    "LRU reset/cumulative equivalence",
+    "reload does not exceed misses",
+    "12 production Gate/BR differential cases: all event metrics and final slots",
+    "capacity-exceeding cyclic scan has zero-hit LRU and LFU-reset"
+  ],
+  "lfu_unit": "one use per layer/step distinct expert"
+}

@@ -26,3 +26,11 @@ for case in range(12):
   expected.append([len(keys)-len(miss),len(miss),sum(f[3]>=0 for f in fetches),sum(k in seen for k in miss)]);seen.update(miss)
  assert np.array_equal(actual,expected) and np.array_equal(slots,policy.slots),case
 print('PASS: LFU reset/cumulative divergence; reset deletes metadata; LRU equivalence; 12 production Gate/BR differential cases')
+
+# Repeated scan larger than cache: LRU and epoch LFU cannot retain a reuse.
+cycle=np.eye(4,dtype=np.int32)[np.tile(np.arange(4),5)]
+zero=np.zeros_like(cycle,dtype=np.float32)
+a=[replay(cycle,zero,np.array([2],np.int32),m,layers=1) for m in (0,1,3,4)]
+assert all(int(x[0][:,0].sum())==0 for x in a)
+assert all(np.array_equal(a[0][0],x[0]) for x in a)
+print('PASS: capacity-exceeding cyclic scan yields zero-hit LRU and LFU-reset')
