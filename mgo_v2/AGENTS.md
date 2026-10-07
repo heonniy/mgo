@@ -1,3 +1,12 @@
+**OWNER C30/P2P-DISABLED FOLLOW-UP IN PROGRESS (2026-10-08).**
+Read experiments/policy_gap_c60_20261008/FOLLOWUP_PLAN.md. After the six
+ShareGPT C60/NVSwitch physical candidates pass, run the four unique
+policy-specific observed best seed cases at C30/NVSwitch, then C30 and C60
+with child-process NCCL_P2P_DISABLE=1. Same R4 GPUs0/1/4/5, native path,
+prefetch OFF, input128/decode32, BR/CA_NATIVE/Near. Effective transport must
+be captured in receipts. LMSYS official gated access is still pending;
+do not use an unofficial mirror or commit raw gated prompts.
+
 **OWNER C60 POLICY GAP STUDY IN PROGRESS (2026-10-08).**
 Read experiments/policy_gap_c60_20261008/PLAN.md. User requests main_OURS
 prefetch OFF, R4 GPUs0/1/4/5, C60, input128, 32 decode forwards, B8/B16/B64,

@@ -61,7 +61,7 @@ def main(a):
  model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
  prefetch_on=rt.prefetch_next
  if prefetch=='off':rt.prefetch_next=lambda:None
- write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,pinned=rt.pinned_expert_store_receipt))
+ write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE'),pinned=rt.pinned_expert_store_receipt))
  def reset():
   rt.reset();rt.event_offset=0;rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt);begin(rt);assert np.all(rt.keys<0)
@@ -160,7 +160,7 @@ def main(a):
    write(a.output/f'diagnostic_{name}_rank{rank}.json',diagnostic)
    dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_modes=list(policy_modes),active_total=active_total,active_decode=active_decode,main_capacities=a.capacities))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_modes=list(policy_modes),active_total=active_total,active_decode=active_decode,main_capacities=a.capacities,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE')))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':

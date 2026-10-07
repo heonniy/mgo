@@ -1,0 +1,7 @@
+# C30 and P2P-disabled policy follow-up
+
+After all ShareGPT C60/NVSwitch candidates pass, use the policy-specific best observed clean TPOT gain versus BR at each batch. CA_NATIVE has no positive C60/NVSwitch winner, so its chosen seed is the least negative observed candidate. The union is four distinct seeds: B8 uses both selected cases; B16 and B64 use one case each. Keep input128, 32 decode forwards, frozen routing/teacher, native main_OURS execution, compiled indices, full pinned sources, prefetch OFF, and one clean primary plus separate MoE diagnostic for BR/CA_NATIVE/LA_CA_NEAR.
+
+Queue order: C30/NVSwitch default for B8/B16/B64 selected seeds; C30/P2P-disabled for the same seeds; then C60/P2P-disabled. The P2P-disabled setting must set `NCCL_P2P_DISABLE=1` in the actual child process after the supervisor clears inherited NCCL variables. Default NVSwitch runs leave this variable unset. Record the effective value in the rank source and result receipts. These are transport settings on the same physical server, not a different non-NVLink machine.
+
+C30 uses 1835 MAIN slots plus eight reserved P2 slots; C60 uses 3678 MAIN plus eight reserved. Both leave P2 unused with prefetch OFF. GPUs 0,1,4,5 only. Supervisor guards host and HBM memory and restores only owned idle model loads. Pair each policy to BR within exactly the same seed/capacity/transport cell. Do not treat one-shot differences as a noise distribution or infer a universal optimum from the bounded seed selection.

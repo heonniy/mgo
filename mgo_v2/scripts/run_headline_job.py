@@ -24,7 +24,8 @@ def main(a):
   a.timeout=max(a.timeout,14400)
  out=ROOT/a.label;assert not out.exists(),'new label required to preserve attempts';assert c.host_available()>=384*2**30
  out.mkdir(parents=True);state=dict(status='RUNNING',started=time.time(),system=a.system,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=c.P.parent,text=True).strip());stopped=[];proc=None
- state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout)
+ state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout,
+              nccl_p2p_disable=bool(a.nccl_p2p_disable))
  try:
   stopped=c.stop_target_idle()
   occupants,observed=wait_for_gpu_release()
@@ -34,6 +35,7 @@ def main(a):
   for k in list(env):
    if k.startswith('NCCL_'):del env[k]
   env['NCCL_CUMEM_ENABLE']='0';env['PYTHONFAULTHANDLER']='1'
+  if a.nccl_p2p_disable:env['NCCL_P2P_DISABLE']='1'
   if a.workloads:env['MGO_HEADLINE_WORKLOADS']=str(Path(a.workloads).resolve())
   command=[a.python,'-u']
   if a.ranks>1:command+=['-m','torch.distributed.run','--standalone',f'--nproc_per_node={a.ranks}']
@@ -113,6 +115,7 @@ def main(a):
 if __name__=='__main__':
  p=argparse.ArgumentParser()
  p.add_argument('--workloads');p.add_argument('--label',required=True);p.add_argument('--system',required=True);p.add_argument('--worker',required=True);p.add_argument('--cell',required=True)
+ p.add_argument('--nccl-p2p-disable',action='store_true',help='Opt-in P2P-disabled transport after the default NCCL environment reset')
  p.add_argument('--python',default=c.PYTHON);p.add_argument('--ranks',type=int,default=4);p.add_argument('--timeout',type=int,default=3600)
  p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6))
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
