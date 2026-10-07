@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "source": "/home/hwlee/mgo-results/headline_r4_20261007/native_policy_ca_near_off_b16_20261008",
+  "policy_pair": [
+    "LA_CA_NEAR",
+    "CA"
+  ],
+  "scope": "Same frozen route, 16 decode steps x 48 layers. One separately instrumented pass per policy; CUDA current-stream spans include host submission and peer waits. Correlations are descriptive over matched layer events, not independent samples or causal coefficients.",
+  "per_policy": {
+    "LA_CA_NEAR": {
+      "raw_sha256": {
+        "diagnostic_LA_CA_NEAR_rank0.json": "2ab550295ef83e85799d6ed676f7ae55ed43c10e4d915025128896d000a93d83",
+        "diagnostic_LA_CA_NEAR_rank1.json": "ba1af0d3be92e227e60744e44c22f0bd14ded9377c74f220c5f43f750e33a255",
+        "diagnostic_LA_CA_NEAR_rank2.json": "39ac2da5489f149351edabe7fa2309c414da04f7643afc311fd2b98e7cccbc77",
+        "diagnostic_LA_CA_NEAR_rank3.json": "4b4caa1a57ccec309fad492a20082befa819c0d39d276f0a1aaecc655fea9b87"
+      },
+      "expert_max_ms_per_layer": 4.98112020889918,
+      "expert_min_ms_per_layer": 4.061680838465691,
+      "expert_rank_spread_ms_per_layer": 0.9194393704334894,
+      "expert_rank_total_max_ms_per_token": 223.67816232144833,
+      "return_rank_mean_ms_per_layer": 0.6676554480412354,
+      "return_rank_min_ms_per_layer": 0.1538255833244572,
+      "return_rank_max_ms_per_layer": 1.2134922083156805,
+      "return_rank_spread_ms_per_layer": 1.0596666249912232,
+      "return_cpu_mean_ms_per_layer": 0.1519021650390625,
+      "controller_rank_mean_ms_per_layer": 0.1921583958416401,
+      "expert_rows_max_per_layer": 133.84635416666666,
+      "expert_rows_spread_per_layer": 13.244791666666666,
+      "expert_groups_max_per_layer": 23.3203125,
+      "expert_groups_spread_per_layer": 4.231770833333333,
+      "within_layer_group_expert_correlation_median": 0.9701520035595246,
+      "within_layer_rows_expert_correlation_median": 0.4529266383439341,
+      "within_layer_expert_return_correlation_median": -0.9840841690209616,
+      "within_layer_expert_return_negative_fraction": 0.9986979166666666,
+      "slowest_expert_fastest_return_fraction": 0.875,
+      "fastest_expert_slowest_return_fraction": 0.8763020833333334,
+      "critical_expert_rank_switch_fraction": 0.7601043024771839
+    },
+    "CA": {
+      "raw_sha256": {
+        "diagnostic_CA_rank0.json": "2948a4f008c68b07c790701e7ea1987611fb1a9ffa26ed947bb8666d39308eb4",
+        "diagnostic_CA_rank1.json": "06e1a3800ecbf51cd1797a71a5de770ad55948451345286bf0b7433aceda5e36",
+        "diagnostic_CA_rank2.json": "fbffb5530f0599c9f0c6e6c00595039627f724266c63224ac000f045b13d9267",
+        "diagnostic_CA_rank3.json": "e0cec008d123e0a92c6667469a4cec71f722be5bd0a08adb7836a7a37fdd53b4"
+      },
+      "expert_max_ms_per_layer": 5.135160121756296,
+      "expert_min_ms_per_layer": 3.903990045034637,
+      "expert_rank_spread_ms_per_layer": 1.2311700767216582,
+      "expert_rank_total_max_ms_per_token": 222.35614804178476,
+      "return_rank_mean_ms_per_layer": 0.8712336568181248,
+      "return_rank_min_ms_per_layer": 0.15363470810310295,
+      "return_rank_max_ms_per_layer": 1.5742813762044534,
+      "return_rank_spread_ms_per_layer": 1.4206466681013505,
+      "return_cpu_mean_ms_per_layer": 0.15127165592447916,
+      "controller_rank_mean_ms_per_layer": 0.2930361249406512,
+      "expert_rows_max_per_layer": 172.40494791666666,
+      "expert_rows_spread_per_layer": 82.34635416666667,
+      "expert_groups_max_per_layer": 24.27734375,
+      "expert_groups_spread_per_layer": 6.04296875,
+      "within_layer_group_expert_correlation_median": 0.9848642071148908,
+      "within_layer_rows_expert_correlation_median": 0.7849249746085386,
+      "within_layer_expert_return_correlation_median": -0.99171746743693,
+      "within_layer_expert_return_negative_fraction": 0.9986979166666666,
+      "slowest_expert_fastest_return_fraction": 0.9153645833333334,
+      "fastest_expert_slowest_return_fraction": 0.8880208333333334,
+      "critical_expert_rank_switch_fraction": 0.6245110821382008
+    }
+  },
+  "comparison": {
+    "matched_layer_delta_expert_max_to_delta_return_mean_pearson": 0.8240021766206465,
+    "matched_layer_delta_group_max_to_delta_expert_max_pearson": 0.39912295327071445
+  }
+}

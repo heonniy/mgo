@@ -3,9 +3,10 @@ Read experiments/native_ca_near_20261008/PLAN.md. Keep main_OURS as native
 C++ expert + compiled prefill/decode indices + Near + prefetch OFF. The one
 frozen R4/C30/B16/L256/O64 route, two clean primaries per policy and separate
 16-decode rank diagnostics all passed on GPUs0/1/4/5. Read RESULTS.md and
-RANK_DIAGNOSTIC.json: CA cuts peer bytes
-9.56% but worsens TPOT0.501191→0.519044s. Controller and return completion
-increase; CA row load is far more skewed. Near remains selected. Owned model
+RANK_DIAGNOSTIC.json plus EVENT_ATTRIBUTION.json: CA cuts peer bytes
+9.56% but worsens TPOT0.501191→0.519044s. CA increases controller work,
+per-layer critical expert completion and return peer waiting; rank-total
+expert time had hidden the changing critical rank. Near remains selected. Owned model
 loads restored; no further policy run queued.
 
 **OWNER OURS MAIN-TABLE NATIVE FINAL (2026-10-08).**

@@ -37,7 +37,7 @@ current-stream completion spans, **not** primary TPOT or pure kernel times.
 | Placement controller, rank mean | 9.22 ms/token | 14.07 ms/token | CA costs +4.84 ms |
 | Return all-to-all completion, rank mean | 32.05 ms/token | 41.82 ms/token | CA costs +9.77 ms |
 | Forward completion, rank mean | 16.86 ms/token | 16.75 ms/token | Essentially unchanged |
-| Expert-compute span, slowest rank | 223.68 ms/token | 222.36 ms/token | No measured critical-compute increase |
+| Expert-compute span, slowest rank after 16-step summation | 223.68 ms/token | 222.36 ms/token | Hides changes of critical rank by layer |
 | Mean per-step maximum expert token rows | 6,247 | 7,166 | CA concentrates +14.7% more rows |
 | Mean per-step row range across ranks | 210 | 1,679 | CA has about 8× more row skew |
 | Distinct expert groups, all ranks | 65,067 | 65,067 | Same total group work |
@@ -48,14 +48,57 @@ under the same balanced miss-count quota, while Near restricts choices to
 within 2% of the best projected critical-rank row load. In this prefix CA
 assigns 113,803 expert token rows to GPU4 versus 98,631 under Near, while
 GPU0 drops from 99,545 to 89,936. This explains why lower total communication
-does not imply balanced rank work. Yet the measured expert-compute completion
-maximum does not rise: group launches and scheduling also matter, so the row
-skew alone is **not proven** to cause the entire timing loss.
+does not imply balanced rank work. The aggregate slowest-rank row above is
+**not** the layer-by-layer critical path: the slowest rank changes between
+layers, so summing by rank first concealed a real critical-expert increase.
 
-The strongest observed costs are CA's controller work and longer return
-collective completion on every rank. Return completion includes network
-transfer, host submission and waiting for peer arrivals; the diagnostic
-cannot apportion those subcomponents. Metadata completion also rises
+## Matched layer-event attribution from the saved diagnostic
+
+The [event summary](EVENT_ATTRIBUTION.json) reuses the existing eight raw
+diagnostic files, with no new GPU run. It aligns all four ranks at each of
+16 × 48 decode layer events. Each event has one recorded expert-compute and
+return-exchange span per rank; the routed expert-row total is exactly 512
+per event in both policies.
+
+| Mean per layer event | Near | CA | CA − Near |
+|---|---:|---:|---:|
+| Slowest rank's expert-compute completion | 4.981 ms | 5.135 ms | +0.154 ms |
+| Expert-compute rank spread | 0.919 ms | 1.231 ms | +0.312 ms |
+| Largest rank expert groups | 23.32 | 24.28 | +0.96 |
+| Expert-group rank spread | 4.23 | 6.04 | +1.81 |
+| Largest rank token rows | 133.85 | 172.40 | +38.56 |
+| Return-exchange rank spread | 1.060 ms | 1.421 ms | +0.361 ms |
+| Shortest return-exchange span | 0.154 ms | 0.154 ms | approximately zero |
+| Return-exchange host CPU time, rank mean | 0.152 ms | 0.151 ms | approximately zero |
+
+The +0.154ms/layer critical expert difference corresponds to 7.39ms across
+48 layers per decode token, even though the slowest *rank-total* expert time
+appears unchanged. Across matched events, the CA−Near increase in critical
+expert time correlates with the increase in mean return span (Pearson
+**0.824**, descriptive). Within each event, the cross-rank expert-versus-return
+correlation has median **−0.992** in CA (−0.984 in Near): ranks that finish
+expert work earlier spend longer in return. In CA, the slowest expert rank is
+also the fastest return rank in **91.5%** of events. These are strong signs
+that CA's concentrated work makes other ranks wait for its arrival at the
+return collective. Larger local-demand assignment also concentrates native
+expert *groups*: their within-layer cross-rank correlation with expert span
+has median **0.985** in CA, versus **0.785** for token rows. Group launch
+count is a better proximate explanation of the observed executor span than
+row volume alone.
+
+The minimum return span across ranks stays about 0.154ms/event, while the
+rank spread grows. That pattern and unchanged return-call host CPU time argue
+against a larger basic transfer cost as the main reason for CA's longer return
+span; the physical peer bytes actually fall. The minimum is only a service
+floor proxy: these CUDA-event spans cannot precisely separate NCCL transfer
+from rank-arrival waiting. The 768 layer events are one trace, not 768
+independent timing repetitions.
+
+The strongest observed costs are CA's controller work, increased per-layer
+critical expert service, and longer return collective completion on every
+rank. Return completion includes network transfer, host submission and
+waiting for peer arrivals; the diagnostic cannot apportion those
+subcomponents exactly. Metadata completion also rises
 51.61→58.02ms/token even though raw routing metadata is fixed, consistent
 with altered rank synchronization rather than more metadata bytes. These
 overlapping diagnostic spans cannot be summed into the clean 17.853ms TPOT
