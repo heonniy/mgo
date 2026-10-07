@@ -246,6 +246,23 @@ class DecodeOffloadRuntime(LiveRuntime):
     return result
    if fused:
     before=self.transport.calls;trigger=getattr(self.args,'trigger','T1')
+    sync_ablation=self.index>=48 and getattr(self.args,'collective_barrier_ablation',False)
+    if sync_ablation:
+     assert overlap and getattr(self.args,'prefetch_off',False) and self.native_executor is not None
+     assert self.transport.before_exchange is None and not getattr(self.args,'post_expert_barrier',False)
+     def before_exchange():
+      stage='dispatch' if self.transport.calls==before else 'return'
+      assert self.transport.calls in (before,before+1)
+      if stage=='dispatch':
+       with nvtx_phase('moe.ablation_required_h2d_complete'):
+        self.h2d.wait_slots([slot for _,_,_,slot in e['groups']],host=True)
+      with nvtx_phase(f'moe.ablation_{stage}_local_ready'):
+       torch.cuda.current_stream().synchronize()
+      with nvtx_phase(f'moe.ablation_{stage}_barrier'):
+       dist.barrier();torch.cuda.current_stream().synchronize()
+      if stage=='dispatch':self.h2d_global_barriers+=1
+      else:self.post_expert_barriers+=1
+     self.transport.before_exchange=before_exchange
     if overlap:
      with nvtx_phase('moe.demand_h2d'):self.apply_fetches(e)
     if trigger=='T0':self.prefetch_next()
@@ -287,6 +304,7 @@ class DecodeOffloadRuntime(LiveRuntime):
      if precision:result=combine_rank_partials(self.transport,hidden,values,e,{'bf16':torch.bfloat16,'fp32':torch.float32,'fp64':torch.float64}[precision],unique_rows=getattr(self.args,'unique_combine',False))
      else:result=self.transport.combine(hidden,values,e)
     assert self.transport.calls-before==2
+    if sync_ablation:self.transport.before_exchange=None
     if self.index<48 and getattr(self.args,'validate_prefill_optimized',False):
      reference=self.transport.combine(hidden,values,e)
      diff=result.float()-reference.float()

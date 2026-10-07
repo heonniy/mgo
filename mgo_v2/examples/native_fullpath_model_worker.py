@@ -41,21 +41,25 @@ def main(a):
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
  policy_comparison=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')
- assert policy_comparison in ('0','1','CA_NEAR')
+ assert policy_comparison in ('0','1','CA_NEAR','BR_CA')
  compare_policy=policy_comparison!='0'
- policy_modes=('BR','LA_CA_NEAR') if policy_comparison=='1' else (('LA_CA_NEAR','CA') if policy_comparison=='CA_NEAR' else ())
+ policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA')}.get(policy_comparison,())
+ capture_policy='LA_CA_NEAR' if policy_comparison=='BR_CA' else (policy_modes[0] if compare_policy else a.policy)
+ sync_ablation=os.environ.get('MGO_NATIVE_SYNC_ABLATION','0')=='1'
  assert not (compare_prefetch and compare_policy)
  if compare_prefetch:assert a.policy=='LA_CA_NEAR' and prefetch=='on'
- if compare_policy:assert a.policy==policy_modes[0] and prefetch=='off'
+ if compare_policy:assert a.policy==capture_policy and prefetch=='off'
+ if sync_ablation:assert policy_comparison=='BR_CA' and prefetch=='off'
  comparing=compare_prefetch or compare_policy
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.native_prefill=True;a.validate_decode_layout=False;a.validate_prefill_optimized=False
+ a.prefetch_off=prefetch=='off';a.collective_barrier_ablation=sync_ablation
  a.capacities=spec.get('expert_slots_per_rank',[461,461,461,460])
  options=selected_options();options.update(arena_budget=2,streaming=True,ready_first=True,trigger='T2',runtime_arm='BR_P2_OVERLAP')
  native=NativeExpertExecutor()
  model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
  prefetch_on=rt.prefetch_next
  if prefetch=='off':rt.prefetch_next=lambda:None
- write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,pinned=rt.pinned_expert_store_receipt))
+ write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,pinned=rt.pinned_expert_store_receipt))
  def reset():
   rt.reset();rt.event_offset=0;rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt);begin(rt);assert np.all(rt.keys<0)
@@ -70,7 +74,7 @@ def main(a):
   if compare_prefetch:rt.prefetch_next=prefetch_on if name=='prefetch_on' else lambda:None
   if rank==0:write(a.output/'phase.json',dict(phase='warmup',backend=name))
   generate_live(model,rt,warm,min(4,a.decode_steps+1));validate_state(rt)
- if compare_policy:a.policy=policy_modes[0]
+ if compare_policy:a.policy=capture_policy
  rt.native_executor=native if compare_policy else None;reset();routes=[];original=rt.execute
  if compare_prefetch:rt.prefetch_next=prefetch_on
  def capture(layer,hidden,selected,weights,probs):
@@ -113,6 +117,8 @@ def main(a):
   before=dict(counters['stats'])
   with torch._dynamo.config.patch(error_on_recompile=True):result=generate_fixed(model,rt,target,teacher,a.decode_steps+1)
   rt.execute=original;validation=validate_state(rt);assert before==dict(counters['stats'])
+  expected_barriers=48*a.decode_steps if sync_ablation else 0
+  assert rt.h2d_global_barriers==rt.post_expert_barriers==expected_barriers
   byte_counts=dict(forward=rt.transport.forward_bytes-boundary['forward'],returned=rt.transport.return_bytes-boundary['returned'],h2d=rt.h2d.metrics['bytes']-boundary['h2d'])
   current=dict(state=validation['state_hash'],roles=validation['role_hash'],controller=validation['controller'],prefill_h2d_bytes=boundary['h2d'],decode_bytes=byte_counts)
   if baseline_tokens is None:baseline_tokens=np.asarray(result['tokens'])
@@ -120,7 +126,7 @@ def main(a):
   else:proofs[name]=current
   if name=='h0':assert np.array_equal(np.asarray(result['tokens']),baseline_tokens)
   hit=dict(active_distinct=active_total,active_decode_distinct=active_decode,mandatory=validation['controller']['mandatory'],mandatory_decode=validation['controller']['mandatory']-boundary['mandatory'],main_hit_rate=1-validation['controller']['mandatory']/active_total,decode_main_hit_rate=1-(validation['controller']['mandatory']-boundary['mandatory'])/active_decode) if comparing else None
-  result.update(status='PASS',rank=rank,backend=name,run=run,validation=validation,decode_bytes=byte_counts,hit=hit,no_compile=True,reference_backend=modes[0],token_agreement_to_reference=float(np.mean(np.asarray(result['tokens'])==baseline_tokens)),native_waves=native.waves-before_waves,native_groups=native.groups-before_groups,ready_metrics=dict(rt.ready_metrics),frozen_parity=True)
+  result.update(status='PASS',rank=rank,backend=name,run=run,validation=validation,decode_bytes=byte_counts,hit=hit,no_compile=True,reference_backend=modes[0],token_agreement_to_reference=float(np.mean(np.asarray(result['tokens'])==baseline_tokens)),native_waves=native.waves-before_waves,native_groups=native.groups-before_groups,ready_metrics=dict(rt.ready_metrics),frozen_parity=True,dispatch_barriers=rt.h2d_global_barriers,return_barriers=rt.post_expert_barriers)
   write(a.output/f'run{run}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'run{run}_rank{r}.json').read_text()) for r in range(4)];start=rr[0]['release_ns'];assert len({r['release_ns'] for r in rr})==1
@@ -143,6 +149,8 @@ def main(a):
    gc.collect();torch.cuda.synchronize()
    with torch._dynamo.config.patch(error_on_recompile=True):check=generate_fixed(model,rt,target,teacher,diagnostic_prefix+1)
    diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9)
+   expected_barriers=48*diagnostic_prefix if sync_ablation else 0
+   assert rt.h2d_global_barriers==rt.post_expert_barriers==expected_barriers
    rt.phase_diagnostic=None;rt.execute=original
    expected=next(json.loads((a.output/f'run{run}_rank{rank}.json').read_text()) for run,mode in enumerate(modes) if mode==name)
    assert check['tokens']==[row[:diagnostic_prefix+1] for row in expected['tokens']]
@@ -150,7 +158,7 @@ def main(a):
    write(a.output/f'diagnostic_{name}_rank{rank}.json',diagnostic)
    dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,policy=a.policy,prefetch_compare=compare_prefetch,policy_compare=compare_policy,policy_pair=list(policy_modes),active_total=active_total,active_decode=active_decode))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_pair=list(policy_modes),active_total=active_total,active_decode=active_decode))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':

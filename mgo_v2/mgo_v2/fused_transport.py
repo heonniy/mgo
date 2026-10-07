@@ -27,10 +27,19 @@ class ForwardPacket:
 class FusedTokenRankTransport:
  def __init__(self,return_mode='exact'):
   if return_mode not in ('exact','rank-partial'):raise ValueError(return_mode)
-  self.return_mode=return_mode;self.calls=0;self.forward_bytes=0;self.return_bytes=0;self.rank=dist.get_rank()
+  self.return_mode=return_mode;self.calls=0;self.forward_bytes=0;self.return_bytes=0;self.rank=dist.get_rank();self.before_exchange=None
  def exchange(self,x,send,recv,async_op=False):
-  y=torch.empty((sum(recv),)+tuple(x.shape[1:]),device=x.device,dtype=x.dtype)
-  work=dist.all_to_all_single(y,x.contiguous(),output_split_sizes=recv,input_split_sizes=send,async_op=async_op);self.calls+=1
+  hook=self.before_exchange
+  if hook is None:
+   y=torch.empty((sum(recv),)+tuple(x.shape[1:]),device=x.device,dtype=x.dtype)
+   work=dist.all_to_all_single(y,x.contiguous(),output_split_sizes=recv,input_split_sizes=send,async_op=async_op)
+  else:
+   # Ablation only: finish packet materialization before the rank rendezvous.
+   # Nothing except the collective may be submitted between hook and A2A.
+   x=x.contiguous();y=torch.empty((sum(recv),)+tuple(x.shape[1:]),device=x.device,dtype=x.dtype)
+   hook()
+   work=dist.all_to_all_single(y,x,output_split_sizes=recv,input_split_sizes=send,async_op=async_op)
+  self.calls+=1
   return y,work
  def forward(self,hidden,dense,e,async_op=False):
   if hidden.dtype!=torch.bfloat16:raise ValueError('validated wire format requires BF16')
