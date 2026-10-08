@@ -116,6 +116,10 @@ def main():
                     if system == 'infinity':
                         expected_calls = (48 if model == 'Qwen3' else 26) * 64
                         assert all(row['eam_calls'] == expected_calls for row in samples)
+                        assert all(row['cache_before']['resident_bytes'] == 0 and
+                                   row['cache_before']['resident_count'] == 0 and
+                                   row['cache_before']['pending_transactions'] == 0
+                                   for row in samples)
                         if model != 'Qwen3':
                             policy = json.loads((path / 'eam_policy.json').read_text())
                             capacity_slots = sum(policy['expert_budget_per_gpu']) // policy['expert_bytes']
@@ -131,6 +135,7 @@ def main():
                                 actual_ids.extend(row['request_ids'])
                                 if system == 'ours':
                                     assert row['policy'] == 'LA_CA_NEAR' and row['prefetch_off'] is True
+                                    assert row.get('expert_cache_start', row.get('cache_start')) == 'empty'
                                     assert row['expert_executor'] == (
                                         'native' if model == 'Qwen3' else 'native_deepseek')
                                     if model == 'Qwen3':
@@ -146,6 +151,9 @@ def main():
                     else:
                         assert all(row['request_ids'] == expected_ids for row in samples)
                         if system == 'llama':
+                            assert all(row['cache_start'] ==
+                                       'empty KV; static weight partition retained'
+                                       for row in samples)
                             placement = json.loads((path / 'placement_audit.json').read_text())
                             balanced = 3 if model == 'Qwen3' else 1
                             assert placement['status'] == 'PASS'
