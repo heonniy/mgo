@@ -22,15 +22,12 @@ C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak char
 | ShareGPT | Qwen3 | 64 | 1024 | llama.cpp balanced | 4.04–4.05 | 3.38–3.38 | 12.14–12.77 | not measured | not measured | not measured |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | main_OURS | 2.00–2.01 | not measured | 11.04–11.42 | 7.47–7.49 | not measured | 26.81–26.81 |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | 2.00–2.01 | not measured | 9.32–9.79 | 5.19–5.20 | 6.84–6.85 | 7.31–7.31 |
-| ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 2.00–2.01 | not measured | 10.96–12.20 | 4.33–4.52 | 7.04–7.74 | not measured |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | 2.00–2.01 | 1.03–1.03 | 2.58–3.05 | not measured | not measured | not measured |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | main_OURS | 2.00–2.01 | not measured | 21.63–22.15 | 16.14–16.24 | not measured | 26.81–26.81 |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | DeepSpeed ZeRO-Inference | 2.00–2.01 | not measured | 20.88–21.35 | 15.02–15.10 | 18.41–18.41 | 7.31–7.31 |
-| ShareGPT | DeepSeekV2Lite | 64 | 512 | MoE-Infinity (repaired) | 2.00–2.01 | not measured | 32.48–34.24 | 17.21–18.00 | 28.62–29.90 | not measured |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | llama.cpp balanced | 2.00–2.01 | 1.03–1.03 | 3.69–4.00 | not measured | not measured | not measured |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | main_OURS | 2.00–2.01 | not measured | 14.53–14.77 | 10.35–10.39 | not measured | 26.81–26.81 |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | DeepSpeed ZeRO-Inference | 2.00–2.01 | not measured | 12.58–13.17 | 7.27–7.29 | 10.10–10.23 | 7.31–7.31 |
-| ShareGPT | DeepSeekV2Lite | 16 | 1024 | MoE-Infinity (repaired) | 2.00–2.01 | not measured | 26.10–26.87 | 13.68–14.08 | 21.92–22.64 | not measured |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | llama.cpp balanced | 2.00–2.01 | 1.03–1.03 | 2.83–3.26 | not measured | not measured | not measured |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | main_OURS | 2.00–2.01 | not measured | 35.50–38.11 | 27.79–27.95 | not measured | 26.81–26.81 |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | DeepSpeed ZeRO-Inference | 2.00–2.01 | not measured | 35.82–36.29 | 28.40–28.50 | 33.35–33.35 | 7.31–7.31 |

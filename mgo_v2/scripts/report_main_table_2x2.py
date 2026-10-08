@@ -96,6 +96,10 @@ def main():
                 for path in attempts:
                     status_path = path / 'status.json'
                     if status_path.exists() and json.loads(status_path.read_text()).get('status') == 'PASS':
+                        if system == 'infinity' and model == 'DeepSeekV2Lite':
+                            backend_path = path / 'attention_backend.json'
+                            if not backend_path.exists() or json.loads(backend_path.read_text()).get('backend') != 'sdpa':
+                                continue
                         passed.append(path)
                 case = dict(dataset=dataset, model=model, input_tokens=cell['input_tokens'],
                             local_batch=cell['local_batch'], global_batch=cell['global_requests'],
@@ -114,6 +118,10 @@ def main():
                     assert all(row['status'] == 'PASS' for row in samples)
                     assert all(row['output_tokens'] == 64 and row['global_requests'] == cell['global_requests'] for row in samples)
                     if system == 'infinity':
+                        if model == 'DeepSeekV2Lite':
+                            backend = json.loads((path / 'attention_backend.json').read_text())
+                            assert backend['status'] == 'PASS' and backend['backend'] == 'sdpa'
+                            assert backend['attention_layers'] == 27
                         expected_calls = (48 if model == 'Qwen3' else 26) * 64
                         assert all(row['eam_calls'] == expected_calls for row in samples)
                         assert all(row['cache_before']['resident_bytes'] == 0 and
@@ -169,7 +177,8 @@ def main():
                 elif attempts:
                     latest = attempts[-1] / 'status.json'
                     if latest.exists():
-                        case['status'] = json.loads(latest.read_text())['status']
+                        latest_status = json.loads(latest.read_text())['status']
+                        case['status'] = 'PENDING_REMEASURE' if latest_status == 'PASS' else latest_status
                 cases.append(case)
     assert len(cases) == 64
     completed = sum(row['status'] == 'PASS' for row in cases)

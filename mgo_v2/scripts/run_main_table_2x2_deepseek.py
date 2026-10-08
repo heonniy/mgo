@@ -54,6 +54,10 @@ def main():
                 prefix = (f'mt2_deepseek_{dataset.lower().replace("-", "_")}'
                           f'_b{cell["local_batch"]}_l{cell["input_tokens"]}_{system}{suffix}')
                 passed = existing_pass(prefix)
+                if system == 'infinity' and passed:
+                    backend_path = passed / 'attention_backend.json'
+                    if not backend_path.exists() or json.loads(backend_path.read_text()).get('backend') != 'sdpa':
+                        passed = None
                 if passed:
                     print('REUSE PASS', passed.name, flush=True)
                     continue
