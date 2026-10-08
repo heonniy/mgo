@@ -131,7 +131,8 @@ def main(a):
  memory_trace_path=a.output/'attention_memory.jsonl'
  def trace_attention_memory(module,stage,hidden):
   if not diag_full_prefill:return
-  row=dict(stage=stage,layer=module.layer_idx,shape=list(hidden.shape),
+  row=dict(stage=stage,layer=module.layer_idx,token_index=(attention_checks[0]-1)//attention_layers,
+           shape=list(hidden.shape),
            allocated=[torch.cuda.memory_allocated(g) for g in range(4)],
            reserved=[torch.cuda.memory_reserved(g) for g in range(4)],
            free=[torch.cuda.mem_get_info(g)[0] for g in range(4)],
@@ -149,8 +150,12 @@ def main(a):
    trace_attention_memory(module,'after',hidden)
   attention_hooks +=[m.register_forward_hook(attention_done,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
  assert len(attention_hooks)==attention_layers*(2 if diag_full_prefill else 1)
- n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats;saved=None
- for repeat in range(repeats+1):
+ n=int(os.environ.get('MGO_DIAG_OUTPUT_TOKENS','2')) if a.smoke else 64
+ assert 2<=n<=64
+ repeats=1 if a.smoke else a.repeats;saved=None
+ warmup_only=a.smoke and os.environ.get('MGO_DIAG_WARMUP_ONLY')=='1'
+ assert not warmup_only or diag_full_prefill
+ for repeat in range(1 if warmup_only else repeats+1):
   if a.smoke and model_family!='Qwen3':trace_phase['repeat']=repeat
   phase='warmup' if repeat==0 else 'target'
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
@@ -198,6 +203,6 @@ def main(a):
    assert attention_checks[0]==attention_layers*n
    for hook in attention_hooks:hook.remove()
    saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
- write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,primary_repeats=repeats))
+ write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,primary_repeats=0 if warmup_only else repeats))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);main(p.parse_args())
