@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 26,
+  "completed": 27,
   "total": 64,
   "clean_repeats": 3,
   "primary_aggregate": "median; full range and all samples retained",
@@ -2313,7 +2313,79 @@
       "attempts": [
         "mt2_qwen_lmsys_chat_1m_b64_l512_infinity_r3_v1"
       ],
-      "status": "RUNNING"
+      "status": "PASS",
+      "selected_attempt": "mt2_qwen_lmsys_chat_1m_b64_l512_infinity_r3_v1",
+      "source_commit": "ae67df240a381aa5aa14fd7e85bca12f3042cf02",
+      "TTFT": {
+        "median": 8.085136103,
+        "minimum": 7.995941341,
+        "maximum": 8.296746896,
+        "mean": 8.125941446666667,
+        "stdev": 0.15449855188166203,
+        "samples": [
+          8.296746896,
+          8.085136103,
+          7.995941341
+        ]
+      },
+      "TPOT": {
+        "median": 3.9411909325238095,
+        "minimum": 3.934399721238095,
+        "maximum": 3.949879953666667,
+        "mean": 3.9418235358095237,
+        "stdev": 0.007759480601076101,
+        "samples": [
+          3.9411909325238095,
+          3.934399721238095,
+          3.949879953666667
+        ]
+      },
+      "E2E": {
+        "median": 256.591775645,
+        "minimum": 255.952318541,
+        "maximum": 256.838378422,
+        "mean": 256.4608242026667,
+        "stdev": 0.4573147038597306,
+        "samples": [
+          256.591775645,
+          255.952318541,
+          256.838378422
+        ]
+      },
+      "memory": {
+        "expert_budget_bytes_per_gpu": [
+          4350541824,
+          4350541824,
+          4350541824,
+          4341104640
+        ],
+        "sampled_peak_hbm_mib_by_physical_gpu": {
+          "0": 36603,
+          "1": 31865,
+          "4": 29523,
+          "5": 31657
+        },
+        "torch_peak_allocated_bytes_by_rank": [
+          11463035904,
+          11191451648,
+          11191451648,
+          11191459328
+        ],
+        "torch_peak_reserved_bytes_by_rank": [
+          31083986944,
+          26738688000,
+          24282923008,
+          25857884160
+        ],
+        "pinned_host_bytes_by_rank": null,
+        "infinity_peak_expert_charged_bytes_per_gpu": [
+          4350541824,
+          4350541824,
+          4350541824,
+          4341104640
+        ],
+        "llama_expert_resident_bytes": null
+      }
     },
     {
       "dataset": "LMSYS-Chat-1M",
@@ -2324,7 +2396,9 @@
       "cache_percent": 30,
       "system": "llama",
       "cell": "Qwen3_LMSYS-Chat-1M_R4_C30_B64_L512_O64",
-      "attempts": [],
+      "attempts": [
+        "mt2_qwen_lmsys_chat_1m_b64_l512_llama_r3_v1"
+      ],
       "status": "PENDING"
     },
     {
