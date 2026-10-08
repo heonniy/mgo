@@ -1,5 +1,6 @@
 """Summarize only complete, unfiltered primary repeats from guarded jobs."""
 import hashlib
+import itertools
 import json
 import statistics
 from pathlib import Path
@@ -218,7 +219,15 @@ def main():
                         latest_status = json.loads(latest.read_text())['status']
                         case['status'] = 'PENDING_REMEASURE' if latest_status == 'PASS' else latest_status
                 cases.append(case)
-    assert len(cases) == 64
+    expected_coordinates = set(itertools.product(
+        ('ShareGPT', 'LMSYS-Chat-1M'), ('Qwen3', 'DeepSeekV2Lite'),
+        (512, 1024), (16, 64), SYSTEMS))
+    actual_coordinates = {(row['dataset'], row['model'], row['input_tokens'],
+                           row['local_batch'], row['system']) for row in cases}
+    assert len(cases) == len(actual_coordinates) == len(expected_coordinates) == 64
+    assert actual_coordinates == expected_coordinates, (
+        'missing', expected_coordinates - actual_coordinates,
+        'unexpected', actual_coordinates - expected_coordinates)
     completed = sum(row['status'] == 'PASS' for row in cases)
     output = dict(status='PASS' if completed == 64 else 'PARTIAL', completed=completed,
                   total=64, clean_repeats=3, primary_aggregate='median; full range and all samples retained',
