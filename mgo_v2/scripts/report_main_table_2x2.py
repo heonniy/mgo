@@ -20,6 +20,25 @@ def summarize(samples):
                 statistics.median(samples), samples=samples)
 
 
+def validate_cell_requests(cell):
+    """Verify the frozen inputs before accepting any system's timing row."""
+    request_ids = {}
+    for stage in ('warmup', 'target'):
+        path = Path(cell[stage]['path'])
+        raw = path.read_bytes()
+        assert hashlib.sha256(raw).hexdigest() == cell[stage]['sha256'], path
+        requests = json.loads(raw)['requests']
+        ids = [request['request_id'] for request in requests]
+        assert len(requests) == cell['global_requests'], (path, len(requests))
+        assert len(ids) == len(set(ids)), (path, 'duplicate request ID')
+        assert all(len(request['input_ids']) == cell['input_tokens']
+                   for request in requests), (path, 'incorrect input length')
+        request_ids[stage] = ids
+    assert set(request_ids['warmup']).isdisjoint(request_ids['target']), (
+        cell['cell'], 'warmup and target requests overlap')
+    return request_ids['target']
+
+
 def memory_receipt(path, cell, system, samples):
     expert_bytes = cell['expert_budget_bytes'] // cell['expert_slots']
     assert expert_bytes * cell['expert_slots'] == cell['expert_budget_bytes']
@@ -87,6 +106,7 @@ def main():
         assert manifest['status'] == 'FROZEN' and len(manifest['cells']) == 8
         for cell in manifest['cells']:
             model = cell['model']
+            expected_ids = validate_cell_requests(cell)
             for system in SYSTEMS:
                 prefix = (f'mt2_{"qwen" if model == "Qwen3" else "deepseek"}_'
                           f'{dataset.lower().replace("-", "_")}_b{cell["local_batch"]}_'
@@ -143,7 +163,6 @@ def main():
                             assert policy['min_free_expert_slots'] > capacity_slots
                             assert all(row['eam_candidates'] == 0 for row in samples)
                             case['baseline_adaptation'] = 'EAM eviction priorities on; speculative prefetch off after native expert-wait stall'
-                    expected_ids = [row['request_id'] for row in json.loads(Path(cell['target']['path']).read_text())['requests']]
                     if system in ('ours', 'deepspeed'):
                         for repeat in (1, 2, 3):
                             actual_ids = []
