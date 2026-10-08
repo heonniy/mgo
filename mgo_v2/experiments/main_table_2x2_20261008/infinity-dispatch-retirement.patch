@@ -1,0 +1,37 @@
+--- a/core/parallel/expert_dispatcher.cpp
++++ b/core/parallel/expert_dispatcher.cpp
+@@ -626,8 +626,10 @@
+   }
+ 
+   {
+     auto expected = NodeExecState::IDLE;
++    const auto retirement_deadline =
++        std::chrono::steady_clock::now() + std::chrono::seconds(30);
+     while (!expert_node->node->exec_state.compare_exchange_strong(
+             expected, NodeExecState::FETCHING, std::memory_order_acq_rel)) {
+       if (expected == NodeExecState::RESIZE_RESERVED) {
+         if (main_thread_stop_flag_.load(std::memory_order_acquire)) return;
+@@ -642,8 +644,23 @@
+         args.gpu_id = expert_node->node->default_device.index();
+         AdmitAndCount(args.gpu_id);
+         input_queue_[args.gpu_id].Push(args);
+         return;
++      }
++      // WaitHiddenStates publishes the output before its CUDA retirement
++      // callback resets this node to IDLE. The next token may route to the
++      // same expert while its previous demand is still retiring.
++      if (expected == NodeExecState::FETCHING ||
++          expected == NodeExecState::EXECUTING) {
++        if (std::chrono::steady_clock::now() >= retirement_deadline) {
++          DLOG_FATAL("ExpertDispatcher::Enqueue: prior demand did not retire "
++                     "within 30s (expert_idx ", expert_idx, " layer_idx ",
++                     layer_idx, " node ", expert_node->node->str(), ")");
++        }
++        if (main_thread_stop_flag_.load(std::memory_order_acquire)) return;
++        std::this_thread::sleep_for(std::chrono::microseconds(10));
++        expected = NodeExecState::IDLE;
++        continue;
+       }
+       DLOG_FATAL(
+           "ExpertDispatcher::Enqueue: exec_state CAS failed (expert_idx ",
+           expert_idx, " layer_idx ", layer_idx, " node ",
