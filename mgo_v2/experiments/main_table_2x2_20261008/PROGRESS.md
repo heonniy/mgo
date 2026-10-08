@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **10/64**.
+Validated rows: **11/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention.
 
@@ -12,8 +12,8 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | Qwen3 | 16 | 512 | llama.cpp balanced | 145.070 [145.007, 145.185] | 0.481 [0.480, 0.481] | 175.331 [175.287, 175.486] | PASS |
 | ShareGPT | Qwen3 | 64 | 512 | main_OURS | 4.787 [4.674, 6.476] | 0.741 [0.739, 0.764] | 51.362 [51.314, 54.589] | PASS |
 | ShareGPT | Qwen3 | 64 | 512 | DeepSpeed ZeRO-Inference | 5.727 [5.691, 7.993] | 4.748 [4.733, 4.749] | 304.907 [303.925, 307.117] | PASS |
-| ShareGPT | Qwen3 | 64 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING |
-| ShareGPT | Qwen3 | 64 | 512 | llama.cpp balanced | — | — | — | PENDING |
+| ShareGPT | Qwen3 | 64 | 512 | MoE-Infinity (repaired) | 9.682 [9.634, 9.687] | 3.809 [3.804, 3.809] | 249.613 [249.337, 249.624] | PASS |
+| ShareGPT | Qwen3 | 64 | 512 | llama.cpp balanced | — | — | — | RUNNING |
 | ShareGPT | Qwen3 | 16 | 1024 | main_OURS | — | — | — | PENDING |
 | ShareGPT | Qwen3 | 16 | 1024 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | ShareGPT | Qwen3 | 16 | 1024 | MoE-Infinity (repaired) | — | — | — | PENDING |
