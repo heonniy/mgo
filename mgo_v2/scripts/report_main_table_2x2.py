@@ -15,7 +15,9 @@ DISPLAY = {'ours': 'main_OURS', 'deepspeed': 'DeepSpeed ZeRO-Inference',
 
 def summarize(samples):
     return dict(median=statistics.median(samples), minimum=min(samples), maximum=max(samples),
-                mean=statistics.mean(samples), stdev=statistics.stdev(samples), samples=samples)
+                mean=statistics.mean(samples), stdev=statistics.stdev(samples),
+                relative_range_percent=100 * (max(samples) - min(samples)) /
+                statistics.median(samples), samples=samples)
 
 
 def memory_receipt(path, cell, system, samples):
@@ -205,6 +207,31 @@ def main():
             f'{span(receipt["torch_peak_reserved_bytes_by_rank"], 2**30)} | '
             f'{span(receipt["pinned_host_bytes_by_rank"], 2**30)} |')
     (REPO / 'MEMORY_AUDIT.md').write_text('\n'.join(memory_lines) + '\n')
+    stability = ['# Main-table repeat stability', '',
+                 'Descriptive audit of the three unfiltered target repeats in each completed row. '
+                 'Relative range is (maximum − minimum) / median × 100%. '
+                 'No repeat is excluded or replaced because of this audit. '
+                 'The full samples for every row are in `PROGRESS.json`.', '']
+    complete_cases = [case for case in cases if case['status'] == 'PASS']
+    for metric in ('TTFT', 'TPOT', 'E2E'):
+        spreads = [case[metric]['relative_range_percent'] for case in complete_cases]
+        if spreads:
+            stability.append(f'{metric}: median relative range {statistics.median(spreads):.2f}% '
+                             f'across {len(spreads)} completed rows; maximum {max(spreads):.2f}%.')
+        else:
+            stability.append(f'{metric}: no completed rows yet.')
+    stability.extend(['', 'Largest relative ranges:', '',
+                      '| Dataset | Model | B/rank | Input | System | Metric | Repeats (s) | Relative range |',
+                      '|---|---|---:|---:|---|---|---|---:|'])
+    ranked = sorted(((case[metric]['relative_range_percent'], case, metric)
+                     for case in complete_cases for metric in ('TTFT', 'TPOT', 'E2E')),
+                    key=lambda item: item[0], reverse=True)
+    for spread, case, metric in ranked[:12]:
+        samples = ', '.join(f'{sample:.3f}' for sample in case[metric]['samples'])
+        stability.append(f'| {case["dataset"]} | {case["model"]} | {case["local_batch"]} | '
+                         f'{case["input_tokens"]} | {DISPLAY[case["system"]]} | {metric} | '
+                         f'{samples} | {spread:.2f}% |')
+    (REPO / 'STABILITY_AUDIT.md').write_text('\n'.join(stability) + '\n')
     print(f'{completed}/64 validated rows')
 
 
