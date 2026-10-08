@@ -20,8 +20,8 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | Qwen3 | 16 | 1024 | llama.cpp balanced | 287.679 [287.678, 287.945] | 0.480 [0.479, 0.480] | 317.896 [317.862, 318.184] | PASS |
 | ShareGPT | Qwen3 | 64 | 1024 | main_OURS | 7.895 [7.821, 8.728] | 0.590 [0.583, 0.591] | 44.961 [44.610, 45.957] | PASS |
 | ShareGPT | Qwen3 | 64 | 1024 | DeepSpeed ZeRO-Inference | 7.477 [7.320, 9.247] | 4.685 [4.659, 4.693] | 302.962 [301.024, 304.398] | PASS |
-| ShareGPT | Qwen3 | 64 | 1024 | MoE-Infinity (repaired) | 13.336 [13.284, 13.493] | 3.708 [3.707, 3.740] | 247.011 [246.899, 248.937] | PASS |
-| ShareGPT | Qwen3 | 64 | 1024 | llama.cpp balanced | — | — | — | PENDING |
+| ShareGPT | Qwen3 | 64 | 1024 | MoE-Infinity (repaired) | 13.494 [13.304, 13.935] | 3.769 [3.744, 3.786] | 250.773 [249.350, 252.440] | PASS |
+| ShareGPT | Qwen3 | 64 | 1024 | llama.cpp balanced | — | — | — | RUNNING |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | main_OURS | 0.650 [0.617, 0.887] | 0.287 [0.285, 0.294] | 18.833 [18.747, 19.112] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | 4.905 [4.885, 5.944] | 4.745 [4.697, 4.745] | 303.821 [300.817, 304.848] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 1.673 [1.643, 1.749] | 1.247 [1.241, 1.248] | 80.292 [79.848, 80.295] | PASS |
