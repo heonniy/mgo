@@ -37,7 +37,7 @@ def main(a):
  attention_layers=48 if model_family=='Qwen3' else 27
  offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store' if model_family=='Qwen3' else '/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store'
  cfg=dict(offload_path=offload_path,device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
- write(a.output/'config.json',cfg)
+ write(a.output/'config.json',dict(cfg,qwen_attention_backend='sdpa' if model_family=='Qwen3' else None))
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
  for root in roots:
@@ -45,6 +45,18 @@ def main(a):
    if file.suffix in ('.py','.so'):sources[str(file)]=hashlib.sha256(file.read_bytes()).hexdigest()
  write(a.output/'source_hashes.json',sources)
  model=MoE(model_path,cfg);engine=model.engine;p=engine.expert_prefetcher
+ if model_family=='Qwen3':
+  # MoE-Infinity forces eager attention at load time. At B64/L1024 its
+  # [batch, heads, query, key] softmax requires another 32 GiB and OOMs.
+  # Select PyTorch's mathematically equivalent streaming SDPA for every
+  # Qwen table cell, including the smaller cells rerun after this change.
+  attention_modules=[m for name,m in model.model.named_modules() if name.endswith('.self_attn')]
+  assert len(attention_modules)==attention_layers
+  model.model.config._attn_implementation='sdpa'
+  for module in attention_modules:
+   module.config._attn_implementation='sdpa'
+  assert all(module.config._attn_implementation=='sdpa' for module in attention_modules)
+  write(a.output/'attention_backend.json',dict(status='PASS',backend='sdpa',attention_layers=len(attention_modules),scope='all Qwen main-table cells'))
  assert engine.dtype==0,engine.dtype  # native BF16 enum
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
