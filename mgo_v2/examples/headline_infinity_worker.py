@@ -37,7 +37,11 @@ def main(a):
  attention_layers=48 if model_family=='Qwen3' else 27
  offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store' if model_family=='Qwen3' else '/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store'
  cfg=dict(offload_path=offload_path,device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
- write(a.output/'config.json',dict(cfg,attention_backend='sdpa'))
+ # Eager is faster on DeepSeek cells that fit. Full B64/L1024 prefill needs
+ # SDPA to avoid allocating the dense attention softmax matrix.
+ use_sdpa=model_family=='Qwen3' or (spec['local_batch']==64 and spec['input_tokens']==1024)
+ attention_backend='sdpa' if use_sdpa else 'eager'
+ write(a.output/'config.json',dict(cfg,attention_backend=attention_backend))
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
  for root in roots:
@@ -45,16 +49,16 @@ def main(a):
    if file.suffix in ('.py','.so'):sources[str(file)]=hashlib.sha256(file.read_bytes()).hexdigest()
  write(a.output/'source_hashes.json',sources)
  model=MoE(model_path,cfg);engine=model.engine;p=engine.expert_prefetcher
- # MoE-Infinity selects eager attention at load time. Its full attention
- # matrix and softmax OOM at large prefill batches; use the model's registered
- # SDPA interface for both Qwen and DeepSeek without changing model weights.
+ # MoE-Infinity selects eager attention at load time. The full B64/L1024
+ # DeepSeek prefill softmax OOMs, so select SDPA only for that cell. Qwen
+ # already uses SDPA for every table cell.
  attention_modules=[m for name,m in model.model.named_modules() if name.endswith('.self_attn')]
  assert len(attention_modules)==attention_layers
- model.model.config._attn_implementation='sdpa'
+ model.model.config._attn_implementation=attention_backend
  for module in attention_modules:
-  module.config._attn_implementation='sdpa'
- assert all(module.config._attn_implementation=='sdpa' for module in attention_modules)
- write(a.output/'attention_backend.json',dict(status='PASS',backend='sdpa',attention_layers=len(attention_modules),scope='all Qwen and DeepSeek main-table cells'))
+  module.config._attn_implementation=attention_backend
+ assert all(module.config._attn_implementation==attention_backend for module in attention_modules)
+ write(a.output/'attention_backend.json',dict(status='PASS',backend=attention_backend,attention_layers=len(attention_modules),scope='Qwen always SDPA; DeepSeek B64/L1024 SDPA, other cells eager'))
  assert engine.dtype==0,engine.dtype  # native BF16 enum
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]

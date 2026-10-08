@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **43/64**.
+Validated rows: **46/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
@@ -24,15 +24,15 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | Qwen3 | 64 | 1024 | llama.cpp balanced | 1149.674 [1148.766, 1150.098] | 1.405 [1.402, 1.405] | 1238.015 [1237.255, 1238.605] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | main_OURS | 0.650 [0.617, 0.887] | 0.287 [0.285, 0.294] | 18.833 [18.747, 19.112] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | 4.905 [4.885, 5.944] | 4.745 [4.697, 4.745] | 303.821 [300.817, 304.848] | PASS |
-| ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING_REMEASURE |
+| ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 1.673 [1.643, 1.749] | 1.247 [1.241, 1.248] | 80.292 [79.848, 80.295] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | 145.843 [145.516, 146.156] | 0.414 [0.413, 0.414] | 171.831 [171.575, 172.217] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | main_OURS | 1.984 [1.967, 2.061] | 0.302 [0.299, 0.308] | 21.038 [20.803, 21.481] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | DeepSpeed ZeRO-Inference | 4.870 [4.828, 5.658] | 4.748 [4.722, 4.820] | 304.001 [302.296, 309.324] | PASS |
-| ShareGPT | DeepSeekV2Lite | 64 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING_REMEASURE |
+| ShareGPT | DeepSeekV2Lite | 64 | 512 | MoE-Infinity (repaired) | 3.717 [3.696, 3.759] | 1.269 [1.252, 1.275] | 83.661 [82.591, 84.060] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | llama.cpp balanced | 580.575 [580.263, 580.659] | 1.345 [1.337, 1.347] | 665.024 [664.866, 665.419] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | main_OURS | 0.960 [0.917, 1.125] | 0.285 [0.284, 0.288] | 19.033 [18.889, 19.090] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | DeepSpeed ZeRO-Inference | 4.787 [4.774, 5.990] | 4.667 [4.657, 4.694] | 300.003 [298.193, 300.482] | PASS |
-| ShareGPT | DeepSeekV2Lite | 16 | 1024 | MoE-Infinity (repaired) | — | — | — | PENDING_REMEASURE |
+| ShareGPT | DeepSeekV2Lite | 16 | 1024 | MoE-Infinity (repaired) | 2.396 [2.383, 2.474] | 1.222 [1.220, 1.233] | 79.455 [79.221, 80.065] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | llama.cpp balanced | 289.553 [288.516, 289.755] | 0.414 [0.413, 0.415] | 315.679 [314.584, 315.799] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | main_OURS | 4.075 [3.834, 4.257] | 0.318 [0.316, 0.318] | 23.996 [23.841, 24.317] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | DeepSpeed ZeRO-Inference | 5.276 [5.260, 6.271] | 4.737 [4.733, 4.746] | 304.234 [303.732, 304.446] | PASS |
@@ -72,3 +72,5 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | llama.cpp balanced | — | — | — | PENDING |
 
 DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.
+
+DeepSeek MoE-Infinity uses eager attention for the three cells that fit and SDPA for B64/L1024, where eager attention OOMs. The selected backend is recorded per row in `PROGRESS.json`; see `INFINITY_DEEPSEEK_SDPA_REPAIR.md`.

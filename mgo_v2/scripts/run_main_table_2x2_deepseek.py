@@ -36,6 +36,19 @@ def command(dataset, cell, system, label, smoke=False):
     raise ValueError(system)
 
 
+def compatible_infinity_pass(prefix, expected_backend):
+    for path in sorted(ROOT.glob(prefix + '_v*'), reverse=True):
+        status_path = path / 'status.json'
+        if not status_path.exists() or json.loads(status_path.read_text()).get('status') != 'PASS':
+            continue
+        backend_path = path / 'attention_backend.json'
+        # Pre-repair DeepSeek attempts had no receipt and used eager attention.
+        actual_backend = json.loads(backend_path.read_text())['backend'] if backend_path.exists() else 'eager'
+        if actual_backend == expected_backend:
+            return path
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true')
@@ -53,11 +66,12 @@ def main():
                 suffix = '_smoke' if args.smoke else '_r3'
                 prefix = (f'mt2_deepseek_{dataset.lower().replace("-", "_")}'
                           f'_b{cell["local_batch"]}_l{cell["input_tokens"]}_{system}{suffix}')
-                passed = existing_pass(prefix)
-                if system == 'infinity' and passed:
-                    backend_path = passed / 'attention_backend.json'
-                    if not backend_path.exists() or json.loads(backend_path.read_text()).get('backend') != 'sdpa':
-                        passed = None
+                if system == 'infinity':
+                    expected_backend = ('sdpa' if cell['local_batch'] == 64 and
+                                        cell['input_tokens'] == 1024 else 'eager')
+                    passed = compatible_infinity_pass(prefix, expected_backend)
+                else:
+                    passed = existing_pass(prefix)
                 if passed:
                     print('REUSE PASS', passed.name, flush=True)
                     continue

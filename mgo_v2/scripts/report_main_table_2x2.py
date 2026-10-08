@@ -97,8 +97,12 @@ def main():
                     status_path = path / 'status.json'
                     if status_path.exists() and json.loads(status_path.read_text()).get('status') == 'PASS':
                         if system == 'infinity' and model == 'DeepSeekV2Lite':
+                            expected_backend = ('sdpa' if cell['local_batch'] == 64 and
+                                                cell['input_tokens'] == 1024 else 'eager')
                             backend_path = path / 'attention_backend.json'
-                            if not backend_path.exists() or json.loads(backend_path.read_text()).get('backend') != 'sdpa':
+                            actual_backend = (json.loads(backend_path.read_text())['backend']
+                                              if backend_path.exists() else 'eager')
+                            if actual_backend != expected_backend:
                                 continue
                         passed.append(path)
                 case = dict(dataset=dataset, model=model, input_tokens=cell['input_tokens'],
@@ -119,9 +123,14 @@ def main():
                     assert all(row['output_tokens'] == 64 and row['global_requests'] == cell['global_requests'] for row in samples)
                     if system == 'infinity':
                         if model == 'DeepSeekV2Lite':
-                            backend = json.loads((path / 'attention_backend.json').read_text())
-                            assert backend['status'] == 'PASS' and backend['backend'] == 'sdpa'
-                            assert backend['attention_layers'] == 27
+                            backend_path = path / 'attention_backend.json'
+                            if backend_path.exists():
+                                backend = json.loads(backend_path.read_text())
+                                assert backend['status'] == 'PASS' and backend['backend'] == expected_backend
+                                assert backend['attention_layers'] == 27
+                            else:
+                                assert expected_backend == 'eager'
+                            case['attention_backend'] = expected_backend
                         expected_calls = (48 if model == 'Qwen3' else 26) * 64
                         assert all(row['eam_calls'] == expected_calls for row in samples)
                         assert all(row['cache_before']['resident_bytes'] == 0 and
@@ -199,7 +208,8 @@ def main():
         lines.append(f'| {case["dataset"]} | {case["model"]} | {case["local_batch"]} | '
                      f'{case["input_tokens"]} | {DISPLAY[case["system"]]} | {value("TTFT")} | '
                      f'{value("TPOT")} | {value("E2E")} | {case["status"]} |')
-    lines.extend(['', 'DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.'])
+    lines.extend(['', 'DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.',
+                  '', 'DeepSeek MoE-Infinity uses eager attention for the three cells that fit and SDPA for B64/L1024, where eager attention OOMs. The selected backend is recorded per row in `PROGRESS.json`; see `INFINITY_DEEPSEEK_SDPA_REPAIR.md`.'])
     (REPO / 'PROGRESS.md').write_text('\n'.join(lines) + '\n')
     memory_lines = ['# Main-table memory audit', '',
                     'C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak charges and llama.cpp resident expert weights are checked against the per-GPU budget for every completed row. The llama.cpp per-GPU value is derived from its audited equal-size expert layers and exact layer ownership. The HBM column is the highest 1 Hz supervisor sample across physical GPUs 0/1/4/5 during each job; it may miss shorter peaks. PyTorch allocated/reserved peaks come from worker counters where available. The difference between those counters does not isolate KV, attention, allocator, and native workspace costs. Pinned host memory is shown only when the worker measured it.', '',
