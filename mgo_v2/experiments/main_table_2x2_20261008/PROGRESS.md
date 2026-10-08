@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **63/64**.
+Validated rows: **64/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
@@ -69,8 +69,10 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | main_OURS | 3.828 [3.788, 3.834] | 0.320 [0.315, 0.325] | 23.988 [23.630, 24.295] | PASS |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | DeepSpeed ZeRO-Inference | 5.327 [5.311, 6.301] | 4.717 [4.698, 4.722] | 302.791 [301.264, 303.469] | PASS |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | MoE-Infinity (repaired) | 6.728 [6.728, 6.796] | 1.360 [1.351, 1.372] | 92.489 [91.865, 93.191] | PASS |
-| LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | llama.cpp balanced | — | — | — | PENDING |
+| LMSYS-Chat-1M | DeepSeekV2Lite | 64 | 1024 | llama.cpp balanced | 1161.699 [1161.550, 1162.336] | 1.345 [1.344, 1.346] | 1246.486 [1246.259, 1247.019] | PASS |
 
 DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.
 
 DeepSeek MoE-Infinity uses eager attention for the three cells that fit and SDPA for B64/L1024, where eager attention OOMs. The selected backend is recorded per row in `PROGRESS.json`; see `INFINITY_DEEPSEEK_SDPA_REPAIR.md`.
+
+DeepSeek generated tokens are not identical across all systems. In a bounded full-512-token stock-model probe, main_OURS and DeepSpeed matched the first two tokens for 16/16 requests, MoE-Infinity for 11/16, and llama.cpp for 10/16. The stock probe used batch 16 while distributed timing used global batch 64; this is a numerical-compatibility check, not a full-output equivalence claim. See `DEEPSEEK_FULL512_TOKEN_CHECK.json`.

@@ -1,6 +1,6 @@
 {
-  "status": "PARTIAL",
-  "completed": 63,
+  "status": "PASS",
+  "completed": 64,
   "total": 64,
   "clean_repeats": 3,
   "primary_aggregate": "median; full range and all samples retained",
@@ -5524,8 +5524,76 @@
       "cache_percent": 30,
       "system": "llama",
       "cell": "DeepSeekV2Lite_LMSYS-Chat-1M_R4_C30_B64_L1024_O64",
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "mt2_deepseek_lmsys_chat_1m_b64_l1024_llama_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "mt2_deepseek_lmsys_chat_1m_b64_l1024_llama_r3_v1",
+      "source_commit": "9d0051746375d235a2725d08923ae6436bfd1127",
+      "TTFT": {
+        "median": 1161.698890808,
+        "minimum": 1161.550037621,
+        "maximum": 1162.335945039,
+        "mean": 1161.8616244893333,
+        "stdev": 0.41746174159690436,
+        "relative_range_percent": 0.06765155964412209,
+        "samples": [
+          1162.335945039,
+          1161.550037621,
+          1161.698890808
+        ]
+      },
+      "TPOT": {
+        "median": 1.3445825893333336,
+        "minimum": 1.3441806125238072,
+        "maximum": 1.3458254790793656,
+        "mean": 1.344862893645502,
+        "stdev": 0.0008575105695930659,
+        "relative_range_percent": 0.12233287628497047,
+        "samples": [
+          1.3441806125238072,
+          1.3445825893333336,
+          1.3458254790793656
+        ]
+      },
+      "E2E": {
+        "median": 1246.48589599,
+        "minimum": 1246.258740749,
+        "maximum": 1247.019323628,
+        "mean": 1246.587986789,
+        "stdev": 0.3904337042153111,
+        "relative_range_percent": 0.06101816967578541,
+        "samples": [
+          1247.019323628,
+          1246.258740749,
+          1246.48589599
+        ]
+      },
+      "memory": {
+        "expert_budget_bytes_per_gpu": [
+          2162688000,
+          2162688000,
+          2162688000,
+          2145386496
+        ],
+        "sampled_peak_hbm_mib_by_physical_gpu": {
+          "0": 4897,
+          "1": 4787,
+          "4": 4787,
+          "5": 4963
+        },
+        "torch_peak_allocated_bytes_by_rank": null,
+        "torch_peak_reserved_bytes_by_rank": null,
+        "pinned_host_bytes_by_rank": null,
+        "infinity_peak_expert_charged_bytes_per_gpu": null,
+        "llama_expert_resident_bytes": 4429185024,
+        "llama_expert_resident_bytes_per_gpu": [
+          1107296256,
+          1107296256,
+          1107296256,
+          1107296256
+        ]
+      }
     }
   ]
 }
