@@ -34,6 +34,7 @@ def memory_receipt(path, cell, system, samples):
     reserved = [0] * 4
     pinned = [0] * 4
     infinity_peak_charged = [0] * 4
+    llama_expert_per_gpu = None
     if system in ('ours', 'deepspeed'):
         for repeat in (1, 2, 3):
             for rank in range(4):
@@ -52,6 +53,18 @@ def memory_receipt(path, cell, system, samples):
             assert row['expert_budget_per_gpu'] == expert_budget
     elif system == 'llama':
         assert all(row['expert_resident_bytes'] <= sum(expert_budget) for row in samples)
+        placement = json.loads((path / 'placement_audit.json').read_text())
+        assert all(row['expert_resident_bytes'] == placement['gpu_expert_bytes'] for row in samples)
+        gpu_layers = placement['gpu_expert_layers_by_device']
+        total_layers = sum(gpu_layers.values())
+        assert total_layers == placement['gpu_expert_layers'] > 0
+        expert_bytes_per_layer, remainder = divmod(placement['gpu_expert_bytes'], total_layers)
+        assert remainder == 0
+        llama_expert_per_gpu = [gpu_layers[f'CUDA{rank}'] * expert_bytes_per_layer
+                                for rank in range(4)]
+        for rank in range(4):
+            assert llama_expert_per_gpu[rank] <= expert_budget[rank], (
+                path, rank, llama_expert_per_gpu[rank], expert_budget[rank])
     else:
         raise AssertionError(system)
     return dict(expert_budget_bytes_per_gpu=expert_budget,
@@ -60,7 +73,8 @@ def memory_receipt(path, cell, system, samples):
                 torch_peak_reserved_bytes_by_rank=reserved if any(reserved) else None,
                 pinned_host_bytes_by_rank=pinned if any(pinned) else None,
                 infinity_peak_expert_charged_bytes_per_gpu=infinity_peak_charged if any(infinity_peak_charged) else None,
-                llama_expert_resident_bytes=samples[0]['expert_resident_bytes'] if system == 'llama' else None)
+                llama_expert_resident_bytes=samples[0]['expert_resident_bytes'] if system == 'llama' else None,
+                llama_expert_resident_bytes_per_gpu=llama_expert_per_gpu)
 
 
 def main():
@@ -169,9 +183,9 @@ def main():
     lines.extend(['', 'DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.'])
     (REPO / 'PROGRESS.md').write_text('\n'.join(lines) + '\n')
     memory_lines = ['# Main-table memory audit', '',
-                    'C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak charges are checked against that budget for every completed repeat. The HBM column is the highest 1 Hz supervisor sample across physical GPUs 0/1/4/5 during each job; it may miss shorter peaks. PyTorch allocated/reserved peaks come from worker counters where available. The difference between those counters does not isolate KV, attention, allocator, and native workspace costs. Pinned host memory is shown only when the worker measured it.', '',
-                    '| Dataset | Model | B/rank | Input | System | C30 expert budget/GPU (GiB) | Sampled peak HBM/GPU (GiB) | PyTorch allocated peak/GPU (GiB) | PyTorch reserved peak/GPU (GiB) | Pinned host/rank (GiB) |',
-                    '|---|---|---:|---:|---|---:|---:|---:|---:|---:|']
+                    'C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak charges and llama.cpp resident expert weights are checked against the per-GPU budget for every completed row. The llama.cpp per-GPU value is derived from its audited equal-size expert layers and exact layer ownership. The HBM column is the highest 1 Hz supervisor sample across physical GPUs 0/1/4/5 during each job; it may miss shorter peaks. PyTorch allocated/reserved peaks come from worker counters where available. The difference between those counters does not isolate KV, attention, allocator, and native workspace costs. Pinned host memory is shown only when the worker measured it.', '',
+                    '| Dataset | Model | B/rank | Input | System | C30 expert budget/GPU (GiB) | llama expert resident/GPU (GiB) | Sampled peak HBM/GPU (GiB) | PyTorch allocated peak/GPU (GiB) | PyTorch reserved peak/GPU (GiB) | Pinned host/rank (GiB) |',
+                    '|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|']
     for case in cases:
         if case['status'] != 'PASS':
             continue
@@ -185,6 +199,7 @@ def main():
             f'| {case["dataset"]} | {case["model"]} | {case["local_batch"]} | '
             f'{case["input_tokens"]} | {DISPLAY[case["system"]]} | '
             f'{span(receipt["expert_budget_bytes_per_gpu"], 2**30)} | '
+            f'{span(receipt["llama_expert_resident_bytes_per_gpu"], 2**30)} | '
             f'{span(receipt["sampled_peak_hbm_mib_by_physical_gpu"].values(), 1024)} | '
             f'{span(receipt["torch_peak_allocated_bytes_by_rank"], 2**30)} | '
             f'{span(receipt["torch_peak_reserved_bytes_by_rank"], 2**30)} | '
