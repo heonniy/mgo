@@ -2,7 +2,7 @@
 
 Validated rows: **19/64**.
 
-Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention.
+Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
 | Dataset | Model | B/rank | Input | System | TTFT median [range] | TPOT median [range] | E2E median [range] | Status |
 |---|---|---:|---:|---|---:|---:|---:|---|

@@ -18,6 +18,51 @@ def summarize(samples):
                 mean=statistics.mean(samples), stdev=statistics.stdev(samples), samples=samples)
 
 
+def memory_receipt(path, cell, system, samples):
+    expert_bytes = cell['expert_budget_bytes'] // cell['expert_slots']
+    assert expert_bytes * cell['expert_slots'] == cell['expert_budget_bytes']
+    expert_budget = [slots * expert_bytes for slots in cell['expert_slots_per_rank']]
+    sampled_hbm = {gpu: 0 for gpu in (0, 1, 4, 5)}
+    with (path / 'resources.jsonl').open() as stream:
+        for line in stream:
+            record = json.loads(line)
+            for gpu in record['gpus']:
+                if gpu['gpu'] in sampled_hbm:
+                    sampled_hbm[gpu['gpu']] = max(sampled_hbm[gpu['gpu']], gpu['used_mib'])
+    assert all(sampled_hbm.values()), path
+    allocated = [0] * 4
+    reserved = [0] * 4
+    pinned = [0] * 4
+    infinity_peak_charged = [0] * 4
+    if system in ('ours', 'deepspeed'):
+        for repeat in (1, 2, 3):
+            for rank in range(4):
+                row = json.loads((path / f'repeat{repeat}_rank{rank}.json').read_text())
+                allocated[rank] = max(allocated[rank], row['peak_allocated_bytes'])
+                reserved[rank] = max(reserved[rank], row.get('peak_reserved_bytes', 0))
+                pinned[rank] = max(pinned[rank], row['pinned_host_bytes'])
+    elif system == 'infinity':
+        for row in samples:
+            for rank in range(4):
+                allocated[rank] = max(allocated[rank], row['peak_allocated_bytes'][rank])
+                reserved[rank] = max(reserved[rank], row['peak_reserved_bytes'][rank])
+                charged = row['cache_after'][f'gpu_{rank}_peak_charged_bytes']
+                assert charged <= expert_budget[rank], (path, rank, charged, expert_budget[rank])
+                infinity_peak_charged[rank] = max(infinity_peak_charged[rank], charged)
+            assert row['expert_budget_per_gpu'] == expert_budget
+    elif system == 'llama':
+        assert all(row['expert_resident_bytes'] <= sum(expert_budget) for row in samples)
+    else:
+        raise AssertionError(system)
+    return dict(expert_budget_bytes_per_gpu=expert_budget,
+                sampled_peak_hbm_mib_by_physical_gpu=sampled_hbm,
+                torch_peak_allocated_bytes_by_rank=allocated if any(allocated) else None,
+                torch_peak_reserved_bytes_by_rank=reserved if any(reserved) else None,
+                pinned_host_bytes_by_rank=pinned if any(pinned) else None,
+                infinity_peak_expert_charged_bytes_per_gpu=infinity_peak_charged if any(infinity_peak_charged) else None,
+                llama_expert_resident_bytes=samples[0]['expert_resident_bytes'] if system == 'llama' else None)
+
+
 def main():
     cases = []
     for dataset in ('ShareGPT', 'LMSYS-Chat-1M'):
@@ -79,7 +124,8 @@ def main():
                     case.update(status='PASS', selected_attempt=path.name, source_commit=status['source_commit'],
                                 TTFT=summarize([row['TTFT'] for row in samples]),
                                 TPOT=summarize([row['TPOT'] for row in samples]),
-                                E2E=summarize([row['E2E'] for row in samples]))
+                                E2E=summarize([row['E2E'] for row in samples]),
+                                memory=memory_receipt(path, cell, system, samples))
                 elif attempts:
                     latest = attempts[-1] / 'status.json'
                     if latest.exists():
@@ -92,7 +138,7 @@ def main():
                   cases=cases)
     (REPO / 'PROGRESS.json').write_text(json.dumps(output, indent=2) + '\n')
     lines = ['# Two-model C30 main-table progress', '', f'Validated rows: **{completed}/64**.', '',
-             'Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention.', '',
+             'Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.', '',
              '| Dataset | Model | B/rank | Input | System | TTFT median [range] | TPOT median [range] | E2E median [range] | Status |',
              '|---|---|---:|---:|---|---:|---:|---:|---|']
     for case in cases:
@@ -106,6 +152,28 @@ def main():
                      f'{value("TPOT")} | {value("E2E")} | {case["status"]} |')
     lines.extend(['', 'DeepSeek MoE-Infinity uses EAM eviction priorities with speculative prefetch disabled after a native expert-wait stall; Qwen MoE-Infinity retains speculative EAM prefetch. See `DEEPSEEK_INFINITY_ADAPTATION.md`.'])
     (REPO / 'PROGRESS.md').write_text('\n'.join(lines) + '\n')
+    memory_lines = ['# Main-table memory audit', '',
+                    'C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak charges are checked against that budget for every completed repeat. The HBM column is the highest 1 Hz supervisor sample across physical GPUs 0/1/4/5 during each job; it may miss shorter peaks. PyTorch allocated/reserved peaks come from worker counters where available. The difference between those counters does not isolate KV, attention, allocator, and native workspace costs. Pinned host memory is shown only when the worker measured it.', '',
+                    '| Dataset | Model | B/rank | Input | System | C30 expert budget/GPU (GiB) | Sampled peak HBM/GPU (GiB) | PyTorch allocated peak/GPU (GiB) | PyTorch reserved peak/GPU (GiB) | Pinned host/rank (GiB) |',
+                    '|---|---|---:|---:|---|---:|---:|---:|---:|---:|']
+    for case in cases:
+        if case['status'] != 'PASS':
+            continue
+        receipt = case['memory']
+        def span(values, scale):
+            if values is None:
+                return 'not measured'
+            converted = [value / scale for value in values]
+            return f'{min(converted):.2f}–{max(converted):.2f}'
+        memory_lines.append(
+            f'| {case["dataset"]} | {case["model"]} | {case["local_batch"]} | '
+            f'{case["input_tokens"]} | {DISPLAY[case["system"]]} | '
+            f'{span(receipt["expert_budget_bytes_per_gpu"], 2**30)} | '
+            f'{span(receipt["sampled_peak_hbm_mib_by_physical_gpu"].values(), 1024)} | '
+            f'{span(receipt["torch_peak_allocated_bytes_by_rank"], 2**30)} | '
+            f'{span(receipt["torch_peak_reserved_bytes_by_rank"], 2**30)} | '
+            f'{span(receipt["pinned_host_bytes_by_rank"], 2**30)} |')
+    (REPO / 'MEMORY_AUDIT.md').write_text('\n'.join(memory_lines) + '\n')
     print(f'{completed}/64 validated rows')
 
 
