@@ -2,6 +2,7 @@
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 from run_main_table_2x2_qwen import (SCRIPT, ROOT, WORKLOAD_ROOT, OURS_PYTHON,
@@ -65,6 +66,14 @@ def main():
                 subprocess.run(call, check=True)
                 status = json.loads((ROOT / label / 'status.json').read_text())
                 assert status['status'] == 'PASS', label
+                if not args.smoke:
+                    report = Path(__file__).with_name('report_main_table_2x2.py')
+                    subprocess.run([sys.executable, str(report)], check=True)
+                    progress_path = (Path(__file__).resolve().parents[1] /
+                                     'experiments/main_table_2x2_20261008/PROGRESS.json')
+                    progress = json.loads(progress_path.read_text())
+                    assert any(case.get('selected_attempt') == label and case['status'] == 'PASS'
+                               for case in progress['cases']), label
                 print('PASS', label, flush=True)
 
 
