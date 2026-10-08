@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 19,
+  "completed": 20,
   "total": 64,
   "clean_repeats": 3,
   "primary_aggregate": "median; full range and all samples retained",
@@ -1271,7 +1271,64 @@
       "attempts": [
         "mt2_qwen_sharegpt_b64_l1024_llama_r3_v1"
       ],
-      "status": "RUNNING"
+      "status": "PASS",
+      "selected_attempt": "mt2_qwen_sharegpt_b64_l1024_llama_r3_v1",
+      "source_commit": "ae1b004baf5391f3d18a2cfcbf52f0332475ace4",
+      "TTFT": {
+        "median": 1149.674484099,
+        "minimum": 1148.765813477,
+        "maximum": 1150.098053768,
+        "mean": 1149.5127837813334,
+        "stdev": 0.6806807568832179,
+        "samples": [
+          1150.098053768,
+          1149.674484099,
+          1148.765813477
+        ]
+      },
+      "TPOT": {
+        "median": 1.4045900040317476,
+        "minimum": 1.4022312008888902,
+        "maximum": 1.4048660039841252,
+        "mean": 1.4038957363015876,
+        "stdev": 0.0014481203674146248,
+        "samples": [
+          1.4048660039841252,
+          1.4022312008888902,
+          1.4045900040317476
+        ]
+      },
+      "E2E": {
+        "median": 1238.015049755,
+        "minimum": 1237.254983731,
+        "maximum": 1238.604612019,
+        "mean": 1237.9582151683333,
+        "stdev": 0.6766067961700759,
+        "samples": [
+          1238.604612019,
+          1238.015049755,
+          1237.254983731
+        ]
+      },
+      "memory": {
+        "expert_budget_bytes_per_gpu": [
+          4350541824,
+          4350541824,
+          4350541824,
+          4341104640
+        ],
+        "sampled_peak_hbm_mib_by_physical_gpu": {
+          "0": 13075,
+          "1": 12427,
+          "4": 12427,
+          "5": 12531
+        },
+        "torch_peak_allocated_bytes_by_rank": null,
+        "torch_peak_reserved_bytes_by_rank": null,
+        "pinned_host_bytes_by_rank": null,
+        "infinity_peak_expert_charged_bytes_per_gpu": null,
+        "llama_expert_resident_bytes": 14495514624
+      }
     },
     {
       "dataset": "ShareGPT",
@@ -1752,8 +1809,10 @@
       "cache_percent": 30,
       "system": "ours",
       "cell": "Qwen3_LMSYS-Chat-1M_R4_C30_B16_L512_O64",
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "mt2_qwen_lmsys_chat_1m_b16_l512_ours_r3_v1"
+      ],
+      "status": "RUNNING"
     },
     {
       "dataset": "LMSYS-Chat-1M",
