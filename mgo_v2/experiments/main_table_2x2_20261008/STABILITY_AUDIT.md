@@ -2,9 +2,9 @@
 
 Descriptive audit of the three unfiltered target repeats in each completed row. Relative range is (maximum − minimum) / median × 100%. No repeat is excluded or replaced because of this audit. The full samples for every row are in `PROGRESS.json`.
 
-TTFT: median relative range 6.30% across 53 completed rows; maximum 194.21%.
-TPOT: median relative range 1.01% across 53 completed rows; maximum 12.05%.
-E2E: median relative range 1.14% across 53 completed rows; maximum 21.46%.
+TTFT: median relative range 8.22% across 54 completed rows; maximum 194.21%.
+TPOT: median relative range 1.01% across 54 completed rows; maximum 12.05%.
+E2E: median relative range 1.12% across 54 completed rows; maximum 21.46%.
 
 Largest relative ranges:
 
