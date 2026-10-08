@@ -8,7 +8,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 |---|---|---:|---:|---|---:|---:|---:|---|
 | ShareGPT | Qwen3 | 16 | 512 | main_OURS | 1.999 [1.988, 4.284] | 0.637 [0.634, 0.641] | 42.342 [41.956, 44.406] | PASS |
 | ShareGPT | Qwen3 | 16 | 512 | DeepSpeed ZeRO-Inference | 5.571 [5.451, 6.312] | 4.122 [4.091, 4.135] | 265.995 [263.176, 266.055] | PASS |
-| ShareGPT | Qwen3 | 16 | 512 | MoE-Infinity (repaired) | 5.859 [5.568, 6.089] | 3.208 [3.175, 3.208] | 207.693 [206.096, 207.973] | PASS |
+| ShareGPT | Qwen3 | 16 | 512 | MoE-Infinity (repaired) | 5.530 [5.245, 5.712] | 3.210 [3.184, 3.251] | 207.741 [206.274, 210.085] | PASS |
 | ShareGPT | Qwen3 | 16 | 512 | llama.cpp balanced | 145.070 [145.007, 145.185] | 0.481 [0.480, 0.481] | 175.331 [175.287, 175.486] | PASS |
 | ShareGPT | Qwen3 | 64 | 512 | main_OURS | 4.787 [4.674, 6.476] | 0.741 [0.739, 0.764] | 51.362 [51.314, 54.589] | PASS |
 | ShareGPT | Qwen3 | 64 | 512 | DeepSpeed ZeRO-Inference | 5.727 [5.691, 7.993] | 4.748 [4.733, 4.749] | 304.907 [303.925, 307.117] | PASS |
