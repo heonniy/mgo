@@ -2,6 +2,7 @@
 import hashlib
 import itertools
 import json
+import math
 import statistics
 from pathlib import Path
 
@@ -37,7 +38,7 @@ def validate_cell_requests(cell):
         request_ids[stage] = ids
     assert set(request_ids['warmup']).isdisjoint(request_ids['target']), (
         cell['cell'], 'warmup and target requests overlap')
-    return request_ids['target']
+    return request_ids
 
 
 def memory_receipt(path, cell, system, samples):
@@ -139,9 +140,23 @@ def main():
                     if 'workload_manifest_sha256' in status:
                         assert status['workload_manifest'] == str(manifest_path)
                         assert status['workload_manifest_sha256'] == hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+                    warmup = json.loads((path / 'repeat0.json').read_text())
                     samples = [json.loads((path / f'repeat{i}.json').read_text()) for i in (1, 2, 3)]
+                    assert warmup['status'] == 'PASS'
+                    assert warmup['output_tokens'] == 64 and warmup['global_requests'] == cell['global_requests']
                     assert all(row['status'] == 'PASS' for row in samples)
                     assert all(row['output_tokens'] == 64 and row['global_requests'] == cell['global_requests'] for row in samples)
+                    assert all(math.isclose(row['E2E'], row['TTFT'] + 63 * row['TPOT'], abs_tol=1e-6)
+                               for row in (warmup, *samples))
+                    if system in ('ours', 'deepspeed'):
+                        warmup_ids = []
+                        for rank in range(4):
+                            warmup_rank = json.loads((path / f'repeat0_rank{rank}.json').read_text())
+                            warmup_ids.extend(warmup_rank['request_ids'])
+                        assert warmup_ids == expected_ids['warmup'], (path.name, 'warmup request mismatch')
+                    else:
+                        assert warmup['request_ids'] == expected_ids['warmup'], (
+                            path.name, 'warmup request mismatch')
                     if system == 'infinity':
                         if model == 'DeepSeekV2Lite':
                             backend_path = path / 'attention_backend.json'
@@ -184,9 +199,9 @@ def main():
                                     if model != 'Qwen3':
                                         assert row['parameter_counter_full_scans'] > 0
                                         assert row['parameter_counter_corrections'] >= 0
-                            assert actual_ids == expected_ids, (path.name, repeat, 'request membership/order mismatch')
+                            assert actual_ids == expected_ids['target'], (path.name, repeat, 'request membership/order mismatch')
                     else:
-                        assert all(row['request_ids'] == expected_ids for row in samples)
+                        assert all(row['request_ids'] == expected_ids['target'] for row in samples)
                         if system == 'llama':
                             assert all(row['cache_start'] ==
                                        'empty KV; static weight partition retained'
