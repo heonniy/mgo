@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **35/64**.
+Validated rows: **36/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
@@ -26,7 +26,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | 4.905 [4.885, 5.944] | 4.745 [4.697, 4.745] | 303.821 [300.817, 304.848] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 1.673 [1.643, 1.749] | 1.247 [1.241, 1.248] | 80.292 [79.848, 80.295] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | 145.843 [145.516, 146.156] | 0.414 [0.413, 0.414] | 171.831 [171.575, 172.217] | PASS |
-| ShareGPT | DeepSeekV2Lite | 64 | 512 | main_OURS | — | — | — | PENDING |
+| ShareGPT | DeepSeekV2Lite | 64 | 512 | main_OURS | — | — | — | RUNNING |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | llama.cpp balanced | — | — | — | PENDING |
@@ -53,7 +53,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | main_OURS | 7.691 [7.653, 8.557] | 0.603 [0.603, 0.608] | 45.702 [45.646, 46.838] | PASS |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | DeepSpeed ZeRO-Inference | 7.538 [7.533, 13.289] | 4.897 [4.882, 5.189] | 316.073 [315.080, 340.220] | PASS |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | MoE-Infinity (repaired) | 13.334 [13.185, 13.571] | 3.761 [3.750, 3.799] | 250.119 [249.821, 252.662] | PASS |
-| LMSYS-Chat-1M | Qwen3 | 64 | 1024 | llama.cpp balanced | — | — | — | RUNNING |
+| LMSYS-Chat-1M | Qwen3 | 64 | 1024 | llama.cpp balanced | 1162.287 [1161.994, 1162.588] | 1.410 [1.407, 1.413] | 1250.932 [1250.828, 1251.579] | PASS |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | main_OURS | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING |

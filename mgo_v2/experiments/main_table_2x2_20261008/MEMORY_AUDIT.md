@@ -39,3 +39,4 @@ C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak char
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | main_OURS | 4.04–4.05 | not measured | 32.36–40.99 | 19.95–20.35 | 29.12–37.79 | 54.00–54.00 |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | DeepSpeed ZeRO-Inference | 4.04–4.05 | not measured | 21.34–21.81 | 13.06–13.07 | 18.85–18.85 | 14.22–14.22 |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | MoE-Infinity (repaired) | 4.04–4.05 | not measured | 52.21–54.87 | 20.81–21.32 | 46.00–48.65 | not measured |
+| LMSYS-Chat-1M | Qwen3 | 64 | 1024 | llama.cpp balanced | 4.04–4.05 | 3.38–3.38 | 12.14–12.77 | not measured | not measured | not measured |
