@@ -18,10 +18,21 @@ class FiniteLogits:
   else:self.flag.logical_and_(finite)
   return scores
 class ClockStreamer:
- def __init__(self):self.stamps=[];self.prompt=True
+ def __init__(self,trim_floor_bytes=0,trim_log=None):
+  self.stamps=[];self.prompt=True;self.trim_floor_bytes=trim_floor_bytes;self.trim_log=trim_log
  def put(self,value):
   if self.prompt:self.prompt=False;return
-  sync();self.stamps.append(time.perf_counter_ns())
+  sync()
+  if self.trim_floor_bytes:
+   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+   if min(free_before)<self.trim_floor_bytes:
+    for gpu in range(4):
+     with torch.cuda.device(gpu):torch.cuda.empty_cache()
+    free_after=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+    with self.trim_log.open('a') as f:
+     f.write(json.dumps(dict(token_index=len(self.stamps),free_before=free_before,
+                             free_after=free_after,unix=time.time()))+'\n')
+  self.stamps.append(time.perf_counter_ns())
  def end(self):pass
 
 def main(a):
@@ -41,7 +52,8 @@ def main(a):
  # SDPA to avoid allocating the dense attention softmax matrix.
  use_sdpa=model_family=='Qwen3' or (spec['local_batch']==64 and spec['input_tokens']==1024)
  attention_backend='sdpa' if use_sdpa else 'eager'
- write(a.output/'config.json',dict(cfg,attention_backend=attention_backend))
+ trim_floor_bytes=16*2**30 if model_family!='Qwen3' and use_sdpa else 0
+ write(a.output/'config.json',dict(cfg,attention_backend=attention_backend,allocator_trim_floor_bytes=trim_floor_bytes))
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
  for root in roots:
@@ -168,7 +180,7 @@ def main(a):
   before=p.reset_eam_residency();sync()
   for gpu in range(4):torch.cuda.reset_peak_memory_stats(gpu)
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
-  streamer=ClockStreamer();finite=FiniteLogits();start=time.perf_counter_ns()
+  streamer=ClockStreamer(trim_floor_bytes,a.output/'allocator_trims.jsonl');finite=FiniteLogits();start=time.perf_counter_ns()
   with torch.no_grad():
    output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
   kv=output.past_key_values
