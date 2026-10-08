@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 41,
+  "completed": 42,
   "total": 64,
   "clean_repeats": 3,
   "primary_aggregate": "median; full range and all samples retained",
@@ -2201,8 +2201,86 @@
       "cache_percent": 30,
       "system": "deepspeed",
       "cell": "DeepSeekV2Lite_ShareGPT_R4_C30_B16_L1024_O64",
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "mt2_deepseek_sharegpt_b16_l1024_deepspeed_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "mt2_deepseek_sharegpt_b16_l1024_deepspeed_r3_v1",
+      "source_commit": "a9253ab3c7ef6c10efbb092911442e8d90375bfe",
+      "TTFT": {
+        "median": 4.786734416,
+        "minimum": 4.773899121,
+        "maximum": 5.990345203,
+        "mean": 5.1836595800000005,
+        "stdev": 0.6986397190008653,
+        "relative_range_percent": 25.4128592957642,
+        "samples": [
+          5.990345203,
+          4.773899121,
+          4.786734416
+        ]
+      },
+      "TPOT": {
+        "median": 4.666861072888889,
+        "minimum": 4.657243489,
+        "maximum": 4.693784494968254,
+        "mean": 4.6726296856190475,
+        "stdev": 0.018941197135236922,
+        "relative_range_percent": 0.7829889383365417,
+        "samples": [
+          4.666861072888889,
+          4.693784494968254,
+          4.657243489
+        ]
+      },
+      "E2E": {
+        "median": 300.002592795,
+        "minimum": 298.193074223,
+        "maximum": 300.482322304,
+        "mean": 299.559329774,
+        "stdev": 1.2072803209818608,
+        "relative_range_percent": 0.7630760986670166,
+        "samples": [
+          300.002592795,
+          300.482322304,
+          298.193074223
+        ]
+      },
+      "memory": {
+        "expert_budget_bytes_per_gpu": [
+          2162688000,
+          2162688000,
+          2162688000,
+          2145386496
+        ],
+        "sampled_peak_hbm_mib_by_physical_gpu": {
+          "0": 13393,
+          "1": 13489,
+          "4": 13359,
+          "5": 12879
+        },
+        "torch_peak_allocated_bytes_by_rank": [
+          7803884032,
+          7800992256,
+          7822510080,
+          7822456832
+        ],
+        "torch_peak_reserved_bytes_by_rank": [
+          10984882176,
+          10984882176,
+          10848567296,
+          10848567296
+        ],
+        "pinned_host_bytes_by_rank": [
+          7853242112,
+          7853242112,
+          7853242112,
+          7853242112
+        ],
+        "infinity_peak_expert_charged_bytes_per_gpu": null,
+        "llama_expert_resident_bytes": null,
+        "llama_expert_resident_bytes_per_gpu": null
+      }
     },
     {
       "dataset": "ShareGPT",

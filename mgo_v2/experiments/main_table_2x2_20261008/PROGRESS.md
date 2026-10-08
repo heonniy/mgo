@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **41/64**.
+Validated rows: **42/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
@@ -31,7 +31,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | MoE-Infinity (repaired) | 3.717 [3.696, 3.759] | 1.269 [1.252, 1.275] | 83.661 [82.591, 84.060] | PASS |
 | ShareGPT | DeepSeekV2Lite | 64 | 512 | llama.cpp balanced | 580.575 [580.263, 580.659] | 1.345 [1.337, 1.347] | 665.024 [664.866, 665.419] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | main_OURS | 0.960 [0.917, 1.125] | 0.285 [0.284, 0.288] | 19.033 [18.889, 19.090] | PASS |
-| ShareGPT | DeepSeekV2Lite | 16 | 1024 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
+| ShareGPT | DeepSeekV2Lite | 16 | 1024 | DeepSpeed ZeRO-Inference | 4.787 [4.774, 5.990] | 4.667 [4.657, 4.694] | 300.003 [298.193, 300.482] | PASS |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | MoE-Infinity (repaired) | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | llama.cpp balanced | — | — | — | PENDING |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | main_OURS | — | — | — | PENDING |
