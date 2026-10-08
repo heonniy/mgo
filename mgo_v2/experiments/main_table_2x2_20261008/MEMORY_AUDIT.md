@@ -25,3 +25,4 @@ C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak char
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | 2.00–2.01 | 10.96–12.20 | 4.33–4.52 | 7.04–7.74 | not measured |
 | ShareGPT | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | 2.00–2.01 | 2.58–3.05 | not measured | not measured | not measured |
 | LMSYS-Chat-1M | Qwen3 | 16 | 512 | main_OURS | 4.04–4.05 | 13.96–14.22 | 8.60–8.66 | 10.95–10.97 | 54.00–54.00 |
+| LMSYS-Chat-1M | Qwen3 | 16 | 512 | DeepSpeed ZeRO-Inference | 4.04–4.05 | 12.02–12.49 | 7.05–7.05 | 9.53–9.53 | 14.22–14.22 |
