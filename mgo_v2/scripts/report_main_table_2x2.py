@@ -113,6 +113,14 @@ def main():
                             for rank in range(4):
                                 row = json.loads((path / f'repeat{repeat}_rank{rank}.json').read_text())
                                 actual_ids.extend(row['request_ids'])
+                                if system == 'ours':
+                                    assert row['policy'] == 'LA_CA_NEAR' and row['prefetch_off'] is True
+                                    assert row['expert_executor'] == (
+                                        'native' if model == 'Qwen3' else 'native_deepseek')
+                                    if model == 'Qwen3':
+                                        assert all(row[key] is True for key in (
+                                            'native_prefill', 'prefill_optimized',
+                                            'prefill_layout_fast', 'decode_layout_fast'))
                                 if system == 'deepspeed':
                                     assert 0 < row['all_parameter_peak_bytes'] <= row['parameter_budget_bytes']
                                     if model != 'Qwen3':
@@ -121,6 +129,14 @@ def main():
                             assert actual_ids == expected_ids, (path.name, repeat, 'request membership/order mismatch')
                     else:
                         assert all(row['request_ids'] == expected_ids for row in samples)
+                        if system == 'llama':
+                            placement = json.loads((path / 'placement_audit.json').read_text())
+                            balanced = 3 if model == 'Qwen3' else 1
+                            assert placement['status'] == 'PASS'
+                            assert placement['expert_placement'] == (
+                                'balanced3' if model == 'Qwen3' else 'balanced4')
+                            assert placement['gpu_expert_layers_by_device'] == {
+                                f'CUDA{rank}': balanced for rank in range(4)}
                     case.update(status='PASS', selected_attempt=path.name, source_commit=status['source_commit'],
                                 TTFT=summarize([row['TTFT'] for row in samples]),
                                 TPOT=summarize([row['TPOT'] for row in samples]),
