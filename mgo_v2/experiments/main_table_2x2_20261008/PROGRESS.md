@@ -1,6 +1,6 @@
 # Two-model C30 main-table progress
 
-Validated rows: **48/64**.
+Validated rows: **49/64**.
 
 Each completed row has three unfiltered clean measurements. Times are seconds; TPOT is seconds per generated token and includes attention. See [MEMORY_AUDIT.md](MEMORY_AUDIT.md) for the expert budget and total HBM measurements.
 
@@ -54,7 +54,7 @@ Each completed row has three unfiltered clean measurements. Times are seconds; T
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | DeepSpeed ZeRO-Inference | 7.538 [7.533, 13.289] | 4.897 [4.882, 5.189] | 316.073 [315.080, 340.220] | PASS |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | MoE-Infinity (repaired) | 13.334 [13.185, 13.571] | 3.761 [3.750, 3.799] | 250.119 [249.821, 252.662] | PASS |
 | LMSYS-Chat-1M | Qwen3 | 64 | 1024 | llama.cpp balanced | 1162.287 [1161.994, 1162.588] | 1.410 [1.407, 1.413] | 1250.932 [1250.828, 1251.579] | PASS |
-| LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | main_OURS | — | — | — | PENDING |
+| LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | main_OURS | 0.580 [0.571, 0.859] | 0.285 [0.282, 0.299] | 18.797 [18.317, 19.398] | PASS |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | MoE-Infinity (repaired) | — | — | — | PENDING |
 | LMSYS-Chat-1M | DeepSeekV2Lite | 16 | 512 | llama.cpp balanced | — | — | — | PENDING |
