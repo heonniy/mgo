@@ -31,6 +31,9 @@ def main(a):
  state.update(requested_timeout_seconds=requested_timeout,effective_timeout_seconds=a.timeout,
               nccl_p2p_disable=bool(a.nccl_p2p_disable),
               nccl_ib_disable=bool(a.nccl_p2p_disable))
+ min_gpu_free_mib=int(os.environ.get('MGO_MIN_GPU_FREE_MIB','0'))
+ assert min_gpu_free_mib>=0
+ state['min_gpu_free_mib']=min_gpu_free_mib
  try:
   stopped=c.stop_target_idle()
   occupants,observed=wait_for_gpu_release()
@@ -111,7 +114,15 @@ def main(a):
     if (ROOT/'STOP').exists() or (out/'STOP').exists():raise RuntimeError('owner STOP')
     if c.host_available()<96*2**30:raise RuntimeError('host available below96 GiB')
     phase=json.loads((out/'phase.json').read_text()) if (out/'phase.json').exists() else {'phase':'loading'}
-    resources.write(json.dumps(dict(unix=time.time(),phase=phase,gpus=c.gpu_state(),host_available=c.host_available()))+'\n');resources.flush();time.sleep(1)
+    gpu_rows=c.gpu_state()
+    if min_gpu_free_mib:
+     free_text=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free','--format=csv,noheader,nounits'],text=True)
+     free_mib={int(g.strip()):int(float(f.strip())) for g,f in (line.split(',') for line in free_text.splitlines())}
+     for row in gpu_rows:
+      row['free_mib']=free_mib[row['gpu']]
+     if any(row['free_mib']<min_gpu_free_mib for row in gpu_rows):
+      raise RuntimeError(f'owner GPU free memory below {min_gpu_free_mib} MiB: {gpu_rows}')
+    resources.write(json.dumps(dict(unix=time.time(),phase=phase,gpus=gpu_rows,host_available=c.host_available()))+'\n');resources.flush();time.sleep(1)
    state['worker_returncode']=proc.returncode
    assert proc.returncode==0,f'worker exited {proc.returncode}; see run.log'
   result=json.loads((out/'result.json').read_text());assert result['status']=='PASS';state.update(status='PASS',result=result)

@@ -127,19 +127,35 @@ def main(a):
  initial=p.reset_eam_residency();assert initial['capacity_bytes']==sum(budgets)
  write(a.output/'initial_budget.json',dict(budgets=budgets,stats=initial))
  attention_checks=[0]
+ diag_full_prefill=a.smoke and os.environ.get('MGO_SMOKE_FULL_PREFILL')=='1'
+ memory_trace_path=a.output/'attention_memory.jsonl'
+ def trace_attention_memory(module,stage,hidden):
+  if not diag_full_prefill:return
+  row=dict(stage=stage,layer=module.layer_idx,shape=list(hidden.shape),
+           allocated=[torch.cuda.memory_allocated(g) for g in range(4)],
+           reserved=[torch.cuda.memory_reserved(g) for g in range(4)],
+           free=[torch.cuda.mem_get_info(g)[0] for g in range(4)],
+           unix=time.time())
+  with memory_trace_path.open('a') as f:f.write(json.dumps(row)+'\n')
  def attention_gpu(module,args,kwargs):
   hidden=args[0] if args else kwargs['hidden_states']
   assert hidden.is_cuda,'CPU attention is forbidden'
   attention_checks[0]+=1
+  trace_attention_memory(module,'before',hidden)
  attention_hooks=[m.register_forward_pre_hook(attention_gpu,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
- assert len(attention_hooks)==attention_layers
+ if diag_full_prefill:
+  def attention_done(module,args,kwargs,result):
+   hidden=args[0] if args else kwargs['hidden_states']
+   trace_attention_memory(module,'after',hidden)
+  attention_hooks +=[m.register_forward_hook(attention_done,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
+ assert len(attention_hooks)==attention_layers*(2 if diag_full_prefill else 1)
  n=2 if a.smoke else 64;repeats=1 if a.smoke else a.repeats;saved=None
  for repeat in range(repeats+1):
   if a.smoke and model_family!='Qwen3':trace_phase['repeat']=repeat
   phase='warmup' if repeat==0 else 'target'
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
-  if a.smoke:rows=rows[:4]
-  ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in rows],device='cuda:0')
+  if a.smoke and not diag_full_prefill:rows=rows[:4]
+  ids=torch.tensor([r['input_ids'][-32:] if a.smoke and not diag_full_prefill else r['input_ids'] for r in rows],device='cuda:0')
   tracer=engine.expert_tracer
   if saved is not None:
    tracer.trace_collection[:]=saved[0];tracer.collection_access[:]=saved[1];tracer.access_clock=saved[2]
