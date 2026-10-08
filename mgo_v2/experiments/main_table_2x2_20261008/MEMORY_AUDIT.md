@@ -34,6 +34,7 @@ C30 limits resident expert weights, not total HBM. MoE-Infinity expert peak char
 | ShareGPT | DeepSeekV2Lite | 16 | 1024 | llama.cpp balanced | 2.00–2.01 | 1.03–1.03 | 2.83–3.26 | not measured | not measured | not measured |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | main_OURS | 2.00–2.01 | not measured | 35.50–38.11 | 27.79–27.95 | not measured | 26.81–26.81 |
 | ShareGPT | DeepSeekV2Lite | 64 | 1024 | DeepSpeed ZeRO-Inference | 2.00–2.01 | not measured | 35.82–36.29 | 28.40–28.50 | 33.35–33.35 | 7.31–7.31 |
+| ShareGPT | DeepSeekV2Lite | 64 | 1024 | MoE-Infinity (repaired) | 2.00–2.01 | not measured | 63.92–64.88 | 16.14–19.41 | 59.66–60.63 | not measured |
 | LMSYS-Chat-1M | Qwen3 | 16 | 512 | main_OURS | 4.04–4.05 | not measured | 13.96–14.22 | 8.60–8.66 | 10.95–10.97 | 54.00–54.00 |
 | LMSYS-Chat-1M | Qwen3 | 16 | 512 | DeepSpeed ZeRO-Inference | 4.04–4.05 | not measured | 12.02–12.49 | 7.05–7.05 | 9.53–9.53 | 14.22–14.22 |
 | LMSYS-Chat-1M | Qwen3 | 16 | 512 | MoE-Infinity (repaired) | 4.04–4.05 | not measured | 12.09–13.33 | 2.63–2.69 | 5.87–6.49 | not measured |
