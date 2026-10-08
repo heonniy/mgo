@@ -191,12 +191,22 @@ def main():
                                        'empty KV; static weight partition retained'
                                        for row in samples)
                             placement = json.loads((path / 'placement_audit.json').read_text())
+                            config = json.loads((path / 'config.json').read_text())
                             balanced = 3 if model == 'Qwen3' else 1
                             assert placement['status'] == 'PASS'
                             assert placement['expert_placement'] == (
                                 'balanced3' if model == 'Qwen3' else 'balanced4')
                             assert placement['gpu_expert_layers_by_device'] == {
                                 f'CUDA{rank}': balanced for rank in range(4)}
+                            assert config['expert_placement'] == placement['expert_placement']
+                            assert config['synchronous_batch'] is True
+                            assert config['cpu_threads'] == 32
+                            assert config['cuda_graphs_runtime'] == 'off'
+                            assert config['llama_graph_reuse'] is False
+                            assert all(row['synchronous_batch'] is True and
+                                       row['cpu_threads'] == 32 and
+                                       row['expert_placement'] == placement['expert_placement']
+                                       for row in samples)
                     case.update(status='PASS', selected_attempt=path.name, source_commit=status['source_commit'],
                                 TTFT=summarize([row['TTFT'] for row in samples]),
                                 TPOT=summarize([row['TPOT'] for row in samples]),
