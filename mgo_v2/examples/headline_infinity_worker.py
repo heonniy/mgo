@@ -195,6 +195,15 @@ def main(a):
   del output,kv
   gc.collect();sync()
   assert kv_ref() is None and all(ref() is None for ref in kv_tensors),'previous batch KV retained'
+  if trim_floor_bytes:
+   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+   for gpu in range(4):
+    with torch.cuda.device(gpu):torch.cuda.empty_cache()
+   free_after=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+   with (a.output/'allocator_trims.jsonl').open('a') as f:
+    f.write(json.dumps(dict(boundary=f'after_{phase}_{repeat}',
+                            free_before=free_before,free_after=free_after,
+                            unix=time.time()))+'\n')
   live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
   assert not tracer.trace
   stats=dict(p.archer_engine.get_expert_policy_stats())
