@@ -1,9 +1,11 @@
 """Resume the guarded Qwen C20/C40/C50 baseline sweep."""
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
 
@@ -15,6 +17,35 @@ PYTHON = '/home/hwlee/sub-moe/phase01/.venv/bin/python'
 BASE = '/home/hwlee/mgo-tools/headline-r4/base-env/bin/python'
 INFINITY = '/home/hwlee/mgo-tools/headline-r4/infinity-env/bin/python'
 SYSTEMS = ('infinity', 'deepspeed', 'llama')
+BUILD = P / 'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json'
+LLAMA_SOURCE = P / 'examples/headline_llama_sync.cpp'
+
+
+def ensure_llama_build():
+    receipt = json.loads(BUILD.read_text())
+    source_sha = hashlib.sha256(LLAMA_SOURCE.read_bytes()).hexdigest()
+    if receipt['source_sha256'] != source_sha:
+        print('BUILD balanced Qwen llama executable between guarded jobs', flush=True)
+        subprocess.run([PYTHON, '-u', str(P / 'scripts/build_headline_llama_sync.py')], check=True)
+    assert json.loads(BUILD.read_text())['source_sha256'] == source_sha
+
+
+def wait_on_running(paths):
+    active = [p for p in paths if (p / 'status.json').exists() and
+              json.loads((p / 'status.json').read_text()).get('status') == 'RUNNING']
+    if not active:
+        return
+    assert len(active) == 1, active
+    path = active[0]
+    print('WAIT current guarded attempt', path.name, flush=True)
+    deadline = time.monotonic() + 7400
+    while time.monotonic() < deadline:
+        status = json.loads((path / 'status.json').read_text())
+        if status['status'] != 'RUNNING':
+            print('FINISHED', path.name, status['status'], flush=True)
+            return
+        time.sleep(10)
+    raise TimeoutError(f'guarded attempt did not finalize: {path}')
 
 
 def command(cell, system, label):
@@ -58,6 +89,8 @@ def main():
         for system in args.system or SYSTEMS:
             prefix = f'qca_baseline_c{cap}_{system}_r3_v'
             attempts = sorted(JOBS.glob(prefix + '*'))
+            if not args.dry_run:
+                wait_on_running(attempts)
             passed = [p for p in attempts if (p / 'status.json').exists() and
                       json.loads((p / 'status.json').read_text()).get('status') == 'PASS']
             if passed:
@@ -70,6 +103,8 @@ def main():
             if args.dry_run:
                 print(json.dumps(call), flush=True)
                 continue
+            if system == 'llama':
+                ensure_llama_build()
             env = dict(os.environ, MGO_MIN_GPU_FREE_MIB='2048')
             subprocess.run(call, check=True, env=env)
             assert json.loads((JOBS / label / 'status.json').read_text())['status'] == 'PASS'
