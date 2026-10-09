@@ -7,6 +7,7 @@ grouped GEMM is introduced. Extension compilation must precede measurement.
 from functools import lru_cache
 from pathlib import Path
 import os
+import time
 
 
 @lru_cache(None)
@@ -36,8 +37,12 @@ class DeepseekNativeExpertExecutor:
         before_wait = 0
         waited = False
         while pending:
+            diagnostic = getattr(rt, 'diag_current', None)
+            started_ns = time.perf_counter_ns() if diagnostic is not None else None
             ready = ([True] * len(pending) if getattr(rt, 'full_resident', False)
                      else rt.h2d.ready_many([groups[i][3] for i in pending]))
+            if diagnostic is not None:
+                diagnostic['ready_query_host_ns'] += time.perf_counter_ns() - started_ns
             selected = [i for i, ok in zip(pending, ready) if ok][:self.max_experts]
             if not selected:
                 # Same dependency as H0: wait for submission on host, then
@@ -54,8 +59,11 @@ class DeepseekNativeExpertExecutor:
             slots = [int(groups[i][3]) for i in selected]
             assert all(rt.keys[slot] == layer*64+groups[i][0]
                        for i, slot in zip(selected, slots))
+            started_ns = time.perf_counter_ns() if diagnostic is not None else None
             outputs = self.native.execute_wave(rt.cache, received, weights, slots,
                         [groups[i][1] for i in selected], [groups[i][2] for i in selected])
+            if diagnostic is not None:
+                diagnostic['native_wave_host_ns'] += time.perf_counter_ns() - started_ns
             # Shared completion event conservatively protects every slot in
             # the wave. It is consumed by the unchanged H2D overwrite hazards.
             rt.h2d.record_slots_use(slots)

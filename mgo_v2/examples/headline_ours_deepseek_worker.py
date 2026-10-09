@@ -180,13 +180,18 @@ class DeepSeekRuntime:
         self.ready_metrics = {'waits': 0, 'ready_before_first_wait': 0}
         self.diag = DIAG
         if self.diag:
+            self.diag_limit = int(os.environ.get('MGO_DEEPSEEK_DIAG_DECODE_STEPS', '63'))
+            assert 1 <= self.diag_limit <= 63
             self.diag_spans = {key: [] for key in ('dispatch', 'expert', 'return', 'h2d_wait')}
+            self.diag_layer_records = []
+            self.diag_current = None
             self.diag_route_host_s = 0.0
             self.diag_h2d_host_wait_s = 0.0
             original_wait_for_slot = self.h2d.wait_for_slot
 
             def timed_wait_for_slot(slot):
-                if self.index < LAYERS:
+                if (self.index < LAYERS or
+                        self.index // LAYERS > self.diag_limit):
                     return original_wait_for_slot(slot)
                 before = torch.cuda.Event(enable_timing=True)
                 after = torch.cuda.Event(enable_timing=True)
@@ -196,6 +201,8 @@ class DeepSeekRuntime:
                 self.diag_h2d_host_wait_s += time.perf_counter() - started
                 after.record()
                 self.diag_spans['h2d_wait'].append((before, after))
+                if self.diag_current is not None:
+                    self.diag_current['h2d_wait_events'].append((before, after))
 
             self.h2d.wait_for_slot = timed_wait_for_slot
 
@@ -237,8 +244,12 @@ class DeepSeekRuntime:
 
     def execute(self, layer, hidden, selected, weights, probs):
         assert layer == self.index % LAYERS
-        diagnostic = self.diag and self.index >= LAYERS
+        diagnostic = (self.diag and self.index >= LAYERS and
+                      self.index // LAYERS <= self.diag_limit)
         route_started = time.perf_counter() if diagnostic else None
+        segment_started_ns = time.perf_counter_ns() if diagnostic else None
+        detail = (dict(step=self.index // LAYERS, layer=layer, rank=self.rank,
+                       h2d_wait_events=[]) if diagnostic else None)
         if self.index < LAYERS:
             gathered = gather_global_routes(layer, selected, weights, probs,
                                               probability_tail=128)
@@ -246,15 +257,27 @@ class DeepSeekRuntime:
             gate = (self.history.sums[layer] /
                     max(1, len(self.history.rows[layer]))).astype(np.float32)
         else:
+            self.metadata.profile = diagnostic
             gathered = self.metadata.collect(self.index, selected, probs)
             gate = gathered.gate_scores
+            if diagnostic:
+                detail.update({f'metadata_{key}': value for key, value in
+                               self.metadata.last_profile.items()})
         routes = gathered.routes
+        if diagnostic:
+            now_ns = time.perf_counter_ns()
+            detail['metadata_host_ms'] = (now_ns - segment_started_ns) / 1e6
+            segment_started_ns = now_ns
         out = self.policy.apply(self.index, routes.selected_experts,
                                 routes.routing_weights, routes.origin_ranks, gate,
                                 np.zeros((EXPERTS, self.world), np.int32))
         targets, effective, _, lengths, destinations, fetches, _ = out
         if self.full_resident:
             assert not fetches, 'full-resident reference must not fetch in generation'
+        if diagnostic:
+            now_ns = time.perf_counter_ns()
+            detail['controller_host_ms'] = (now_ns - segment_started_ns) / 1e6
+            segment_started_ns = now_ns
         event = plan_rank_partial_layout(effective, lengths, destinations,
                                          routes.origin_ranks, gathered.counts, self.rank,
                                          experts=EXPERTS)
@@ -265,17 +288,32 @@ class DeepSeekRuntime:
         event['groups'] = [(expert, rows, cols, slot)
                            for (expert, rows, cols), slot in zip(event['groups'], slots)]
         event = pack_rank_partial_layout(event)
+        if diagnostic:
+            now_ns = time.perf_counter_ns()
+            detail['layout_host_ms'] = (now_ns - segment_started_ns) / 1e6
+            detail['expert_groups'] = len(event['groups'])
+            detail['expert_token_rows'] = sum(rows.numel() for _, rows, _, _ in event['groups'])
+            detail['local_fetches'] = sum(rank == self.rank for rank, *_ in fetches)
+            segment_started_ns = now_ns
         for rank, key, slot, victim, replica in fetches:
             assert not replica
             if rank == self.rank:
                 assert self.keys[slot] == victim
                 self.h2d.enqueue_demand(slot, key, self.sources[key])
                 self.keys[slot] = key
+        if diagnostic:
+            now_ns = time.perf_counter_ns()
+            detail['h2d_enqueue_host_ms'] = (now_ns - segment_started_ns) / 1e6
+            segment_started_ns = now_ns
         dense = torch.zeros((hidden.shape[0], EXPERTS), device='cuda',
                             dtype=torch.float32).scatter_add_(
                                 1, event['targets'][selected], weights.float()).to(weights.dtype)
         if diagnostic:
+            now_ns = time.perf_counter_ns()
+            detail['dense_submit_host_ms'] = (now_ns - segment_started_ns) / 1e6
             self.diag_route_host_s += time.perf_counter() - route_started
+            detail['dispatch_submit_ns'] = time.perf_counter_ns()
+            before_dispatch_bytes = self.transport.forward_bytes
             start = torch.cuda.Event(enable_timing=True)
             start.record()
         pending = self.transport.forward(hidden, dense, event, async_op=True)
@@ -284,21 +322,46 @@ class DeepSeekRuntime:
             end = torch.cuda.Event(enable_timing=True)
             end.record()
             self.diag_spans['dispatch'].append((start, end))
+            detail['_dispatch_events'] = (start, end)
+            detail['dispatch_host_ms'] = (time.perf_counter_ns() -
+                                          detail['dispatch_submit_ns']) / 1e6
+            detail['dispatch_peer_bytes'] = (self.transport.forward_bytes -
+                                             before_dispatch_bytes)
             start = torch.cuda.Event(enable_timing=True)
             start.record()
+            detail['executor_submit_ns'] = time.perf_counter_ns()
+            detail['ready_query_host_ns'] = 0
+            detail['native_wave_host_ns'] = 0
+            waves_before = self.native_executor.waves
+            self.diag_current = detail
         parts = self.native_executor.compute(
             self, ('current', received, received_ids, received_weights), event, layer)
         if diagnostic:
+            self.diag_current = None
             end = torch.cuda.Event(enable_timing=True)
             end.record()
             self.diag_spans['expert'].append((start, end))
+            detail['_expert_events'] = (start, end)
+            detail['executor_host_ms'] = (time.perf_counter_ns() -
+                                          detail['executor_submit_ns']) / 1e6
+            detail['native_waves'] = self.native_executor.waves - waves_before
+            detail['ready_query_host_ms'] = detail.pop('ready_query_host_ns') / 1e6
+            detail['native_wave_host_ms'] = detail.pop('native_wave_host_ns') / 1e6
             start = torch.cuda.Event(enable_timing=True)
             start.record()
+            detail['return_submit_ns'] = time.perf_counter_ns()
+            before_return_bytes = self.transport.return_bytes
         result = combine_rank_partials(self.transport, hidden, parts, event, torch.bfloat16)
         if diagnostic:
             end = torch.cuda.Event(enable_timing=True)
             end.record()
             self.diag_spans['return'].append((start, end))
+            detail['_return_events'] = (start, end)
+            detail['return_host_ms'] = (time.perf_counter_ns() -
+                                        detail['return_submit_ns']) / 1e6
+            detail['return_peer_bytes'] = (self.transport.return_bytes -
+                                           before_return_bytes)
+            self.diag_layer_records.append(detail)
         self.index += 1
         return result
 
@@ -371,6 +434,20 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
             for name, pairs in events.items():
                 row[name + '_ms'] = sum(before.elapsed_time(after)
                                         for before, after in pairs)
+        diagnostic_layers = []
+        for detail in runtime.diag_layer_records:
+            dispatch_start, dispatch_end = detail.pop('_dispatch_events')
+            expert_start, expert_end = detail.pop('_expert_events')
+            return_start, return_end = detail.pop('_return_events')
+            waits = detail.pop('h2d_wait_events')
+            detail['dispatch_cuda_ms'] = dispatch_start.elapsed_time(dispatch_end)
+            detail['expert_cuda_ms'] = expert_start.elapsed_time(expert_end)
+            detail['return_combine_cuda_ms'] = return_start.elapsed_time(return_end)
+            detail['dispatch_to_combine_cuda_ms'] = dispatch_start.elapsed_time(return_end)
+            detail['explicit_h2d_wait_cuda_ms'] = sum(
+                before.elapsed_time(after) for before, after in waits)
+            diagnostic_layers.append(detail)
+        assert len(diagnostic_layers) == LAYERS * min(runtime.diag_limit, count - 1)
     result = dict(release_ns=start, first_ns=stamps[0], end_ns=stamps[-1],
                   output_tokens=count, finite_logits=True,
                   argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
@@ -389,6 +466,8 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
             fixed_tokens.cpu().numpy().tobytes()).hexdigest()
     if runtime.diag:
         result['diagnostic_steps'] = diagnostic_steps
+        result['diagnostic_layers'] = diagnostic_layers
+        result['diagnostic_decode_steps'] = runtime.diag_limit
     return result
 
 
