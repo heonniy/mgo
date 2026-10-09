@@ -114,7 +114,9 @@ def run(a):
                     write(a.out/'statistics.json',statistics)
                 write(a.out/'status.json',dict(status='PASS',wall_seconds=time.monotonic()-started))
         except BaseException as exc:
-            write(a.out/'failure.json',dict(status='FAIL',cause=repr(exc),timestamp=time.time()));raise
+            failure=dict(status='FAIL',cause=repr(exc),timestamp=time.time(),pid=process.pid if process else None)
+            write(a.out/'failure.json',failure);write(a.out/'status.json',failure)
+            raise
         finally:
             if process is not None:
                 try:os.killpg(process.pid,signal.SIGTERM)
