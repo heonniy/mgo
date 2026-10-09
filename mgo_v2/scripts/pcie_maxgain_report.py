@@ -43,13 +43,12 @@ def validate_stage(root):
     report=dict(status='PASS',stage=stage,root=str(root),arms={},selection_is_not_final_estimate=stage!='final')
     screen=None
     if stage=='final':
-        admin=root/'ADMIN_GIT_PUSH.json'
-        if admin.exists():
+        for admin in sorted(root.glob('ADMIN_GIT_PUSH*.json')):
             receipt=json.loads(admin.read_text())
             assert receipt['status']=='PASS' and receipt['owner_requested_immediate_push_during_gpu_measurement']
             assert receipt['cohort_root']==str(root),'Administrative activity belongs to another cohort'
-            report['administrative_activity']=dict(source_path=str(admin),sha256=sha(admin),receipt=receipt,
-                  timing_policy='Keep all unprofiled repetitions and the preregistered stability rule; no timing-based exclusion of concurrent administrative activity')
+            report.setdefault('administrative_activities',[]).append(dict(source_path=str(admin),sha256=sha(admin),receipt=receipt,
+                  timing_policy='Keep all unprofiled repetitions and the preregistered stability rule; no timing-based exclusion of concurrent administrative activity'))
         screen=Path(spec['selection_root'])
         assert json.loads((screen/'status.json').read_text())['status']=='PASS'
         launches=[json.loads((path/'launch.json').read_text()) for path in (screen,root)]
@@ -184,8 +183,8 @@ def validate_stage(root):
             lines.append(f'| {arm} | {values} |')
         lines.extend(['','Phase values are seconds per token from separate timers-only diagnostics, including rendezvous and diagnostic assignment-copy overhead. Their endpoint sum equals diagnostic TPOT; they are excluded from unprofiled primary statistics. Differences between these separate diagnostics do not establish causal contributions to the primary R/G gap.',
              '', 'R/G per-arm output agreement, actual expert assignments, all-rank stage completions, nested native controller/metadata call costs and all repetitions remain inspectable in the archived validation/analysis/CSV/JSONL artifacts.'])
-        if 'administrative_activity' in report:
-            lines.extend(['','An owner-requested Git push ran concurrently with part of the final primaries. ADMIN_GIT_PUSH.json records the observation timestamps, before/after phase labels and verified remote SHA. These observations approximately bracket administration, not exact pack/upload duration. Every timing is retained and the originally prescribed three/five-repeat stability rule is unchanged.'])
+        if 'administrative_activities' in report:
+            lines.extend(['','Owner-requested Git pushes ran concurrently with part of the final measurements. The cohort-local ADMIN_GIT_PUSH*.json receipts record observation timestamps, before/after phase labels and verified remote SHAs. These observations approximately bracket administration, not exact pack/upload duration. Every timing is retained and the originally prescribed three/five-repeat stability rule is unchanged.'])
         (root/'MAX_GAIN_RESULTS.md').write_text('\n'.join(lines)+'\n')
         import matplotlib
         matplotlib.use('Agg')
