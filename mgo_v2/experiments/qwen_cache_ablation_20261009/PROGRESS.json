@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 0,
+  "completed": 1,
   "total": 4,
   "clean_target_repeats": 3,
   "source_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
@@ -20,8 +20,110 @@
       "local_batch": 16,
       "input_tokens": 512,
       "output_tokens": 64,
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "qca_c20_b16_ours_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "qca_c20_b16_ours_r3_v1",
+      "source_commit": "00dda9e67b59278ef4de891555ef27aa62472dc4",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.888745115,
+            2.097995558,
+            1.974223993
+          ],
+          "median": 2.097995558,
+          "minimum": 1.974223993,
+          "maximum": 3.888745115,
+          "mean": 2.653654888666667,
+          "stdev": 1.0714083024056378
+        },
+        "TPOT": {
+          "samples": [
+            0.6490522156349205,
+            0.6448172608412699,
+            0.6310151666349207
+          ],
+          "median": 0.6448172608412699,
+          "minimum": 0.6310151666349207,
+          "maximum": 0.6490522156349205,
+          "mean": 0.6416282143703704,
+          "stdev": 0.009431929664828184
+        },
+        "E2E": {
+          "samples": [
+            44.7790347,
+            42.721482991,
+            41.728179491
+          ],
+          "median": 42.721482991,
+          "minimum": 41.728179491,
+          "maximum": 44.7790347,
+          "mean": 43.076232394,
+          "stdev": 1.5560574317059273
+        }
+      },
+      "h2d_bytes_by_rank": [
+        {
+          "samples": [
+            524386566144,
+            524386566144,
+            524386566144
+          ],
+          "median": 524386566144,
+          "minimum": 524386566144,
+          "maximum": 524386566144,
+          "mean": 524386566144,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            517091622912,
+            517091622912,
+            517091622912
+          ],
+          "median": 517091622912,
+          "minimum": 517091622912,
+          "maximum": 517091622912,
+          "mean": 517091622912,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            509957111808,
+            509957111808,
+            509957111808
+          ],
+          "median": 509957111808,
+          "minimum": 509957111808,
+          "maximum": 509957111808,
+          "mean": 509957111808,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            502643294208,
+            502643294208,
+            502643294208
+          ],
+          "median": 502643294208,
+          "minimum": 502643294208,
+          "maximum": 502643294208,
+          "mean": 502643294208,
+          "stdev": 0.0
+        }
+      ],
+      "sampled_peak_hbm_mib_by_physical_gpu": {
+        "0": 11737,
+        "1": 11785,
+        "4": 11789,
+        "5": 11549
+      },
+      "min_host_available_bytes": 1510389178368,
+      "full_output_agreement_1_2": 64,
+      "full_output_agreement_1_3": 64,
+      "full_output_agreement_2_3": 64
     },
     {
       "cell": "Qwen3_ShareGPT_R4_C30_B16_L512_O64",
