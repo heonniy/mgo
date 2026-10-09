@@ -40,14 +40,17 @@ def main(a):
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=spec['local_batch'];a.seed=42;a.policy=os.environ.get('MGO_NATIVE_POLICY','BR');a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
- assert a.policy in ('BR','CA','CA_NATIVE','LA_CA_NEAR')
+ assert a.policy in ('BR','CA','CA_NATIVE','LA_CA_NEAR','STATIC_MOD')
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
  policy_comparison=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')
- assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE')
+ assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE','BR_NEAR_STATIC')
  compare_policy=policy_comparison!='0'
- policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR')}.get(policy_comparison,())
+ policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR'),'BR_NEAR_STATIC':('BR','LA_CA_NEAR','STATIC_MOD')}.get(policy_comparison,())
  capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE') else (policy_modes[0] if compare_policy else a.policy)
+ grouped_mode=os.environ.get('MGO_NATIVE_GROUPED_MODE','off')
+ assert grouped_mode in ('off','hit_then_miss')
+ if grouped_mode!='off':assert prefetch=='off' and policy_comparison=='BR_NEAR_STATIC'
  sync_ablation=os.environ.get('MGO_NATIVE_SYNC_ABLATION','0')=='1'
  assert not (compare_prefetch and compare_policy)
  if compare_prefetch:assert a.policy=='LA_CA_NEAR' and prefetch=='on'
@@ -56,12 +59,16 @@ def main(a):
  comparing=compare_prefetch or compare_policy
  a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.native_prefill=True;a.validate_decode_layout=False;a.validate_prefill_optimized=False
  a.prefetch_off=prefetch=='off';a.collective_barrier_ablation=sync_ablation
+ a.compiled_dense=grouped_mode!='off'
  a.capacities=spec.get('expert_slots_per_rank',[461,461,461,460])
  if os.environ.get('MGO_NATIVE_MAIN_CAPACITY','0')=='1':
   a.capacities=[x-2 for x in a.capacities]
  options=selected_options();options.update(arena_budget=2,streaming=True,ready_first=True,trigger='T2',runtime_arm='BR_P2_OVERLAP')
  native=NativeExpertExecutor()
  model,backing,experts=load_model();rt=_create_runtime(a,model,backing,experts,options)
+ if grouped_mode!='off':
+  from mgo_v2.grouped_expert import GroupedExpertExecutor
+  rt.grouped_executor=GroupedExpertExecutor(rt.cache,rt.kernel,a.local_batch*4*8,schedule=grouped_mode)
  prefetch_on=rt.prefetch_next
  if prefetch=='off':rt.prefetch_next=lambda:None
  write(a.output/f'source_rank{rank}.json',dict(options=options,capacities=a.capacities,gpu=physical[rank],prefetch=prefetch,policy=a.policy,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE'),nccl_ib_disable=os.environ.get('NCCL_IB_DISABLE'),pinned=rt.pinned_expert_store_receipt))
@@ -106,7 +113,7 @@ def main(a):
   for t in row:h.update(t.cpu().view(torch.uint8).numpy().tobytes())
  write(a.output/f'trace_rank{rank}.json',dict(route_sha256=h.hexdigest(),events=len(routes),bytes=route_bytes,teacher_tokens=captured['tokens']))
  proofs={};baseline_tokens=None;results=[]
- modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (policy_modes if policy_comparison=='TRIPLE' else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0')))
+ modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (policy_modes if policy_comparison=='TRIPLE' else (policy_modes+tuple(reversed(policy_modes)) if policy_comparison=='BR_NEAR_STATIC' else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0'))))
  for run,name in enumerate(modes):
   if compare_policy:a.policy=name
   rt.native_executor=native if comparing or name=='native' else None;reset();a.phase='MEASURE'
@@ -122,6 +129,9 @@ def main(a):
   before=dict(counters['stats'])
   with torch._dynamo.config.patch(error_on_recompile=True):result=generate_fixed(model,rt,target,teacher,a.decode_steps+1)
   rt.execute=original;validation=validate_state(rt);assert before==dict(counters['stats'])
+  if name=='STATIC_MOD':
+   resident=rt.policy.slots[rank,:a.capacities[rank]]
+   assert np.all(resident[resident>=0]%128%4==rank),'static owner drift'
   expected_barriers=48*a.decode_steps if sync_ablation else 0
   assert rt.h2d_global_barriers==rt.post_expert_barriers==expected_barriers
   byte_counts=dict(forward=rt.transport.forward_bytes-boundary['forward'],returned=rt.transport.return_bytes-boundary['returned'],h2d=rt.h2d.metrics['bytes']-boundary['h2d'])
@@ -163,7 +173,7 @@ def main(a):
    write(a.output/f'diagnostic_{name}_rank{rank}.json',diagnostic)
    dist.barrier()
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_modes=list(policy_modes),active_total=active_total,active_decode=active_decode,main_capacities=a.capacities,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE')))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',results=results,route_frozen=True,production_default_changed=False,cell=a.cell,decode_steps=a.decode_steps,prefetch=prefetch,capture_policy=capture_policy,collective_barrier_ablation=sync_ablation,policy_compare=compare_policy,policy_modes=list(policy_modes),grouped_decode_mode=grouped_mode,compiled_dense=a.compiled_dense,active_total=active_total,active_decode=active_decode,main_capacities=a.capacities,nccl_p2p_disable=os.environ.get('NCCL_P2P_DISABLE')))
  dist.barrier();dist.destroy_process_group()
 
 if __name__=='__main__':

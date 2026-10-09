@@ -58,7 +58,10 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
-    if policy==7:
+    if policy==9:
+        # Static expert owner: layer does not affect the canonical rank.
+        assignment=misses%world
+    elif policy==7:
         assert 1<=world<=8 and not substitution
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
     elif policy==6:
@@ -76,7 +79,8 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     else:
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
-    row[44]=rank_fetches.max();row[45]=rank_fetches.min();assert row[44]-row[45]<=1
+    row[44]=rank_fetches.max();row[45]=rank_fetches.min()
+    if policy!=9:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0

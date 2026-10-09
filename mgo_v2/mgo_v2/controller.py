@@ -233,7 +233,7 @@ from .cache import SlotArena
 class DecodePrefetchController:
  def __init__(self,capacities,budget,policy,seed,predictor):
   self.world=len(capacities);self.policy_name=policy;self.seed=seed;self.budget=budget;self.predictor=predictor
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8}[policy],seed)
+  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9}[policy],seed)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):
@@ -254,7 +254,8 @@ class DecodePrefetchController:
    else:discard.append(self.arena.discard(key));self.counters['wasted']+=1
   self.pending.clear()
   out=m.apply(event,selected,weights,origins,gates,np.zeros((128,self.world),np.int32));fetches=out[5]
-  quotas=np.bincount([f[0] for f in fetches],minlength=self.world);assert quotas.max()-quotas.min()<=1
+  quotas=np.bincount([f[0] for f in fetches],minlength=self.world)
+  if self.policy_name!='STATIC_MOD':assert quotas.max()-quotas.min()<=1
   for rank,key,slot,victim,rep in fetches:
    assert not rep
    if key in self.promotion_victims:self.counters['promotion_victim_reloads']+=1;self.promotion_victims.remove(key)
