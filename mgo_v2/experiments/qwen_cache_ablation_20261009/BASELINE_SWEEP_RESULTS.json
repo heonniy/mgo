@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 5,
+  "completed": 6,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -163,9 +163,62 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "llama",
-      "cache_percent": 20
+      "cache_percent": 20,
+      "label": "qca_baseline_c20_llama_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.0014490905238433893,
+      "reused_c30": false,
+      "source_commit": "97aa9767118457466ac7b35b4ce92b7535f6f84a",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "e5e53725408bb7ba941b08b9457e814935dbff95299ef22926a21b09ff5eae8e",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            162.083266447,
+            161.78817124
+          ],
+          "mean": 161.9357188435,
+          "median": 161.9357188435,
+          "minimum": 161.78817124,
+          "maximum": 162.083266447,
+          "stdev": 0.20866382196534994
+        },
+        "TPOT": {
+          "samples": [
+            0.5251762417142859,
+            0.525374366936508
+          ],
+          "mean": 0.5252753043253969,
+          "median": 0.5252753043253969,
+          "minimum": 0.5251762417142859,
+          "maximum": 0.525374366936508,
+          "stdev": 0.0001400956881573156
+        },
+        "E2E": {
+          "samples": [
+            195.169369675,
+            194.886756357
+          ],
+          "mean": 195.028063016,
+          "median": 195.028063016,
+          "minimum": 194.886756357,
+          "maximum": 195.169369675,
+          "stdev": 0.1998377936114422
+        }
+      },
+      "memory": {
+        "resident_expert_bytes_per_gpu": [
+          2415919104,
+          2415919104,
+          2415919104,
+          2415919104
+        ],
+        "expert_budget_bytes_global": 11588861952
+      }
     },
     {
       "status": "PASS",
