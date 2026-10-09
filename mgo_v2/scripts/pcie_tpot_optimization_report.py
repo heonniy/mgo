@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import numpy as np
 from pcie_host import write
-from pcie_policy_report import summarize_arm
+from pcie_policy_report import summarize_arm,expected_quota
 from validate_pcie_phases import validate
 
 VARIANTS=('NATIVE','GROUPED','GROUPED_META')
@@ -90,11 +90,20 @@ def run(root,out):
             assert r['tokens']==diagnostic['tokens'] and r['validation']['state_hash']==diagnostic['validation']['state_hash']
             assert np.array_equal(np.load(path/f'policy_trace_repeat1_rank{rank}.npy'),np.load(path/f'policy_trace_repeat-1_rank{rank}.npy'))
             if arm.endswith('GROUPED_META'):
-                warm=json.loads((path/f'metadata_repeat0_rank{rank}.json').read_text());assert warm['wire_checks']==48
+                warm=json.loads((path/f'metadata_repeat0_rank{rank}.json').read_text());assert warm['wire_checks']==48 and warm['calls']==3024
             if not arm.endswith('NATIVE'):
                 warm=json.loads((path/f'grouped_repeat0_rank{rank}.json').read_text())
                 assert len(warm['checks'])==48 and all(x['finite'] and x['relative_l2']<=.01 for x in warm['checks'])
-        report['arms'][arm]=dict(live=live,diagnostic=partition(path))
+        trace=np.load(path/'policy_trace_repeat1_rank0.npy')[48:]
+        count=trace[:,19].astype(np.int64)
+        r=np.array([expected_quota(int(m),int(event),False) for m,event in zip(count,trace[:,52])])
+        g=np.array([expected_quota(int(m),int(event),True) for m,event in zip(count,trace[:,52])])
+        critical_r=r.reshape(-1,2,2).sum(axis=2).max(axis=1)
+        critical_g=g.reshape(-1,2,2).sum(axis=2).max(axis=1)
+        count_proxy=dict(events_with_different_group_totals_fraction=float(np.mean(critical_r!=critical_g)),
+                         mean_critical_group_count_reduction_percent=float(np.mean((critical_r-critical_g)/np.maximum(1,critical_r)))*100,
+                         scope='Count-only same-M counterfactual on this arm\'s live trace; not measured H2D speedup')
+        report['arms'][arm]=dict(live=live,diagnostic=partition(path),same_m_quota_count_proxy=count_proxy)
     for v in VARIANTS:
         r=report['arms']['R-NEAR__'+v]['live']['primary']['TPOT']['median']
         g=report['arms']['G-NEAR__'+v]['live']['primary']['TPOT']['median']
@@ -103,17 +112,23 @@ def run(root,out):
         a=[report['arms'][base+'__'+v]['live']['primary']['TPOT']['median'] for v in VARIANTS]
         report['implementation_comparisons'][base]=dict(native_to_grouped_reduction_percent=(a[0]-a[1])/a[0]*100,
                                                        grouped_to_metadata_reduction_percent=(a[1]-a[2])/a[1]*100)
-        agreement=[]
+        agreement=[];prefix_lengths=[]
         for rank in range(4):
             rows=[json.loads((root/(base+'__'+v)/f'repeat1_rank{rank}.json').read_text()) for v in VARIANTS]
+            assert np.array_equal(np.array(rows[0]['tokens'])[:,0],np.array(rows[1]['tokens'])[:,0]),'Native prefill first token changed'
             assert rows[1]['tokens']==rows[2]['tokens'] and rows[1]['validation']['state_hash']==rows[2]['validation']['state_hash']
-            agreement.append(float(np.mean(np.array(rows[0]['tokens'])==np.array(rows[1]['tokens']))))
+            same=np.array(rows[0]['tokens'])==np.array(rows[1]['tokens'])
+            agreement.append(float(same.mean()))
+            prefix_lengths.extend(np.where(same.all(axis=1),64,same.argmin(axis=1)).tolist())
             assert json.loads((root/f'metadata_parity_rank{rank}.json').read_text())['status']=='PASS'
         report['implementation_comparisons'][base]['native_grouped_token_agreement_rank']=agreement
+        report['implementation_comparisons'][base]['native_grouped_matching_prefix_lengths']=prefix_lengths
+        report['implementation_comparisons'][base]['native_grouped_first_token_exact']=True
         report['implementation_comparisons'][base]['grouped_metadata_exact_token_cache_trace_parity']=True
     report['notes']=['Only unprofiled repeats supply primary TPOT. Separate diagnostic is a frontier partition, not kernel-active time.',
        'Each arm generates its own greedy tokens. Native versus grouped BF16 reductions may change routes and H2D; report agreement and live bytes.',
        'C++ metadata changes preserve exact grouped tokens, policy trace and cache state.',
+       'The common cohort retains the same 8.25-MiB grouped activation workspace per rank in every arm; expert-cache slots remain unchanged.',
        'R/G both receive each optimization. A positive placement benefit is not assumed. Short cohorts do not establish a universal gain.',
        'Full 54 GiB per-NUMA shared pinned source, C30/P2, no prefetch, no expert H2D/token A2A overlap or H2D/compute overlap.']
     write(out/'RESULTS.json',report)
@@ -126,6 +141,16 @@ def run(root,out):
             '| Arm | Metadata max-rank mean ms/layer | PLAN residual ms/layer |','|---|---:|---:|']
     for arm,row in report['arms'].items():
         c=row['diagnostic']['nested_cpu_calls'];lines.append(f"| {arm} | {c['metadata_call']['max_rank_mean_ms']:.4f} | {c['plan_residual_checksum_slots_glue']['max_rank_mean_ms']:.4f} |")
+    lines+=['','## Numerical trajectories and fetch opportunity','',
+            'All variants retain native prefill and identical first generated tokens for each placement. Grouped decode can diverge later through different BF16 GEMM reductions; token agreement is reproducibility evidence, not task accuracy. Grouped and grouped+metadata retain the entire same trajectory exactly.','',
+            '| Placement | Native/grouped token agreement (global %) | Grouped/metadata tokens, cache, trace |','|---|---:|---|']
+    for base,row in report['implementation_comparisons'].items():
+        lines.append(f"| {base} | {np.mean(row['native_grouped_token_agreement_rank'])*100:.3f} | Exact |")
+    lines+=['','| Arm | Decode H2D (GiB) | Mean M | M mod 4 = 2 (%) | Count-only critical-group reduction (%) |','|---|---:|---:|---:|---:|']
+    for arm,row in report['arms'].items():
+        d=row['live']['live_decode'][0];c=row['same_m_quota_count_proxy']
+        lines.append(f"| {arm} | {d['H2D_bytes']/2**30:.3f} | {d['miss_mean']:.3f} | {d['M_mod_4_equals_2_fraction']*100:.3f} | {c['mean_critical_group_count_reduction_percent']:.3f} |")
+    lines+=['','The last column holds each event\'s M fixed and compares quota counts only. For M=54 the critical group changes 28 to 27 fetches (3.57% fewer); for the microbenchmark M=6 it changes 4 to 3 (25% fewer). This count comparison cannot replace measured H2D timing. Live cache trajectories and total bytes are reported separately above.']
     (out/'RESULTS.md').write_text('\n'.join(lines)+'\n')
     plot(report,out)
     write(out/'SOURCES.json',{str(p):dict(bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in root.rglob('*') if p.is_file() and p.suffix in ('.json','.npy','.csv')})
