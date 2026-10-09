@@ -1,4 +1,4 @@
-"""Drive audited DeepSeek synchronous llama batch on the C30 layer budget."""
+"""Drive audited DeepSeek synchronous llama batch within each expert budget."""
 import argparse,hashlib,json,os,subprocess,re
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
@@ -19,19 +19,24 @@ def main(a):
  spec=next(s for s in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if s['cell']==a.cell)
  assert spec.get('model')=='DeepSeekV2Lite'
  binary=TOOLS/'llama.cpp/build/bin/headline-llama-deepseek-sync'
- build_path=P/'experiments/main_table_2x2_20261008/LLAMA_DEEPSEEK_BUILD.json'
+ build_path=P/'experiments/deepseek_cache_ablation_20261009/LLAMA_BUILD.json'
  build=json.loads(build_path.read_text())
  source=P/'examples/headline_llama_deepseek_sync.cpp'
  assert hashlib.sha256(source.read_bytes()).hexdigest()==build['source_sha256'],'llama sync source changed: rebuild and refresh LLAMA_BUILD.json'
  assert hashlib.sha256(binary.read_bytes()).hexdigest()==build['binary_sha256'],'llama sync binary does not match build receipt'
  assert build.get('cmake_flags',{}).get('GGML_CUDA_GRAPHS:BOOL')=='ON','A/B-capable llama build requires CUDA Graph support compiled in; rebuild first'
  assert build.get('cuda_graph_support') is True and build.get('baseline_policy_eligible') is True,'stale llama build receipt'
- assert a.expert_placement=='balanced4'
- layers=4
+ slots=spec['expert_slots_per_rank']
+ assert spec['cache_percent'] in (20,30,40,50)
+ assert len(slots)==4 and max(slots)-min(slots)<=1
+ layers_per_gpu=min(slots)//64
+ layers=4*layers_per_gpu
+ assert layers in (4,8,12)
+ assert a.expert_placement==f'balanced{layers}'
  expert_layer_bytes=64*3*2048*1408*2
  resident=layers*expert_layer_bytes
  assert resident<=spec['expert_budget_bytes']
- assert spec['cache_percent']==30 and 64<=min(spec['expert_slots_per_rank'])<128
+ assert all(layers_per_gpu*64<=slot for slot in slots)
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
  assert set(os.sched_getaffinity(0))==set(affinity)
@@ -44,7 +49,7 @@ def main(a):
  write(a.output/'config.json',dict(
   command=cmd,build=build,expert_budget_bytes=spec['expert_budget_bytes'],expert_resident_bytes=resident,
   gpu_expert_layers=layers,cpu_expert_layers=26-layers,expert_placement=a.expert_placement,
-  static_expert_bytes_per_gpu=[expert_layer_bytes]*4,
+  static_expert_bytes_per_gpu=[layers_per_gpu*expert_layer_bytes]*4,
   unused_expert_budget_bytes=spec['expert_budget_bytes']-resident,
   synchronous_batch=True,op_offload=False,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
@@ -61,9 +66,12 @@ def main(a):
  assert placement['expected_total_expert_tensor_count']==26*3
  assert placement['gpu_expert_bytes']==resident and placement['op_offload'] is False
  assert placement['expert_placement']==a.expert_placement
- assert placement['gpu_expert_layer_ids']==[5,12,19,24]
+ expected_ids={4:[5,12,19,24],
+               8:[3,5,10,12,17,19,22,24],
+               12:[1,3,5,8,10,12,15,17,19,22,24,26]}[layers]
+ assert placement['gpu_expert_layer_ids']==expected_ids
  counts=placement['gpu_expert_layers_by_device']
- assert set(counts)=={'CUDA0','CUDA1','CUDA2','CUDA3'} and sorted(counts.values())==[1,1,1,1],counts
+ assert counts=={f'CUDA{rank}':layers_per_gpu for rank in range(4)},counts
 
  lines=[s for s in (a.output/'run.log').read_text().splitlines() if 'KV buffer size' in s]
  assert len(lines)==4 and all(re.search(r'CUDA[0-3] KV buffer',s) for s in lines),lines
@@ -96,5 +104,5 @@ if __name__=='__main__':
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
  p.add_argument('--graph-reuse',choices=('on','off'),required=True)
- p.add_argument('--expert-placement',choices=('balanced4',),default='balanced4')
+ p.add_argument('--expert-placement',choices=('balanced4','balanced8','balanced12'),default='balanced4')
  main(p.parse_args())

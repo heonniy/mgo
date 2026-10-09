@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "command": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_llama_deepseek_sync.cpp",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/ggml/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/vendor/nlohmann",
+    "-L/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-Wl,-rpath,/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-lllama",
+    "-lggml",
+    "-lggml-base",
+    "-lggml-cpu",
+    "-o",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-deepseek-sync"
+  ],
+  "source_sha256": "4bbca7ae0ef3380b8f9719a5f11d3f09f6786b8d254a528d036a2efdac5fea03",
+  "binary_sha256": "f63a89e367cc337a32b8703d31f91e4118c9b46f413a209ce200f32b6528a294",
+  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf",
+  "cmake_flags": {
+    "GGML_CUDA:BOOL": "ON",
+    "GGML_CUDA_GRAPHS:BOOL": "ON",
+    "GGML_NATIVE:BOOL": "ON",
+    "GGML_OPENMP:BOOL": "ON"
+  },
+  "cuda_graph_support": true,
+  "baseline_policy_eligible": true,
+  "expert_placement": [
+    "balanced4",
+    "balanced8",
+    "balanced12"
+  ],
+  "cpu_threads": 32,
+  "cuda_graphs_runtime": "OFF",
+  "graph_reuse": "OFF"
+}

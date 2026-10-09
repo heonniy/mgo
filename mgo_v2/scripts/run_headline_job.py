@@ -149,7 +149,7 @@ if __name__=='__main__':
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
  p.add_argument('--llama-cuda-graphs',choices=('on','off'))
  p.add_argument('--llama-graph-reuse',choices=('on','off'))
- p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3','balanced4'))
+ p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced3','balanced4','balanced8','balanced12'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))

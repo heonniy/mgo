@@ -10,7 +10,7 @@ ROOT = Path('/home/hwlee/mgo-tools/headline-r4/llama.cpp')
 BUILD = ROOT / 'build'
 SOURCE = PKG / 'examples/headline_llama_deepseek_sync.cpp'
 BINARY = BUILD / 'bin/headline-llama-deepseek-sync'
-RECEIPT = PKG / 'experiments/main_table_2x2_20261008/LLAMA_DEEPSEEK_BUILD.json'
+RECEIPT = PKG / 'experiments/deepseek_cache_ablation_20261009/LLAMA_BUILD.json'
 
 
 def main():
@@ -30,7 +30,8 @@ def main():
                    binary_sha256=hashlib.sha256(BINARY.read_bytes()).hexdigest(),
                    llama_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                    cmake_flags=flags, cuda_graph_support=True, baseline_policy_eligible=True,
-                   expert_placement='balanced4', cpu_threads=32, cuda_graphs_runtime='OFF', graph_reuse='OFF')
+                   expert_placement=['balanced4', 'balanced8', 'balanced12'],
+                   cpu_threads=32, cuda_graphs_runtime='OFF', graph_reuse='OFF')
     RECEIPT.write_text(json.dumps(receipt, indent=2) + '\n')
     print(f'PASS {BINARY}')
 

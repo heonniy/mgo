@@ -52,22 +52,27 @@ int main(int argc,char **argv){try{
  int layers=std::stoi(argv[5]),repeats=std::stoi(argv[6]),threads=std::stoi(argv[8]);
  bool smoke=std::stoi(argv[7]);
  std::string placement_mode=argc==10?argv[9]:"legacy_tail";
- require(placement_mode=="balanced4","DeepSeek C30 requires audited balanced4 placement");
+ require((layers==4 && placement_mode=="balanced4") ||
+         (layers==8 && placement_mode=="balanced8") ||
+         (layers==12 && placement_mode=="balanced12"),
+         "DeepSeek requires an audited symmetric balanced placement");
  require(threads==16||threads==32||threads==64,"cpu_threads must be 16, 32, or 64");
  auto warm=read(argv[2])["requests"],target=read(argv[3])["requests"];
  int count=smoke?4:target.size(),len=smoke?32:target[0]["input_ids"].size(),n=smoke?2:64;
- require(count>0 && layers==4,"DeepSeek C30 uses four GPU-routed-expert layers");
+ require(count>0,"empty DeepSeek batch");
 
  PlacementAudit placement;
  llama_log_set(audit_log,&placement);
  ggml_backend_load_all();llama_backend_init();
 
  std::set<int> gpu_expert_layer_ids;
- // A routed layer contains 64 experts. Two layers on one rank need 128
- // slots, above its C30 quota of at most 125. Exactly one layer per GPU
- // is the largest symmetric layer-granular placement inside all quotas.
- const int ids[]={5,12,19,24};
- gpu_expert_layer_ids.insert(std::begin(ids),std::end(ids));
+ // Each routed layer has 64 experts. These nested sets add one whole layer
+ // per CUDA device at C40 and C50 while preserving the C20/C30 placement.
+ const std::vector<int> ids = layers==4 ? std::vector<int>{5,12,19,24} :
+                              layers==8 ? std::vector<int>{3,5,10,12,17,19,22,24} :
+                                          std::vector<int>{1,3,5,8,10,12,15,17,19,22,24,26};
+ gpu_expert_layer_ids.insert(ids.begin(),ids.end());
+ require((int)gpu_expert_layer_ids.size()==layers,"duplicate balanced expert layer");
  std::vector<std::string> patterns;
  for(int i=1;i<27;i++)if(!gpu_expert_layer_ids.count(i))patterns.push_back("blk\\."+std::to_string(i)+"\\.ffn_(up|down|gate|gate_up)_(ch|)exps");
  std::vector<llama_model_tensor_buft_override> overrides;
@@ -96,12 +101,13 @@ int main(int argc,char **argv){try{
   gpu_layer_ids.push_back(layer);
  }
  for(auto &[dev,cnt]:gpu_experts_by_device)gpu_by_device[dev]=cnt;
- require(placement.layer_device.size()==27,"balanced4 requires audited ownership for all 27 transformer layers");
- require(gpu_experts_by_device.size()==4,"balanced4 must span exactly four CUDA devices");
+ require(placement.layer_device.size()==27,"missing audited ownership for transformer layers");
+ require(gpu_experts_by_device.size()==4,"balanced placement must span four CUDA devices");
  std::vector<int> device_counts;
  for(auto &[dev,cnt]:gpu_experts_by_device)device_counts.push_back(cnt);
  std::sort(device_counts.begin(),device_counts.end());
- require(device_counts==std::vector<int>({1,1,1,1}),"balanced4 placement is not 1/1/1/1 on actual layer owners");
+ require(device_counts==std::vector<int>(4,layers/4),
+         "balanced placement differs from the audited per-device quotas");
  const int64_t expert_layer_bytes=int64_t(64)*3*2048*1408*2;
  json layer_counts=json::object();
  for(auto &[layer,cnt]:placement.cpu_expert_layer_counts)layer_counts[std::to_string(layer)]=cnt;

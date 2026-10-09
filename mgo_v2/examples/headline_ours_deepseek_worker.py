@@ -1,4 +1,4 @@
-"""DeepSeek-V2-Lite main_OURS: live Near, C30, pinned source, native experts.
+"""DeepSeek-V2-Lite main_OURS: live Near, bounded cache, pinned source, native experts.
 
 The checkpoint's routed expert weights stay in rank-private pinned host memory.
 All dense, attention and shared-expert weights are resident on each GPU.
@@ -237,8 +237,14 @@ def main(args):
     spec = next(x for x in json.loads(manifest.read_text())['cells'] if x['cell'] == args.cell)
     assert spec['model'] == 'DeepSeekV2Lite' and spec['model_path'] == str(MODEL)
     batch = 1 if args.smoke else spec['local_batch']
-    capacities = [max(0, x - 2) for x in spec['expert_slots_per_rank']]
-    assert capacities == [123, 123, 123, 122]
+    percent = spec['cache_percent']
+    assert percent in (20, 30, 40, 50)
+    slots = 26 * 64 * percent // 100
+    expected_per_rank = [slots // 4 + (r < slots % 4) for r in range(4)]
+    assert spec['expert_slots'] == slots
+    assert spec['expert_slots_per_rank'] == expected_per_rank
+    capacities = [x - 2 for x in expected_per_rank]
+    assert all(x > 0 for x in capacities)
     model, pool, sources = load_model_and_store()
     runtime = DeepSeekRuntime(batch, capacities, sources, pool)
     runtime.install(model)
