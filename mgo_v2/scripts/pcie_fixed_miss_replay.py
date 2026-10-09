@@ -1,5 +1,6 @@
 """Conditional Stage-II comparison: restore identical pre-event cache/input."""
 import argparse
+import csv
 import hashlib
 import json
 from pathlib import Path
@@ -22,7 +23,7 @@ def replay(capture,reference,cost_path,out):
     arms={'G-BR':(0,None),'G-CA':(1,None),'G-NUMA-CA':(1,costs),'G-NEAR':(7,None)}
     policies={name:Policy(source['capacities'],np.zeros((48,128,128),np.float32),False,kind,42,
                          native_pcie=True,quota_mode='group_balanced',peer_costs=cost) for name,(kind,cost) in arms.items()}
-    timings={name:[] for name in arms}
+    timings={name:[] for name in arms};assignments=[]
     for i,event in enumerate(source['events']):
         lo,hi=source['offsets'][i:i+2]
         inputs=[source[k][lo:hi] for k in ('selected','weights','origins')]+[source['gate'][i]]
@@ -37,6 +38,7 @@ def replay(capture,reference,cost_path,out):
             start=time.perf_counter_ns();result=p.apply(int(event),*inputs,None)
             timings[name].append((time.perf_counter_ns()-start)/1000)
             fetched=np.asarray(result[5]);quota=p.native_pcie.quotas.copy()
+            assignments.extend([name,int(event),int(event)%48,*map(int,fetch)] for fetch in fetched)
             miss_keys=fetched[:,1] if len(fetched) else np.empty(0,np.int64)
             if baseline_quota is None:baseline_quota=quota;baseline_keys=miss_keys
             np.testing.assert_array_equal(quota,baseline_quota)
@@ -45,6 +47,9 @@ def replay(capture,reference,cost_path,out):
             assert np.all((p.owner==0)|((p.owner&(p.owner-1))==0))
             if name=='G-NEAR':np.testing.assert_array_equal(result[-1],expected[i,:48])
     results={}
+    with (out/'assigned_experts.csv').open('w',newline='') as stream:
+        writer=csv.writer(stream);writer.writerow(['arm','event','layer','rank','expert_key','logical_slot','victim','replica'])
+        writer.writerows(assignments)
     for name,p in policies.items():
         trace=p.native_pcie.trace();np.save(out/f'{name}_trace.npy',trace)
         if name=='G-NEAR':np.testing.assert_array_equal(trace,expected)
