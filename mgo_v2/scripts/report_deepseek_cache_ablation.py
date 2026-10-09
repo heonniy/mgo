@@ -176,7 +176,7 @@ def main():
              '|---:|---:|---|---:|---:|---:|---|']
     csv_path = REPORT / 'RESULTS.csv'
     with csv_path.open('w', newline='') as stream:
-        writer = csv.writer(stream)
+        writer = csv.writer(stream, lineterminator='\n')
         writer.writerow(['batch_per_rank', 'cache_percent', 'system', 'status', 'TTFT_median_s',
                          'TTFT_min_s', 'TTFT_max_s', 'TPOT_median_s_per_token', 'TPOT_min_s_per_token',
                          'TPOT_max_s_per_token', 'E2E_median_s', 'E2E_min_s', 'E2E_max_s',
