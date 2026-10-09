@@ -19,6 +19,11 @@ The rank-private full pinned host store is 54 GiB per rank; verify host
 headroom and the supervisor's HBM stop guard before timing. No other GPU may
 be used.
 
+Preflight `qca_c50_b16_ours_smoke_v1` passed on the four owner GPUs with
+native expert execution, Near placement, prefetch OFF and the compiled
+prefill/decode paths. The guarded job restored owner inference loads. This
+two-token smoke run checks feasibility only and is excluded from timing.
+
 Keep all four cache settings on identical frozen input requests and rank
 order. Use a separate, non-primary generation diagnostic at the endpoints
 (C20/C50) if needed to attribute exposed H2D wait and expert/communication
