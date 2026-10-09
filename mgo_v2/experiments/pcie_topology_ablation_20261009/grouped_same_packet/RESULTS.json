@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "scope": "R-NEAR paired compute-only on identical real packets; native output alone advances model",
+  "max_rank_local_complete_ms": {
+    "native": {
+      "mean": 12.843815979166667,
+      "median": 12.141517499999999,
+      "p10": 6.1954,
+      "p90": 19.6029087,
+      "min": 5.003113,
+      "max": 20.690327
+    },
+    "grouped": {
+      "mean": 0.41958988194444446,
+      "median": 0.414458,
+      "p10": 0.2934609,
+      "p90": 0.5132322,
+      "min": 0.237017,
+      "max": 1.407167
+    }
+  },
+  "median_ratio_native_over_grouped": 29.294928557296515,
+  "median_latency_reduction_fraction": 0.9658643987458734,
+  "event_count": 48,
+  "repeat_count_per_event_per_backend": 3,
+  "raw_rank_samples": 1152,
+  "workspace_bytes_per_rank": 8650752,
+  "max_relative_l2": 0.004491943400353193,
+  "max_absolute_error": 0.03125,
+  "native_reference_token_cache_parity": true,
+  "source_root": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_grouped_same_packet_attempt1",
+  "reference": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_stage1_attempt1",
+  "limits": [
+    "Selected fixed event set: steps1,32,63 and layers0,3,...45; not a serving-workload speedup estimate",
+    "Local completion includes CPU submission gaps and CUDA completion; max rank durations exclude Gloo rendezvous/start skew",
+    "Extra grouped metadata preparation occurs before metadata/forward completion and is outside compute timer",
+    "No Torch profiler inside paired timing; each current packet warms both methods once before three counterordered pairs",
+    "Different floating-point reduction order: finite BF16 outputs with relative-L2 <=1%; no full grouped greedy-generation parity claimed"
+  ]
+}
