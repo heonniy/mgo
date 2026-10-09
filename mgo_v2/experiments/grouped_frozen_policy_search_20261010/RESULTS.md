@@ -25,4 +25,6 @@ Largest screen gain: **ShareGPT_R4_C30_B8_L128_O33_s14_d5**, +0.04%. The two-run
 
 The same env2 C30/B8 seed 14/5 and identical route/teacher were rerun in a fresh guarded job. BR was 0.2690 [0.2606, 0.2773] and Near was 0.2676 [0.2603, 0.2750] s/token, an observed Near mean gain of +0.50%. Within that job, BR repeats differed by 6.2% and Near by 5.5%; their ranges overlap. Both absolute TPOT means also shifted about 21% below the first job, despite identical route and H2D bytes. Thus this seed is the best observed positive candidate, **not a reliable Near speedup**. The full 12-cell screen found no stable Near winner under these grouped settings.
 
+A later quiet-host rerun, after stopping the managed loads on GPUs 2/3/6/7, and the same-route Ready-First comparison are in [QUIET_PAIR.md](../main_ours_static_placement_20261010/QUIET_PAIR.md). The quiet grouped run favored BR by 0.58%; Ready-First favored Near by 1.90%.
+
 Full per-run values, peer/H2D bytes, decode hit rates, token agreement, and raw receipt paths are in [RESULTS.json](RESULTS.json).

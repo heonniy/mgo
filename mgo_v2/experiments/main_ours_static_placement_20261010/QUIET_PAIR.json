@@ -1,0 +1,104 @@
+{
+  "status": "PASS",
+  "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "quiet_gpus": [
+    2,
+    3,
+    6,
+    7
+  ],
+  "transport": "p2p_disabled",
+  "trace_sha256_per_rank": [
+    "da8272ad0c6ce2cb015e23696cd86f385b8a8b2c375de41065d08899a25eb617",
+    "6d2f633373767a5dc92adfbb2941c4bfc08d045017508a85013955e3c2e6e3f8",
+    "0dfa958650eda202cf47049513c11895b2f9e95d7a12e39d8ff3b6ee722cbcd7",
+    "6d9dd21fab049e21a4c0e0c3c28025d128d5868df77ce6d688f070abc64575df"
+  ],
+  "same_route_and_teacher": true,
+  "cells": {
+    "new_OURS grouped": {
+      "path": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s14_d5_env2_quiet_v1",
+      "policies": {
+        "BR": {
+          "samples": [
+            0.2625986548125,
+            0.2617842720625
+          ],
+          "mean": 0.2621914634375,
+          "min": 0.2617842720625,
+          "max": 0.2625986548125,
+          "peer_bytes": 1091865320,
+          "h2d_bytes": 575677661184
+        },
+        "Near": {
+          "samples": [
+            0.264119566875,
+            0.2633152256875
+          ],
+          "mean": 0.26371739628125,
+          "min": 0.2633152256875,
+          "max": 0.264119566875,
+          "peer_bytes": 1057670328,
+          "h2d_bytes": 576574193664
+        },
+        "Static": {
+          "samples": [
+            0.28177428371875,
+            0.28023642809375
+          ],
+          "mean": 0.28100535590625,
+          "min": 0.28023642809375,
+          "max": 0.28177428371875,
+          "peer_bytes": 1097912296,
+          "h2d_bytes": 578065268736
+        }
+      },
+      "near_gain_vs_br_pct": -0.5819918100093929
+    },
+    "main_OURS Ready-First": {
+      "path": "/home/hwlee/mgo-results/headline_r4_20261007/main_ours_c30_b8_s14_d5_env2_quiet_pair_v1",
+      "policies": {
+        "BR": {
+          "samples": [
+            0.43632580621875,
+            0.43603671996875
+          ],
+          "mean": 0.43618126309375,
+          "min": 0.43603671996875,
+          "max": 0.43632580621875,
+          "peer_bytes": 1091865320,
+          "h2d_bytes": 575677661184
+        },
+        "Near": {
+          "samples": [
+            0.426608135875,
+            0.4291922908125
+          ],
+          "mean": 0.42790021334375,
+          "min": 0.426608135875,
+          "max": 0.4291922908125,
+          "peer_bytes": 1057670328,
+          "h2d_bytes": 576574193664
+        },
+        "Static": {
+          "samples": [
+            0.44054353884375,
+            0.43995987
+          ],
+          "mean": 0.440251704421875,
+          "min": 0.43995987,
+          "max": 0.44054353884375,
+          "peer_bytes": 1097912296,
+          "h2d_bytes": 578065268736
+        }
+      },
+      "near_gain_vs_br_pct": 1.8985340386389122
+    }
+  }
+}

@@ -123,7 +123,12 @@ def main():
             'identical route and H2D bytes. Thus this seed is the best observed positive '
             'candidate, **not a reliable Near speedup**. The full 12-cell screen found '
             'no stable Near winner under these grouped settings.', '']
-    lines += ['Full per-run values, peer/H2D bytes, decode hit rates, token agreement, '
+    lines += ['A later quiet-host rerun, after stopping the managed loads on GPUs '
+              '2/3/6/7, and the same-route Ready-First comparison are in '
+              '[QUIET_PAIR.md](../main_ours_static_placement_20261010/QUIET_PAIR.md). '
+              'The quiet grouped run favored BR by 0.58%; Ready-First favored '
+              'Near by 1.90%.', '',
+              'Full per-run values, peer/H2D bytes, decode hit rates, token agreement, '
               'and raw receipt paths are in [RESULTS.json](RESULTS.json).', '']
     (HERE / 'RESULTS.md').write_text('\n'.join(lines))
 
