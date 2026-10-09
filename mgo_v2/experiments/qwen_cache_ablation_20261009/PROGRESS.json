@@ -1,6 +1,6 @@
 {
-  "status": "PARTIAL",
-  "completed": 3,
+  "status": "PASS",
+  "completed": 4,
   "total": 4,
   "clean_target_repeats": 3,
   "source_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
@@ -380,8 +380,110 @@
       "local_batch": 16,
       "input_tokens": 512,
       "output_tokens": 64,
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "qca_c50_b16_ours_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "qca_c50_b16_ours_r3_v1",
+      "source_commit": "eab3bf17130300f21d9bffa7e863adc0aef19afc",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.665012651,
+            1.763713324,
+            1.763358396
+          ],
+          "median": 1.763713324,
+          "minimum": 1.763358396,
+          "maximum": 3.665012651,
+          "mean": 2.397361457,
+          "stdev": 1.0978181514853407
+        },
+        "TPOT": {
+          "samples": [
+            0.48095294052380955,
+            0.48227294134920634,
+            0.48193633823809523
+          ],
+          "median": 0.48193633823809523,
+          "minimum": 0.48095294052380955,
+          "maximum": 0.48227294134920634,
+          "mean": 0.481720740037037,
+          "stdev": 0.0006859026774890885
+        },
+        "E2E": {
+          "samples": [
+            33.965047904,
+            32.146908629,
+            32.125347705
+          ],
+          "median": 32.146908629,
+          "minimum": 32.125347705,
+          "maximum": 33.965047904,
+          "mean": 32.74576807933334,
+          "stdev": 1.0559823324707265
+        }
+      },
+      "h2d_bytes_by_rank": [
+        {
+          "samples": [
+            267987714048,
+            267987714048,
+            267987714048
+          ],
+          "median": 267987714048,
+          "minimum": 267987714048,
+          "maximum": 267987714048,
+          "mean": 267987714048,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            261447745536,
+            261447745536,
+            261447745536
+          ],
+          "median": 261447745536,
+          "minimum": 261447745536,
+          "maximum": 261447745536,
+          "mean": 261447745536,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            253869686784,
+            253869686784,
+            253869686784
+          ],
+          "median": 253869686784,
+          "minimum": 253869686784,
+          "maximum": 253869686784,
+          "mean": 253869686784,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            246414311424,
+            246414311424,
+            246414311424
+          ],
+          "median": 246414311424,
+          "minimum": 246414311424,
+          "maximum": 246414311424,
+          "mean": 246414311424,
+          "stdev": 0.0
+        }
+      ],
+      "sampled_peak_hbm_mib_by_physical_gpu": {
+        "0": 20033,
+        "1": 20081,
+        "4": 20085,
+        "5": 19845
+      },
+      "min_host_available_bytes": 1513251139584,
+      "full_output_agreement_1_2": 64,
+      "full_output_agreement_1_3": 64,
+      "full_output_agreement_2_3": 64
     }
   ],
   "cross_capacity_agreement": [
@@ -400,11 +502,32 @@
       "same_token_positions": 3001
     },
     {
+      "left_cache_percent": 20,
+      "right_cache_percent": 50,
+      "same_full_output_requests": 28,
+      "same_first_token_requests": 64,
+      "same_token_positions": 3043
+    },
+    {
       "left_cache_percent": 30,
       "right_cache_percent": 40,
       "same_full_output_requests": 26,
       "same_first_token_requests": 64,
       "same_token_positions": 2792
+    },
+    {
+      "left_cache_percent": 30,
+      "right_cache_percent": 50,
+      "same_full_output_requests": 26,
+      "same_first_token_requests": 64,
+      "same_token_positions": 2877
+    },
+    {
+      "left_cache_percent": 40,
+      "right_cache_percent": 50,
+      "same_full_output_requests": 25,
+      "same_first_token_requests": 64,
+      "same_token_positions": 2914
     }
   ]
 }
