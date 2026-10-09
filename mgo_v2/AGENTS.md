@@ -1,4 +1,4 @@
-**OWNER MAIN_OURS EXPERT GROUPING A/B/C ACTIVE (2026-10-09).**
+**OWNER MAIN_OURS EXPERT GROUPING A/B/C COMPLETE (2026-10-09).**
 The owner stopped the four-system Qwen R8 comparison during DeepSpeed target
 repeat 2. Do not resume that baseline queue. Read
 `experiments/expert_grouping_ablation_20261009/PLAN.md`. Compare A: current C++
@@ -11,7 +11,10 @@ The owner then added R4 physical GPUs0/1/4/5 on the frozen Qwen C30/local-B16/
 input512/output64 workload, plus a separate full-decode stage breakdown for
 each arm. Stop all eight owned model loads during R4 timing, restore all eight
 afterward, and report exclusive critical-path shares separately from overlapping
-H2D copy service. R8 A/B/C primaries passed; R4 and detailed diagnostics remain.
+H2D copy service. R8/R4 A/B/C primaries and R4 full-decode diagnostics passed.
+Read `experiments/expert_grouping_ablation_20261009/{PRIMARY_RESULTS.md,BREAKDOWN.md,INTERPRETATION.md}`.
+All eight owned model-inference loads were restored. Do not silently promote
+the B/C grouped backend to the selected main_OURS runtime.
 
 **OWNER QWEN SHAREGPT R8 MAIN-SYSTEM COMPARISON STOPPED (2026-10-09).**
 Read `experiments/qwen_r8_sharegpt_b16_l512_20261009/PLAN.md`. The latest

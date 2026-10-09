@@ -1,0 +1,998 @@
+{
+  "status": "PASS",
+  "basis": "one separately instrumented decode64 target per arm; first-token-ready to last-token-ready; exclusive current-stream partition on slowest diagnostic rank",
+  "arms": {
+    "a": {
+      "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_a_diagnostic_v1",
+      "critical_rank": 0,
+      "critical_physical_gpu": 0,
+      "diagnostic_decode_seconds": 36.43462294274521,
+      "diagnostic_tpot_ms": 578.3273482975429,
+      "category": {
+        "Attention, dense and output": {
+          "ms_per_token": 47.726486357893556,
+          "percent": 8.25250379363675
+        },
+        "Router gate": {
+          "ms_per_token": 9.538016001797384,
+          "percent": 1.649241736513934
+        },
+        "Routing metadata": {
+          "ms_per_token": 52.30346871425745,
+          "percent": 9.043921036801443
+        },
+        "Placement and index": {
+          "ms_per_token": 32.79336482094275,
+          "percent": 5.670381128867337
+        },
+        "Demand H2D submission": {
+          "ms_per_token": 7.683257899350584,
+          "percent": 1.3285309646808598
+        },
+        "Forward dispatch": {
+          "ms_per_token": 59.63142094104777,
+          "percent": 10.311015226339956
+        },
+        "Exposed H2D wait": {
+          "ms_per_token": 0.0,
+          "percent": 0.0
+        },
+        "Expert execution and preparation": {
+          "ms_per_token": 244.59027209736004,
+          "percent": 42.29270374596241
+        },
+        "Return and combine": {
+          "ms_per_token": 69.20384270020772,
+          "percent": 11.966206146731125
+        },
+        "MoE runtime residual": {
+          "ms_per_token": 54.85721876468575,
+          "percent": 9.485496220466185
+        }
+      },
+      "fine_phase": {
+        "attention_dense_residual": {
+          "ms_per_token": 47.726486357893556,
+          "percent": 8.25250379363675
+        },
+        "forward_token_a2a_submit": {
+          "ms_per_token": 12.557010783799123,
+          "percent": 2.171263527613548
+        },
+        "layout_cpu": {
+          "ms_per_token": 5.954686986312024,
+          "percent": 1.0296395292114742
+        },
+        "layout_device_materialization": {
+          "ms_per_token": 12.921561388978883,
+          "percent": 2.234298866726061
+        },
+        "metadata_cpu_parse": {
+          "ms_per_token": 3.5987713011720768,
+          "percent": 0.6222723707889651
+        },
+        "metadata_demand_histogram": {
+          "ms_per_token": 1.5010473666978783,
+          "percent": 0.2595497811259664
+        },
+        "metadata_device_to_host": {
+          "ms_per_token": 1.4661373988030408,
+          "percent": 0.25351341296914237
+        },
+        "metadata_gate_history": {
+          "ms_per_token": 9.965381079486425,
+          "percent": 1.7231384801051026
+        },
+        "metadata_gpu_packet_pack": {
+          "ms_per_token": 7.049622350268899,
+          "percent": 1.2189674880534866
+        },
+        "metadata_rank_all_gather": {
+          "ms_per_token": 23.481064136539185,
+          "percent": 4.060168381395383
+        },
+        "moe.current_controller": {
+          "ms_per_token": 4.067897906586066,
+          "percent": 0.7033902025489513
+        },
+        "moe.demand_h2d": {
+          "ms_per_token": 7.683257899350584,
+          "percent": 1.3285309646808598
+        },
+        "moe.expert_compute": {
+          "ms_per_token": 244.59027209736004,
+          "percent": 42.29270374596241
+        },
+        "moe.forward_a2a": {
+          "ms_per_token": 31.139267054046467,
+          "percent": 5.384367027724524
+        },
+        "moe.forward_complete": {
+          "ms_per_token": 15.935143103202188,
+          "percent": 2.7553846710018863
+        },
+        "moe.metadata": {
+          "ms_per_token": 5.241445081289939,
+          "percent": 0.9063111223633978
+        },
+        "moe.return_a2a": {
+          "ms_per_token": 28.520774625093814,
+          "percent": 4.9315970806243445
+        },
+        "moe_other": {
+          "ms_per_token": 54.85721876468575,
+          "percent": 9.485496220466185
+        },
+        "placement_controller_cpu": {
+          "ms_per_token": 9.84921853906578,
+          "percent": 1.7030525303808504
+        },
+        "return_token_a2a": {
+          "ms_per_token": 40.683068075113894,
+          "percent": 7.03460906610678
+        },
+        "router_gate_compute": {
+          "ms_per_token": 9.538016001797384,
+          "percent": 1.649241736513934
+        }
+      },
+      "ranks": [
+        {
+          "rank": 0,
+          "physical_gpu": 0,
+          "decode_seconds": 36.43456356,
+          "event_seconds": 36.43462294274521,
+          "phase_seconds": {
+            "attention_dense_residual": 3.006768640547294,
+            "router_gate_compute": 0.6008950081132353,
+            "moe_other": 3.456004782175202,
+            "moe.metadata": 0.3302110401212661,
+            "metadata_gpu_packet_pack": 0.4441262080669406,
+            "metadata_rank_all_gather": 1.4793070406019688,
+            "metadata_device_to_host": 0.09236665612459156,
+            "metadata_cpu_parse": 0.22672259197384084,
+            "metadata_gate_history": 0.6278190080076448,
+            "metadata_demand_histogram": 0.09456598410196633,
+            "moe.current_controller": 0.2562775681149222,
+            "placement_controller_cpu": 0.6205007679611441,
+            "layout_cpu": 0.3751452801376575,
+            "layout_device_materialization": 0.8140583675056697,
+            "moe.demand_h2d": 0.4840452476590868,
+            "moe.forward_a2a": 1.9617738244049274,
+            "forward_token_a2a_submit": 0.7910916793793448,
+            "moe.forward_complete": 1.0039140155017379,
+            "moe.expert_compute": 15.409187142133682,
+            "moe.return_a2a": 1.7968088013809105,
+            "return_token_a2a": 2.563033288732175
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.006768640547294,
+            "Router gate": 0.6008950081132353,
+            "MoE runtime residual": 3.456004782175202,
+            "Routing metadata": 3.295118528998219,
+            "Placement and index": 2.0659819837193933,
+            "Demand H2D submission": 0.4840452476590868,
+            "Forward dispatch": 3.7567795192860096,
+            "Expert execution and preparation": 15.409187142133682,
+            "Return and combine": 4.359842090113085
+          },
+          "diagnostic_h2d_service_seconds": 8.910058144137263,
+          "diagnostic_h2d_bytes": 434252021760,
+          "decoded_expert_uses": 71601,
+          "decoded_main_hits": 27115,
+          "decoded_demand_misses": 44486
+        },
+        {
+          "rank": 1,
+          "physical_gpu": 1,
+          "decode_seconds": 36.434246519,
+          "event_seconds": 36.43452390000524,
+          "phase_seconds": {
+            "attention_dense_residual": 2.8343120953692056,
+            "router_gate_compute": 0.5997839677110306,
+            "moe_other": 2.9977871670876635,
+            "moe.metadata": 0.3242663041304302,
+            "metadata_gpu_packet_pack": 0.4504388161823152,
+            "metadata_rank_all_gather": 1.7440037119239558,
+            "metadata_device_to_host": 0.08965436805412155,
+            "metadata_cpu_parse": 0.22016435199975926,
+            "metadata_gate_history": 0.6164457598924641,
+            "metadata_demand_histogram": 0.09149568000622098,
+            "moe.current_controller": 0.25340758393239204,
+            "placement_controller_cpu": 0.6132703360766181,
+            "layout_cpu": 0.3738283517211669,
+            "layout_device_materialization": 0.8069615999460222,
+            "moe.demand_h2d": 0.4145502723678948,
+            "moe.forward_a2a": 1.9833910084385464,
+            "forward_token_a2a_submit": 0.7203398081660268,
+            "moe.forward_complete": 1.3518191748112425,
+            "moe.expert_compute": 15.6949451369047,
+            "moe.return_a2a": 1.7141354884598343,
+            "return_token_a2a": 2.539522916823625
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.8343120953692056,
+            "Router gate": 0.5997839677110306,
+            "MoE runtime residual": 2.9977871670876635,
+            "Routing metadata": 3.536468992189267,
+            "Placement and index": 2.047467871676199,
+            "Demand H2D submission": 0.4145502723678948,
+            "Forward dispatch": 4.055549991415816,
+            "Expert execution and preparation": 15.6949451369047,
+            "Return and combine": 4.253658405283459
+          },
+          "diagnostic_h2d_service_seconds": 9.2827113609612,
+          "diagnostic_h2d_bytes": 427419500544,
+          "decoded_expert_uses": 70937,
+          "decoded_main_hits": 27172,
+          "decoded_demand_misses": 43765
+        },
+        {
+          "rank": 2,
+          "physical_gpu": 4,
+          "decode_seconds": 36.433767605,
+          "event_seconds": 36.43389169630544,
+          "phase_seconds": {
+            "attention_dense_residual": 3.2383564482226572,
+            "router_gate_compute": 0.6344627519138163,
+            "moe_other": 3.167331039779545,
+            "moe.metadata": 0.3511322879148616,
+            "metadata_gpu_packet_pack": 0.4630779838934548,
+            "metadata_rank_all_gather": 1.1677238718569252,
+            "metadata_device_to_host": 0.09629904000833649,
+            "metadata_cpu_parse": 0.22965462411940157,
+            "metadata_gate_history": 0.6145761917531459,
+            "metadata_demand_histogram": 0.09446160005591794,
+            "moe.current_controller": 0.25628790401760515,
+            "placement_controller_cpu": 0.6154726718515153,
+            "layout_cpu": 0.36874188800901075,
+            "layout_device_materialization": 0.8153277440667157,
+            "moe.demand_h2d": 0.4590771839842197,
+            "moe.forward_a2a": 2.0080600654277965,
+            "forward_token_a2a_submit": 0.7626258557289833,
+            "moe.forward_complete": 1.3923221191242376,
+            "moe.expert_compute": 15.470986509323131,
+            "moe.return_a2a": 2.138592798613002,
+            "return_token_a2a": 2.0893211166411603
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.2383564482226572,
+            "Router gate": 0.6344627519138163,
+            "MoE runtime residual": 3.167331039779545,
+            "Routing metadata": 3.016925599602043,
+            "Placement and index": 2.055830207944847,
+            "Demand H2D submission": 0.4590771839842197,
+            "Forward dispatch": 4.163008040281017,
+            "Expert execution and preparation": 15.470986509323131,
+            "Return and combine": 4.227913915254162
+          },
+          "diagnostic_h2d_service_seconds": 8.634796831265092,
+          "diagnostic_h2d_bytes": 420049059840,
+          "decoded_expert_uses": 70172,
+          "decoded_main_hits": 27182,
+          "decoded_demand_misses": 42990
+        },
+        {
+          "rank": 3,
+          "physical_gpu": 5,
+          "decode_seconds": 36.434332898,
+          "event_seconds": 36.434517705623804,
+          "phase_seconds": {
+            "attention_dense_residual": 2.4022223691611995,
+            "router_gate_compute": 0.5376229118295021,
+            "moe_other": 2.97696172591489,
+            "moe.metadata": 0.3131158399516662,
+            "metadata_gpu_packet_pack": 0.42457696020603164,
+            "metadata_rank_all_gather": 2.370235582709318,
+            "metadata_device_to_host": 0.08874134402535833,
+            "metadata_cpu_parse": 0.2247019520476459,
+            "metadata_gate_history": 0.6104445760995157,
+            "metadata_demand_histogram": 0.0920631681121886,
+            "moe.current_controller": 0.2501542399926115,
+            "placement_controller_cpu": 0.6103471358418472,
+            "layout_cpu": 0.36434598394483336,
+            "layout_device_materialization": 0.7937852803766716,
+            "moe.demand_h2d": 0.4962364158704884,
+            "moe.forward_a2a": 1.9232976318728199,
+            "forward_token_a2a_submit": 0.771414240568875,
+            "moe.forward_complete": 1.460517830312256,
+            "moe.expert_compute": 14.882081905722618,
+            "moe.return_a2a": 1.5970914553608702,
+            "return_token_a2a": 3.2445591557025986
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.4022223691611995,
+            "Router gate": 0.5376229118295021,
+            "MoE runtime residual": 2.97696172591489,
+            "Routing metadata": 4.123879423151724,
+            "Placement and index": 2.0186326401559636,
+            "Demand H2D submission": 0.4962364158704884,
+            "Forward dispatch": 4.15522970275395,
+            "Expert execution and preparation": 14.882081905722618,
+            "Return and combine": 4.841650611063469
+          },
+          "diagnostic_h2d_service_seconds": 8.47569289945066,
+          "diagnostic_h2d_bytes": 412980609024,
+          "decoded_expert_uses": 69340,
+          "decoded_main_hits": 27092,
+          "decoded_demand_misses": 42248
+        }
+      ]
+    },
+    "b": {
+      "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_b_diagnostic_v1",
+      "critical_rank": 3,
+      "critical_physical_gpu": 5,
+      "diagnostic_decode_seconds": 27.376447584446964,
+      "diagnostic_tpot_ms": 434.5467870547137,
+      "category": {
+        "Attention, dense and output": {
+          "ms_per_token": 45.86228217329039,
+          "percent": 10.554049308277563
+        },
+        "Router gate": {
+          "ms_per_token": 9.5940124485346,
+          "percent": 2.2078203623506756
+        },
+        "Routing metadata": {
+          "ms_per_token": 53.568008130638034,
+          "percent": 12.327328086743695
+        },
+        "Placement and index": {
+          "ms_per_token": 31.89920915364627,
+          "percent": 7.340799680019231
+        },
+        "Demand H2D submission": {
+          "ms_per_token": 12.985769678794206,
+          "percent": 2.988347875451941
+        },
+        "Forward dispatch": {
+          "ms_per_token": 71.19267360980253,
+          "percent": 16.383201010950906
+        },
+        "Exposed H2D wait": {
+          "ms_per_token": 79.78795176324606,
+          "percent": 18.36118782606485
+        },
+        "Expert execution and preparation": {
+          "ms_per_token": 25.795945647808345,
+          "percent": 5.936287280513337
+        },
+        "Return and combine": {
+          "ms_per_token": 56.53763692826027,
+          "percent": 13.01071337138701
+        },
+        "MoE runtime residual": {
+          "ms_per_token": 47.323297520692996,
+          "percent": 10.890265198240789
+        }
+      },
+      "fine_phase": {
+        "attention_dense_residual": {
+          "ms_per_token": 45.86228217329039,
+          "percent": 10.554049308277563
+        },
+        "expert_grouped_gemm_kernels": {
+          "ms_per_token": 7.519699299619318,
+          "percent": 1.7304694278345942
+        },
+        "forward_token_a2a_submit": {
+          "ms_per_token": 11.761075309581235,
+          "percent": 2.7065153074300374
+        },
+        "layout_cpu": {
+          "ms_per_token": 5.762923683675505,
+          "percent": 1.3261917600946147
+        },
+        "layout_device_materialization": {
+          "ms_per_token": 12.54493156170086,
+          "percent": 2.886900084275926
+        },
+        "metadata_cpu_parse": {
+          "ms_per_token": 3.522807367146016,
+          "percent": 0.8106854019156423
+        },
+        "metadata_demand_histogram": {
+          "ms_per_token": 1.422730667013972,
+          "percent": 0.32740563488157526
+        },
+        "metadata_device_to_host": {
+          "ms_per_token": 1.4947459064424051,
+          "percent": 0.3439781287012949
+        },
+        "metadata_gate_history": {
+          "ms_per_token": 9.563643937782645,
+          "percent": 2.2008318143607606
+        },
+        "metadata_gpu_packet_pack": {
+          "ms_per_token": 7.036855367559295,
+          "percent": 1.619355056161832
+        },
+        "metadata_rank_all_gather": {
+          "ms_per_token": 25.312577012394158,
+          "percent": 5.825052161577036
+        },
+        "moe.current_controller": {
+          "ms_per_token": 3.8875128890254746,
+          "percent": 0.8946131935238537
+        },
+        "moe.demand_h2d": {
+          "ms_per_token": 12.985769678794206,
+          "percent": 2.988347875451941
+        },
+        "moe.expert_compute": {
+          "ms_per_token": 18.276246348189026,
+          "percent": 4.205817852678742
+        },
+        "moe.forward_a2a": {
+          "ms_per_token": 31.0008055978889,
+          "percent": 7.134054725846031
+        },
+        "moe.forward_complete": {
+          "ms_per_token": 28.430792702332404,
+          "percent": 6.542630977674836
+        },
+        "moe.metadata": {
+          "ms_per_token": 5.214647872299541,
+          "percent": 1.2000198891455538
+        },
+        "moe.return_a2a": {
+          "ms_per_token": 24.856489665806222,
+          "percent": 5.7200951442488845
+        },
+        "moe_other": {
+          "ms_per_token": 47.323297520692996,
+          "percent": 10.890265198240789
+        },
+        "placement_controller_cpu": {
+          "ms_per_token": 9.703841019244434,
+          "percent": 2.2330946421248363
+        },
+        "required_h2d_exposed_wait": {
+          "ms_per_token": 79.78795176324606,
+          "percent": 18.36118782606485
+        },
+        "return_token_a2a": {
+          "ms_per_token": 31.68114726245405,
+          "percent": 7.2906182271381255
+        },
+        "router_gate_compute": {
+          "ms_per_token": 9.5940124485346,
+          "percent": 2.2078203623506756
+        }
+      },
+      "ranks": [
+        {
+          "rank": 0,
+          "physical_gpu": 0,
+          "decode_seconds": 27.37627505,
+          "event_seconds": 27.376299016433514,
+          "phase_seconds": {
+            "attention_dense_residual": 3.471224288588157,
+            "router_gate_compute": 0.6544258561991155,
+            "moe_other": 3.171612991899925,
+            "moe.metadata": 0.348885440113252,
+            "metadata_gpu_packet_pack": 0.4706818880438809,
+            "metadata_rank_all_gather": 0.9359685436412706,
+            "metadata_device_to_host": 0.09282944000512301,
+            "metadata_cpu_parse": 0.22508921600133183,
+            "metadata_gate_history": 0.6309791678637267,
+            "metadata_demand_histogram": 0.09319056007079767,
+            "moe.current_controller": 0.25632780796755145,
+            "placement_controller_cpu": 0.6280712960660442,
+            "layout_cpu": 0.379202816076576,
+            "layout_device_materialization": 0.8557910725176342,
+            "moe.demand_h2d": 0.8548072285726684,
+            "moe.forward_a2a": 1.9829703671475805,
+            "forward_token_a2a_submit": 0.8210065605938424,
+            "moe.forward_complete": 1.7253351644501074,
+            "moe.expert_compute": 1.2743753920532799,
+            "required_h2d_exposed_wait": 4.848426204152414,
+            "expert_grouped_gemm_kernels": 0.4870496004670855,
+            "moe.return_a2a": 1.6392202566564087,
+            "return_token_a2a": 1.528827857285741
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.471224288588157,
+            "Router gate": 0.6544258561991155,
+            "MoE runtime residual": 3.171612991899925,
+            "Routing metadata": 2.7976242557393824,
+            "Placement and index": 2.1193929926278057,
+            "Demand H2D submission": 0.8548072285726684,
+            "Forward dispatch": 4.52931209219153,
+            "Expert execution and preparation": 1.7614249925203653,
+            "Exposed H2D wait": 4.848426204152414,
+            "Return and combine": 3.1680481139421497
+          },
+          "diagnostic_h2d_service_seconds": 8.91856208126247,
+          "diagnostic_h2d_bytes": 434252021760,
+          "decoded_expert_uses": 71601,
+          "decoded_main_hits": 27115,
+          "decoded_demand_misses": 44486
+        },
+        {
+          "rank": 1,
+          "physical_gpu": 1,
+          "decode_seconds": 27.376237564,
+          "event_seconds": 27.37642571657336,
+          "phase_seconds": {
+            "attention_dense_residual": 2.990641216123011,
+            "router_gate_compute": 0.6189641919210549,
+            "moe_other": 3.038695777559186,
+            "moe.metadata": 0.32460681609064296,
+            "metadata_gpu_packet_pack": 0.4410237437561157,
+            "metadata_rank_all_gather": 1.5566077760085486,
+            "metadata_device_to_host": 0.08940556804835786,
+            "metadata_cpu_parse": 0.2200789120346314,
+            "metadata_gate_history": 0.6193101758956907,
+            "metadata_demand_histogram": 0.09155260800011453,
+            "moe.current_controller": 0.24787152006756563,
+            "placement_controller_cpu": 0.6184999677389861,
+            "layout_cpu": 0.3698562880158419,
+            "layout_device_materialization": 0.7790205762833337,
+            "moe.demand_h2d": 0.4945492799803619,
+            "moe.forward_a2a": 2.2674686086792426,
+            "forward_token_a2a_submit": 0.7775693763196478,
+            "moe.forward_complete": 1.7363309882357676,
+            "moe.expert_compute": 1.211021824147552,
+            "required_h2d_exposed_wait": 4.975173246979717,
+            "expert_grouped_gemm_kernels": 0.4773029760420326,
+            "moe.return_a2a": 1.5658500798903383,
+            "return_token_a2a": 1.8650241987556206
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.990641216123011,
+            "Router gate": 0.6189641919210549,
+            "MoE runtime residual": 3.038695777559186,
+            "Routing metadata": 3.342585599834101,
+            "Placement and index": 2.0152483521057274,
+            "Demand H2D submission": 0.4945492799803619,
+            "Forward dispatch": 4.781368973234658,
+            "Expert execution and preparation": 1.6883248001895848,
+            "Exposed H2D wait": 4.975173246979717,
+            "Return and combine": 3.430874278645959
+          },
+          "diagnostic_h2d_service_seconds": 9.164641084298491,
+          "diagnostic_h2d_bytes": 427419500544,
+          "decoded_expert_uses": 70937,
+          "decoded_main_hits": 27172,
+          "decoded_demand_misses": 43765
+        },
+        {
+          "rank": 2,
+          "physical_gpu": 4,
+          "decode_seconds": 27.375685709,
+          "event_seconds": 27.375759854054255,
+          "phase_seconds": {
+            "attention_dense_residual": 2.5873205430409723,
+            "router_gate_compute": 0.6333994565904145,
+            "moe_other": 3.1569831352845847,
+            "moe.metadata": 0.32478425574395503,
+            "metadata_gpu_packet_pack": 0.4530752959027895,
+            "metadata_rank_all_gather": 2.070902015902103,
+            "metadata_device_to_host": 0.0895736639909447,
+            "metadata_cpu_parse": 0.228256576158106,
+            "metadata_gate_history": 0.622171967804433,
+            "metadata_demand_histogram": 0.09206227196007954,
+            "moe.current_controller": 0.25330620802007614,
+            "placement_controller_cpu": 0.6153781440407033,
+            "layout_cpu": 0.3704045122116805,
+            "layout_device_materialization": 0.7992113600522273,
+            "moe.demand_h2d": 0.5058967040032143,
+            "moe.forward_a2a": 1.9482448328416773,
+            "forward_token_a2a_submit": 0.7953509120792172,
+            "moe.forward_complete": 2.0780917385220565,
+            "moe.expert_compute": 1.630140115646642,
+            "required_h2d_exposed_wait": 3.9328530563451327,
+            "expert_grouped_gemm_kernels": 0.4828505917042494,
+            "moe.return_a2a": 1.4917001939825694,
+            "return_token_a2a": 2.2138023022264273
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.5873205430409723,
+            "Router gate": 0.6333994565904145,
+            "MoE runtime residual": 3.1569831352845847,
+            "Routing metadata": 3.8808260474624108,
+            "Placement and index": 2.0383002243246873,
+            "Demand H2D submission": 0.5058967040032143,
+            "Forward dispatch": 4.82168748344295,
+            "Expert execution and preparation": 2.1129907073508916,
+            "Exposed H2D wait": 3.9328530563451327,
+            "Return and combine": 3.7055024962089966
+          },
+          "diagnostic_h2d_service_seconds": 8.578500840485097,
+          "diagnostic_h2d_bytes": 420049059840,
+          "decoded_expert_uses": 70172,
+          "decoded_main_hits": 27182,
+          "decoded_demand_misses": 42990
+        },
+        {
+          "rank": 3,
+          "physical_gpu": 5,
+          "decode_seconds": 27.376328083,
+          "event_seconds": 27.376447584446964,
+          "phase_seconds": {
+            "attention_dense_residual": 2.8893237769172946,
+            "router_gate_compute": 0.6044227842576798,
+            "moe_other": 2.9813677438036588,
+            "moe.metadata": 0.3285228159548711,
+            "metadata_gpu_packet_pack": 0.44332188815623563,
+            "metadata_rank_all_gather": 1.594692351780832,
+            "metadata_device_to_host": 0.09416899210587153,
+            "metadata_cpu_parse": 0.221936864130199,
+            "metadata_gate_history": 0.6025095680803066,
+            "metadata_demand_histogram": 0.08963203202188025,
+            "moe.current_controller": 0.2449133120086049,
+            "placement_controller_cpu": 0.6113419842123994,
+            "layout_cpu": 0.3630641920715568,
+            "layout_device_materialization": 0.7903306883871541,
+            "moe.demand_h2d": 0.818103489764035,
+            "moe.forward_a2a": 1.9530507526670005,
+            "forward_token_a2a_submit": 0.7409477445036179,
+            "moe.forward_complete": 1.7911399402469415,
+            "moe.expert_compute": 1.1514035199359087,
+            "required_h2d_exposed_wait": 5.026640961084501,
+            "expert_grouped_gemm_kernels": 0.473741055876017,
+            "moe.return_a2a": 1.5659588489457918,
+            "return_token_a2a": 1.9959122775346052
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.8893237769172946,
+            "Router gate": 0.6044227842576798,
+            "MoE runtime residual": 2.9813677438036588,
+            "Routing metadata": 3.374784512230196,
+            "Placement and index": 2.009650176679715,
+            "Demand H2D submission": 0.818103489764035,
+            "Forward dispatch": 4.485138437417559,
+            "Expert execution and preparation": 1.6251445758119258,
+            "Exposed H2D wait": 5.026640961084501,
+            "Return and combine": 3.561871126480397
+          },
+          "diagnostic_h2d_service_seconds": 8.486346561402083,
+          "diagnostic_h2d_bytes": 412980609024,
+          "decoded_expert_uses": 69340,
+          "decoded_main_hits": 27092,
+          "decoded_demand_misses": 42248
+        }
+      ]
+    },
+    "c": {
+      "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_c_diagnostic_v1",
+      "critical_rank": 3,
+      "critical_physical_gpu": 5,
+      "diagnostic_decode_seconds": 27.306521372627056,
+      "diagnostic_tpot_ms": 433.4368471845564,
+      "category": {
+        "Attention, dense and output": {
+          "ms_per_token": 48.67827044005338,
+          "percent": 11.230764240799832
+        },
+        "Router gate": {
+          "ms_per_token": 9.444308319321234,
+          "percent": 2.1789352660411607
+        },
+        "Routing metadata": {
+          "ms_per_token": 53.635290891257334,
+          "percent": 12.37441884317222
+        },
+        "Placement and index": {
+          "ms_per_token": 31.831136004348817,
+          "percent": 7.343892475019594
+        },
+        "Demand H2D submission": {
+          "ms_per_token": 7.353511621909486,
+          "percent": 1.6965589496313351
+        },
+        "Forward dispatch": {
+          "ms_per_token": 60.22792026849968,
+          "percent": 13.895431516659857
+        },
+        "Exposed H2D wait": {
+          "ms_per_token": 55.17131534384364,
+          "percent": 12.728801370307083
+        },
+        "Expert execution and preparation": {
+          "ms_per_token": 54.49469647042099,
+          "percent": 12.572695843557865
+        },
+        "Return and combine": {
+          "ms_per_token": 65.52447352428287,
+          "percent": 15.11742113064575
+        },
+        "MoE runtime residual": {
+          "ms_per_token": 47.075924300619,
+          "percent": 10.861080364165296
+        }
+      },
+      "fine_phase": {
+        "attention_dense_residual": {
+          "ms_per_token": 48.67827044005338,
+          "percent": 11.230764240799832
+        },
+        "expert_grouped_gemm_kernels": {
+          "ms_per_token": 13.23549866747291,
+          "percent": 3.0536164041995404
+        },
+        "forward_token_a2a_submit": {
+          "ms_per_token": 11.92621561766617,
+          "percent": 2.7515463198697585
+        },
+        "layout_cpu": {
+          "ms_per_token": 5.753966731566266,
+          "percent": 1.3275213607107659
+        },
+        "layout_device_materialization": {
+          "ms_per_token": 12.465296764458925,
+          "percent": 2.875919951298287
+        },
+        "metadata_cpu_parse": {
+          "ms_per_token": 3.6376457126840736,
+          "percent": 0.8392562229798548
+        },
+        "metadata_demand_histogram": {
+          "ms_per_token": 1.4907570796767406,
+          "percent": 0.34393870511013097
+        },
+        "metadata_device_to_host": {
+          "ms_per_token": 1.3629729524550476,
+          "percent": 0.3144571028763267
+        },
+        "metadata_gate_history": {
+          "ms_per_token": 9.418978032375147,
+          "percent": 2.173091211224266
+        },
+        "metadata_gpu_packet_pack": {
+          "ms_per_token": 6.938608761344653,
+          "percent": 1.60083500201131
+        },
+        "metadata_rank_all_gather": {
+          "ms_per_token": 25.77795603871352,
+          "percent": 5.947338396852385
+        },
+        "moe.current_controller": {
+          "ms_per_token": 3.9303700317525325,
+          "percent": 0.9067918561337701
+        },
+        "moe.demand_h2d": {
+          "ms_per_token": 7.353511621909486,
+          "percent": 1.6965589496313351
+        },
+        "moe.expert_compute": {
+          "ms_per_token": 41.25919780294809,
+          "percent": 9.519079439358325
+        },
+        "moe.forward_a2a": {
+          "ms_per_token": 30.44678957381891,
+          "percent": 7.024504208996042
+        },
+        "moe.forward_complete": {
+          "ms_per_token": 17.8549150770146,
+          "percent": 4.119380987794058
+        },
+        "moe.metadata": {
+          "ms_per_token": 5.008372314008151,
+          "percent": 1.1555022021179469
+        },
+        "moe.return_a2a": {
+          "ms_per_token": 23.106381206758492,
+          "percent": 5.330968365252954
+        },
+        "moe_other": {
+          "ms_per_token": 47.075924300619,
+          "percent": 10.861080364165296
+        },
+        "placement_controller_cpu": {
+          "ms_per_token": 9.681502476571099,
+          "percent": 2.2336593068767723
+        },
+        "required_h2d_exposed_wait": {
+          "ms_per_token": 55.17131534384364,
+          "percent": 12.728801370307083
+        },
+        "return_token_a2a": {
+          "ms_per_token": 42.418092317524376,
+          "percent": 9.786452765392797
+        },
+        "router_gate_compute": {
+          "ms_per_token": 9.444308319321234,
+          "percent": 2.1789352660411607
+        }
+      },
+      "ranks": [
+        {
+          "rank": 0,
+          "physical_gpu": 0,
+          "decode_seconds": 27.306297388,
+          "event_seconds": 27.305968358354228,
+          "phase_seconds": {
+            "attention_dense_residual": 3.029343138142021,
+            "router_gate_compute": 0.6322521919235571,
+            "moe_other": 3.166103296269031,
+            "moe.metadata": 0.34596156808058975,
+            "metadata_gpu_packet_pack": 0.45339619198441533,
+            "metadata_rank_all_gather": 1.4108247675448635,
+            "metadata_device_to_host": 0.09527465602755543,
+            "metadata_cpu_parse": 0.23212960009276873,
+            "metadata_gate_history": 0.6348597114235148,
+            "metadata_demand_histogram": 0.09423168006166831,
+            "moe.current_controller": 0.260462560035288,
+            "placement_controller_cpu": 0.6312832320183518,
+            "layout_cpu": 0.37715168008953276,
+            "layout_device_materialization": 0.8247347520887855,
+            "moe.demand_h2d": 0.5415665282607081,
+            "moe.forward_a2a": 1.9503138562664402,
+            "forward_token_a2a_submit": 0.8236154241412883,
+            "moe.forward_complete": 1.025049856089054,
+            "moe.expert_compute": 2.80435017406567,
+            "expert_grouped_gemm_kernels": 0.9681149119734767,
+            "required_h2d_exposed_wait": 2.753526400091131,
+            "moe.return_a2a": 1.6992018881477375,
+            "return_token_a2a": 2.552220293536779
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.029343138142021,
+            "Router gate": 0.6322521919235571,
+            "MoE runtime residual": 3.166103296269031,
+            "Routing metadata": 3.2666781752153757,
+            "Placement and index": 2.093632224231958,
+            "Demand H2D submission": 0.5415665282607081,
+            "Forward dispatch": 3.7989791364967824,
+            "Expert execution and preparation": 3.772465086039147,
+            "Exposed H2D wait": 2.753526400091131,
+            "Return and combine": 4.251422181684516
+          },
+          "diagnostic_h2d_service_seconds": 9.213724219709635,
+          "diagnostic_h2d_bytes": 434252021760,
+          "decoded_expert_uses": 71601,
+          "decoded_main_hits": 27115,
+          "decoded_demand_misses": 44486
+        },
+        {
+          "rank": 1,
+          "physical_gpu": 1,
+          "decode_seconds": 27.306309217,
+          "event_seconds": 27.306145504772218,
+          "phase_seconds": {
+            "attention_dense_residual": 2.72328118371428,
+            "router_gate_compute": 0.613016767881812,
+            "moe_other": 3.0737337283455326,
+            "moe.metadata": 0.3181398403004182,
+            "metadata_gpu_packet_pack": 0.44155375967919874,
+            "metadata_rank_all_gather": 1.9410571210011835,
+            "metadata_device_to_host": 0.08710422402061528,
+            "metadata_cpu_parse": 0.22326115192472973,
+            "metadata_gate_history": 0.6190856641829036,
+            "metadata_demand_histogram": 0.09171711999364195,
+            "moe.current_controller": 0.24811302403546912,
+            "placement_controller_cpu": 0.6143582723736793,
+            "layout_cpu": 0.3688537919744836,
+            "layout_device_materialization": 0.8119415357410898,
+            "moe.demand_h2d": 0.5203428158387547,
+            "moe.forward_a2a": 1.9564043203368762,
+            "forward_token_a2a_submit": 0.7876492800265533,
+            "moe.forward_complete": 1.0491275848522768,
+            "moe.expert_compute": 2.739256612796332,
+            "expert_grouped_gemm_kernels": 0.9376076161339871,
+            "required_h2d_exposed_wait": 2.661631392655891,
+            "moe.return_a2a": 1.5019307843279084,
+            "return_token_a2a": 2.976977912634602
+          },
+          "category_seconds": {
+            "Attention, dense and output": 2.72328118371428,
+            "Router gate": 0.613016767881812,
+            "MoE runtime residual": 3.0737337283455326,
+            "Routing metadata": 3.721918881102691,
+            "Placement and index": 2.0432666241247217,
+            "Demand H2D submission": 0.5203428158387547,
+            "Forward dispatch": 3.793181185215706,
+            "Expert execution and preparation": 3.6768642289303193,
+            "Exposed H2D wait": 2.661631392655891,
+            "Return and combine": 4.4789086969625105
+          },
+          "diagnostic_h2d_service_seconds": 9.05882048007846,
+          "diagnostic_h2d_bytes": 427419500544,
+          "decoded_expert_uses": 70937,
+          "decoded_main_hits": 27172,
+          "decoded_demand_misses": 43765
+        },
+        {
+          "rank": 2,
+          "physical_gpu": 4,
+          "decode_seconds": 27.306169895,
+          "event_seconds": 27.305889859099395,
+          "phase_seconds": {
+            "attention_dense_residual": 3.5944082254622987,
+            "router_gate_compute": 0.652035359803587,
+            "moe_other": 3.1855773433607517,
+            "moe.metadata": 0.3455669118023914,
+            "metadata_gpu_packet_pack": 0.4623274241238835,
+            "metadata_rank_all_gather": 0.8149663675203912,
+            "metadata_device_to_host": 0.09479705594107445,
+            "metadata_cpu_parse": 0.23272681598365316,
+            "metadata_gate_history": 0.6239754558056598,
+            "metadata_demand_histogram": 0.0947657600436357,
+            "moe.current_controller": 0.2582222399190069,
+            "placement_controller_cpu": 0.6213929922133683,
+            "layout_cpu": 0.3807239041104915,
+            "layout_device_materialization": 0.8104717757701879,
+            "moe.demand_h2d": 0.48377753594517664,
+            "moe.forward_a2a": 2.0023693755548484,
+            "forward_token_a2a_submit": 1.115420314013961,
+            "moe.forward_complete": 1.0149780791401883,
+            "moe.expert_compute": 2.3521917768232536,
+            "expert_grouped_gemm_kernels": 0.8877155845612278,
+            "required_h2d_exposed_wait": 3.5693853460717935,
+            "moe.return_a2a": 1.673772991497067,
+            "return_token_a2a": 2.034321223631499
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.5944082254622987,
+            "Router gate": 0.652035359803587,
+            "MoE runtime residual": 3.1855773433607517,
+            "Routing metadata": 2.669125791220689,
+            "Placement and index": 2.0708109120130547,
+            "Demand H2D submission": 0.48377753594517664,
+            "Forward dispatch": 4.132767768708998,
+            "Expert execution and preparation": 3.2399073613844815,
+            "Exposed H2D wait": 3.5693853460717935,
+            "Return and combine": 3.7080942151285656
+          },
+          "diagnostic_h2d_service_seconds": 8.785913024440408,
+          "diagnostic_h2d_bytes": 420049059840,
+          "decoded_expert_uses": 70172,
+          "decoded_main_hits": 27182,
+          "decoded_demand_misses": 42990
+        },
+        {
+          "rank": 3,
+          "physical_gpu": 5,
+          "decode_seconds": 27.306759551,
+          "event_seconds": 27.306521372627056,
+          "phase_seconds": {
+            "attention_dense_residual": 3.066731037723363,
+            "router_gate_compute": 0.5949914241172378,
+            "moe_other": 2.965783230938997,
+            "moe.metadata": 0.31552745578251346,
+            "metadata_gpu_packet_pack": 0.4371323519647132,
+            "metadata_rank_all_gather": 1.6240112304389518,
+            "metadata_device_to_host": 0.085867296004668,
+            "metadata_cpu_parse": 0.22917167989909662,
+            "metadata_gate_history": 0.5933956160396343,
+            "metadata_demand_histogram": 0.09391769601963466,
+            "moe.current_controller": 0.24761331200040954,
+            "placement_controller_cpu": 0.6099346560239792,
+            "layout_cpu": 0.3624999040886748,
+            "layout_device_materialization": 0.7853136961609123,
+            "moe.demand_h2d": 0.4632712321802976,
+            "moe.forward_a2a": 1.9181477431505913,
+            "forward_token_a2a_submit": 0.7513515839129687,
+            "moe.forward_complete": 1.1248596498519199,
+            "moe.expert_compute": 2.599329461585729,
+            "expert_grouped_gemm_kernels": 0.8338364160507933,
+            "required_h2d_exposed_wait": 3.4757928666621494,
+            "moe.return_a2a": 1.455702016025785,
+            "return_token_a2a": 2.6723398160040355
+          },
+          "category_seconds": {
+            "Attention, dense and output": 3.066731037723363,
+            "Router gate": 0.5949914241172378,
+            "MoE runtime residual": 2.965783230938997,
+            "Routing metadata": 3.379023326149212,
+            "Placement and index": 2.0053615682739756,
+            "Demand H2D submission": 0.4632712321802976,
+            "Forward dispatch": 3.79435897691548,
+            "Expert execution and preparation": 3.4331658776365224,
+            "Exposed H2D wait": 3.4757928666621494,
+            "Return and combine": 4.128041832029821
+          },
+          "diagnostic_h2d_service_seconds": 8.571090081393718,
+          "diagnostic_h2d_bytes": 412980609024,
+          "decoded_expert_uses": 69340,
+          "decoded_main_hits": 27092,
+          "decoded_demand_misses": 42248
+        }
+      ]
+    }
+  },
+  "note": "H2D copy-stream service overlaps current-stream phases and is not added to 100%. NCCL spans include peer-arrival wait; they are not pure wire times. Instrumentation inflates total TPOT and must not replace primary timings."
+}
