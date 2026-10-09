@@ -43,6 +43,7 @@ LAYERS, EXPERTS, TOPK, HIDDEN, EXPERT_ELEMENTS = 26, 64, 6, 2048, 8650752
 EXPERT = re.compile(r'^model\.layers\.(\d+)\.mlp\.experts\.(\d+)\.(gate_proj|up_proj|down_proj)\.weight$')
 PARTS = {'gate_proj': (0, 2883584), 'up_proj': (2883584, 2883584),
          'down_proj': (5767168, 2883584)}
+DIAG = os.environ.get('MGO_DEEPSEEK_CACHE_DIAG') == '1'
 
 
 def write(path, value):
@@ -115,6 +116,26 @@ class DeepSeekRuntime:
         self.transport = FusedTokenRankTransport('rank-partial', topk=TOPK)
         self.h2d = PriorityH2DScheduler(self.cache, direct_pinned=True)
         self.ready_metrics = {'waits': 0, 'ready_before_first_wait': 0}
+        self.diag = DIAG
+        if self.diag:
+            self.diag_spans = {key: [] for key in ('dispatch', 'expert', 'return', 'h2d_wait')}
+            self.diag_route_host_s = 0.0
+            self.diag_h2d_host_wait_s = 0.0
+            original_wait_for_slot = self.h2d.wait_for_slot
+
+            def timed_wait_for_slot(slot):
+                if self.index < LAYERS:
+                    return original_wait_for_slot(slot)
+                before = torch.cuda.Event(enable_timing=True)
+                after = torch.cuda.Event(enable_timing=True)
+                before.record()
+                started = time.perf_counter()
+                original_wait_for_slot(slot)
+                self.diag_h2d_host_wait_s += time.perf_counter() - started
+                after.record()
+                self.diag_spans['h2d_wait'].append((before, after))
+
+            self.h2d.wait_for_slot = timed_wait_for_slot
 
     def install(self, model):
         for layer, block in enumerate(model.model.layers[1:]):
@@ -135,6 +156,8 @@ class DeepSeekRuntime:
 
     def execute(self, layer, hidden, selected, weights, probs):
         assert layer == self.index % LAYERS
+        diagnostic = self.diag and self.index >= LAYERS
+        route_started = time.perf_counter() if diagnostic else None
         if self.index < LAYERS:
             gathered = gather_global_routes(layer, selected, weights, probs,
                                               probability_tail=128)
@@ -168,11 +191,31 @@ class DeepSeekRuntime:
         dense = torch.zeros((hidden.shape[0], EXPERTS), device='cuda',
                             dtype=torch.float32).scatter_add_(
                                 1, event['targets'][selected], weights.float()).to(weights.dtype)
+        if diagnostic:
+            self.diag_route_host_s += time.perf_counter() - route_started
+            start = torch.cuda.Event(enable_timing=True)
+            start.record()
         pending = self.transport.forward(hidden, dense, event, async_op=True)
         received, received_weights, received_ids = pending.finish()
+        if diagnostic:
+            end = torch.cuda.Event(enable_timing=True)
+            end.record()
+            self.diag_spans['dispatch'].append((start, end))
+            start = torch.cuda.Event(enable_timing=True)
+            start.record()
         parts = self.native_executor.compute(
             self, ('current', received, received_ids, received_weights), event, layer)
+        if diagnostic:
+            end = torch.cuda.Event(enable_timing=True)
+            end.record()
+            self.diag_spans['expert'].append((start, end))
+            start = torch.cuda.Event(enable_timing=True)
+            start.record()
         result = combine_rank_partials(self.transport, hidden, parts, event, torch.bfloat16)
+        if diagnostic:
+            end = torch.cuda.Event(enable_timing=True)
+            end.record()
+            self.diag_spans['return'].append((start, end))
         self.index += 1
         return result
 
@@ -192,8 +235,15 @@ def generate(model, runtime, ids, count):
     mask = torch.ones_like(ids)
     past = None
     tokens, stamps = [], []
+    diagnostic_steps = [] if runtime.diag else None
+    diagnostic_events = [] if runtime.diag else None
     with torch.inference_mode():
         for step in range(count):
+            if runtime.diag:
+                previous = (runtime.h2d.metrics['bytes'], runtime.native_executor.waits,
+                            runtime.native_executor.groups, runtime.native_executor.waves,
+                            runtime.diag_route_host_s, runtime.diag_h2d_host_wait_s,
+                            runtime.transport.forward_bytes, runtime.transport.return_bytes)
             position = torch.arange(mask.shape[1] - ids.shape[1], mask.shape[1],
                                     device='cuda')[None, :].expand(len(ids), -1)
             out = model(input_ids=ids, attention_mask=mask, position_ids=position,
@@ -204,15 +254,38 @@ def generate(model, runtime, ids, count):
             tokens.append(next_ids)
             torch.cuda.synchronize()
             stamps.append(time.perf_counter_ns())
+            if runtime.diag:
+                diagnostic_events.append({name: pairs[:] for name, pairs in
+                                          runtime.diag_spans.items()})
+                for pairs in runtime.diag_spans.values():
+                    pairs.clear()
+                diagnostic_steps.append(dict(step=step,
+                    rank_step_ms=(stamps[-1] - (start if step == 0 else stamps[-2])) / 1e6,
+                    route_to_dispatch_host_ms=(runtime.diag_route_host_s - previous[4]) * 1000,
+                    h2d_host_wait_ms=(runtime.diag_h2d_host_wait_s - previous[5]) * 1000,
+                    h2d_bytes=runtime.h2d.metrics['bytes'] - previous[0],
+                    expert_wait_calls=runtime.native_executor.waits - previous[1],
+                    expert_groups=runtime.native_executor.groups - previous[2],
+                    expert_waves=runtime.native_executor.waves - previous[3],
+                    dispatch_bytes=runtime.transport.forward_bytes - previous[6],
+                    return_bytes=runtime.transport.return_bytes - previous[7]))
             if step < count - 1:
                 ids = next_ids[:, None]
                 mask = torch.cat((mask, mask.new_ones((len(ids), 1))), 1)
     assert runtime.index == LAYERS * count
     actual = torch.stack(tokens, 1).cpu().numpy()
-    return dict(release_ns=start, first_ns=stamps[0], end_ns=stamps[-1],
-                output_tokens=count, finite_logits=True,
-                argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
-                tokens=actual.tolist())
+    if runtime.diag:
+        for row, events in zip(diagnostic_steps, diagnostic_events):
+            for name, pairs in events.items():
+                row[name + '_ms'] = sum(before.elapsed_time(after)
+                                        for before, after in pairs)
+    result = dict(release_ns=start, first_ns=stamps[0], end_ns=stamps[-1],
+                  output_tokens=count, finite_logits=True,
+                  argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
+                  tokens=actual.tolist())
+    if runtime.diag:
+        result['diagnostic_steps'] = diagnostic_steps
+    return result
 
 
 def main(args):
