@@ -120,7 +120,8 @@ def run(a):
                 result=json.loads((out/'result.json').read_text());assert result['status']=='PASS'
                 write(out/'status.json',dict(status='PASS',pid=process.pid,wall_seconds=time.monotonic()-started))
         except BaseException as exc:
-            write(out/'failure.json',dict(status='FAIL',cause=repr(exc),timestamp=time.time()))
+            failure=dict(status='FAIL',cause=repr(exc),timestamp=time.time(),pid=process.pid if process else None)
+            write(out/'failure.json',failure);write(out/'status.json',failure)
             raise
         finally:
             if process is not None:

@@ -56,3 +56,15 @@ global optimum among all combinatorial batches and not corpus-average gain.
 If the best candidate has small or negative benefit, report that measured result
 and continue diagnosis; do not redefine the winner as H2D-only gain or change
 quotas/cache budget to manufacture an improvement.
+
+Input-identity repair (before screen primaries): different source records can
+have identical ordered token matrices. The initial source-index signature missed
+two duplicate pairs, family0/1 and family3/4 (31 unique inputs among 33 labels).
+The preregistered fallback now compares exact ordered uint32 input-token hashes,
+so family1 and family4 use the predeclared seeds100025 and100028. All other31
+manifest hashes are unchanged. Preserve the original nominations and interrupted
+screen initialization, run only the two repaired nominees, verify identical
+active runtime source hashes and warmup tokens/cache, then compose the31 valid
+original nominees plus the two repaired nominees with per-case source provenance.
+Recompute the frozen top8 from all33 unique candidates before any screen primary.
+This repair does not use measured timing to construct candidates.

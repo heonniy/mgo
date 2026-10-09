@@ -62,7 +62,7 @@ def main(pool,out):
                            global_index=position,origin_rank=position//16))
         assert len({r['source_row'] for r in rr})==64 and len({r['input_ids_uint32_sha256'] for r in rr})==64
         assert not {r['source_row'] for r in rr}&warm_sources
-        signature=hashlib.sha256(np.asarray([r['pool_index'] for r in rr],np.int64).tobytes()).hexdigest()
+        signature=hashlib.sha256(np.asarray([r['input_ids'] for r in rr],np.uint32).tobytes()).hexdigest()
         if signature in signatures:
             # Deterministic fallback for coincident lexical neighborhoods;
             # decide entirely before any nomination or serving measurement.
@@ -73,6 +73,7 @@ def main(pool,out):
         signatures.add(signature)
         path=out/(label+'.json');write(path,dict(cell='R4_C30_B16_L512_O64',phase='target',candidate=label,requests=rr))
         candidates.append(dict(candidate=label,path=str(path),sha256=sha(path),method=method,
+                ordered_input_tokens_uint32_sha256=signature,
                 conversation_families=len({r['conversation_key'] for r in rr}),request_ids=[r['request_id'] for r in rr],**(extra or {})))
     for seed in range(100,108):
         order=np.random.default_rng(seed).permutation(allowed);freeze(f'random_{seed}',pick(order,64),'uniform whole-pool seeded random',dict(seed=seed))
@@ -92,6 +93,8 @@ def main(pool,out):
     assert len(candidates)==32
     control=FIXED/'R4_C30_B16_L512_O64_target.json'
     control_rows=json.loads(control.read_text())['requests']
+    control_signature=hashlib.sha256(np.asarray([r['input_ids'] for r in control_rows],np.uint32).tobytes()).hexdigest()
+    assert control_signature not in signatures,'Generated candidate duplicates the immutable control'
     candidates.insert(0,dict(candidate='reference_control',path=str(control),sha256=sha(control),method='immutable headline64 reference',request_ids=[r['request_id'] for r in control_rows]))
     spec=dict(status='FROZEN',source_pool=str(pool),source_pool_sha256=sha(pool/'POOL.json'),
               source_dataset_sha256=receipt['source_sha256'],eligible_pool=len(allowed),whole_dataset_rows=receipt['scanned_source_rows'],

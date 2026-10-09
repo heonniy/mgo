@@ -52,6 +52,7 @@ def validate_stage(root):
                 with np.load(path/'actual_fetches_repeat-1.npz') as capture:
                     fetches=capture['fetches'];assert int(capture['events'])==3072
                 assert fetches.shape[1]==7 and np.all(fetches[:,5]==0)
+                assert len(np.unique(fetches[:,0]*6144+fetches[:,2]))==len(fetches),'Duplicate mandatory expert within an event'
                 counts=np.zeros((3072,4),np.int64)
                 np.add.at(counts,(fetches[:,0],fetches[:,1]),1)
                 np.testing.assert_array_equal(counts,trace[:,48:52])
@@ -75,6 +76,20 @@ def validate_stage(root):
                     other,rr=verify_generation(path,repeat,64);np.testing.assert_array_equal(trace,other)
                     assert [r['tokens'] for r in ranks]==[r['tokens'] for r in rr]
                     assert [r['validation']['state_hash'] for r in ranks]==[r['validation']['state_hash'] for r in rr]
+                # Identical per-arm trajectories let a separate diagnostic
+                # supply assignment detail without logging inside primaries.
+                offsets=np.r_[0,np.cumsum(counts.sum(axis=1))]
+                assignments=[json.dumps(fetches[offsets[event]:offsets[event+1],1:].tolist(),separators=(',',':')) for event in range(3072)]
+                quota_path=path/'quota_event_trace.csv'
+                with quota_path.open(newline='') as stream:
+                    reader=csv.DictReader(stream);fields=list(reader.fieldnames);quota_rows=list(reader)
+                fields=[f for f in fields if f not in ('assigned_experts','assignment_provenance')]
+                with quota_path.open('w',newline='') as stream:
+                    writer=csv.DictWriter(stream,fieldnames=fields+['assigned_experts','assignment_provenance']);writer.writeheader()
+                    for row in quota_rows:
+                        row['assigned_experts']=assignments[int(row['event'])]
+                        row['assignment_provenance']='actual separate repeat-1 diagnostic; full tokens/cache/policy trace match; [rank,key,logical_slot,victim,replica,physical_slot]'
+                        writer.writerow(row)
             report['arms'][c['candidate']+'/'+arm]=entry
     if stage=='final':
         comparisons=[]
@@ -132,8 +147,10 @@ def validate_stage(root):
     write(root/'maxgain_validation.json',report);return report
 
 
-def archive(root,report,commit):
-    stage=report['stage'];destination=DEST/stage;destination.mkdir(parents=True,exist_ok=False)
+def archive(root,report,commit,label=None):
+    stage=report['stage'];label=label or stage
+    assert Path(label).name==label and label not in ('.','..')
+    destination=DEST/label;destination.mkdir(parents=True,exist_ok=False)
     if commit:assert not subprocess.check_output(['git','diff','--cached','--name-only'],cwd=REPO,text=True).strip(),'Unrelated staged files present'
     def copy_tree(source,target,external_captures=False):
         target.mkdir(parents=True,exist_ok=True);inventory={}
@@ -171,6 +188,6 @@ def archive(root,report,commit):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--archive',action='store_true');p.add_argument('--commit',action='store_true')
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--archive',action='store_true');p.add_argument('--commit',action='store_true');p.add_argument('--archive-label')
     a=p.parse_args();r=validate_stage(a.root)
-    if a.archive:archive(a.root,r,a.commit)
+    if a.archive:archive(a.root,r,a.commit,a.archive_label)
