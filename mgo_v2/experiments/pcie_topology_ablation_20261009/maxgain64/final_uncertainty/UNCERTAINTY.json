@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "source": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/maxgain64_search_repair1/resume/final/maxgain_validation.json",
+  "source_sha256": "35343ec0afe2a6336e67f4b0e600619acc38b4f3aaa76219025d71202b865791",
+  "comparisons": [
+    {
+      "candidate": "family_3",
+      "median_gain_pct": 4.736185523469749,
+      "mean_gain_pct": 2.6151455560837755,
+      "exploratory_paired_bootstrap_ci95_pct": [
+        -3.122136445576995,
+        8.477603752029417
+      ],
+      "paired_repeat_gain_pct": [
+        8.477603752029417,
+        1.5499564843333036,
+        2.0191101147131296,
+        4.06172963355459,
+        -3.122136445576995
+      ],
+      "original_conversation_families": 1
+    },
+    {
+      "candidate": "mixed_0",
+      "median_gain_pct": 4.193671021828016,
+      "mean_gain_pct": 3.9288580787385285,
+      "exploratory_paired_bootstrap_ci95_pct": [
+        1.1597957973826345,
+        9.156134474250354
+      ],
+      "paired_repeat_gain_pct": [
+        1.1597957973826345,
+        4.2673534331407525,
+        9.156134474250354,
+        2.0113306181621216,
+        2.888996603733196
+      ],
+      "original_conversation_families": 52
+    },
+    {
+      "candidate": "family_0",
+      "median_gain_pct": 1.938839788628588,
+      "mean_gain_pct": 1.7156564368118854,
+      "exploratory_paired_bootstrap_ci95_pct": [
+        0.7571544055008816,
+        3.684891315821237
+      ],
+      "paired_repeat_gain_pct": [
+        3.684891315821237,
+        0.7571544055008816,
+        0.8648600144821494,
+        1.264012431814865,
+        1.9811630493357546
+      ],
+      "original_conversation_families": 1
+    }
+  ],
+  "seed": 20261010,
+  "bootstrap_draws": 10000,
+  "cpu_administration": {
+    "first_cpu_preflight_completion_observed_unix": 1791561860.798152,
+    "first_timestamp_provenance": "First CPU-only meta-preflight stdout in the tool execution record; original receipt was later overwritten by scripted preflight",
+    "overlapping_generation": {
+      "candidate": "family_3",
+      "arm": "G-NEAR",
+      "repeat": 5,
+      "generation_start_observed_unix": 1791561831.4522178,
+      "metric_file_mtime_unix": 1791561908.5769343
+    },
+    "second_preflight_receipt": "mgo_v2/experiments/pcie_topology_ablation_20261009/DEEPSPEED_LEAF_PREFLIGHT.json",
+    "second_preflight_completion_unix": 1791561929.0522907,
+    "timing_limit": "Observed first completion falls inside the observed generation window; start/duration and causal effect on GPU timing are not established. File mtime follows result writing and is not the exact GPU end timestamp."
+  },
+  "method": "Exploratory paired repeat-block bootstrap of ratio of medians; five repeats per arm; not preregistered or selection-adjusted",
+  "timing_policy": "All original timings remain retained; no exclusion, new winner selection or alteration of the frozen final cohort"
+}

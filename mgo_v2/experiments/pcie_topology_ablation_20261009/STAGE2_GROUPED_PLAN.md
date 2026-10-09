@@ -57,9 +57,13 @@ Execute only after the best64 pipeline terminates and releases its lease:
 ```sh
 /data2/esjung/envs/mgo-pcie/bin/python -u mgo_v2/scripts/run_pcie_ours_job.py \
   --arm R-NEAR --sequence stage2_grouped --timeout 10800 \
-  --out /data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_stage2_grouped_attempt1
+  --out /data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_stage2_grouped_attempt1/live
 ```
 
-This seven-policy cohort is prepared, NOT RUN. External baselines follow its
+The cohort was launched after the best64 predecessor terminated PASS and
+archived all final experiments. ContinuationPID4069365, supervisor4084437 and
+torchrun4084452 were verified live during setup/warmup. The original headline
+manifest,1843 physical expert slots, grouped decode and serialized phase
+configuration are recorded in live/config.json. External baselines follow its
 correctness/measurement/commit gates; the complete original experiment goal
 remains active.
