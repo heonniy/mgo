@@ -43,6 +43,8 @@ path: generated continuations can change with capacity. MoE-Infinity's EAM
 evictions fell from 91,400 to 59,863, but its fastest median TPOT occurred at
 C40 rather than C50. [CACHE_ACTIVITY.md](CACHE_ACTIVITY.md) has the separate
 traffic and eviction counters; they are not cross-system-equivalent misses.
+The later [C20/C50 diagnostic](CACHE_PLATEAU_DIAG_RESULTS.md) separately
+measured the exposed H2D wait and found it below 0.33 ms/token on every rank.
 
 The llama.cpp expert placement was deliberately quantized to whole layers:
 1/1/1/1 GPU expert layers at C20 and C30, 2/2/2/2 at C40, and 3/3/3/3 at C50.
