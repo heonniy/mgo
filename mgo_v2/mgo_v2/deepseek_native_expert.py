@@ -36,7 +36,8 @@ class DeepseekNativeExpertExecutor:
         before_wait = 0
         waited = False
         while pending:
-            ready = rt.h2d.ready_many([groups[i][3] for i in pending])
+            ready = ([True] * len(pending) if getattr(rt, 'full_resident', False)
+                     else rt.h2d.ready_many([groups[i][3] for i in pending]))
             selected = [i for i, ok in zip(pending, ready) if ok][:self.max_experts]
             if not selected:
                 # Same dependency as H0: wait for submission on host, then

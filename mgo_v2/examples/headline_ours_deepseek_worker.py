@@ -88,6 +88,27 @@ def load_route_replay(path, batch, count):
     return tensors, sha
 
 
+def preload_full_resident(runtime):
+    """Diagnostic static e-mod-4 owner map; no H2D in measured generation."""
+    total = LAYERS * EXPERTS
+    assert runtime.world == 4 and runtime.cap == total // runtime.world
+    assert runtime.index == 0 and np.all(runtime.keys < 0)
+    for key in range(total):
+        owner = key % runtime.world
+        slot = key // runtime.world
+        runtime.policy.slots[owner, slot] = key
+        runtime.policy.owner[key] = 1 << owner
+        runtime.policy.primary[key] = owner
+        runtime.policy.seen[key] = True
+        runtime.policy.birth[owner, key] = 0
+        if owner == runtime.rank:
+            runtime.cache[slot].copy_(runtime.sources[key][0], non_blocking=True)
+            runtime.keys[slot] = key
+    torch.cuda.synchronize()
+    assert np.all(runtime.keys[:runtime.cap] >= 0)
+    assert runtime.h2d.metrics['bytes'] == 0
+
+
 def load_model_and_store():
     config = AutoConfig.from_pretrained(MODEL, local_files_only=True)
     config._attn_implementation = 'sdpa'
@@ -142,6 +163,7 @@ class DeepSeekRuntime:
         self.route_capture = []
         self.route_replay = None
         self.route_sha256 = None
+        self.full_resident = False
         self.reset()
 
     def reset(self):
@@ -231,6 +253,8 @@ class DeepSeekRuntime:
                                 routes.routing_weights, routes.origin_ranks, gate,
                                 np.zeros((EXPERTS, self.world), np.int32))
         targets, effective, _, lengths, destinations, fetches, _ = out
+        if self.full_resident:
+            assert not fetches, 'full-resident reference must not fetch in generation'
         event = plan_rank_partial_layout(effective, lengths, destinations,
                                          routes.origin_ranks, gathered.counts, self.rank,
                                          experts=EXPERTS)
@@ -407,10 +431,20 @@ def main(args):
     expected_per_rank = [slots // 4 + (r < slots % 4) for r in range(4)]
     assert spec['expert_slots'] == slots
     assert spec['expert_slots_per_rank'] == expected_per_rank
-    capacities = [x - 2 for x in expected_per_rank]
+    if args.full_resident:
+        assert percent == 50 and args.route_mode == 'replay' and not args.smoke
+        capacities = [LAYERS * EXPERTS // 4] * 4
+    else:
+        capacities = [x - 2 for x in expected_per_rank]
     assert all(x > 0 for x in capacities)
     model, pool, sources = load_model_and_store()
+    if args.full_resident:
+        free_bytes, total_bytes = torch.cuda.mem_get_info()
+        full_cache_bytes = (capacities[rank] + 2) * EXPERT_ELEMENTS * 2
+        assert full_cache_bytes + 2 * 2**30 < free_bytes
+        assert full_cache_bytes < total_bytes * .5
     runtime = DeepSeekRuntime(batch, capacities, sources, pool)
+    runtime.full_resident = args.full_resident
     runtime.install(model)
     fixed = None
     if fixed_manifest is not None and not args.smoke:
@@ -437,6 +471,8 @@ def main(args):
         runtime.route_mode = args.route_mode if repeat else 'none'
         runtime.route_capture = []
         assert np.all(runtime.keys < 0)
+        if args.full_resident:
+            preload_full_resident(runtime)
         gc.collect()
         torch.cuda.synchronize()
         torch.cuda.reset_peak_memory_stats()
@@ -456,7 +492,9 @@ def main(args):
         result.update(rank=rank, repeat=repeat, phase=phase,
                       request_ids=[r['request_id'] for r in local],
                       expert_executor='native_deepseek', policy='LA_CA_NEAR',
-                      prefetch_off=True, cache_start='empty',
+                      prefetch_off=True,
+                      cache_start='full_resident' if args.full_resident else 'empty',
+                      full_resident_reference=args.full_resident,
                       cache_capacity_slots=runtime.cap,
                       physical_cache_slots=runtime.cache.shape[0],
                       peak_allocated_bytes=torch.cuda.max_memory_allocated(),
@@ -491,7 +529,8 @@ def main(args):
                                                 cell=args.cell, primary_repeats=args.repeats,
                                                 headline_eligible=(not args.smoke and
                                                                    args.route_mode == 'none' and
-                                                                   not args.fixed_continuation)))
+                                                                   not args.fixed_continuation and
+                                                                   not args.full_resident)))
     dist.barrier()
     dist.destroy_process_group()
 
@@ -506,4 +545,5 @@ if __name__ == '__main__':
     parser.add_argument('--route-mode', choices=('none', 'capture', 'replay'),
                         default='none')
     parser.add_argument('--route-dir')
+    parser.add_argument('--full-resident', action='store_true')
     main(parser.parse_args())
