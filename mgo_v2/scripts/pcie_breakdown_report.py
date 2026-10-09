@@ -24,6 +24,7 @@ def kernel_report(path):
     kernels=[e for e in events if e.get('cat')=='kernel' and e.get('ph')=='X']
     parents_all=[e for e in events if e.get('cat')=='user_annotation' and e.get('name')=='pcie.moe_runtime' and e.get('ph')=='X']
     launches=[e for e in events if e.get('cat') in ('cuda_runtime','cuda_driver') and e.get('ph')=='X']
+    matmuls=[e for e in events if e.get('cat')=='cpu_op' and e.get('ph')=='X' and e.get('name')=='aten::mm']
     assert len(cpu)==48
     per_layer=[];families=collections.defaultdict(lambda:dict(count=0,kernel_sum_us=0.))
     for span in cpu:
@@ -42,14 +43,16 @@ def kernel_report(path):
         windows=[(k['ts'],k['ts']+k['dur']) for k in local]
         for k in local:
             name=k['name'].lower()
-            family='gemm' if 'gemm' in name else 'activation' if 'silu_product' in name else 'gather' if 'index' in name else 'weight_or_other'
+            family='matmul_gemm' if 'gemm' in name else 'matmul_gemv' if 'gemv' in name else 'matmul_reduction' if 'splitkreduce' in name else 'activation' if 'silu_product' in name else 'gather' if 'index' in name else 'weight_or_other'
             families[family]['count']+=1;families[family]['kernel_sum_us']+=k['dur']
         per_layer.append(dict(cpu_executor_us=span['dur'],kernel_count=len(local),kernel_active_union_us=union(windows),
+                              cpu_mm_calls=sum(left<=m['ts'] and m['ts']+m['dur']<=right for m in matmuls),
                               gemm_count=sum('gemm' in k['name'].lower() for k in local),
                               kernel_stream_window_us=max((b for _,b in windows),default=left)-min((a for a,_ in windows),default=left)))
     return dict(scope='One early target decode forward under intrusive Torch CPU+CUDA profiler; not primary timing',
                 layers=per_layer,families=dict(families),cpu_executor_us=sum(r['cpu_executor_us'] for r in per_layer),
                 kernel_active_union_us=sum(r['kernel_active_union_us'] for r in per_layer),
+                cpu_mm_calls=sum(r['cpu_mm_calls'] for r in per_layer),
                 gemm_count=sum(r['gemm_count'] for r in per_layer),kernel_count=sum(r['kernel_count'] for r in per_layer))
 
 
