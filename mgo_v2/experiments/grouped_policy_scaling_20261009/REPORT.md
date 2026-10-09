@@ -177,6 +177,12 @@ so its apparent 3.8% mean disadvantage against BR is **not a stable policy
 ranking**. N BR's repeat difference is 5.5%, whereas CA_NATIVE's is 2.9%.
 No sample was deleted or replaced by the instrumented run.
 
+BR, CA_NATIVE and Near do **not** have identical generated-token hashes or
+final cache hashes, even though their input requests and seeds are frozen.
+Consequently the policy work-count comparisons include subsequent live
+routing differences; they are system-level results, not a fixed-route causal
+decomposition of placement alone.
+
 The full-decode diagnosis supplies exact work counts and a separate
 instrumented phase partition:
 
@@ -206,3 +212,43 @@ also contain peer waiting: for example, the N BR anchor rank reports
 although its primary TPOT is faster than CA_NATIVE. Do not treat those
 spans as isolated CPU parse or NCCL wire time, or compare diagnostic total
 TPOT directly as the policy result.
+
+### B16: completed primary timing
+
+| Path/policy | TTFT samples (s) | TPOT samples (s/token) | Mean TPOT | E2E samples (s) | TPOT repeat difference |
+|---|---:|---:|---:|---:|---:|
+| Current A, Near | 3.646 / 1.775 | 0.4905 / 0.4910 | 0.4908 | 34.548 / 32.710 | 0.1% |
+| Grouped N, BR | 3.707 / 1.738 | 0.3437 / 0.3169 | 0.3303 | 25.363 / 21.703 | 8.1% |
+| Grouped N, CA_NATIVE | 3.897 / 1.770 | 0.3196 / 0.3348 | 0.3272 | 24.030 / 22.860 | 4.6% |
+| Grouped N, Near | 3.678 / 1.763 | 0.3476 / 0.3320 | 0.3398 | 25.577 / 22.680 | 4.6% |
+
+The A and N Near target repeats match generated tokens and final cache
+state on every rank. Their mean TPOT differs by 30.8%, with the same
+compiled-dense confound noted for B8. All three grouped policy ranges
+overlap; the ordering of their means is not a stable winner claim. In N BR,
+GPU 0's explicit serial H2D wait fell from 4.64 to 3.01 s between the two
+otherwise token-identical target repeats. The 1.63 s difference over 63
+decode intervals is about 26 ms/token, close to the 27 ms/token TPOT
+difference. In N CA_NATIVE the second repeat was slower and GPU 0's wait
+rose from 2.93 to 4.03 s. Thus the large repeat spread is not consistently
+a first-versus-second-repeat effect. These waits expose where time varies,
+not whether the DMA service itself or preceding first-wave overlap changed.
+
+| B16 path/policy | Four-rank MAIN demand misses / H2D copies | Four-rank H2D GiB | Four-rank off-rank forward+return GiB | Maximum rank token-expert rows | Mean controller CPU ms/token across ranks | Maximum rank copy-stream service ms/token |
+|---|---:|---:|---:|---:|---:|---:|
+| A Near | 173,489 | 1,524.8 | 3.883 | 393,688 | 9.8 | 138.4 |
+| N BR | 172,689 | 1,517.8 | 4.021 | 402,408 | 8.9 | 142.8 |
+| N CA_NATIVE | 172,439 | 1,515.6 | 3.493 | 439,318 | 13.3 | 141.0 |
+| N Near | 173,489 | 1,524.8 | 3.883 | 393,688 | 9.7 | 148.5 |
+
+BR and CA show a 13% lower four-rank off-rank byte count under CA, but
+CA's largest-rank token-expert row load is 9% higher, controller CPU time
+is roughly 4.4 ms/token higher, and demand-miss copies are nearly unchanged.
+The policies have different generated-token and cache hashes, so these are
+live-system associations, not fixed-routing placement deltas. A and N Near
+have exactly matching work counts and token/cache hashes. On physical GPU 0,
+the diagnostic expert-execution/preparation span falls from 243.8 to
+51.4 ms/token under grouping, while an explicit 52.9 ms/token H2D wait
+appears and the `Other MoE runtime` span falls from 50.2 to 33.7 ms/token.
+Those phase spans come from different, instrumented runs; their change is
+descriptive and is not substituted for the clean primary TPOT gain.
