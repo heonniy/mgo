@@ -260,8 +260,10 @@
       "local_batch": 16,
       "input_tokens": 512,
       "output_tokens": 64,
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "qca_c40_b16_ours_r3_v1"
+      ],
+      "status": "RUNNING"
     },
     {
       "cell": "Qwen3_ShareGPT_R4_C50_B16_L512_O64",
@@ -280,6 +282,15 @@
       "output_tokens": 64,
       "attempts": [],
       "status": "PENDING"
+    }
+  ],
+  "cross_capacity_agreement": [
+    {
+      "left_cache_percent": 20,
+      "right_cache_percent": 30,
+      "same_full_output_requests": 23,
+      "same_first_token_requests": 64,
+      "same_token_positions": 2735
     }
   ]
 }

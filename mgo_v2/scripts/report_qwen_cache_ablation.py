@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import statistics
+from itertools import combinations
 from pathlib import Path
 
 
@@ -155,9 +156,24 @@ def main():
     assert all(inputs == same_inputs['warmup'][0] for inputs in same_inputs['warmup'])
     assert all(inputs == same_inputs['target'][0] for inputs in same_inputs['target'])
     completed = sum(c['status'] == 'PASS' for c in cases)
+    cross_capacity_agreement = []
+    for left, right in combinations((c for c in cases if c['status'] == 'PASS'), 2):
+        def output_tokens(case):
+            root = JOBS / case['selected_attempt']
+            return [tokens for rank in range(4)
+                    for tokens in read(root / f'repeat2_rank{rank}.json')['tokens']]
+        left_tokens, right_tokens = output_tokens(left), output_tokens(right)
+        assert len(left_tokens) == len(right_tokens) == 64
+        cross_capacity_agreement.append(dict(
+            left_cache_percent=left['cache_percent'],
+            right_cache_percent=right['cache_percent'],
+            same_full_output_requests=sum(a == b for a, b in zip(left_tokens, right_tokens)),
+            same_first_token_requests=sum(a[0] == b[0] for a, b in zip(left_tokens, right_tokens)),
+            same_token_positions=sum(x == y for a, b in zip(left_tokens, right_tokens)
+                                     for x, y in zip(a, b))))
     output = dict(status='PASS' if completed == 4 else 'PARTIAL', completed=completed,
                   total=4, clean_target_repeats=3, source_manifest_sha256=digest(MANIFEST),
-                  cases=cases)
+                  cases=cases, cross_capacity_agreement=cross_capacity_agreement)
     write(REPORT / 'PROGRESS.json', output)
     lines = ['# Qwen3 ShareGPT main_OURS cache-capacity sweep', '',
              f'Validated cells: **{completed}/4**. R4 GPUs 0/1/4/5, B16/rank, input512/output64. '
@@ -207,6 +223,16 @@ def main():
                                + ' | '.join(f'{value}/64' for value in fields) + ' |')
         else:
             token_lines.append(f'| {case["cache_percent"]}% | — | — | — |')
+    token_lines.extend(['', 'Across capacities, identical input requests can lead to different '
+                        'autoregressive output paths. Compare the second target repeat in '
+                        'each passed cell; these are aggregate counts, not raw token IDs.', '',
+                        '| Cache pair | Same first token | Same complete 64-token sequence | '
+                        'Same token positions |', '|---|---:|---:|---:|'])
+    for pair in cross_capacity_agreement:
+        token_lines.append(f'| C{pair["left_cache_percent"]}–C{pair["right_cache_percent"]} | '
+                           f'{pair["same_first_token_requests"]}/64 | '
+                           f'{pair["same_full_output_requests"]}/64 | '
+                           f'{pair["same_token_positions"]}/4096 |')
     (REPORT / 'TOKEN_STABILITY.md').write_text('\n'.join(token_lines) + '\n')
     print(f'{completed}/4 validated Qwen cache cells')
 
