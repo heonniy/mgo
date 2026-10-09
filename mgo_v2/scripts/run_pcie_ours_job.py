@@ -36,6 +36,14 @@ def run(a):
     if search_stage:
         assert search_spec and not a.sequence and not a.smoke and not a.overlap and not a.diagnostic
         frozen=json.loads(search_spec.read_text());assert frozen['status']=='FROZEN'
+        # The owner's larger-batch/long-output matrix has more work than the
+        # historical full64 cohort. Keep the one-hour PER GENERATION guard,
+        # while allowing all prescribed repetitions to finish in one job.
+        if frozen.get('required_control_candidate') and search_stage!='nomination':
+            outputs=int(frozen['final_output_tokens'])
+            expansion_bound=86400 if outputs==256 and search_stage=='final' else (
+                43200 if outputs>=128 else a.timeout)
+            a.timeout=max(a.timeout,expansion_bound)
         write(out/'SEARCH_SPEC.json',frozen)
     identity=dict(arm=a.arm,sequence=a.sequence,search_stage=search_stage,
                   search_spec=str(search_spec) if search_spec else None,
@@ -46,6 +54,7 @@ def run(a):
                   git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),
                   base_commit='7ddc55dff8d8a571a79a7fa415ad16fbc47e78dc',seed=42,
                   physical_gpus=list(GPUS),groups=[[0,1],[4,5]],conda_prefix=sys.prefix,
+                  job_timeout_seconds=a.timeout,generation_timeout_seconds=3600,
                   cache_slots=1843,main_slots=[459,459,459,458],reserved_slots_per_rank=2,
                   source='numa_shared_full_pinned',source_unique_bytes=108*2**30,
                   controller='native C++',phase_order='native overlap diagnostic' if a.overlap else 'metadata PLAN -> forward -> CPU rendezvous -> H2D -> CPU rendezvous -> compute -> CPU rendezvous -> return -> CPU rendezvous')
