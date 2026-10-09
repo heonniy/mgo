@@ -197,10 +197,10 @@ def validate_stage(root):
             ax.bar(x+(j-.5)*width,med,width,label=arm+'-NEAR',color=color)
             ax.errorbar(x+(j-.5)*width,med,yerr=np.array([[v['median']-v['min'] for v in values],
                  [v['max']-v['median'] for v in values]]),fmt='none',ecolor='#333333',capsize=3)
-        ax.set_xticks(x,[c['candidate']+'\n'+f"{c['gain_percent']:.2f}% reduction" for c in comparisons])
+        ax.set_xticks(x,[c['candidate']+'\n'+f"{c['input_provenance']['known_conversation_families']} original families\n{c['gain_percent']:.2f}% reduction" for c in comparisons],fontsize=9)
         ax.set_ylabel('Unprofiled median TPOT (s/token)');ax.set_ylim(bottom=0);ax.legend()
         ax.spines[['top','right']].set_visible(False);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
-        ax.set_title('Best observed real ShareGPT batches of 64\nFinal repetitions; bars show min–max range')
+        ax.set_title(f"ShareGPT batch64: three finalists, {cohort['primary_repeats']} repeats per arm\nGrouped decode + C++ metadata; median bars, min–max whiskers")
         fig.savefig(root/'maxgain64.pdf');fig.savefig(root/'maxgain64.png',dpi=160);plt.close(fig)
     write(root/'maxgain_validation.json',report);return report
 
