@@ -35,10 +35,14 @@ def check(old_label, new_label):
         old = json.loads((original / f'trace_rank{rank}.json').read_text())
         new = json.loads((measured / f'trace_rank{rank}.json').read_text())
         assert old['route_sha256'] == new['route_sha256'], (old_label, new_label, rank)
+        assert old['teacher_tokens'] == new['teacher_tokens'], (old_label, new_label, rank)
     result = json.loads((measured / 'result.json').read_text())
+    prior = json.loads((original / 'result.json').read_text())
     assert result['status'] == 'PASS' and result['route_frozen']
     assert result['grouped_decode_mode'] == 'off' and result['prefetch'] == 'off'
     assert result['capture_policy'] == 'LA_CA_NEAR' and result['policy_modes'] == ['STATIC_MOD']
+    assert result['main_capacities'] == prior['main_capacities']
+    assert bool(result['nccl_p2p_disable']) == bool(prior['nccl_p2p_disable'])
     assert len(result['results']) == 2
     assert all(x['status'] == 'PASS' and x['backend'] == 'STATIC_MOD' for x in result['results'])
 
