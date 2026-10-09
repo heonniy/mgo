@@ -42,8 +42,8 @@ def check(old_label, new_label):
     assert result['grouped_decode_mode'] == 'off' and result['prefetch'] == 'off'
     assert result['capture_policy'] == 'LA_CA_NEAR' and result['policy_modes'] == ['STATIC_MOD']
     assert result['main_capacities'] == prior['main_capacities']
-    previous_status = json.loads((original / 'status.json').read_text())
-    assert bool(result['nccl_p2p_disable']) == bool(previous_status['nccl_p2p_disable'])
+    # The 2026-10-08 receipts predate the explicit NCCL transport field.
+    assert bool(result['nccl_p2p_disable']) == ('p2p_disabled' in old_label)
     assert len(result['results']) == 2
     assert all(x['status'] == 'PASS' and x['backend'] == 'STATIC_MOD' for x in result['results'])
 
