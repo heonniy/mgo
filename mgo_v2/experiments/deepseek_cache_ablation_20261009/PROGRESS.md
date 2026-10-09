@@ -1,6 +1,6 @@
 # DeepSeek ShareGPT cache-capacity ablation
 
-Validated system cells: **8/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three unfiltered target repeats per completed row; values below are median [minimum, maximum] seconds, with TPOT in seconds per generated token.
+Validated system cells: **9/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three unfiltered target repeats per completed row; values below are median [minimum, maximum] seconds, with TPOT in seconds per generated token.
 
 | B/rank | Cache | System | TTFT | TPOT | E2E | Status |
 |---:|---:|---|---:|---:|---:|---|
@@ -12,7 +12,7 @@ Validated system cells: **8/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three u
 | 16 | 30% | MoE-Infinity (repaired) | 1.674 [1.660, 1.764] | 1.259 [1.243, 1.259] | 81.010 [79.985, 81.089] | PASS |
 | 16 | 30% | DeepSpeed ZeRO-Inference | 4.907 [4.800, 5.948] | 4.638 [4.615, 4.700] | 297.022 [295.678, 302.024] | PASS |
 | 16 | 30% | llama.cpp balanced | 145.381 [145.243, 145.453] | 0.413 [0.413, 0.414] | 171.452 [171.293, 171.455] | PASS |
-| 16 | 40% | main_OURS | — | — | — | PENDING |
+| 16 | 40% | main_OURS | 0.588 [0.578, 0.860] | 0.282 [0.275, 0.286] | 18.604 [17.916, 18.609] | PASS |
 | 16 | 40% | MoE-Infinity (repaired) | — | — | — | PENDING |
 | 16 | 40% | DeepSpeed ZeRO-Inference | — | — | — | PENDING |
 | 16 | 40% | llama.cpp balanced | — | — | — | PENDING |
