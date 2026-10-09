@@ -8,6 +8,8 @@ import math
 import statistics
 from pathlib import Path
 
+from report_deepseek_cache_token_stability import main as report_token_stability
+
 
 PKG = Path(__file__).resolve().parents[1]
 REPORT = PKG / 'experiments/deepseek_cache_ablation_20261009'
@@ -232,6 +234,7 @@ def main():
                         f'{activity_value("remote_return_bytes", 2**30)} | '
                         f'{activity_value("evictions")} |')
     (REPORT / 'CACHE_ACTIVITY.md').write_text('\n'.join(activity) + '\n')
+    report_token_stability()
     print(f'{completed}/{total} validated cache-ablation rows')
 
 
