@@ -65,9 +65,12 @@ def _create_runtime(args, model, backing, experts, options):
         native = NativeExpertExecutor()
     for name, value in options.items():
         setattr(args, name, value)
+    if getattr(args, 'numa_shared_source_root', None):
+        args.expert_source = 'numa_shared_full_pinned'
+        options = dict(options, expert_source=args.expert_source)
     from .decode_runtime import DecodeOffloadRuntime
     source = options.get('expert_source', 'staged')
-    args.direct_pinned_source = source == 'full_pinned'
+    args.direct_pinned_source = source in ('full_pinned', 'numa_shared_full_pinned')
     pool = receipt = None
     if args.direct_pinned_source:
         import time
@@ -77,12 +80,24 @@ def _create_runtime(args, model, backing, experts, options):
         world = dist.get_world_size() if dist.is_initialized() else 1
         required = len(experts) * expert_bytes
         available = next(int(x.split()[1]) * 1024 for x in Path('/proc/meminfo').read_text().splitlines() if x.startswith('MemAvailable:'))
-        if available < required * world + 128 * 2**30:
+        if source == 'numa_shared_full_pinned':
+            from .numa_shared_source import build_numa_shared_expert_store
+            if world != 4:
+                raise ValueError('NUMA-shared study requires exactly four ranks')
+            # The supervisor checks available >= 2*required + 128 GiB before
+            # launch. Every rank also checks the remaining 128-GiB headroom.
+            if available < 128 * 2**30:
+                raise RuntimeError('Insufficient shared-source host headroom')
+            started = time.perf_counter()
+            pool, experts, receipt = build_numa_shared_expert_store(experts, expert_bytes, args.numa_shared_source_root, dist.get_rank())
+            receipt.update(init_seconds=time.perf_counter()-started, host_available_before=available)
+        elif available < required * world + 128 * 2**30:
             raise RuntimeError('Insufficient host headroom for rank-private full pinned stores')
-        started = time.perf_counter()
-        pool, experts = build_full_pinned_expert_store(experts, expert_bytes)
-        receipt = dict(bytes=required, init_seconds=time.perf_counter()-started,
-                       host_available_before=available, source='full_pinned')
+        else:
+            started = time.perf_counter()
+            pool, experts = build_full_pinned_expert_store(experts, expert_bytes)
+            receipt = dict(bytes=required, init_seconds=time.perf_counter()-started,
+                           host_available_before=available, source='full_pinned')
     runtime = DecodeOffloadRuntime(args, model, backing, experts)
     runtime.native_executor = native
     runtime.pinned_expert_pool = pool

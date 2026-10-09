@@ -21,7 +21,9 @@ from .coalesced_return import combine_rank_partials
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
-  self.predictor=TransitionPredictor(np.load('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/predictor/transition.npy'))
+  if getattr(a,'prefetch_off',False):
+   self.predictor=None
+  else:self.predictor=TransitionPredictor(np.load(getattr(a,'predictor_path','/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/predictor/transition.npy')))
   super().__init__(a,model,backing,experts)
   self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2)
@@ -49,10 +51,11 @@ class DecodeOffloadRuntime(LiveRuntime):
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):
    self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"),cpu_team=getattr(self.args,"staging_cpu_team",None),direct_pinned=getattr(self.args,"direct_pinned_source",False))
   super().reset()
-  self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
+  self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor,native_pcie=getattr(self.args,'pcie_native_controller',False),quota_mode=getattr(self.args,'pcie_quota_mode','rank_order'),peer_costs=getattr(self.args,'pcie_peer_costs',None))
   self.policy=self.controller.main;self.arena=self.controller.arena
   self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0;self.h2d_global_barriers=0
   self.transport=FusedTokenRankTransport('exact')
+  self.pcie_phase_trace=[]
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
@@ -83,7 +86,9 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
    out,promotions,discards=self.controller.plan_current(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)
-   if self.index>=48 and self.args.phase!='MEASURE':self.controller_times.append((time.perf_counter()-start)*1000)
+   controller_ms=(time.perf_counter()-start)*1000
+   if self.index>=48 and (self.args.phase!='MEASURE' or getattr(self.args,'pcie_phase_diagnostic',False)):self.controller_times.append(controller_ms)
+   if getattr(self.args,'pcie_phase_diagnostic',False):self.pcie_controller_last_ms=controller_ms
    targets,effective,masses,lengths,destinations,fetches,row=out
    if getattr(self.args,'physical_prefetch',False):
     for promotion in promotions:
@@ -191,6 +196,85 @@ class DecodeOffloadRuntime(LiveRuntime):
   return torch.cat(parts) if parts else received.new_empty((0,2048))
  def close(self):
   if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
+  torch.cuda.synchronize()
+  pool=getattr(self,'pinned_expert_pool',None)
+  if hasattr(pool,'unregister'):pool.unregister()
+ def execute_pcie_serial(self,layer,hidden,dense,e,fused):
+  # Gloo rendezvous cannot issue GPU traffic while a peer is still copying.
+  assert getattr(self.args,'prefetch_off',False) and self.args.arena_budget==2
+  assert self.args.debug_plan and not self.controller.pending
+  assert isinstance(self.h2d,PriorityH2DScheduler)
+  assert self.h2d.metrics.get('background_copies',0)==0
+  group=self.args.pcie_cpu_group
+  diagnostic=getattr(self.args,'pcie_phase_diagnostic',False)
+  trace=dict(event=self.index,rank=self.rank,misses=self.current_global_fetch_count,local_fetches=len(e['fetches']),controller_ms=self.pcie_controller_last_ms) if diagnostic else None
+  def phase(name,fn):
+   if diagnostic:
+    begin=time.perf_counter_ns();fn_result=fn();trace[name]=[begin,time.perf_counter_ns()];return fn_result
+   return fn()
+  def align():
+   torch.cuda.synchronize();dist.barrier(group=group)
+  # PLAN checksum and metadata collectives must finish on every rank.
+  phase('metadata_plan_complete',align)
+  before=self.transport.calls
+  def forward():
+   if fused:
+    pending=self.transport.forward(hidden,dense,e,async_op=True)
+    received,rw,recv_ids=pending.finish();packet=('current',received,recv_ids,rw)
+   else:packet=self.dispatch(hidden,dense,e)
+   torch.cuda.synchronize()
+   return packet
+  with nvtx_phase('moe.pcie_forward_a2a'):packet=phase('forward_a2a',forward)
+  phase('forward_global_complete',lambda:dist.barrier(group=group))
+  def copy():
+   if diagnostic:
+    copy_start=torch.cuda.Event(enable_timing=True);copy_end=torch.cuda.Event(enable_timing=True)
+    copy_start.record(self.h2d.h2d_stream)
+   self.apply_fetches(e)
+   self.h2d.synchronize()
+   if diagnostic:
+    copy_end.record(self.h2d.h2d_stream);copy_end.synchronize()
+    trace['h2d_cuda_service_ms']=copy_start.elapsed_time(copy_end)
+   torch.cuda.synchronize()
+  with nvtx_phase('moe.pcie_h2d_only'):phase('h2d_only',copy)
+  phase('h2d_global_complete',lambda:dist.barrier(group=group))
+  self.h2d_global_barriers+=1
+  def compute():
+   if diagnostic:
+    begin=torch.cuda.Event(enable_timing=True);end=torch.cuda.Event(enable_timing=True);begin.record()
+   values=self.compute(packet,e,layer)
+   if diagnostic:end.record()
+   torch.cuda.synchronize()
+   if diagnostic:trace['compute_cuda_ms']=begin.elapsed_time(end)
+   return values
+  with nvtx_phase('moe.pcie_expert_compute'):values=phase('expert_compute',compute)
+  phase('compute_global_complete',lambda:dist.barrier(group=group))
+  self.post_expert_barriers+=1
+  def returned():
+   if fused:
+    precision=getattr(self.args,'partial_precision',None)
+    result=combine_rank_partials(self.transport,hidden,values,e,{'bf16':torch.bfloat16,'fp32':torch.float32,'fp64':torch.float64}[precision],unique_rows=getattr(self.args,'unique_combine',False)) if precision else self.transport.combine(hidden,values,e)
+    assert self.transport.calls-before==2
+    if self.index<48 and getattr(self.args,'validate_prefill_optimized',False):
+     reference=self.transport.combine(hidden,values,e);diff=result.float()-reference.float()
+     assert bool(torch.isfinite(result).all()) and bool(torch.isfinite(reference).all())
+     row=dict(layer=layer,max_abs=float(diff.abs().max()),relative_l2=float(torch.linalg.vector_norm(diff)/torch.linalg.vector_norm(reference.float()).clamp_min(1e-20)))
+     if not hasattr(self,'prefill_numerics'):self.prefill_numerics=[]
+     self.prefill_numerics.append(row)
+   else:result=self.combine(hidden,values,e,packet[0])
+   torch.cuda.synchronize();return result
+  with nvtx_phase('moe.pcie_return_a2a'):result=phase('return_a2a',returned)
+  phase('return_global_complete',lambda:dist.barrier(group=group))
+  if diagnostic:self.pcie_phase_trace.append(trace)
+  self.index+=1
+  if self.args.phase!='MEASURE':
+   self.arena.assert_consistent()
+   assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
+   self.actual_h2d_bytes=self.h2d.metrics['bytes']
+  if self.index==48:
+   self.arena.assert_consistent();assert not self.arena.reservations and np.all(self.keys[self.cap:]<0)
+   self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=2,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
+  return result
  def execute(self,*args):
   if not getattr(self.args,'physical_prefetch',False):result=super().execute(*args)
   else:
@@ -199,6 +283,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
    fused=getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False))
    overlap=getattr(self.args,'streaming',False) and self.index>=48
+   if getattr(self.args,'pcie_g2g_first_serial',False):return self.execute_pcie_serial(layer,hidden,dense,e,fused)
    if getattr(self.args,'strict_serialized_phases',False):
     # Characterization substrate:
     # required H2D -> all-rank H2D barrier -> forward dispatch -> expert compute

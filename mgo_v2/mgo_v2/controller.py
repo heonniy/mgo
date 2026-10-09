@@ -231,13 +231,19 @@ from .predictor import choose_candidates
 from .cache import SlotArena
 
 class DecodePrefetchController:
- def __init__(self,capacities,budget,policy,seed,predictor):
+ def __init__(self,capacities,budget,policy,seed,predictor,*,native_pcie=False,quota_mode='rank_order',peer_costs=None):
   self.world=len(capacities);self.policy_name=policy;self.seed=seed;self.budget=budget;self.predictor=predictor
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8}[policy],seed)
+  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8}[policy],seed,native_pcie=native_pcie,quota_mode=quota_mode,peer_costs=peer_costs)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):
   self.event=event;layer=event%48;tick=event+1
+  if self.main.native_pcie is not None:
+   # Exact-only study: reserved P2 remains physical, but no prefetch decisions.
+   assert not self.pending and not self.promotion_victims
+   out=self.main.apply(event,selected,weights,origins,gates,None)
+   self.counters['mandatory']+=len(out[5])
+   return out,[],[]
   active=None
   if self.pending:
    active=np.zeros(128,np.bool_);active[np.unique(selected)]=True
@@ -261,6 +267,7 @@ class DecodePrefetchController:
   self.counters['mandatory']+=len(fetches)
   return out,promotions,discard
  def plan_prefetch_next(self,per_rank_counts):
+  assert self.main.native_pcie is None,'native PCIe study requires prefetch OFF'
   layer=self.event%48
   if self.event<48 or layer==47 or self.budget==0:return []
   predicted=self.predictor.predict_next(layer,per_rank_counts)

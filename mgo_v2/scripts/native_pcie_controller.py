@@ -42,6 +42,8 @@ def load_engine():
     library.mgo_pcie_create.argtypes = [C.c_int, C.c_int, C.c_int, C.c_void_p]
     library.mgo_pcie_create.restype = C.c_void_p
     library.mgo_pcie_destroy.argtypes = [C.c_void_p]
+    library.mgo_pcie_trace.argtypes = [C.c_void_p, C.c_void_p, C.c_int]
+    library.mgo_pcie_trace.restype = C.c_int
     library.mgo_pcie_step.argtypes = [C.c_void_p, C.c_int, C.c_int, C.c_int,
                                    C.c_void_p, C.c_void_p, C.c_void_p, C.c_void_p,
                                    C.POINTER(State), C.POINTER(Output)]
@@ -115,6 +117,13 @@ class NativePcieController:
         if self.handle:
             self.library.mgo_pcie_destroy(self.handle)
             self.handle = None
+
+    def trace(self):
+        count = self.library.mgo_pcie_trace(self.handle, None, 0)
+        if count < 0:raise RuntimeError('Native trace length failed')
+        output = np.empty((count, 61), np.float64)
+        assert self.library.mgo_pcie_trace(self.handle, output.ctypes.data, count) == count
+        return output
 
     def __del__(self):
         if getattr(self, 'handle', None):

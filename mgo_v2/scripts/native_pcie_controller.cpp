@@ -35,9 +35,11 @@ struct Engine {
   int policy, quota_mode;
   bool weighted;
   std::array<I, W * W> costs;
+  std::vector<std::array<double,61>> trace;
   Engine(int seed, int p, int q, const I *c)
     : random(seed), policy(p), quota_mode(q), weighted(c != nullptr) {
     if (c) std::copy(c, c + W * W, costs.begin());
+    trace.reserve(4096);
   }
 };
 
@@ -194,6 +196,15 @@ extern "C" void* mgo_pcie_create(int seed, int policy, int quota_mode, const I* 
   try { return new Engine(seed, policy, quota_mode, costs); } catch (...) { return nullptr; }
 }
 extern "C" void mgo_pcie_destroy(void* handle) noexcept { delete static_cast<Engine*>(handle); }
+extern "C" int mgo_pcie_trace(void* handle, double* output, int capacity) noexcept {
+  if (!handle) return -1;
+  const auto& trace = static_cast<Engine*>(handle)->trace;
+  if (!output) return int(trace.size());
+  if (capacity < int(trace.size())) return -1;
+  for (std::size_t i = 0; i < trace.size(); ++i)
+    std::copy(trace[i].begin(), trace[i].end(), output + i*61);
+  return int(trace.size());
+}
 extern "C" int mgo_pcie_quotas(int n, int mode, int event, I* result) noexcept {
   if (n < 0 || event < 0 || !result || mode < 0 || mode > 1) return -1;
   quota(n, mode, event, result); return 0;
@@ -284,17 +295,24 @@ extern "C" int mgo_pcie_step(void *handle, int event, int n, int topk,
       std::copy(fetch, fetch+5, o->fetches+i*5);
     }
     std::array<bool,E*W> served{};
+    std::array<double,61> record{};
     for (int t = 0; t < n; ++t) {
       const int origin = int(origins[t]); unsigned dispatch = 0;
       for (int j = 0; j < o->lengths[t]; ++j) {
         const int e = o->effective[t*topk+j], key = layer*E+e, dst = s->primary[key];
         if (dst < 0 || s->owner[key] != (1 << dst)) return -5;
         ++row[28]; row[32] += o->masses[t*topk+j]; served[dst*E+e] = true;
+        ++record[57+dst];
         if (dst == origin) { ++row[27]; row[31] += o->masses[t*topk+j]; }
-        else { ++row[29]; dispatch |= 1u << dst; }
+        else {
+          ++row[29]; dispatch |= 1u << dst;
+          ++record[origin/2 != dst/2 ? 53 : 54];
+        }
         o->destinations[t*topk+j] = std::int8_t(dst);
       }
       row[30] += __builtin_popcount(dispatch);
+      for (int dst=0; dst<W; ++dst) if (dispatch & (1u<<dst))
+        ++record[origin/2 != dst/2 ? 55 : 56];
     }
     for (int rank = 0; rank < W; ++rank) {
       for (int e = 0; e < E; ++e) if (served[rank*E+e]) s->last[rank*K+layer*E+e] = tick;
@@ -303,6 +321,10 @@ extern "C" int mgo_pcie_step(void *handle, int event, int n, int topk,
     for (int key = 0; key < K; ++key) row[25] += s->owner[key] != 0;
     row[26] = row[24] - row[25];
     if (row[26] != 0 || row[27] + row[29] != row[28]) return -5;
+    std::copy(row, row+48, record.begin());
+    for (int rank=0; rank<W; ++rank) record[48+rank] = o->quotas[rank];
+    record[52] = event;
+    engine.trace.push_back(record);
     return count;
   } catch (...) { return -99; }
 }

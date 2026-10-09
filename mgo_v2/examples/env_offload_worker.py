@@ -26,8 +26,8 @@ PKG=Path(__file__).resolve().parents[1]
 PACKET=PKG/'experiments/env_e2e_tpot_offload_20261003'
 ROOT=Path('/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003')
 SOURCE=Path('/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003')
-MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
-STORE=Path('/home/hwlee/mgo-results/runtime_validation_20261001/expert_store')
+MODEL=os.environ.get('MGO_MODEL_PATH','/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507')
+STORE=Path(os.environ.get('MGO_EXPERT_STORE','/home/hwlee/mgo-results/runtime_validation_20261001/expert_store'))
 EB=9437184
 
 def digest(x):return hashlib.sha256(pickle.dumps(x,protocol=4)).hexdigest()

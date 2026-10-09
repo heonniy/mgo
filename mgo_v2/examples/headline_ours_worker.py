@@ -43,14 +43,23 @@ def main(a):
  assert not a.native_prefill or (a.expert_executor=='native' and a.prefill_optimized)
  rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
  physical=[0,1,4,5];assert os.environ['MGO_V2_PHYSICAL_GPUS']=='0,1,4,5'
- cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
+ if a.pcie_native_controller:
+  from pcie_host import affinity
+  cpus=affinity(rank)
+ else:cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
   except FileNotFoundError:pass
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
+ if a.pcie_native_controller:
+  assert a.prefetch_off and a.expert_executor=='native' and a.numa_shared_source_root
+  assert not a.capture_eviction_trace and not a.record_main_eviction_trace
+  a.pcie_cpu_group=dist.new_group(backend='gloo')
+  a.pcie_peer_costs=np.asarray(json.loads(a.pcie_peer_costs_path.read_text())['matrix'],np.int64) if a.pcie_peer_costs_path else None
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-(0 if a.capture_eviction_trace else 2) for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ if a.pcie_native_controller:a.debug_plan=True
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None)
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+a.arena_budget)*EB
  from refactor_thread_affinity import configure
@@ -145,6 +154,15 @@ def main(a):
   no_compile=before==dict(counters['stats']);assert a.capture_eviction_trace or not repeat or no_compile
   result.update(expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
+  if a.pcie_native_controller:
+   trace=rt.policy.native_pcie.trace()
+   assert trace.shape==(rt.index,61)
+   np.save(a.output/f'policy_trace_repeat{repeat}_rank{rank}.npy',trace)
+   quotas=np.column_stack((trace[:,19],trace[:,48:52])).astype(np.int64)
+   assert np.all(quotas[:,0]==quotas[:,1:].sum(axis=1))
+   assert np.all(quotas[:,1:].max(axis=1)-quotas[:,1:].min(axis=1)<=1)
+   np.save(a.output/f'quota_repeat{repeat}_rank{rank}.npy',quotas)
+   if a.pcie_phase_diagnostic:write(a.output/f'phases_repeat{repeat}_rank{rank}.json',rt.pcie_phase_trace)
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
    release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
@@ -179,7 +197,7 @@ def main(a):
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,pcie_native_controller=a.pcie_native_controller,pcie_quota_mode=a.pcie_quota_mode,pcie_g2g_first_serial=a.pcie_g2g_first_serial,headline_eligible=not (a.pcie_phase_diagnostic or a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--native-prefill',action='store_true');p.add_argument('--prefetch-off',action='store_true');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--native-prefill',action='store_true');p.add_argument('--prefetch-off',action='store_true');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);p.add_argument('--pcie-native-controller',action='store_true');p.add_argument('--pcie-quota-mode',choices=('rank_order','group_balanced'),default='rank_order');p.add_argument('--numa-shared-source-root');p.add_argument('--pcie-peer-costs-path',type=Path);p.add_argument('--pcie-g2g-first-serial',action='store_true');p.add_argument('--pcie-phase-diagnostic',action='store_true');main(p.parse_args())
