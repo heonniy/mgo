@@ -59,6 +59,11 @@ def main():
     env['PATH'] = '/home/hwlee/mgo-tools/native-expert-build/bin:' + env['PATH']
     for index, (cell, transport, old_label, manifest) in enumerate(cells, 1):
         run_label = label(cell, transport)
+        # Preserve interrupted attempts and use a fresh receipt directory.
+        attempt = 1
+        while (OUTPUT / run_label).exists() and not (OUTPUT / run_label / 'result.json').exists():
+            attempt += 1
+            run_label = label(cell, transport).removesuffix('_v1') + f'_v{attempt}'
         result = OUTPUT / run_label / 'result.json'
         if result.exists():
             check(old_label, run_label)

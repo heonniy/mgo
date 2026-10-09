@@ -17,7 +17,8 @@ R8 job attempts; use new labels.
 
 R2 uses GPUs 0/1, the first 32 target and disjoint 32 warmup requests from
 the same frozen source, with global C30 capacity of 1,843 expert slots split
-922/921. Do not compare R2 and R8 as equal global-batch throughput: per-rank
+922/921. Pause the owned inference loads on GPUs 4/5 during each R2 job as
+well, then restore them; GPUs 2/3/6/7 remain idle. Do not compare R2 and R8 as equal global-batch throughput: per-rank
 B16 makes their global batches 32 and 128. Verify the four workers support
 two GPUs, budget checks, local batch semantics and synchronous llama.cpp
 balanced expert-layer placement before timing.

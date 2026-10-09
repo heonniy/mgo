@@ -40,14 +40,14 @@ def main(a):
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=spec['local_batch'];a.seed=42;a.policy=os.environ.get('MGO_NATIVE_POLICY','BR');a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
- assert a.policy in ('BR','CA','CA_NATIVE','LA_CA_NEAR','STATIC_MOD')
+ assert a.policy in ('BR','CA','CA_NATIVE','LA_CA_NEAR','STATIC_MOD','RANDOM_HASH')
  prefetch=os.environ.get('MGO_NATIVE_PREFETCH','off');assert prefetch in ('on','off')
  compare_prefetch=os.environ.get('MGO_NATIVE_COMPARE_PREFETCH','0')=='1'
  policy_comparison=os.environ.get('MGO_NATIVE_COMPARE_POLICY','0')
- assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE','BR_NEAR_STATIC','STATIC_ONLY')
+ assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE','BR_NEAR_STATIC','STATIC_ONLY','RANDOM_ONLY')
  compare_policy=policy_comparison!='0'
- policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR'),'BR_NEAR_STATIC':('BR','LA_CA_NEAR','STATIC_MOD'),'STATIC_ONLY':('STATIC_MOD',)}.get(policy_comparison,())
- capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE','STATIC_ONLY') else (policy_modes[0] if compare_policy else a.policy)
+ policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR'),'BR_NEAR_STATIC':('BR','LA_CA_NEAR','STATIC_MOD'),'STATIC_ONLY':('STATIC_MOD',),'RANDOM_ONLY':('RANDOM_HASH',)}.get(policy_comparison,())
+ capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE','STATIC_ONLY','RANDOM_ONLY') else (policy_modes[0] if compare_policy else a.policy)
  grouped_mode=os.environ.get('MGO_NATIVE_GROUPED_MODE','off')
  assert grouped_mode in ('off','hit_then_miss')
  if grouped_mode!='off':assert prefetch=='off' and policy_comparison=='BR_NEAR_STATIC'
@@ -79,7 +79,7 @@ def main(a):
   rows=json.loads(Path(spec[kind]['path']).read_text())['requests'][rank*a.local_batch:(rank+1)*a.local_batch]
   return torch.tensor([r['input_ids'] for r in rows],device='cuda')
  warm=inputs('warmup');target=inputs('target')
- warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else ([(name,native) for name in (('LA_CA_NEAR',)+policy_modes if policy_comparison=='STATIC_ONLY' else policy_modes)] if compare_policy else [('h0',None),('native',native)])
+ warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else ([(name,native) for name in (('LA_CA_NEAR',)+policy_modes if policy_comparison in ('STATIC_ONLY','RANDOM_ONLY') else policy_modes)] if compare_policy else [('h0',None),('native',native)])
  for name,executor in warm_modes:
   if compare_policy:a.policy=name
   rt.native_executor=executor;reset()
@@ -113,7 +113,7 @@ def main(a):
   for t in row:h.update(t.cpu().view(torch.uint8).numpy().tobytes())
  write(a.output/f'trace_rank{rank}.json',dict(route_sha256=h.hexdigest(),events=len(routes),bytes=route_bytes,teacher_tokens=captured['tokens']))
  proofs={};baseline_tokens=None;results=[]
- modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (policy_modes if policy_comparison=='TRIPLE' else (policy_modes*2 if policy_comparison=='STATIC_ONLY' else (policy_modes+tuple(reversed(policy_modes)) if policy_comparison=='BR_NEAR_STATIC' else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0')))))
+ modes=('prefetch_on','prefetch_off','prefetch_off','prefetch_on') if compare_prefetch else (policy_modes if policy_comparison=='TRIPLE' else (policy_modes*2 if policy_comparison in ('STATIC_ONLY','RANDOM_ONLY') else (policy_modes+tuple(reversed(policy_modes)) if policy_comparison=='BR_NEAR_STATIC' else ((policy_modes[0],policy_modes[1],policy_modes[1],policy_modes[0]) if compare_policy else ('h0','native','native','h0')))))
  for run,name in enumerate(modes):
   if compare_policy:a.policy=name
   rt.native_executor=native if comparing or name=='native' else None;reset();a.phase='MEASURE'
@@ -132,6 +132,10 @@ def main(a):
   if name=='STATIC_MOD':
    resident=rt.policy.slots[rank,:a.capacities[rank]]
    assert np.all(resident[resident>=0]%128%4==rank),'static owner drift'
+  elif name=='RANDOM_HASH':
+   resident=rt.policy.slots[rank,:a.capacities[rank]]
+   live=resident[resident>=0]
+   assert np.all(rt.policy.random_owners[live]==rank),'random owner drift'
   expected_barriers=48*a.decode_steps if sync_ablation else 0
   assert rt.h2d_global_barriers==rt.post_expert_barriers==expected_barriers
   byte_counts=dict(forward=rt.transport.forward_bytes-boundary['forward'],returned=rt.transport.return_bytes-boundary['returned'],h2d=rt.h2d.metrics['bytes']-boundary['h2d'])

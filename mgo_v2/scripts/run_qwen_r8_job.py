@@ -61,12 +61,12 @@ def gpu_state():
 
 def stop_owned_loads(quiet_2367=False):
     rows = json.loads((LOAD / 'processes.json').read_text())
-    owned = [row for row in rows if row['gpu'] in PHYSICAL and owner.owned_idle(row['pid'])]
     expected = {0, 1, 4, 5} if quiet_2367 else set(PHYSICAL)
+    owned = [row for row in rows if row['gpu'] in expected and owner.owned_idle(row['pid'])]
     assert len(owned) == len(expected) and {row['gpu'] for row in owned} == expected, owned
     outsiders = [(gpu, pid) for gpu, pid in apps()
-                if gpu in PHYSICAL and pid not in {row['pid'] for row in owned}]
-    assert not outsiders, f'foreign compute process on R8 GPU: {outsiders}'
+                if gpu in expected and pid not in {row['pid'] for row in owned}]
+    assert not outsiders, f'foreign compute process on reserved GPU: {outsiders}'
     for row in owned:
         os.kill(row['pid'], signal.SIGTERM)
     deadline = time.monotonic() + 30
@@ -76,9 +76,9 @@ def stop_owned_loads(quiet_2367=False):
         if owner.owned_idle(row['pid']):
             os.kill(row['pid'], signal.SIGKILL)
     deadline = time.monotonic() + 30
-    while any(gpu in PHYSICAL for gpu, _ in apps()) and time.monotonic() < deadline:
+    while any(gpu in expected for gpu, _ in apps()) and time.monotonic() < deadline:
         time.sleep(1)
-    assert not [(gpu, pid) for gpu, pid in apps() if gpu in PHYSICAL]
+    assert not [(gpu, pid) for gpu, pid in apps() if gpu in expected]
     # Prune stale receipts for loads intentionally stopped before this job.
     write(LOAD / 'processes.json', [row for row in rows
                                    if row not in owned and owner.owned_idle(row['pid'])])
@@ -135,7 +135,7 @@ def main():
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C'))
     parser.add_argument('--quiet-2367', action='store_true',
-                        help='Keep the four previously stopped model loads off GPUs 2/3/6/7')
+                        help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
     args = parser.parse_args()
     assert args.ours_mode is None or args.system == 'ours'
     manifest = json.loads(WORKLOADS.read_text())

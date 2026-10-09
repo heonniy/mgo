@@ -8,7 +8,7 @@ from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignmen
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
-def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates):
+def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates,random_owners):
     layers,experts=similarity.shape[:2];world=len(capacities);gate_eviction=True
     rank_fetches=np.zeros(world,np.int32)
     fetches=[(0,0,0,0,0)];fetches.pop()
@@ -61,6 +61,11 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     if policy==9:
         # Static expert owner: layer does not affect the canonical rank.
         assignment=misses%world
+    elif policy==10:
+        # Fixed seeded permutation, balanced within every layer.
+        assignment=np.empty(len(misses),np.int64)
+        for i in range(len(misses)):
+            assignment[i]=random_owners[layer*experts+misses[i]]
     elif policy==7:
         assert 1<=world<=8 and not substitution
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
@@ -80,7 +85,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min()
-    if policy!=9:assert row[44]-row[45]<=1
+    if policy!=9 and policy!=10:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0
@@ -132,6 +137,8 @@ class Policy:
         self.slots=np.full((w,max(capacities)),-1,np.int32);self.owner=np.zeros(k,np.int16);self.primary=np.full(k,-1,np.int8)
         self.last=np.zeros((w,k),np.int32);self.seen=np.zeros(k,np.bool_);self.lost=np.zeros(k,np.bool_)
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
+        rng=np.random.default_rng(seed)
+        self.random_owners=np.concatenate([rng.permutation(np.arange(e,dtype=np.int8)%w) for _ in range(l)])
         seed_rng(seed)
     def apply(self,event,selected,weights,origins,gate_scores,future):
         if self.policy==8:
@@ -140,4 +147,4 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates)
+        return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates,self.random_owners)
