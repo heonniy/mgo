@@ -1,3 +1,12 @@
+**OWNER PCIe CONCURRENCY FOLLOW-UP (2026-10-09).**
+After the Qwen baseline cache sweep completes, run the pinned-host H2D
+microbenchmark in `experiments/pcie_rank_concurrency_20261009/README.md` on
+the user's newer GPU set 0/1/3/4/5/6/7 (all 127 nonempty subsets). GPU2 is
+excluded. Do not terminate other users' processes on 3/6/7. Also plot the
+validated Qwen OURS and baseline TTFT/TPOT/output-throughput cache sweep, and
+render LFU/LRU history-retained versus gate-score hit rates only from recorded
+data; do not rerun model or cache-policy experiments for that figure.
+
 **OWNER QWEN THREE-BASELINE CACHE SWEEP ACTIVE (2026-10-09).**
 Read `experiments/qwen_cache_ablation_20261009/BASELINE_SWEEP_PLAN.md`.
 After the DeepSeek fixed-route/overlap diagnosis, complete Qwen C20/C30/C40/C50

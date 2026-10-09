@@ -1,0 +1,148 @@
+{
+  "status": "PASS",
+  "model": "DeepSeek-V2-Lite-Chat",
+  "workload": "ShareGPT B16/rank input512 63 decode forwards",
+  "source": "previously captured D1 frozen routing trace",
+  "source_files": [
+    "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank0.npz",
+    "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank1.npz",
+    "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank2.npz",
+    "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank3.npz"
+  ],
+  "source_sha256": [
+    "130f72517ea5e47dd877b77d9302d0de655f2315c13e9db03c18fb3d5b44cb9a",
+    "741f9af8df657ef2a330f4515cbfd2cbeeab09d516b13d99452cc1163c4654c9",
+    "4efac8769ff163ff0899adb60e98de893066ae16ecc7f9c81309d6ce69ccc515",
+    "0f29858783c55eed335c6ed92a84858c3617d8924cbc97ebd4719549cfd7f0ce"
+  ],
+  "cpu_counterfactual": true,
+  "admission": "BR, seed42, common to all policies",
+  "gate": "rolling last 128 full-router probability rows per layer",
+  "prefetch": false,
+  "main_only": true,
+  "caveat": "No source-policy parity or physical timing claim; C60 is counterfactual.",
+  "results": [
+    {
+      "cache_percent": 30,
+      "capacities": [
+        123,
+        123,
+        123,
+        122
+      ],
+      "policies": [
+        {
+          "policy": "gate-score",
+          "decode": {
+            "hit": 26806,
+            "miss": 76012,
+            "eviction": 76012,
+            "reload": 76012,
+            "hit_rate": 0.26071310470929215
+          }
+        },
+        {
+          "policy": "LFU-reset",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        },
+        {
+          "policy": "LFU-cumulative",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        },
+        {
+          "policy": "LRU-reset",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        },
+        {
+          "policy": "LRU-cumulative",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "cache_percent": 60,
+      "capacities": [
+        248,
+        248,
+        247,
+        247
+      ],
+      "policies": [
+        {
+          "policy": "gate-score",
+          "decode": {
+            "hit": 59088,
+            "miss": 43730,
+            "eviction": 43730,
+            "reload": 43730,
+            "hit_rate": 0.5746853663755374
+          }
+        },
+        {
+          "policy": "LFU-reset",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        },
+        {
+          "policy": "LFU-cumulative",
+          "decode": {
+            "hit": 1739,
+            "miss": 101079,
+            "eviction": 101079,
+            "reload": 101079,
+            "hit_rate": 0.01691338092551888
+          }
+        },
+        {
+          "policy": "LRU-reset",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        },
+        {
+          "policy": "LRU-cumulative",
+          "decode": {
+            "hit": 0,
+            "miss": 102818,
+            "eviction": 102818,
+            "reload": 102818,
+            "hit_rate": 0.0
+          }
+        }
+      ]
+    }
+  ]
+}
