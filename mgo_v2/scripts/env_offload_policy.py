@@ -4,11 +4,12 @@ from numba import njit
 from br_carep_cpu import balanced_assignment,choose_slot,place,ROW_BYTES,EXPERT_BYTES
 from old_ca_fanout_policy import fanout_assignment
 from la_placement import load_assignment,load_locality_near_assignment
+from pcie_quota import quota_vector
 from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignment, load_fanout_assignment
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
-def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates):
+def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates,quota_mode=0,peer_costs=None):
     layers,experts=similarity.shape[:2];world=len(capacities);gate_eviction=True
     rank_fetches=np.zeros(world,np.int32)
     fetches=[(0,0,0,0,0)];fetches.pop()
@@ -58,9 +59,10 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
+    supplied_quota=quota_vector(len(misses),world,quota_mode==1,event)
     if policy==7:
         assert 1<=world<=8 and not substitution
-        assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,200,supplied_quota)
     elif policy==6:
         assert 1<=world<=8 and not substitution
         assignment=load_fanout_assignment(demand,effective,lengths,org,owner,primary,layer,experts,misses,world)
@@ -74,7 +76,18 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assert not substitution
         assignment=fanout_assignment(effective,lengths,org,primary,layer,experts,misses,world)
     else:
-        assignment=balanced_assignment(demand,misses,world,policy==0)
+        if quota_mode or peer_costs is not None:
+            assert not substitution and policy in (0,1)
+            scores=demand.copy()
+            if peer_costs is not None:
+                assert policy==1 and world==4
+                for expert in range(experts):
+                    for dst in range(world):
+                        value=0
+                        for origin in range(world):value-=demand[expert,origin]*peer_costs[origin,dst]
+                        scores[expert,dst]=value
+            assignment=balanced_assignment(scores,misses,world,policy==0,supplied_quota)
+        else:assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min();assert row[44]-row[45]<=1
     for i in range(len(misses)):
@@ -122,18 +135,27 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     return targets,effective,masses,lengths,destinations,fetches,row
 
 class Policy:
-    def __init__(self,capacities,similarity,substitution,policy,seed=42):
+    def __init__(self,capacities,similarity,substitution,policy,seed=42,*,native_pcie=False,quota_mode='rank_order',peer_costs=None):
         self.capacities=np.asarray(capacities,np.int32);self.similarity=similarity
         self.substitution=substitution;self.policy=policy;w=len(capacities);l,e=similarity.shape[:2];k=l*e
         self.slots=np.full((w,max(capacities)),-1,np.int32);self.owner=np.zeros(k,np.int16);self.primary=np.full(k,-1,np.int8)
         self.last=np.zeros((w,k),np.int32);self.seen=np.zeros(k,np.bool_);self.lost=np.zeros(k,np.bool_)
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
         seed_rng(seed)
+        self.quota_mode=quota_mode;self.peer_costs=peer_costs;self.native_pcie=None
+        if native_pcie:
+            from native_pcie_controller import NativePcieController
+            self.native_pcie=NativePcieController(self,seed,quota_mode,peer_costs)
     def apply(self,event,selected,weights,origins,gate_scores,future):
+        if self.native_pcie is not None:
+            return self.native_pcie.apply(event,selected,weights,origins,gate_scores)
         if self.policy==8:
             # Compile a CA-only copy of the unchanged replay kernel with the
             # native quota solver. Keep the cached legacy JIT path untouched.
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
+        if self.quota_mode!='rank_order' or self.peer_costs is not None:
+            assert self.policy!=8
+            return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates,int(self.quota_mode=='group_balanced'),self.peer_costs)
         return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates)

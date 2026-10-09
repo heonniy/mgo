@@ -44,7 +44,8 @@ import numpy as np
 
 
 @njit
-def native_balanced_assignment(demand, experts, world, randomized):
+def native_balanced_assignment(demand, experts, world, randomized, quota=None):
+    assert quota is None  # Legacy CA_NATIVE keeps its frozen rank-order quota.
     assert not randomized and demand.shape == (128, world)
     assert demand.flags.c_contiguous and experts.flags.c_contiguous
     assignment = np.empty(len(experts), np.int64)

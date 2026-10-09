@@ -18,11 +18,16 @@ METRICS=['raw_routes','raw_gate_mass','exact_global_hits','exact_global_hit_mass
  'min_rank_mandatory_fetches','protected_miss_experts','substituted_experts']
 
 @njit(cache=True)
-def balanced_assignment(demand,experts,world,randomized):
+def balanced_assignment(demand,experts,world,randomized,quota=None):
     """Exact Hungarian local-route objective; BR shuffles the same quota slots."""
     n=len(experts);slots=np.empty(n,np.int64);at=0
     for r in range(world):
-        for _ in range(n//world+(r<n%world)):slots[at]=r;at+=1
+        count=n//world+(r<n%world) if quota is None else quota[r]
+        assert count>=0
+        for _ in range(count):
+            assert at<n
+            slots[at]=r;at+=1
+    assert at==n
     if randomized:
         order=np.arange(n);np.random.shuffle(order);answer=np.empty(n,np.int64)
         for j in range(n):answer[order[j]]=slots[j]

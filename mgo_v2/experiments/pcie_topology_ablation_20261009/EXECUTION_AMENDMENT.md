@@ -37,6 +37,18 @@ an early finisher's NCCL barrier would otherwise overlap another rank's H2D.
 Keep the selected production default unchanged. Instrument a separate
 diagnostic pass, and preserve all unprofiled repeats.
 
+The owner additionally requires controller and decision work in the C++ engine
+to minimize Python overhead. The opt-in native engine owns demand aggregation,
+quota rotation, BR/Near/CA assignment, Gate eviction, admission, owner state,
+and routing/accounting. The array adapter and experiment orchestration stay in
+Python. Gate G1 compares all outputs and residency arrays against the reference,
+including deterministic BR randomness and Near/Hungarian tie decisions.
+
+Maintain our burner on GPUs 0,1,4,5 whenever GPU experiments are inactive.
+An ownership-checked lease stops our burner before a GPU experiment and restores
+it after workers exit, including failed attempts. Downloads and CPU checks do
+not hold that GPU lease.
+
 ## Paths and bounds
 
 Model: `/data2/esjung/models/Qwen3-30B-A3B-Instruct-2507`.
