@@ -22,8 +22,11 @@ BR/Near/Static and Ready-First main_OURS BR/Near/Static/seeded-random.
 Near regressed grouped TPOT by 0.58% but improved Ready-First TPOT by 1.90%
 versus BR. Random's first attempt used a different Near-captured route and
 is excluded; the BR-captured rerun has exact rank route hashes and tokens.
-The earlier separately confirmed 18-cell Static extension has only its
-first three cases complete and remains queued after the R2/R8 table.
+The separately confirmed 18-cell Static extension is complete; read
+`experiments/main_ours_static_placement_20261010/RESULTS.md`. Every Static
+cell has two unfiltered measurements and exact route/teacher-token matches.
+The earlier BR/CA/Near values have only one measurement each, so do not
+claim a stable policy winner from those cross-run comparisons.
 
 **OWNER R4 NEW_OURS CACHE SWEEP COMPLETE (2026-10-10).**
 Read `experiments/grouped_cache_ablation_20261010/{PLAN.md,RESULTS.md}`.

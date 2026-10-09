@@ -16,6 +16,10 @@ def main():
     rows = []
     for cell, transport, old_label, _ in cases():
         run_label = label(cell, transport)
+        attempt = 1
+        while (OUTPUT / run_label).exists() and not (OUTPUT / run_label / 'result.json').exists():
+            attempt += 1
+            run_label = label(cell, transport).removesuffix('_v1') + f'_v{attempt}'
         check(old_label, run_label)
         previous = (followup | original)[old_label]
         result = json.loads((OUTPUT / run_label / 'result.json').read_text())
@@ -41,7 +45,9 @@ def main():
              'and teacher tokens; all four rank trace hashes and teacher tokens '
              'match the earlier cell. Static has **two unfiltered clean runs**; '
              'BR/CA/Near are the earlier **single** clean measurements, so their '
-             'one-shot differences should not be treated as stable gains.', '',
+             'one-shot differences should not be treated as stable gains. '
+             'The largest relative difference between the two Static repeats '
+             'is 0.66%.', '',
              '| Transport | C | B/rank | Seed | Earlier BR | Earlier CA | Earlier Near | Added Static mean [range] (s/token) |',
              '|---|---:|---:|---|---:|---:|---:|---:|']
     for row in rows:
