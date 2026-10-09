@@ -33,3 +33,13 @@ Compare placement gain separately at each common implementation level. Report
 negative or small results as measured; the placement benefit is not assumed.
 
 Commit each validated completed arm and the final comparison separately.
+
+The launched cohort is stored under
+`/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_tpot_optimization_attempt1`.
+After the bounded launcher reports PASS, run
+`scripts/pcie_tpot_optimization_report.py --root <cohort> --out <new-report-dir>`.
+Inspect the generated PNG/PDF and conclusions, then run
+`scripts/archive_pcie_optimization.py --root <cohort> --report <new-report-dir> --commit`.
+The archiver preserves original and stored SHA256, uses lossless gzip for large
+raw files, and creates one local commit per completed arm plus a report commit.
+Do not invoke it for an incomplete cohort or skip diagnosis of a failed gate.
