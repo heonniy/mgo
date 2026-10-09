@@ -1,0 +1,39 @@
+{
+  "arm": "R-NEAR",
+  "sequence": "stage1",
+  "smoke": false,
+  "overlap": false,
+  "diagnostic": false,
+  "git_head": "88dd57d854f5f16943b7643baff5596ebe072025",
+  "base_commit": "7ddc55dff8d8a571a79a7fa415ad16fbc47e78dc",
+  "seed": 42,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "groups": [
+    [
+      0,
+      1
+    ],
+    [
+      4,
+      5
+    ]
+  ],
+  "conda_prefix": "/data2/esjung/envs/mgo-pcie",
+  "cache_slots": 1843,
+  "main_slots": [
+    459,
+    459,
+    459,
+    458
+  ],
+  "reserved_slots_per_rank": 2,
+  "source": "numa_shared_full_pinned",
+  "source_unique_bytes": 115964116992,
+  "controller": "native C++",
+  "phase_order": "metadata PLAN -> forward -> CPU rendezvous -> H2D -> CPU rendezvous -> compute -> CPU rendezvous -> return -> CPU rendezvous"
+}
