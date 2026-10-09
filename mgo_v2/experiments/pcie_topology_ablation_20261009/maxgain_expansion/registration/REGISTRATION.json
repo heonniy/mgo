@@ -1,0 +1,91 @@
+{
+  "status": "FROZEN",
+  "source_pool": "/data2/esjung/datasets/pcie_maxgain64_20261009",
+  "source_pool_sha256": "ab001dfc06c4f00d473ce788fd2f8d1423e53147f2f3b8781859cceedcaa9c0e",
+  "previous_winner_path": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/maxgain64_search_attempt1/candidates_repaired/family_3.json",
+  "previous_winner_sha256": "32431c31694c633583fcc20cc9bab56b8db5c8b271d8d0ba7856c3b4735b7506",
+  "batches": {
+    "16": {
+      "path": "/data2/esjung/datasets/pcie_maxgain_expansion_20261010/B16/candidates/CANDIDATES.json",
+      "sha256": "78209c1ee1fc2c5851eb9e54ccb68793239acef4a5f4681eed03a95e53a1678e",
+      "candidates": 32,
+      "warmup_sha256": "801d8d8f2437b8ee9c0d9658382d3fc0500d4501e5d7fdabac455778963c0373",
+      "previous_best_control_sha256": "fa0585a130c1093e796b119a71c57ffc57d8e44fcac7388862ccff3d883c830e",
+      "original64_input_order_exact": true
+    },
+    "32": {
+      "path": "/data2/esjung/datasets/pcie_maxgain_expansion_20261010/B32/candidates/CANDIDATES.json",
+      "sha256": "fbc97f5f8b7fb12191b364cb319244f08d571e83479ddec411fd929205230359",
+      "candidates": 33,
+      "warmup_sha256": "746601c0840762bb857385c0637dd8678b46689bedf4651ca82b4fd25f40a075",
+      "previous_best_control_sha256": "7b2f4caecc2985407ee6b0bc202b02d25c603e813404a990b9c410c9fd0398af",
+      "original64_input_order_exact": true
+    },
+    "64": {
+      "path": "/data2/esjung/datasets/pcie_maxgain_expansion_20261010/B64/candidates/CANDIDATES.json",
+      "sha256": "f8edb82afc187af38c7fb0094af09165e32b216f8350d08881686101e99fc15a",
+      "candidates": 33,
+      "warmup_sha256": "900680ec2ea2fd2579f9ae88f716931955e0d0aa3b4cebe04b0afe31c5297ae8",
+      "previous_best_control_sha256": "32eb417ada2722cdf0266b9748733c3648997febb11c90e7999d2da190122dc2",
+      "original64_input_order_exact": true
+    }
+  },
+  "matrix": [
+    {
+      "local_batch": 16,
+      "global_requests": 64,
+      "output_tokens": 128,
+      "decode_forwards": 127
+    },
+    {
+      "local_batch": 16,
+      "global_requests": 64,
+      "output_tokens": 256,
+      "decode_forwards": 255
+    },
+    {
+      "local_batch": 32,
+      "global_requests": 128,
+      "output_tokens": 64,
+      "decode_forwards": 63
+    },
+    {
+      "local_batch": 32,
+      "global_requests": 128,
+      "output_tokens": 128,
+      "decode_forwards": 127
+    },
+    {
+      "local_batch": 32,
+      "global_requests": 128,
+      "output_tokens": 256,
+      "decode_forwards": 255
+    },
+    {
+      "local_batch": 64,
+      "global_requests": 256,
+      "output_tokens": 64,
+      "decode_forwards": 63
+    },
+    {
+      "local_batch": 64,
+      "global_requests": 256,
+      "output_tokens": 128,
+      "decode_forwards": 127
+    },
+    {
+      "local_batch": 64,
+      "global_requests": 256,
+      "output_tokens": 256,
+      "decode_forwards": 255
+    }
+  ],
+  "historical_B16_O64": "Retained original five-repeat result; no relabeling or rerun",
+  "control_semantics": "First64 inputs retained. Larger batches add distinct inputs and repartition by new local batch; not the original rank-routing trace",
+  "search": "Whole frozen corpus, 32 lexical/random/family candidates plus prior-winner control; remove an exact duplicate control batch before nomination",
+  "nomination": "16-output G routing capture with exact native C++ independent R/G cold-cache replay once per local batch",
+  "screen": "Top8 proxy nominations plus prespecified previous-winner control, fresh full requested output R/G pair per matrix cell",
+  "final": "Top3 screen candidates plus control, counterordered three repeats; all finalist arms get two extras if any range/median exceeds5%; separate diagnostics",
+  "no_global_optimum_claim": true,
+  "raw_manifests_stay_under_data2": true
+}
