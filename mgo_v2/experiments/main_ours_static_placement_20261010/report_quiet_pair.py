@@ -11,6 +11,7 @@ JOBS = {
     'new_OURS grouped': ROOT / 'grouped_frozen_policy_c30_b8_s14_d5_env2_quiet_v1',
     'main_OURS Ready-First': ROOT / 'main_ours_c30_b8_s14_d5_env2_quiet_pair_v1',
 }
+RANDOM_JOB = ROOT / 'main_ours_c30_b8_s14_d5_env2_quiet_random_v1'
 POLICIES = {'BR': 'BR', 'LA_CA_NEAR': 'Near', 'STATIC_MOD': 'Static'}
 
 
@@ -33,12 +34,29 @@ def main():
         br = policies['BR']['mean']; near = policies['Near']['mean']
         cells[path_name] = {'path': str(path), 'policies': policies,
                             'near_gain_vs_br_pct': 100 * (br - near) / br}
+    if (RANDOM_JOB / 'result.json').exists():
+        random_result = json.loads((RANDOM_JOB / 'result.json').read_text())
+        assert random_result['status'] == 'PASS' and random_result['route_frozen']
+        assert random_result['policy_modes'] == ['RANDOM_HASH']
+        rows = random_result['results']
+        assert len(rows) == 2 and all(row['backend'] == 'RANDOM_HASH' for row in rows)
+        values = [row['TPOT'] for row in rows]
+        cells['main_OURS Ready-First']['policies']['Random'] = {
+            'samples': values, 'mean': statistics.mean(values),
+            'min': min(values), 'max': max(values),
+            'peer_bytes': rows[0]['decode_peer_bytes'],
+            'h2d_bytes': rows[0]['decode_h2d_bytes'],
+            'path': str(RANDOM_JOB),
+        }
     route_match = []
     for rank in range(4):
         receipts = [json.loads((path / f'trace_rank{rank}.json').read_text())
                     for path in JOBS.values()]
-        assert receipts[0]['route_sha256'] == receipts[1]['route_sha256']
-        assert receipts[0]['teacher_tokens'] == receipts[1]['teacher_tokens']
+        if (RANDOM_JOB / 'result.json').exists():
+            receipts.append(json.loads((RANDOM_JOB / f'trace_rank{rank}.json').read_text()))
+        assert len({receipt['route_sha256'] for receipt in receipts}) == 1
+        assert all(receipt['teacher_tokens'] == receipts[0]['teacher_tokens']
+                   for receipt in receipts)
         route_match.append(receipts[0]['route_sha256'])
     output = {'status': 'PASS', 'cell': 'ShareGPT_R4_C30_B8_L128_O33_s14_d5',
               'physical_gpus': [0, 1, 4, 5], 'quiet_gpus': [2, 3, 6, 7],
@@ -47,19 +65,21 @@ def main():
     (HERE / 'QUIET_PAIR.json').write_text(json.dumps(output, indent=2) + '\n')
     lines = ['# Quiet-host paired frozen-route policy check', '',
              'The four managed model-inference loads on GPUs 2/3/6/7 were '
-             'stopped before these jobs; those GPUs were idle. Both jobs used '
+             'stopped before these jobs; those GPUs were idle. The jobs used '
              'R4 GPUs 0/1/4/5, ShareGPT input128, B8 per rank, 32 decode '
              'forwards, C30, P2P-disabled same-host transport, prefetch OFF, '
              'and the **same route hash and teacher tokens on all four ranks**. '
              'Each policy has two unfiltered cache-reset timings. Full TPOT '
              'includes attention.', '',
-             '| Executor | BR TPOT (s/token) | Near TPOT (s/token) | Static TPOT (s/token) | Near vs BR |',
-             '|---|---:|---:|---:|---:|']
+             '| Executor | BR TPOT (s/token) | Near TPOT (s/token) | Static TPOT (s/token) | Random TPOT (s/token) | Near vs BR |',
+             '|---|---:|---:|---:|---:|---:|']
     for name, cell in cells.items():
         def fmt(policy):
+            if policy not in cell['policies']:
+                return '—'
             row = cell['policies'][policy]
             return f"{row['mean']:.4f} [{row['min']:.4f}, {row['max']:.4f}]"
-        lines.append(f"| {name} | {fmt('BR')} | {fmt('Near')} | {fmt('Static')} | "
+        lines.append(f"| {name} | {fmt('BR')} | {fmt('Near')} | {fmt('Static')} | {fmt('Random')} | "
                      f"{cell['near_gain_vs_br_pct']:+.2f}% |")
     lines += ['', 'The `main_OURS` Ready-First Near range is wholly below its BR '
               'range, whereas grouped `new_OURS` Near is wholly above BR. '

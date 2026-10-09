@@ -62,10 +62,11 @@ def gpu_state():
 def stop_owned_loads(quiet_2367=False):
     rows = json.loads((LOAD / 'processes.json').read_text())
     expected = {0, 1, 4, 5} if quiet_2367 else set(PHYSICAL)
+    reserved = expected | set(PHYSICAL)
     owned = [row for row in rows if row['gpu'] in expected and owner.owned_idle(row['pid'])]
     assert len(owned) == len(expected) and {row['gpu'] for row in owned} == expected, owned
     outsiders = [(gpu, pid) for gpu, pid in apps()
-                if gpu in expected and pid not in {row['pid'] for row in owned}]
+                if gpu in reserved and pid not in {row['pid'] for row in owned}]
     assert not outsiders, f'foreign compute process on reserved GPU: {outsiders}'
     for row in owned:
         os.kill(row['pid'], signal.SIGTERM)
@@ -76,9 +77,9 @@ def stop_owned_loads(quiet_2367=False):
         if owner.owned_idle(row['pid']):
             os.kill(row['pid'], signal.SIGKILL)
     deadline = time.monotonic() + 30
-    while any(gpu in expected for gpu, _ in apps()) and time.monotonic() < deadline:
+    while any(gpu in reserved for gpu, _ in apps()) and time.monotonic() < deadline:
         time.sleep(1)
-    assert not [(gpu, pid) for gpu, pid in apps() if gpu in expected]
+    assert not [(gpu, pid) for gpu, pid in apps() if gpu in reserved]
     # Prune stale receipts for loads intentionally stopped before this job.
     write(LOAD / 'processes.json', [row for row in rows
                                    if row not in owned and owner.owned_idle(row['pid'])])
