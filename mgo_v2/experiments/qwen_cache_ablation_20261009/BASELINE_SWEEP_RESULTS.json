@@ -1,0 +1,269 @@
+{
+  "status": "PARTIAL",
+  "completed": 3,
+  "total": 12,
+  "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+  "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "rows": [
+    {
+      "status": "PENDING",
+      "system": "infinity",
+      "cache_percent": 20
+    },
+    {
+      "status": "PENDING",
+      "system": "deepspeed",
+      "cache_percent": 20
+    },
+    {
+      "status": "PENDING",
+      "system": "llama",
+      "cache_percent": 20
+    },
+    {
+      "status": "PASS",
+      "system": "infinity",
+      "cache_percent": 30,
+      "label": "mt2_qwen_sharegpt_b16_l512_infinity_r3_v3",
+      "reused_c30": true,
+      "source_commit": "ede66e16ff35beaf408fb4822bb47eb647b4de76",
+      "workload_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
+      "target_sha256": "3b26dae335488ab942a2e5edffb053875f43372a3c048e6947b62d0d432477ff",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.181730178,
+            5.21943652,
+            5.192269641
+          ],
+          "mean": 5.197812113,
+          "median": 5.192269641,
+          "minimum": 5.181730178,
+          "maximum": 5.21943652,
+          "stdev": 0.01945459595207113
+        },
+        "TPOT": {
+          "samples": [
+            3.2639271783492063,
+            3.2133266036507937,
+            3.2271836794444444
+          ],
+          "mean": 3.2348124871481483,
+          "median": 3.2271836794444444,
+          "minimum": 3.2133266036507937,
+          "maximum": 3.2639271783492063,
+          "stdev": 0.026148681997138514
+        },
+        "E2E": {
+          "samples": [
+            210.809142414,
+            207.65901255,
+            208.504841446
+          ],
+          "mean": 208.99099880333333,
+          "median": 208.504841446,
+          "minimum": 207.65901255,
+          "maximum": 210.809142414,
+          "stdev": 1.630365379932724
+        }
+      },
+      "memory": {
+        "peak_expert_bytes_per_gpu": [
+          [
+            4350541824,
+            4350541824,
+            4350541824,
+            4341104640
+          ],
+          [
+            4350541824,
+            4350541824,
+            4350541824,
+            4341104640
+          ],
+          [
+            4350541824,
+            4350541824,
+            4350541824,
+            4341104640
+          ]
+        ],
+        "expert_budget_bytes_per_gpu": [
+          4350541824,
+          4350541824,
+          4350541824,
+          4341104640
+        ]
+      }
+    },
+    {
+      "status": "PASS",
+      "system": "deepspeed",
+      "cache_percent": 30,
+      "label": "mt2_qwen_sharegpt_b16_l512_deepspeed_r3_v1",
+      "reused_c30": true,
+      "source_commit": "f10d59953ebc82bdcb1d87ae4d1787d073eebe0a",
+      "workload_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
+      "target_sha256": "3b26dae335488ab942a2e5edffb053875f43372a3c048e6947b62d0d432477ff",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.312381671,
+            5.450924912,
+            5.570741751
+          ],
+          "mean": 5.778016111333333,
+          "median": 5.570741751,
+          "minimum": 5.450924912,
+          "maximum": 6.312381671,
+          "stdev": 0.46663575971563775
+        },
+        "TPOT": {
+          "samples": [
+            4.1219440317142855,
+            4.09087552684127,
+            4.1346727160952375
+          ],
+          "mean": 4.115830758216931,
+          "median": 4.1219440317142855,
+          "minimum": 4.09087552684127,
+          "maximum": 4.1346727160952375,
+          "stdev": 0.02252948138056132
+        },
+        "E2E": {
+          "samples": [
+            265.994855669,
+            263.176083103,
+            266.055122865
+          ],
+          "mean": 265.075353879,
+          "median": 265.994855669,
+          "minimum": 263.176083103,
+          "maximum": 266.055122865,
+          "stdev": 1.64509274636847
+        }
+      },
+      "memory": {
+        "peak_all_parameter_bytes_per_rank": [
+          [
+            3115216896,
+            3115216896,
+            3115216896,
+            3115216896
+          ],
+          [
+            3115216896,
+            3115216896,
+            3115216896,
+            3115216896
+          ],
+          [
+            3115216896,
+            3115216896,
+            3115216896,
+            3115216896
+          ]
+        ],
+        "parameter_budget_bytes_per_rank": [
+          4348182528,
+          4348182528,
+          4348182528,
+          4348182528
+        ]
+      }
+    },
+    {
+      "status": "PASS",
+      "system": "llama",
+      "cache_percent": 30,
+      "label": "mt2_qwen_sharegpt_b16_l512_llama_r3_v1",
+      "reused_c30": true,
+      "source_commit": "1f4751f63c2da72ed2a6bc60dcdcf9ae1c003b57",
+      "workload_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
+      "target_sha256": "3b26dae335488ab942a2e5edffb053875f43372a3c048e6947b62d0d432477ff",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            145.069623064,
+            145.006625554,
+            145.184759153
+          ],
+          "mean": 145.08700259033333,
+          "median": 145.069623064,
+          "minimum": 145.006625554,
+          "maximum": 145.184759153,
+          "stdev": 0.09032956727920946
+        },
+        "TPOT": {
+          "samples": [
+            0.4803461144444441,
+            0.48063358366666653,
+            0.4809642286984128
+          ],
+          "mean": 0.48064797560317446,
+          "median": 0.48063358366666653,
+          "minimum": 0.4803461144444441,
+          "maximum": 0.4809642286984128,
+          "stdev": 0.00030930834715081477
+        },
+        "E2E": {
+          "samples": [
+            175.331428274,
+            175.286541325,
+            175.485505561
+          ],
+          "mean": 175.36782505333332,
+          "median": 175.331428274,
+          "minimum": 175.286541325,
+          "maximum": 175.485505561,
+          "stdev": 0.10435629334709658
+        }
+      },
+      "memory": {
+        "resident_expert_bytes_per_gpu": [
+          3623878656,
+          3623878656,
+          3623878656,
+          3623878656
+        ],
+        "expert_budget_bytes_global": 17392730112
+      }
+    },
+    {
+      "status": "PENDING",
+      "system": "infinity",
+      "cache_percent": 40
+    },
+    {
+      "status": "PENDING",
+      "system": "deepspeed",
+      "cache_percent": 40
+    },
+    {
+      "status": "PENDING",
+      "system": "llama",
+      "cache_percent": 40
+    },
+    {
+      "status": "PENDING",
+      "system": "infinity",
+      "cache_percent": 50
+    },
+    {
+      "status": "PENDING",
+      "system": "deepspeed",
+      "cache_percent": 50
+    },
+    {
+      "status": "PENDING",
+      "system": "llama",
+      "cache_percent": 50
+    }
+  ]
+}

@@ -25,12 +25,13 @@ def main(a):
  assert hashlib.sha256(binary.read_bytes()).hexdigest()==build['binary_sha256'],'llama sync binary does not match build receipt'
  assert build.get('cmake_flags',{}).get('GGML_CUDA_GRAPHS:BOOL')=='ON','A/B-capable llama build requires CUDA Graph support compiled in; rebuild first'
  assert build.get('cuda_graph_support') is True and build.get('baseline_policy_eligible') is True,'stale llama build receipt'
- layers=12 if a.expert_placement=='balanced3' else spec['expert_slots']//128
+ per=int(a.expert_placement.removeprefix('balanced')) if a.expert_placement.startswith('balanced') else None
+ layers=4*per if per is not None else spec['expert_slots']//128
  resident=layers*128*9*2**20
  assert resident<=spec['expert_budget_bytes']
- if a.expert_placement=='balanced3':
-  assert spec['cache_percent']==30,'balanced3 baseline is validated for C30 only'
-  assert layers==12 and 3*128<=min(spec['expert_slots_per_rank'])
+ if per is not None:
+  assert {20:2,30:3,40:4,50:6}[spec['cache_percent']]==per
+  assert per*128<=min(spec['expert_slots_per_rank'])
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
  assert set(os.sched_getaffinity(0))==set(affinity)
@@ -43,7 +44,7 @@ def main(a):
  write(a.output/'config.json',dict(
   command=cmd,build=build,expert_budget_bytes=spec['expert_budget_bytes'],expert_resident_bytes=resident,
   gpu_expert_layers=layers,cpu_expert_layers=48-layers,expert_placement=a.expert_placement,
-  static_expert_bytes_per_gpu=([3*128*9*2**20]*4 if a.expert_placement=='balanced3' else None),
+  static_expert_bytes_per_gpu=([per*128*9*2**20]*4 if per is not None else None),
   unused_expert_budget_bytes=spec['expert_budget_bytes']-resident,
   synchronous_batch=True,op_offload=False,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
@@ -60,10 +61,10 @@ def main(a):
  assert placement['expected_total_expert_tensor_count']==144
  assert placement['gpu_expert_bytes']==resident and placement['op_offload'] is False
  assert placement['expert_placement']==a.expert_placement
- if a.expert_placement=='balanced3':
-  assert placement['gpu_expert_layer_ids']==[2,6,10,14,18,22,26,30,34,38,42,46]
+ if per is not None:
+  if per==3:assert placement['gpu_expert_layer_ids']==[2,6,10,14,18,22,26,30,34,38,42,46]
   counts=placement['gpu_expert_layers_by_device']
-  assert set(counts)=={'CUDA0','CUDA1','CUDA2','CUDA3'} and sorted(counts.values())==[3,3,3,3],counts
+  assert set(counts)=={'CUDA0','CUDA1','CUDA2','CUDA3'} and sorted(counts.values())==[per]*4,counts
 
  lines=[s for s in (a.output/'run.log').read_text().splitlines() if 'KV buffer size' in s]
  assert len(lines)==4 and all(re.search(r'CUDA[0-3] KV buffer',s) for s in lines),lines
@@ -96,5 +97,5 @@ if __name__=='__main__':
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
  p.add_argument('--graph-reuse',choices=('on','off'),required=True)
- p.add_argument('--expert-placement',choices=('legacy_tail','balanced3'),default='balanced3')
+ p.add_argument('--expert-placement',choices=('legacy_tail','balanced2','balanced3','balanced4','balanced6'),default='balanced3')
  main(p.parse_args())

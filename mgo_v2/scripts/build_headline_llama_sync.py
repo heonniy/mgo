@@ -37,7 +37,7 @@ receipt=dict(
  cmake_flags=flags,cuda_graph_support=True,
  headline_cuda_graph_runtime='OFF via GGML_CUDA_DISABLE_GRAPHS=1',
  llama_graph_reuse=False,headline_llama_graph_reuse='OFF via LLAMA_GRAPH_REUSE_DISABLE=1',
- headline_expert_placement='balanced3',baseline_policy_eligible=True,
+ headline_expert_placement='balanced2/3/4/6',baseline_policy_eligible=True,
  thread_policy='headline fixed 32/32 with deterministic affinity'
 )
 (p/'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json').write_text(json.dumps(receipt,indent=2)+'\n')

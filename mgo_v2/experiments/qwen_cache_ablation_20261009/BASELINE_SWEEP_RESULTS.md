@@ -1,0 +1,20 @@
+# Qwen cache-capacity baseline sweep
+
+ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. Three unfiltered clean target repeats per baseline cell. C30 is validated reuse of the earlier same-request, same-budget run; C20/C40/C50 are new guarded jobs.
+
+| Cache | System | TTFT median [range], s | TPOT median [range], s/token | E2E median [range], s | Receipt |
+|---:|---|---:|---:|---:|---|
+| C20 | infinity | pending | pending | pending | — |
+| C20 | deepspeed | pending | pending | pending | — |
+| C20 | llama | pending | pending | pending | — |
+| C30 | infinity | 5.192 [5.182, 5.219] | 3.227 [3.213, 3.264] | 208.505 [207.659, 210.809] | `mt2_qwen_sharegpt_b16_l512_infinity_r3_v3 (C30 reuse)` |
+| C30 | deepspeed | 5.571 [5.451, 6.312] | 4.122 [4.091, 4.135] | 265.995 [263.176, 266.055] | `mt2_qwen_sharegpt_b16_l512_deepspeed_r3_v1 (C30 reuse)` |
+| C30 | llama | 145.070 [145.007, 145.185] | 0.481 [0.480, 0.481] | 175.331 [175.287, 175.486] | `mt2_qwen_sharegpt_b16_l512_llama_r3_v1 (C30 reuse)` |
+| C40 | infinity | pending | pending | pending | — |
+| C40 | deepspeed | pending | pending | pending | — |
+| C40 | llama | pending | pending | pending | — |
+| C50 | infinity | pending | pending | pending | — |
+| C50 | deepspeed | pending | pending | pending | — |
+| C50 | llama | pending | pending | pending | — |
+
+Expert residency/placement or live-parameter budget checks are recorded per cell in `BASELINE_SWEEP_RESULTS.json`. llama.cpp statically holds balanced full expert layers, so its quantized GPU residency is not a dynamic cache hit-rate measurement. DeepSpeed limits all live parameters, including non-experts, under its cap. Raw requests, tokens, logs and GPU resource samples remain outside Git.

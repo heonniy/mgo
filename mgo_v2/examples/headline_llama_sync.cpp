@@ -52,7 +52,7 @@ int main(int argc,char **argv){try{
  int layers=std::stoi(argv[5]),repeats=std::stoi(argv[6]),threads=std::stoi(argv[8]);
  bool smoke=std::stoi(argv[7]);
  std::string placement_mode=argc==10?argv[9]:"legacy_tail";
- require(placement_mode=="legacy_tail"||placement_mode=="balanced3","expert_placement must be legacy_tail or balanced3");
+ require(placement_mode=="legacy_tail"||placement_mode=="balanced2"||placement_mode=="balanced3"||placement_mode=="balanced4"||placement_mode=="balanced6","invalid expert_placement");
  require(threads==16||threads==32||threads==64,"cpu_threads must be 16, 32, or 64");
  auto warm=read(argv[2])["requests"],target=read(argv[3])["requests"];
  int count=smoke?4:target.size(),len=smoke?32:target[0]["input_ids"].size(),n=smoke?2:64;
@@ -65,10 +65,19 @@ int main(int argc,char **argv){try{
  std::set<int> gpu_expert_layer_ids;
  if(placement_mode=="legacy_tail"){
   for(int i=48-layers;i<48;i++)gpu_expert_layer_ids.insert(i);
- }else{
+ }else if(placement_mode=="balanced3"){
   require(layers==12,"balanced3 requires exactly 12 GPU expert layers");
   const int ids[]={2,6,10,14,18,22,26,30,34,38,42,46};
   gpu_expert_layer_ids.insert(std::begin(ids),std::end(ids));
+ }else{
+  const int per=std::stoi(placement_mode.substr(8));
+  require(layers==4*per,"balanced placement layer count mismatch");
+  const int begin[]={0,13,25,37},end[]={13,25,37,48};
+  for(int dev=0;dev<4;dev++)for(int j=0;j<per;j++){
+   const int size=end[dev]-begin[dev];
+   gpu_expert_layer_ids.insert(begin[dev]+(2*j+1)*size/(2*per));
+  }
+  require((int)gpu_expert_layer_ids.size()==layers,"balanced selection collision");
  }
  std::vector<std::string> patterns;
  for(int i=0;i<48;i++)if(!gpu_expert_layer_ids.count(i))patterns.push_back("blk\\."+std::to_string(i)+"\\.ffn_(up|down|gate|gate_up)_(ch|)exps");
@@ -98,10 +107,11 @@ int main(int argc,char **argv){try{
   gpu_layer_ids.push_back(layer);
  }
  for(auto &[dev,cnt]:gpu_experts_by_device)gpu_by_device[dev]=cnt;
- if(placement_mode=="balanced3"){
-  require(placement.layer_device.size()==48,"balanced3 requires audited ownership for all 48 transformer layers");
-  require(gpu_experts_by_device.size()==4,"balanced3 must span exactly four CUDA devices");
-  for(auto &[dev,cnt]:gpu_experts_by_device)require(cnt==3,"balanced3 placement is not 3/3/3/3 on actual layer owners");
+ if(placement_mode.rfind("balanced",0)==0){
+  const int per=std::stoi(placement_mode.substr(8));
+  require(placement.layer_device.size()==48,"balanced placement requires audited ownership for all transformer layers");
+  require(gpu_experts_by_device.size()==4,"balanced placement must span four CUDA devices");
+  for(auto &[dev,cnt]:gpu_experts_by_device)require(cnt==per,"balanced placement violates equal per-device expert layers");
  }
  const int64_t expert_layer_bytes=int64_t(128)*9*1024*1024;
  json layer_counts=json::object();
