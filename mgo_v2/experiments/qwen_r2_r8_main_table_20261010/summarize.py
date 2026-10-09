@@ -30,6 +30,7 @@ def read_row(world, system):
     status = json.loads((path / 'status.json').read_text())
     result = json.loads((path / 'result.json').read_text())
     assert result['status'] == 'PASS' and not status['smoke']
+    assert result.get('headline_eligible', True)
     assert status['physical_gpus'] == ([0, 1] if world == 2 else list(range(8)))
     assert status['repeats'] == 2 and status['quiet_2367']
     assert len(list(path.glob('repeat[1-9].json'))) == 2
