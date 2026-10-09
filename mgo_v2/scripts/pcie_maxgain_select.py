@@ -14,6 +14,14 @@ def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def verify_generation(path,repeat,n):
     ranks=[json.loads((path/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)]
+    pinned=[json.loads((path/f'pinned_rank{r}.json').read_text()) for r in range(4)]
+    for r,p in enumerate(pinned):
+        assert p['pinned'] and p['bytes']==54*2**30 and p['numa_node']==r//2
+        assert set(p['locality']['node_counts'])=={str(r//2)}
+        assert p['physical_unique_global_bytes']==108*2**30
+    for left,right in ((0,1),(2,3)):
+        assert pinned[left]['inode']==pinned[right]['inode'] and pinned[left]['device']==pinned[right]['device']
+    assert pinned[0]['inode']!=pinned[2]['inode']
     trace=np.load(path/f'policy_trace_repeat{repeat}_rank0.npy')
     assert trace.shape==(n*48,61)
     for r,rank in enumerate(ranks):

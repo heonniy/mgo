@@ -35,6 +35,7 @@ def validate_stage(root):
         warm=root/'_warmup'/arm
         for r in range(4):
             group=json.loads((warm/f'grouped_repeat0_rank{r}.json').read_text())
+            assert group['decode_calls']==3024 and group['all_ready'] and not group['expert_h2d_compute_overlap']
             assert len(group['checks'])==48 and all(c['finite'] and c['relative_l2']<=.01 for c in group['checks'])
             receipt=json.loads((warm/f'repeat0_rank{r}.json').read_text())
             assert receipt['metadata_wire_checks']==48 and receipt['finite_logits']
