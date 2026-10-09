@@ -1,0 +1,50 @@
+{
+  "arm": "R-NEAR",
+  "sequence": null,
+  "search_stage": "final",
+  "search_spec": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/maxgain_expansion_attempt1/B32_O64/screen_selection/CANDIDATES.json",
+  "search_spec_sha256": "f93f3e4b374d599d9087d37849028569a3e27e984800fa4a37c8db423377c7a5",
+  "smoke": false,
+  "overlap": false,
+  "diagnostic": false,
+  "breakdown_reference": null,
+  "grouped_probe": false,
+  "git_head": "5d8432b910c0c47c3e598a44705b0614db28ce48",
+  "base_commit": "7ddc55dff8d8a571a79a7fa415ad16fbc47e78dc",
+  "seed": 42,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "groups": [
+    [
+      0,
+      1
+    ],
+    [
+      4,
+      5
+    ]
+  ],
+  "conda_prefix": "/data2/esjung/envs/mgo-pcie",
+  "job_timeout_seconds": 28800,
+  "generation_timeout_seconds": 3600,
+  "cache_slots": 1843,
+  "main_slots": [
+    459,
+    459,
+    459,
+    458
+  ],
+  "reserved_slots_per_rank": 2,
+  "source": "numa_shared_full_pinned",
+  "source_unique_bytes": 115964116992,
+  "controller": "native C++",
+  "phase_order": "metadata PLAN -> forward -> CPU rendezvous -> H2D -> CPU rendezvous -> compute -> CPU rendezvous -> return -> CPU rendezvous",
+  "local_batch": 32,
+  "global_requests": 128,
+  "input_tokens": 512,
+  "final_output_tokens": 64
+}
