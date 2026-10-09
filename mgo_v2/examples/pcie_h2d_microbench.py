@@ -15,7 +15,7 @@ import time
 
 PKG = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(PKG), str(PKG/'scripts')]
-from pcie_host import GPUS, affinity, write, topology
+from pcie_host import GPUS, ROOT, affinity, write, topology, available_bytes
 from pcie_gpu_occupancy import gpu_experiment
 
 EB = 9437184
@@ -58,18 +58,33 @@ def worker(a):
     dest=torch.empty((16,EB//2),device='cuda',dtype=torch.bfloat16)
     dist.init_process_group('gloo',init_method=f'tcp://127.0.0.1:{a.port}',rank=rank,world_size=4,timeout=datetime.timedelta(seconds=600))
     node=rank//2;root=Path(a.pool);root.mkdir(parents=True,exist_ok=True)
+    source_bytes=a.source_gib*2**30 if a.source_gib else 16*EB
+    source_experts=source_bytes//EB;assert source_experts*EB==source_bytes
     mappings={}
     if rank%2==0:
-        pool=SharedPinnedMapping(root/f'node{node}.bin',16*EB,node,create=True)
-        pool.tensor.fill_(node+1);mappings[node]=pool
+        pool=SharedPinnedMapping(root/f'node{node}.bin',source_bytes,node,create=True)
+        if a.source_gib:
+            # Equal source IDs have byte-identical BF16 payloads on both
+            # nodes; row labels validate spread-address DMA outside timing.
+            for index,row in enumerate(pool.tensor.view(source_experts,EB//2)):
+                row.fill_(index%127+1)
+        else:pool.tensor.fill_(node+1)
+        mappings[node]=pool
     dist.barrier()
     receipts=[]
     for source_node in (0,1):
         if source_node not in mappings:
-            mappings[source_node]=SharedPinnedMapping(root/f'node{source_node}.bin',16*EB,source_node)
-        receipts.append(mappings[source_node].register())
-    write(a.out/f'host_rank{rank}.json',dict(rank=rank,gpu=GPUS[rank],affinity=sorted(os.sched_getaffinity(0)),sources=receipts))
-    rows={n:p.tensor.view(16,EB//2) for n,p in mappings.items()}
+            mappings[source_node]=SharedPinnedMapping(root/f'node{source_node}.bin',source_bytes,source_node)
+        if not a.source_gib or source_node==node:
+            receipts.append(mappings[source_node].register())
+        else:
+            stat=mappings[source_node].path.stat()
+            receipts.append(dict(numa_node=source_node,mapped_bytes=source_bytes,pinned=False,
+                                 device=stat.st_dev,inode=stat.st_ino,
+                                 reason='Remote control source registers only after the main local-source matrix'))
+    write(a.out/f'host_rank{rank}.json',dict(rank=rank,gpu=GPUS[rank],affinity=sorted(os.sched_getaffinity(0)),sources=receipts,
+          software=dict(torch=torch.__version__,cuda=torch.version.cuda,nccl=list(torch.cuda.nccl.version()))))
+    rows={n:p.tensor.view(source_experts,EB//2) for n,p in mappings.items()}
     streams=[torch.cuda.Stream() for _ in range(4)]
     starts=[torch.cuda.Event(enable_timing=True) for _ in range(4)]
     ends=[torch.cuda.Event(enable_timing=True) for _ in range(4)]
@@ -82,13 +97,18 @@ def worker(a):
         return start
     def run(cell,repeat,nccl=None,send=None,recv=None):
         count=cell['counts'][rank];concurrency=cell['streams'];source_node=1-node if cell['remote'] else node
+        # compact changes the pinned footprint only; spread also removes
+        # repeated reads of the same initial 144-MiB working set.
+        base=((repeat+5)*211+sum(cell['counts'])*73)%source_experts
+        prefix=sum(cell['counts'][:rank])
+        indices=[index if a.source_layout=='compact' else (base+(prefix+index)*383)%source_experts for index in range(count)]
         start=release();comm=None
         if cell['overlap']:
             comm=dist.all_to_all_single(recv,send,group=nccl,async_op=True)
         for s in range(concurrency):
             with torch.cuda.stream(streams[s]):starts[s].record()
         for index in range(count):
-            with torch.cuda.stream(streams[index%concurrency]):dest[index].copy_(rows[source_node][index],non_blocking=True)
+            with torch.cuda.stream(streams[index%concurrency]):dest[index].copy_(rows[source_node][indices[index]],non_blocking=True)
         for s in range(concurrency):
             with torch.cuda.stream(streams[s]):ends[s].record()
         for s in range(concurrency):ends[s].synchronize()
@@ -96,16 +116,31 @@ def worker(a):
         service=max(starts[s].elapsed_time(ends[s]) for s in range(concurrency)) if count else 0
         if comm is not None:comm.wait();torch.cuda.synchronize()
         if repeat<0 and count:
-            assert torch.equal(dest[:count],torch.full_like(dest[:count],source_node+1))
+            if a.source_gib:
+                expected=torch.tensor([index%127+1 for index in indices],device='cuda',dtype=torch.bfloat16)[:,None]
+                assert bool((dest[:count]==expected).all())
+            else:assert torch.equal(dest[:count],torch.full_like(dest[:count],source_node+1))
         records.append(dict(cell=cell['name'],repeat=repeat,rank=rank,gpu=GPUS[rank],counts=cell['counts'],
                             streams=concurrency,remote=cell['remote'],overlap=cell['overlap'],
                             start_ns=start,ready_ns=end,bytes=count*EB,service_ms=service,
-                            nccl_initialized=nccl is not None))
-    cells=matrix();rng=random.Random(20261009)
-    isolated=[c for c in cells if not c['overlap']]
+                            nccl_initialized=nccl is not None,source_bytes_per_node=source_bytes,
+                            source_layout=a.source_layout,source_expert_indices=indices))
+    cells=matrix()
+    rng=random.Random(20261009)
+    isolated=[c for c in cells if not c['overlap'] and not (a.source_gib and c['remote'])]
     for repeat in range(-5,30):
         order=isolated.copy();rng.shuffle(order)
         for cell in order:run(cell,repeat)
+    if a.source_gib:
+        # Main cells have exactly the real runtime's 54-GiB registration per
+        # rank. Additional remote registration is outside all main timings.
+        dist.barrier()
+        remote_receipt=mappings[1-node].register()
+        write(a.out/f'host_remote_control_rank{rank}.json',remote_receipt)
+        controls=[c for c in cells if c['remote'] and not c['overlap']]
+        for repeat in range(-5,30):
+            order=controls.copy();rng.shuffle(order)
+            for cell in order:run(cell,repeat)
     write(a.out/f'isolated_rank{rank}.json',records)
     # Separate calibration/overlap sensitivity: no NCCL object existed above.
     nccl=dist.new_group(backend='nccl',timeout=datetime.timedelta(seconds=600))
@@ -185,7 +220,8 @@ def summarize(out):
     costs=np.rint(cost/cost[cost>0].min()*1000).astype(np.int64)
     write(out/'peer_costs.json',dict(status='PASS',matrix=costs.tolist(),method='measured directional 9MiB-minus-4KiB transfer slope, integer scale 1000',pairs=pair_summary))
     result=dict(status='PASS',payload_bytes=EB,gpus=list(GPUS),warmups=5,timed_samples=30,seed=20261009,
-                source='one shared pinned pool per NUMA node, both registered by each rank for local/remote controls',
+                source_bytes_per_node=records[0]['source_bytes_per_node'],source_layout=records[0]['source_layout'],
+                source='one shared pinned pool per NUMA node; full-size main matrix registers only the local 54-GiB pool per rank, then adds remote registration outside main timing',
                 isolated_nccl_never_initialized=True,cells=cells)
     write(out/'microbench_summary.json',result)
     write(out/'result.json',dict(status='PASS',cells=len(cells),timed_rank_samples=30*4*len(cells),pair_calibration_samples=len(pairs)))
@@ -193,32 +229,45 @@ def summarize(out):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--rank',type=int);p.add_argument('--pool');p.add_argument('--port',type=int)
+    p.add_argument('--source-gib',type=int,choices=(0,54),default=0);p.add_argument('--source-layout',choices=('compact','spread'),default='compact')
     a=p.parse_args()
     if a.rank is not None:worker(a);return
     a.out.mkdir(parents=True,exist_ok=False);write(a.out/'topology_before.json',topology())
+    source_bytes=a.source_gib*2**30 if a.source_gib else 16*EB
+    assert available_bytes()>=2*source_bytes+128*2**30,'shared source plus host headroom guard failed'
+    assert shutil.disk_usage('/dev/shm').free>=2*source_bytes
+    write(a.out/'config.json',dict(source_bytes_per_node=source_bytes,unique_source_bytes=2*source_bytes,
+          source_layout=a.source_layout,shared_pairs=[[0,1],[4,5]],seed=20261009,
+          argv=sys.argv,conda_prefix=sys.prefix,git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=PKG.parent,text=True).strip(),
+          spread_address_rule='base=((repeat+5)*211+M*73)%6144; source=(base+global_fetch_index*383)%6144; identical global source IDs for equal-M quota arms',
+          registration='54-GiB main cells register only the local shared pool per rank; remote controls register the other pool afterwards; 144-MiB legacy cells register both initially; no private payload copies',
+          source_hash=__import__('hashlib').sha256(Path(__file__).read_bytes()).hexdigest()))
     pool=Path('/dev/shm')/f'esjung_pcie_micro_{os.getpid()}'
     with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
     processes=[];logs=[]
-    try:
-        with gpu_experiment('PCIe H2D microbenchmark and pair calibration'):
+    with gpu_experiment('PCIe H2D microbenchmark and pair calibration'):
+        try:
             for rank in range(4):
                 log=(a.out/f'worker_rank{rank}.log').open('w');logs.append(log)
                 env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(GPUS[rank]),OMP_NUM_THREADS='1',NCCL_DEBUG='INFO',NCCL_DEBUG_FILE=str(a.out/f'nccl_rank{rank}.log'))
-                processes.append(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--out',str(a.out),'--rank',str(rank),'--pool',str(pool),'--port',str(port)],env=env,stdout=log,stderr=subprocess.STDOUT))
+                processes.append(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--out',str(a.out),'--rank',str(rank),'--pool',str(pool),'--port',str(port),'--source-gib',str(a.source_gib),'--source-layout',a.source_layout],env=env,stdout=log,stderr=subprocess.STDOUT))
             deadline=time.monotonic()+600
             while any(x.poll() is None for x in processes):
+                if (ROOT/'STOP').exists():raise RuntimeError('Owner STOP file observed')
+                if available_bytes()<128*2**30:raise RuntimeError('128-GiB host headroom was lost')
                 if any(x.poll() not in (None,0) for x in processes):raise RuntimeError('microbenchmark worker failed; inspect rank logs')
                 if time.monotonic()>deadline:raise TimeoutError('microbenchmark exceeded 600 seconds')
                 time.sleep(.2)
             if any(x.returncode for x in processes):raise RuntimeError('microbenchmark worker failed')
-    finally:
-        for process in processes:
-            if process.poll() is None:process.terminate()
-        for process in processes:
-            try:process.wait(timeout=10)
-            except subprocess.TimeoutExpired:process.kill();process.wait()
-        for log in logs:log.close()
-        shutil.rmtree(pool,ignore_errors=True)
+        finally:
+            # Worker cleanup must finish before the lease restores our burn.
+            for process in processes:
+                if process.poll() is None:process.terminate()
+            for process in processes:
+                try:process.wait(timeout=10)
+                except subprocess.TimeoutExpired:process.kill();process.wait()
+            for log in logs:log.close()
+            shutil.rmtree(pool,ignore_errors=True)
     summarize(a.out);write(a.out/'topology_after.json',topology())
 
 
