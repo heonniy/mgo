@@ -197,7 +197,15 @@ class DecodeOffloadRuntime(LiveRuntime):
   else:
    layer,hidden,selected,weights,probs=args
    e=self.plan_event(layer,selected,weights,probs)
-   dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
+   if self.index>=48 and getattr(self.args,'compiled_dense',False):
+    from .dense_routing import dense_decode_weights
+    shape=(hidden.shape[0],128)
+    if getattr(self,'decode_dense_scratch',None) is None or self.decode_dense_scratch.shape!=shape:
+     self.decode_dense_scratch=torch.empty(shape,device=hidden.device,dtype=weights.dtype)
+    with nvtx_phase('moe.dense_weights'):
+     dense=dense_decode_weights(selected,weights,e['targets'],self.decode_dense_scratch)
+   else:
+    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
    fused=getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False))
    overlap=getattr(self.args,'streaming',False) and self.index>=48
    if getattr(self.args,'strict_serialized_phases',False):

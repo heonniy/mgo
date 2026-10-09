@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--arm', choices=('A', 'B', 'C'), required=True)
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--diagnostic', action='store_true')
+    parser.add_argument('--compiled-dense', action='store_true')
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     args = parser.parse_args()
@@ -49,6 +50,8 @@ def main():
                '--policy', 'LA_CA_NEAR']
     if args.arm in ('B', 'C'):
         command += ['--grouped-decode-mode', 'serial_all' if args.arm == 'B' else 'two_wave']
+    if args.compiled_dense:
+        command += ['--compiled-dense']
     if args.smoke:
         command += ['--smoke']
     if args.diagnostic:
