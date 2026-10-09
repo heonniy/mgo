@@ -110,9 +110,10 @@ import time
 from collections import deque
 
 class CopyTicket:
-    def __init__(self, slot, key, tensors, urgent, profile):
+    def __init__(self, slot, key, tensors, urgent, profile, event_index=None):
         from .prefetch import TransferState
         self.slot=int(slot);self.key=int(key);self.tensors=tensors;self.valid=True
+        self.event_index=event_index
         self.state=TransferState(key)
         if urgent:self.state.demand()
         self.done=torch.cuda.Event(enable_timing=profile)
@@ -157,7 +158,7 @@ class PriorityH2DScheduler:
         if self.error is not None:raise RuntimeError('expert staging worker failed') from self.error
     def _retire_pending(self,t):
         if t.counted:self.pending-=1;t.counted=False
-    def _enqueue(self,slot,key,tensors,urgent):
+    def _enqueue(self,slot,key,tensors,urgent,event_index=None):
         with self.cv:
             self._check()
             if self.stopping:raise RuntimeError('scheduler closed')
@@ -167,7 +168,7 @@ class PriorityH2DScheduler:
                     old.state.demand();self.metrics['escalated']+=1
                     if not old.submitted:self.urgent.append(old)
                 self.cv.notify_all();return old
-            t=CopyTicket(slot,key,tensors,urgent,self.profile)
+            t=CopyTicket(slot,key,tensors,urgent,self.profile,event_index)
             if old is not None:
                 if old.submitted or old.state.state=='INFLIGHT':t.previous_copy=old.done
                 elif old.state.state=='QUEUED':
@@ -177,7 +178,7 @@ class PriorityH2DScheduler:
             t.previous_compute=self.compute_done.get(slot)
             self.tickets[slot]=t;self.pending+=1
             (self.urgent if urgent else self.background).append(t);self.cv.notify_all();return t
-    def enqueue_demand(self,slot,key,tensors):return self._enqueue(slot,key,tensors,True)
+    def enqueue_demand(self,slot,key,tensors,event_index=None):return self._enqueue(slot,key,tensors,True,event_index)
     def enqueue_prefetch(self,slot,key,tensors):return self._enqueue(slot,key,tensors,False)
     def promote(self,slot,key):
         with self.cv:

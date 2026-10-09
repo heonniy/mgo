@@ -97,7 +97,7 @@ class PrefillDiagnostics:
   totals['clock_boundary_residual']=residual
   copies=[]
   for t in self.rt.h2d.trace:
-   copies.append(dict(layer=t.key//128,key=t.key,slot=t.slot,bytes=self.rt.h2d.bytes_per_expert,service_seconds=t.begin.elapsed_time(t.done)/1000))
+   copies.append(dict(layer=t.key//128,key=t.key,slot=t.slot,event_index=getattr(t,'event_index',None),bytes=self.rt.h2d.bytes_per_expert,service_seconds=t.begin.elapsed_time(t.done)/1000))
   assert sum(x['bytes'] for x in copies)==self.rt.h2d.metrics['bytes']
   self.rt.h2d.profile=False
   for hook in self.hooks:hook.remove()

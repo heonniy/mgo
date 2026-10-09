@@ -19,12 +19,16 @@ B64_ROOT = Path('/home/hwlee/mgo-results/ep_overhead_r4_b64_20261009')
 PHYSICAL = (0, 1, 4, 5)
 CELL = 'Qwen3_ShareGPT_R4_C30_B16_L512_O64'
 B64_CELL = 'Qwen3_ShareGPT_R4_C30_B64_L512_O64'
+B8_CELL = 'Qwen3_ShareGPT_R4_C30_B8_L512_O64'
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--arm', choices=('A', 'B', 'C'), required=True)
-    parser.add_argument('--cell', choices=(CELL, B64_CELL), default=CELL)
+    parser.add_argument('--arm', choices=('A', 'B', 'C', 'N'), required=True)
+    parser.add_argument('--cell', choices=(B8_CELL, CELL, B64_CELL), default=CELL)
+    parser.add_argument('--workloads', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    parser.add_argument('--policy', choices=('BR', 'CA_NATIVE', 'LA_CA_NEAR'), default='LA_CA_NEAR')
     parser.add_argument('--runtime-root', type=Path, default=guard.PKG.parent)
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--diagnostic', action='store_true')
@@ -38,21 +42,24 @@ def main():
     assert not (args.smoke and args.diagnostic)
     assert not args.post_prefill_diagnostic or args.diagnostic
     assert not args.diagnostic or args.repeats == 1
-    workload_path = WORKLOADS if args.cell == CELL else MAIN_TABLE_WORKLOADS
-    root = ROOT if args.cell == CELL else B64_ROOT
+    workload_path = args.workloads or (WORKLOADS if args.cell == CELL else MAIN_TABLE_WORKLOADS)
+    root = args.output_root or (ROOT if args.cell == CELL else B64_ROOT)
     manifest = json.loads(workload_path.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     spec, = [row for row in manifest['cells'] if row['cell'] == args.cell]
+    expected_batch = {B8_CELL: 8, CELL: 16, B64_CELL: 64}[args.cell]
     assert (spec['local_batch'], spec['global_requests'], spec['input_tokens'],
             spec['output_tokens'], spec['cache_percent'], spec['expert_slots']) == (
-                (16, 64, 512, 64, 30, 1843) if args.cell == CELL
-                else (64, 256, 512, 64, 30, 1843))
+                expected_batch, expected_batch * 4, 512, 64, 30, 1843)
     for phase in ('warmup', 'target'):
         source = spec[phase]
         assert hashlib.sha256(Path(source['path']).read_bytes()).hexdigest() == source['sha256']
     assert guard.owner.host_available() >= 384 * 2**30
     kind = 'smoke' if args.smoke else 'diagnostic' if args.diagnostic else 'full'
-    output = root / 'jobs' / f'r4_{args.arm.lower()}_{kind}_v{args.attempt}'
+    batch_label = str(expected_batch)
+    job_name = (f'r4_{args.arm.lower()}_{args.policy.lower()}_{batch_label}_{kind}_v{args.attempt}'
+                if args.output_root else f'r4_{args.arm.lower()}_{kind}_v{args.attempt}')
+    output = root / 'jobs' / job_name
     assert not output.exists(), f'preserve previous attempt: {output}'
     output.mkdir(parents=True)
     command = [guard.PYTHON, '-u', '-m', 'torch.distributed.run', '--standalone',
@@ -60,9 +67,10 @@ def main():
                '--cell', args.cell, '--output', str(output), '--repeats', str(args.repeats),
                '--expert-executor', 'native', '--native-prefill', '--prefetch-off',
                '--prefill-optimized', '--prefill-layout-fast', '--decode-layout-fast',
-               '--policy', 'LA_CA_NEAR']
-    if args.arm in ('B', 'C'):
-        command += ['--grouped-decode-mode', 'serial_all' if args.arm == 'B' else 'two_wave']
+               '--policy', args.policy]
+    if args.arm in ('B', 'C', 'N'):
+        command += ['--grouped-decode-mode', {'B': 'serial_all', 'C': 'two_wave',
+                                             'N': 'hit_then_miss'}[args.arm]]
     if args.compiled_dense:
         command += ['--compiled-dense']
     if args.smoke:

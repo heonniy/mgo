@@ -163,7 +163,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   if not getattr(self.args,'physical_prefetch',False):return super().apply_fetches(e)
   for key,slot,victim,rep in e['fetches']:
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
-   self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
+   self.h2d.enqueue_demand(slot,key,self.experts[key],event_index=self.index);self.keys[slot]=key
  def compute(self,packet,e,layer):
   if (self.index<48 and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
   grouped=getattr(self,'grouped_executor',None)

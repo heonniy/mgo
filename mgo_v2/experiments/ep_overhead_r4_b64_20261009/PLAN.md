@@ -37,3 +37,25 @@ latency because it may overlap compute or communication. Use uninstrumented
 runs for primary TTFT
 and TPOT, and do not call the diagnostic elapsed time a primary performance
 number.
+
+## Strict hit-then-miss grouped executor follow-up
+
+On the current selected main_OURS code, keep the same frozen cell and compare
+two expert execution schedules with two uninstrumented repetitions each:
+
+- A: C++ Ready-First, individual expert GEMMs (the main_OURS default and the
+  current-code baseline above).
+- N (`new_OURS`): execute **only resident cache hits** in one grouped GEMM
+  wave; after that wave is submitted, wait for all current demand-miss H2D
+  transfers to complete and execute **all misses** in a second grouped GEMM
+  wave (`hit_then_miss`). An already-ready miss still belongs to wave two.
+  If there are no hits or misses, omit the corresponding empty wave.
+
+The previously planned B (`serial_all`) run is retained as a secondary
+reference because it started before the strict user clarification. Do not
+conflate B or the older C (`two_wave`, which admits ready misses in wave one)
+with `new_OURS`. The primary comparison is A versus N on the same code
+revision, routing, cache and workload, requiring token/cache/H2D parity.
+Use a separate diagnostic pass for each primary arm to attribute differences
+and report first/second-wave hit/miss group counts. Keep the pre/post metadata
+and index optimization comparison distinct from the A/N scheduling comparison.
