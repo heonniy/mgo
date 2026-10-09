@@ -1,3 +1,13 @@
+**OWNER R4 DECODE HOT-PATH FOLLOW-UP COMPLETE (2026-10-09).**
+Read `experiments/expert_grouping_ablation_20261009/DECODE_HOTPATH_OPTIMIZATION.md`.
+The same frozen R4/C30/local-B16/input512/output64 main_OURS A path was
+retested with compiled gate-history updates and batched layout views: exact
+tokens/cache/H2D and mean TPOT 0.499878 -> 0.494769 s/token. A Qwen-only
+opt-in `--compiled-dense` routing-weight kernel then reached 0.478078
+s/token in two exact-parity repeats. It is not the shared default and is not
+validated on DeepSeek or other cells. All eight owned model loads were
+restored. Do not read the diagnostic collective spans as pure wire time.
+
 **OWNER MAIN_OURS EXPERT GROUPING A/B/C COMPLETE (2026-10-09).**
 The owner stopped the four-system Qwen R8 comparison during DeepSpeed target
 repeat 2. Do not resume that baseline queue. Read
