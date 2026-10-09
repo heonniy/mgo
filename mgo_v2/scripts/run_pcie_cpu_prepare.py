@@ -11,14 +11,19 @@ from pcie_host import ROOT, available_bytes, write
 
 
 def main(a):
+    if a.command and a.command[0]=='--':a.command=a.command[1:]
     assert a.command
     a.out.mkdir(parents=True,exist_ok=False)
     env=dict(os.environ,CUDA_VISIBLE_DEVICES='',MGO_V2_PHYSICAL_GPUS='',
              CUDA_HOME='/data2/esjung/envs/cuda121',MAX_JOBS='4',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='2')
+    command=(['bash','-c','kill -STOP $$; exec "$@"','pcie_cpu_prepare',*a.command] if a.start_paused else a.command)
     with (a.out/'worker.log').open('w') as log:
-        proc=subprocess.Popen(a.command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+        proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         write(a.out/'status.json',dict(status='RUNNING',pid=proc.pid,argv=a.command,gpus_visible=''))
-        paused=False;events=[];started=time.monotonic()
+        paused=a.start_paused;events=[];started=time.monotonic()
+        if paused:
+            events.append(dict(action='PAUSE',unix=time.time(),reason='Start paused before importing/scanning'))
+            write(a.out/'events.json',events)
         try:
             while proc.poll() is None:
                 primary=False
@@ -59,4 +64,5 @@ def main(a):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--gpu-job',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--timeout',type=int,default=14400);p.add_argument('command',nargs=argparse.REMAINDER);main(p.parse_args())
+    p.add_argument('--timeout',type=int,default=14400);p.add_argument('--start-paused',action='store_true')
+    p.add_argument('command',nargs=argparse.REMAINDER);main(p.parse_args())
