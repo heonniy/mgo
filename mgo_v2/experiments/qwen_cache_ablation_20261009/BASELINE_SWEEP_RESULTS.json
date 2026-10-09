@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 3,
+  "completed": 4,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -12,9 +12,84 @@
   ],
   "rows": [
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "infinity",
-      "cache_percent": 20
+      "cache_percent": 20,
+      "label": "qca_baseline_c20_infinity_r3_v1",
+      "third_label": null,
+      "clean_target_repeats": 3,
+      "stability": "THREE",
+      "first_two_max_relative_difference": 0.0005208701195452176,
+      "reused_c30": false,
+      "source_commit": "5bce9ceadc728a62002dbf3e8ded2ac813a8b03a",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "e5e53725408bb7ba941b08b9457e814935dbff95299ef22926a21b09ff5eae8e",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.207145866,
+            5.176994345,
+            5.246509602
+          ],
+          "mean": 5.210216604333334,
+          "median": 5.207145866,
+          "minimum": 5.176994345,
+          "maximum": 5.246509602,
+          "stdev": 0.03485921419621878
+        },
+        "TPOT": {
+          "samples": [
+            3.1441856414920637,
+            3.142983910793651,
+            3.1380836426031746
+          ],
+          "mean": 3.141751064962963,
+          "median": 3.142983910793651,
+          "minimum": 3.1380836426031746,
+          "maximum": 3.1441856414920637,
+          "stdev": 0.0032324184818312137
+        },
+        "E2E": {
+          "samples": [
+            203.29084128,
+            203.184980725,
+            202.945779086
+          ],
+          "mean": 203.140533697,
+          "median": 203.184980725,
+          "minimum": 202.945779086,
+          "maximum": 203.29084128,
+          "stdev": 0.17677282923444376
+        }
+      },
+      "memory": {
+        "peak_expert_bytes_per_gpu": [
+          [
+            2897215488,
+            2897215488,
+            2897215488,
+            2897215488
+          ],
+          [
+            2897215488,
+            2897215488,
+            2897215488,
+            2897215488
+          ],
+          [
+            2897215488,
+            2897215488,
+            2897215488,
+            2897215488
+          ]
+        ],
+        "expert_budget_bytes_per_gpu": [
+          2897215488,
+          2897215488,
+          2897215488,
+          2897215488
+        ]
+      }
     },
     {
       "status": "PENDING",

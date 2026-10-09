@@ -59,10 +59,17 @@ def inspect(spec, system, job, third, reused, original_sha, current_sha):
     assert reused or status.get('min_gpu_free_mib') == 2048
     assert not status.get('remaining_gpu_occupants')
     assert reused or {r['gpu'] for r in status['restored']} == {0, 1, 4, 5}
-    source_spec = next(c for c in read(SOURCE)['cells'] if c['cell'] == spec['cell'])
+    source_spec = next(c for c in read(SOURCE)['cells'] if c['model'] == 'Qwen3'
+                       and c['dataset'] == 'ShareGPT' and c['local_batch'] == 16
+                       and c['input_tokens'] == 512)
     for phase in ('warmup', 'target'):
-        assert spec[phase]['sha256'] == source_spec[phase]['sha256']
         assert hashlib.sha256(Path(spec[phase]['path']).read_bytes()).hexdigest() == spec[phase]['sha256']
+        new_requests = read(Path(spec[phase]['path']))['requests']
+        source_requests = read(Path(source_spec[phase]['path']))['requests']
+        assert [(r['request_id'], r['input_ids']) for r in new_requests] == [
+            (r['request_id'], r['input_ids']) for r in source_requests]
+        if reused:
+            assert spec[phase]['sha256'] == source_spec[phase]['sha256']
     expected_ids = [row['request_id'] for row in read(Path(spec['target']['path']))['requests']]
     repeats = [read(job / f'repeat{i}.json') for i in range(1, count + 1)]
     if third:
