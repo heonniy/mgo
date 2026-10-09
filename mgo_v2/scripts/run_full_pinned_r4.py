@@ -39,7 +39,12 @@ def owned_idle(pid):
   proc=Path(f'/proc/{pid}')
   if proc.stat().st_uid!=os.getuid():return False
   args=proc.joinpath('cmdline').read_bytes().decode().split('\0')
-  return any(str(p) in args for p in (IDLE_WORKER,Path('/home/hwlee/mgo-policy-regime/mgo_v2/examples/model_inference_load.py')))
+  known_owner_workers = (
+      IDLE_WORKER,
+      Path('/home/hwlee/mgo-main-table/mgo_v2/examples/model_inference_load.py'),
+      Path('/home/hwlee/mgo-policy-regime/mgo_v2/examples/model_inference_load.py'),
+  )
+  return any(str(p) in args for p in known_owner_workers)
  except FileNotFoundError:return False
 
 def stop_target_idle():
