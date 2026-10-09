@@ -58,8 +58,22 @@ def validate_stage(root):
         for c in spec['candidates']:
             r=report['arms'][c['candidate']+'/R-NEAR']['live']['primary']['TPOT']
             g=report['arms'][c['candidate']+'/G-NEAR']['live']['primary']['TPOT']
+            token_arrays={}
+            for arm in ('R-NEAR','G-NEAR'):
+                token_arrays[arm]=np.concatenate([np.asarray(json.loads((root/c['candidate']/arm/f'repeat1_rank{rank}.json').read_text())['tokens']) for rank in range(4)])
+            same=token_arrays['R-NEAR']==token_arrays['G-NEAR'];assert same.shape==(64,64)
+            config=json.loads(Path('/data2/esjung/models/Qwen3-30B-A3B-Instruct-2507/config.json').read_text())
+            eos=config['eos_token_id'];eos=eos if isinstance(eos,list) else [eos]
+            eos_stats={}
+            for arm,array in token_arrays.items():
+                hits=np.isin(array,eos);first=[int(np.flatnonzero(row)[0])+1 if row.any() else None for row in hits]
+                eos_stats[arm]=dict(eos_token_ids=eos,requests_with_eos=int(hits.any(axis=1).sum()),
+                    total_eos_tokens=int(hits.sum()),first_eos_token_positions=first,
+                    early_stop=False,all_requests_generate_exactly64=True)
             comparisons.append(dict(candidate=c['candidate'],R=r,G=g,gain_percent=(1-g['median']/r['median'])*100,
-                    request_ids=c['request_ids'],manifest_path=c['path'],manifest_sha256=c['sha256']))
+                    request_ids=c['request_ids'],manifest_path=c['path'],manifest_sha256=c['sha256'],
+                    R_G_full_token_agreement=float(same.mean()),R_G_first_token_agreement=float(same[:,0].mean()),
+                    matching_prefix_tokens=[int(np.flatnonzero(~row)[0]) if not row.all() else 64 for row in same],eos=eos_stats))
         comparisons.sort(key=lambda c:(-c['gain_percent'],c['candidate']))
         report.update(comparisons=comparisons,best_observed=comparisons[0],
              scope='Best observed among the preregistered screened candidates; no global-optimum or corpus-average claim',
@@ -73,6 +87,7 @@ def validate_stage(root):
         best=comparisons[0]
         lines.extend(['',f"Winner token manifest: `{best['manifest_path']}`; SHA256 `{best['manifest_sha256']}`.",
              '',report['trajectory_note']+'.',
+             '', 'R/G full token agreement, matching prefixes and EOS positions are retained in maxgain_validation.json. Every request runs all 64 output steps even if EOS occurs; any resulting routing/cache differences are part of live serving evidence, not proof of a same-trace quota-only speedup.',
              '', 'Nomination and single-pair screen timing selected the finalists and do not enter the final median. All candidates and screen pairs remain reported. Finalist batches were frozen before counterordered final repetitions; selecting the largest final gain still has selection bias.',
              '',f"Request source IDs (64): {best['request_ids']}"])
         (root/'MAX_GAIN_RESULTS.md').write_text('\n'.join(lines)+'\n')
