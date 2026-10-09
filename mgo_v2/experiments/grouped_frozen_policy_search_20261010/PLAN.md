@@ -30,3 +30,9 @@ repeats or label a gain reliable when the paired ranges overlap materially.
 Static is a different placement constraint: its unequal rank fetch counts
 are expected, while its per-rank slot capacity and fixed-owner invariant
 must pass.
+
+If all eight NVSwitch cells show no positive Near mean gain, extend the
+bounded search to the four C30 seeds under the established same-host env2
+transport (`NCCL_P2P_DISABLE=1`, `NCCL_IB_DISABLE=1`). Keep every other
+condition and the two-run order unchanged. Label this transport separately;
+do not pool its timings with NVSwitch.
