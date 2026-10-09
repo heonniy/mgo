@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "system": "Ours",
+  "arm": "R-NEAR__GROUPED",
+  "cell": "R4_C30_B16_L512_O64",
+  "primary_repeats": 3,
+  "profiled": false,
+  "statistics": {
+    "TTFT": {
+      "median": 6.223324829,
+      "mean": 6.222473042333333,
+      "sd": 0.0029126629723230358,
+      "min": 6.219229446,
+      "max": 6.224864852,
+      "values": [
+        6.219229446,
+        6.223324829,
+        6.224864852
+      ]
+    },
+    "TPOT": {
+      "median": 1.4811041466349206,
+      "mean": 1.4814228097936508,
+      "sd": 0.0050333422652755365,
+      "min": 1.4765563703174602,
+      "max": 1.4866079124285714,
+      "values": [
+        1.4866079124285714,
+        1.4765563703174602,
+        1.4811041466349206
+      ]
+    },
+    "E2E": {
+      "median": 99.53442609,
+      "mean": 99.55211005933334,
+      "sd": 0.31494845530986837,
+      "min": 99.246376159,
+      "max": 99.875527929,
+      "values": [
+        99.875527929,
+        99.246376159,
+        99.53442609
+      ]
+    },
+    "throughput": {
+      "median": 41.15159107157916,
+      "mean": 41.14455556008428,
+      "sd": 0.13013322041993117,
+      "min": 41.01104729991299,
+      "max": 41.271028308760684,
+      "values": [
+        41.01104729991299,
+        41.271028308760684,
+        41.15159107157916
+      ]
+    }
+  },
+  "schedule": [
+    [
+      "R-NEAR__NATIVE",
+      "G-NEAR__NATIVE",
+      "R-NEAR__GROUPED",
+      "G-NEAR__GROUPED",
+      "R-NEAR__GROUPED_META",
+      "G-NEAR__GROUPED_META"
+    ],
+    [
+      "G-NEAR__GROUPED_META",
+      "R-NEAR__GROUPED_META",
+      "G-NEAR__GROUPED",
+      "R-NEAR__GROUPED",
+      "G-NEAR__NATIVE",
+      "R-NEAR__NATIVE"
+    ],
+    [
+      "R-NEAR__NATIVE",
+      "G-NEAR__NATIVE",
+      "R-NEAR__GROUPED",
+      "G-NEAR__GROUPED",
+      "R-NEAR__GROUPED_META",
+      "G-NEAR__GROUPED_META"
+    ]
+  ],
+  "source": "numa_shared_full_pinned",
+  "controller": "native C++"
+}
