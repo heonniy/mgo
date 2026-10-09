@@ -1,0 +1,196 @@
+{
+  "status": "PASS",
+  "scope": "First eight decode steps, fixed continuation and frozen router; instrumented diagnostic only",
+  "fixed_continuation_sha256": "f6614fca1fbc1501fb39002fad57475d3ba8a8a9941e0562f2724e6c34fd6942",
+  "route_sha256_per_rank": [
+    "130f72517ea5e47dd877b77d9302d0de655f2315c13e9db03c18fb3d5b44cb9a",
+    "741f9af8df657ef2a330f4515cbfd2cbeeab09d516b13d99452cc1163c4654c9",
+    "4efac8769ff163ff0899adb60e98de893066ae16ecc7f9c81309d6ce69ccc515",
+    "0f29858783c55eed335c6ed92a84858c3617d8924cbc97ebd4719549cfd7f0ce"
+  ],
+  "cases": {
+    "20": {
+      "label": "dca_d3_fixedroute_c20_sample8_v1",
+      "source_commit": "e2b82ccc7b9ebd19d4a47fd9a751eba9e533cf28",
+      "diagnostic_tpot_s_per_token": 0.28988847119047617,
+      "diagnostic_overhead_vs_clean_median_percent": 0.6175636622808067,
+      "sampled_step_layer_pairs": 208,
+      "summary": {
+        "max_rank_metadata_host_ms": {
+          "median": 1.3980625,
+          "p95": 3.220402
+        },
+        "max_rank_metadata_recv_to_host_wait_ms": {
+          "median": 0.9177424999999999,
+          "p95": 1.58556
+        },
+        "max_rank_controller_host_ms": {
+          "median": 0.08459749999999999,
+          "p95": 0.09921
+        },
+        "max_rank_layout_host_ms": {
+          "median": 0.28419249999999996,
+          "p95": 0.315636
+        },
+        "max_rank_h2d_enqueue_host_ms": {
+          "median": 0.2714995,
+          "p95": 0.346358
+        },
+        "max_rank_dense_submit_host_ms": {
+          "median": 0.8654310000000001,
+          "p95": 0.954599
+        },
+        "max_rank_dispatch_cuda_ms": {
+          "median": 1.219327986240387,
+          "p95": 1.4275840520858765
+        },
+        "max_rank_expert_cuda_ms": {
+          "median": 3.5576000213623047,
+          "p95": 5.238719940185547
+        },
+        "max_rank_return_combine_cuda_ms": {
+          "median": 2.973919987678528,
+          "p95": 4.70579195022583
+        },
+        "max_rank_dispatch_to_combine_cuda_ms": {
+          "median": 7.478672027587891,
+          "p95": 8.787839889526367
+        },
+        "max_rank_explicit_h2d_wait_cuda_ms": {
+          "median": 0.0,
+          "p95": 0.10707199946045876
+        },
+        "max_rank_executor_host_ms": {
+          "median": 3.596007,
+          "p95": 5.244872
+        },
+        "max_rank_ready_query_host_ms": {
+          "median": 0.06965099999999999,
+          "p95": 0.08478
+        },
+        "max_rank_native_wave_host_ms": {
+          "median": 3.3639395,
+          "p95": 5.043506
+        },
+        "dispatch_submit_ns_skew_ms": {
+          "median": 0.24369449999999998,
+          "p95": 0.421131
+        },
+        "return_submit_ns_skew_ms": {
+          "median": 0.617528,
+          "p95": 2.540424
+        },
+        "max_min_expert_token_row_ratio": {
+          "median": 1.0210526315789474,
+          "p95": 1.065217391304348
+        }
+      },
+      "max_ep_interval_rank_frequency": {
+        "1": 61,
+        "0": 11,
+        "2": 104,
+        "3": 32
+      },
+      "last_return_host_submit_rank_frequency": {
+        "1": 58,
+        "0": 14,
+        "2": 105,
+        "3": 31
+      },
+      "sampled_fetches": 10386,
+      "sampled_waves": 3015
+    },
+    "50": {
+      "label": "dca_d3_fixedroute_c50_sample8_v1",
+      "source_commit": "e2b82ccc7b9ebd19d4a47fd9a751eba9e533cf28",
+      "diagnostic_tpot_s_per_token": 0.28083708512698413,
+      "diagnostic_overhead_vs_clean_median_percent": 0.3172310580692228,
+      "sampled_step_layer_pairs": 208,
+      "summary": {
+        "max_rank_metadata_host_ms": {
+          "median": 1.7190615,
+          "p95": 3.688025
+        },
+        "max_rank_metadata_recv_to_host_wait_ms": {
+          "median": 1.250751,
+          "p95": 1.561293
+        },
+        "max_rank_controller_host_ms": {
+          "median": 0.0852495,
+          "p95": 0.103082
+        },
+        "max_rank_layout_host_ms": {
+          "median": 0.2868155,
+          "p95": 0.308841
+        },
+        "max_rank_h2d_enqueue_host_ms": {
+          "median": 0.153845,
+          "p95": 0.254745
+        },
+        "max_rank_dense_submit_host_ms": {
+          "median": 0.8481025,
+          "p95": 0.999216
+        },
+        "max_rank_dispatch_cuda_ms": {
+          "median": 1.0529919862747192,
+          "p95": 1.2247040271759033
+        },
+        "max_rank_expert_cuda_ms": {
+          "median": 3.4703680276870728,
+          "p95": 5.220672130584717
+        },
+        "max_rank_return_combine_cuda_ms": {
+          "median": 3.2494559288024902,
+          "p95": 5.007808208465576
+        },
+        "max_rank_dispatch_to_combine_cuda_ms": {
+          "median": 7.2455198764801025,
+          "p95": 8.77667236328125
+        },
+        "max_rank_explicit_h2d_wait_cuda_ms": {
+          "median": 0.0,
+          "p95": 0
+        },
+        "max_rank_executor_host_ms": {
+          "median": 3.496494,
+          "p95": 5.291094
+        },
+        "max_rank_ready_query_host_ms": {
+          "median": 0.04786,
+          "p95": 0.058515
+        },
+        "max_rank_native_wave_host_ms": {
+          "median": 3.3334070000000002,
+          "p95": 5.10681
+        },
+        "dispatch_submit_ns_skew_ms": {
+          "median": 0.2074095,
+          "p95": 0.417523
+        },
+        "return_submit_ns_skew_ms": {
+          "median": 0.862881,
+          "p95": 2.683756
+        },
+        "max_min_expert_token_row_ratio": {
+          "median": 1.053191489361702,
+          "p95": 1.2738095238095237
+        }
+      },
+      "max_ep_interval_rank_frequency": {
+        "3": 25,
+        "2": 81,
+        "1": 58,
+        "0": 44
+      },
+      "last_return_host_submit_rank_frequency": {
+        "3": 23,
+        "2": 76,
+        "1": 59,
+        "0": 50
+      },
+      "sampled_fetches": 6413,
+      "sampled_waves": 1675
+    }
+  },
+  "interpretation_limit": "Per-phase max ranks may differ; CUDA intervals include host gaps/peer waits; receive-to-host wait can include NCCL completion; host submission skew is not GPU arrival skew."
+}
