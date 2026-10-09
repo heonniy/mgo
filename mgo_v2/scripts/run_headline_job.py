@@ -70,6 +70,9 @@ def main(a):
   if a.full_resident:
    assert a.worker=='headline_ours_deepseek_worker.py' and a.route_mode=='replay'
    command+=['--full-resident']
+  if a.overlap_sequence:
+   assert a.worker=='headline_ours_deepseek_worker.py' and a.route_mode=='replay' and not a.full_resident
+   command+=['--overlap-sequence',a.overlap_sequence]
   if a.expert_executor is not None:
    assert a.worker=='headline_ours_worker.py';command+=['--expert-executor',a.expert_executor]
   if a.native_prefill:
@@ -159,6 +162,7 @@ if __name__=='__main__':
  p.add_argument('--route-mode',choices=('none','capture','replay'),default='none')
  p.add_argument('--route-dir')
  p.add_argument('--full-resident',action='store_true')
+ p.add_argument('--overlap-sequence')
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
  p.add_argument('--llama-cuda-graphs',choices=('on','off'))
  p.add_argument('--llama-graph-reuse',choices=('on','off'))

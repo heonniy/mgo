@@ -27,11 +27,21 @@ class DeepseekNativeExpertExecutor:
         self.native = load_native_expert()
         self.max_experts = max_experts
         self.waves = self.groups = self.waits = 0
+        self.serial_wait_wall_ns = self.serial_waited_copies = 0
 
     def compute(self, rt, packet, event, layer):
         mode, received, _, weights = packet
         assert mode == 'current'
         groups = event['groups']
+        if getattr(rt, 'h2d_serial_ablation', False) and rt.index >= 26:
+            assert not getattr(rt, 'full_resident', False)
+            fetch_slots = [slot for rank, _, slot, _, _ in event['fetches']
+                           if rank == rt.rank]
+            if fetch_slots:
+                started_ns = time.perf_counter_ns()
+                rt.h2d.wait_slots(fetch_slots, host=True)
+                self.serial_wait_wall_ns += time.perf_counter_ns() - started_ns
+                self.serial_waited_copies += len(fetch_slots)
         pending = list(range(len(groups)))
         parts = [None] * len(groups)
         before_wait = 0

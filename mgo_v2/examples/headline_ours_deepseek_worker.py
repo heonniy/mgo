@@ -164,6 +164,7 @@ class DeepSeekRuntime:
         self.route_replay = None
         self.route_sha256 = None
         self.full_resident = False
+        self.h2d_serial_ablation = False
         self.reset()
 
     def reset(self):
@@ -288,6 +289,7 @@ class DeepSeekRuntime:
         event['groups'] = [(expert, rows, cols, slot)
                            for (expert, rows, cols), slot in zip(event['groups'], slots)]
         event = pack_rank_partial_layout(event)
+        event['fetches'] = fetches
         if diagnostic:
             now_ns = time.perf_counter_ns()
             detail['layout_host_ms'] = (now_ns - segment_started_ns) / 1e6
@@ -407,7 +409,9 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
                 after_prefill_counters = (
                     runtime.h2d.metrics['bytes'], runtime.native_executor.groups,
                     runtime.native_executor.waves, runtime.native_executor.waits,
-                    runtime.transport.forward_bytes, runtime.transport.return_bytes)
+                    runtime.transport.forward_bytes, runtime.transport.return_bytes,
+                    runtime.native_executor.serial_wait_wall_ns,
+                    runtime.native_executor.serial_waited_copies)
             if runtime.diag:
                 diagnostic_events.append({name: pairs[:] for name, pairs in
                                           runtime.diag_spans.items()})
@@ -459,7 +463,11 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
         decode_expert_waves=runtime.native_executor.waves - after_prefill_counters[2],
         decode_expert_wait_calls=runtime.native_executor.waits - after_prefill_counters[3],
         decode_dispatch_bytes=runtime.transport.forward_bytes - after_prefill_counters[4],
-        decode_return_bytes=runtime.transport.return_bytes - after_prefill_counters[5])
+        decode_return_bytes=runtime.transport.return_bytes - after_prefill_counters[5],
+        decode_serial_wait_wall_ns=(runtime.native_executor.serial_wait_wall_ns -
+                                    after_prefill_counters[6]),
+        decode_serial_waited_copies=(runtime.native_executor.serial_waited_copies -
+                                     after_prefill_counters[7]))
     if fixed_tokens is not None:
         result['fixed_continuation'] = True
         result['fed_token_hash'] = hashlib.sha256(
@@ -493,6 +501,11 @@ def main(args):
     spec = next(x for x in json.loads(manifest.read_text())['cells'] if x['cell'] == args.cell)
     assert spec['model'] == 'DeepSeekV2Lite' and spec['model_path'] == str(MODEL)
     assert args.route_mode == 'none' or (args.fixed_continuation and args.route_dir)
+    overlap_modes = args.overlap_sequence.split(',') if args.overlap_sequence else None
+    if overlap_modes is not None:
+        assert args.route_mode == 'replay' and not args.full_resident and not args.smoke
+        assert len(overlap_modes) == args.repeats
+        assert all(mode in ('normal', 'serial') for mode in overlap_modes)
     fixed_manifest = None
     fixed_sha256 = None
     if args.fixed_continuation:
@@ -549,6 +562,8 @@ def main(args):
             runtime.reset()
         runtime.route_mode = args.route_mode if repeat else 'none'
         runtime.route_capture = []
+        runtime.h2d_serial_ablation = (repeat > 0 and overlap_modes is not None and
+                                       overlap_modes[repeat - 1] == 'serial')
         assert np.all(runtime.keys < 0)
         if args.full_resident:
             preload_full_resident(runtime)
@@ -574,6 +589,7 @@ def main(args):
                       prefetch_off=True,
                       cache_start='full_resident' if args.full_resident else 'empty',
                       full_resident_reference=args.full_resident,
+                      h2d_serial_ablation=runtime.h2d_serial_ablation,
                       cache_capacity_slots=runtime.cap,
                       physical_cache_slots=runtime.cache.shape[0],
                       peak_allocated_bytes=torch.cuda.max_memory_allocated(),
@@ -609,7 +625,8 @@ def main(args):
                                                 headline_eligible=(not args.smoke and
                                                                    args.route_mode == 'none' and
                                                                    not args.fixed_continuation and
-                                                                   not args.full_resident)))
+                                                                   not args.full_resident and
+                                                                   not args.overlap_sequence)))
     dist.barrier()
     dist.destroy_process_group()
 
@@ -625,4 +642,5 @@ if __name__ == '__main__':
                         default='none')
     parser.add_argument('--route-dir')
     parser.add_argument('--full-resident', action='store_true')
+    parser.add_argument('--overlap-sequence')
     main(parser.parse_args())
