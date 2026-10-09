@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "source_path": "/data2/esjung/datasets/ShareGPT_Vicuna_unfiltered/ShareGPT_V3_unfiltered_cleaned_split.json",
+  "source_sha256": "35f0e213ce091ed9b9af2a1f0755e9d39f9ccec34ab281cd4ca60d70f6479ba4",
+  "model": "/data2/esjung/models/Qwen3-30B-A3B-Instruct-2507",
+  "selection": "WHOLE corpus census: first user-ending conversation prefix >=512 Qwen chat-template tokens per source row, retain last512; no padding or duplication",
+  "scanned_source_rows": 94145,
+  "eligible_conversations": 67333,
+  "unique_token_prefixes": 51889,
+  "duplicate_token_prefixes": 15444,
+  "distinct_conversation_families": 27917,
+  "sample_unit": "A distinct source-row request; split conversation families are recorded separately",
+  "scanned_user_prefixes": 187170,
+  "input_tokens": 512,
+  "token_dtype": "little-endian uint32",
+  "tokens_shape": [
+    67333,
+    512
+  ],
+  "original_token_min": 512,
+  "original_token_max": 221051,
+  "original_token_mean": 835.1119510492626,
+  "legacy_manifest_first_prefix_matches": 128,
+  "legacy_first_prefix_mismatches": [],
+  "warmup_exclusion": "Candidate selection must exclude frozen warmup source rows and exact token prefixes",
+  "source_identity_only": true,
+  "no_timing_selection_yet": true,
+  "cuda_initialized": false,
+  "wall_seconds": 278.4966160301119,
+  "model_revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+  "conda_prefix": "/data2/esjung/envs/mgo-pcie",
+  "tokenizer_assets": {
+    "config.json": "a1ee086a68d0cbfc87316da00ba4b8507bd1292978108e2496201a30a450f438",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "a62ff0a2472a0fa1b8eaabcb57c59b58afa42a22831dc141400b6e0cf2b65ce3"
+  },
+  "artifacts": {
+    "tokens.uint32": {
+      "bytes": 137897984,
+      "sha256": "8dd618389d53fd02b59a1797187d149e2f5898614aaf94c8f62850a7b0f83c27"
+    },
+    "requests.jsonl": {
+      "bytes": 17669851,
+      "sha256": "4edeb98e1ef86a0d753c0a1f474cd34f202b27ae62b9a19009cad290ec20381a"
+    }
+  }
+}
