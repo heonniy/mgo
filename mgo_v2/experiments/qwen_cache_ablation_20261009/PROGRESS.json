@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 2,
+  "completed": 3,
   "total": 4,
   "clean_target_repeats": 3,
   "source_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
@@ -263,7 +263,107 @@
       "attempts": [
         "qca_c40_b16_ours_r3_v1"
       ],
-      "status": "RUNNING"
+      "status": "PASS",
+      "selected_attempt": "qca_c40_b16_ours_r3_v1",
+      "source_commit": "f4305b35a973635a53746af785999afa838389e5",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            4.236241331,
+            1.760939537,
+            2.015964131
+          ],
+          "median": 2.015964131,
+          "minimum": 1.760939537,
+          "maximum": 4.236241331,
+          "mean": 2.6710483330000003,
+          "stdev": 1.361481261945014
+        },
+        "TPOT": {
+          "samples": [
+            0.537894732984127,
+            0.5881089694603174,
+            0.5266148943650794
+          ],
+          "median": 0.537894732984127,
+          "minimum": 0.5266148943650794,
+          "maximum": 0.5881089694603174,
+          "mean": 0.5508728656031746,
+          "stdev": 0.03273689451769799
+        },
+        "E2E": {
+          "samples": [
+            38.123609509,
+            38.811804613,
+            35.192702476
+          ],
+          "median": 38.123609509,
+          "minimum": 35.192702476,
+          "maximum": 38.811804613,
+          "mean": 37.376038866,
+          "stdev": 1.9218796708472834
+        }
+      },
+      "h2d_bytes_by_rank": [
+        {
+          "samples": [
+            345221627904,
+            345221627904,
+            345221627904
+          ],
+          "median": 345221627904,
+          "minimum": 345221627904,
+          "maximum": 345221627904,
+          "mean": 345221627904,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            338294734848,
+            338294734848,
+            338294734848
+          ],
+          "median": 338294734848,
+          "minimum": 338294734848,
+          "maximum": 338294734848,
+          "mean": 338294734848,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            330971480064,
+            330971480064,
+            330971480064
+          ],
+          "median": 330971480064,
+          "minimum": 330971480064,
+          "maximum": 330971480064,
+          "mean": 330971480064,
+          "stdev": 0.0
+        },
+        {
+          "samples": [
+            323846406144,
+            323846406144,
+            323846406144
+          ],
+          "median": 323846406144,
+          "minimum": 323846406144,
+          "maximum": 323846406144,
+          "mean": 323846406144,
+          "stdev": 0.0
+        }
+      ],
+      "sampled_peak_hbm_mib_by_physical_gpu": {
+        "0": 17281,
+        "1": 17309,
+        "4": 17313,
+        "5": 17073
+      },
+      "min_host_available_bytes": 1477202231296,
+      "full_output_agreement_1_2": 64,
+      "full_output_agreement_1_3": 64,
+      "full_output_agreement_2_3": 64
     },
     {
       "cell": "Qwen3_ShareGPT_R4_C50_B16_L512_O64",
@@ -291,6 +391,20 @@
       "same_full_output_requests": 23,
       "same_first_token_requests": 64,
       "same_token_positions": 2735
+    },
+    {
+      "left_cache_percent": 20,
+      "right_cache_percent": 40,
+      "same_full_output_requests": 31,
+      "same_first_token_requests": 64,
+      "same_token_positions": 3001
+    },
+    {
+      "left_cache_percent": 30,
+      "right_cache_percent": 40,
+      "same_full_output_requests": 26,
+      "same_first_token_requests": 64,
+      "same_token_positions": 2792
     }
   ]
 }
