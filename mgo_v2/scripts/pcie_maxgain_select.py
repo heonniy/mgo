@@ -34,13 +34,15 @@ def main(a):
     a.out.mkdir(parents=True,exist_ok=False)
     rows=[]
     if a.stage=='nomination':
+        import mgo_v2  # Initialize the runtime package before its policy adapter.
         from env_offload_policy import Policy
         assert cohort['search_stage']=='nomination'
         for candidate in spec['candidates']:
             path=a.root/candidate['candidate']/'G-NEAR';actual,ranks=verify_generation(path,1,16)
             capture=path/'current_routing.npz';receipt=json.loads(Path(str(capture)+'.json').read_text())
             assert sha(capture)==receipt['sha256']
-            with np.load(capture) as raw:
+            with np.load(capture) as stream:
+                raw={name:stream[name] for name in stream.files}
                 assert np.array_equal(raw['events'],np.arange(768))
                 summaries={}
                 for arm,mode in (('R-NEAR','rank_order'),('G-NEAR','group_balanced')):
@@ -52,8 +54,7 @@ def main(a):
                     trace=p.native_pcie.trace();assert trace.shape==actual.shape
                     if arm=='G-NEAR':
                         np.testing.assert_array_equal(actual,trace)
-                        from headline_ours_worker import array_hash
-                        assert array_hash(p.slots)==ranks[0]['validation']['state_hash']
+                        assert hashlib.sha256(np.ascontiguousarray(p.slots).tobytes()).hexdigest()==ranks[0]['validation']['state_hash']
                     np.save(a.out/(candidate['candidate']+'__'+arm+'.npy'),trace)
                     counts=trace[48:,48:52].astype(np.int64);critical=counts.reshape(-1,2,2).sum(axis=2).max(axis=1)
                     summaries[arm]=dict(critical_group_fetch_sum=int(critical.sum()),total_fetches=int(counts.sum()),

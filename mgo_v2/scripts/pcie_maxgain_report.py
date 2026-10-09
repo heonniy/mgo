@@ -76,6 +76,21 @@ def validate_stage(root):
              '', 'Nomination and single-pair screen timing selected the finalists and do not enter the final median. All candidates and screen pairs remain reported. Finalist batches were frozen before counterordered final repetitions; selecting the largest final gain still has selection bias.',
              '',f"Request source IDs (64): {best['request_ids']}"])
         (root/'MAX_GAIN_RESULTS.md').write_text('\n'.join(lines)+'\n')
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig,ax=plt.subplots(figsize=(8,4.5),constrained_layout=True)
+        x=np.arange(len(comparisons));width=.34
+        for j,(arm,color) in enumerate((('R','#0072B2'),('G','#D55E00'))):
+            values=[c[arm] for c in comparisons];med=np.array([v['median'] for v in values])
+            ax.bar(x+(j-.5)*width,med,width,label=arm+'-NEAR',color=color)
+            ax.errorbar(x+(j-.5)*width,med,yerr=np.array([[v['median']-v['min'] for v in values],
+                 [v['max']-v['median'] for v in values]]),fmt='none',ecolor='#333333',capsize=3)
+        ax.set_xticks(x,[c['candidate']+'\n'+f"{c['gain_percent']:.2f}% reduction" for c in comparisons])
+        ax.set_ylabel('Unprofiled median TPOT (s/token)');ax.set_ylim(bottom=0);ax.legend()
+        ax.spines[['top','right']].set_visible(False);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
+        ax.set_title('Best observed real ShareGPT batches of 64\nFinal repetitions; bars show min–max range')
+        fig.savefig(root/'maxgain64.pdf');fig.savefig(root/'maxgain64.png',dpi=160);plt.close(fig)
     write(root/'maxgain_validation.json',report);return report
 
 
