@@ -42,7 +42,10 @@ def main(a):
  if grouped_stage2:arms=['R-NEAR','G-NEAR','G-BR','G-CA','G-NUMA-CA','R-BR','R-CA']
  paths={arm:cohort/arm for arm in arms}
  for path in paths.values():path.mkdir(exist_ok=True)
- costs=np.asarray(json.loads((PKG/'experiments/pcie_topology_ablation_20261009/microbench_physical_cores/peer_costs.json').read_text())['matrix'],np.int64)
+ costs_path=PKG/'experiments/pcie_topology_ablation_20261009/microbench_physical_cores/peer_costs.json'
+ costs_payload=costs_path.read_bytes();costs=np.asarray(json.loads(costs_payload)['matrix'],np.int64)
+ if grouped_stage2 and rank==0:
+  write(cohort/'peer_costs_frozen.json',dict(path=str(costs_path),sha256=hashlib.sha256(costs_payload).hexdigest(),matrix=costs.tolist(),source='Measured peer transport; frozen before all warmups and primaries'))
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts)
  grouped=GroupedDecode(rt) if optimized else None
  assert sum(a.capacities)+4*a.arena_budget==1843 and a.arena_budget==2
@@ -129,6 +132,7 @@ def main(a):
    write(a.output/f'metadata_repeat{repeat}_rank{rank}.json',dict(status='PASS',wire_checks=rt.metadata.wire_checks,calls=rt.metadata.calls,engine='C++ history and histogram; fused GPU wire pack'))
   result.update(arm=arm,policy=a.policy,quota_mode=a.pcie_quota_mode,rank=rank,physical_gpu=[0,1,4,5][rank],repeat=repeat,phase=phase,
                 system='Ours',smoke=False,profiled=diagnostic,expert_executor='grouped_decode_native_prefill' if grouped and grouped.enabled else 'native',expert_cache_start='empty',native_prefill=True,prefetch_off=True,
+                metadata='native C++' if isinstance(rt.metadata,NativeLiveMetadata) else 'Python history/histogram',
                 pcie_native_controller=True,pcie_g2g_first_serial=True,debug_plan_checks=rt.debug_plan_checks,validation=state,cache_before=empty,
                 no_compile=before==dict(counters['stats']),peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),
                 triton_no_compile=jit_before==jit_after,triton_specializations_before={k:len(v) for k,v in jit_before.items()},
