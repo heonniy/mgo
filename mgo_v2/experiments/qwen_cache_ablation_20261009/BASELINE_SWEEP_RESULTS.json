@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 8,
+  "completed": 9,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -593,9 +593,62 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "llama",
-      "cache_percent": 40
+      "cache_percent": 40,
+      "label": "qca_baseline_c40_llama_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.0006499007003008619,
+      "reused_c30": false,
+      "source_commit": "d856187ea59671778aa123fd55e04ea8e0a5e4eb",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "c2f82c4eab4f15f445a50bd7e57a27c900543c159cd5536c6e96637fb6c6d4af",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            129.470450737,
+            129.580045656
+          ],
+          "mean": 129.5252481965,
+          "median": 129.5252481965,
+          "minimum": 129.470450737,
+          "maximum": 129.580045656,
+          "stdev": 0.07749531040850238
+        },
+        "TPOT": {
+          "samples": [
+            0.43558656863492057,
+            0.4354661830952381
+          ],
+          "mean": 0.43552637586507936,
+          "median": 0.43552637586507936,
+          "minimum": 0.4354661830952381,
+          "maximum": 0.43558656863492057,
+          "stdev": 8.512543146627393e-05
+        },
+        "E2E": {
+          "samples": [
+            156.912404561,
+            157.014415191
+          ],
+          "mean": 156.96340987600001,
+          "median": 156.96340987600001,
+          "minimum": 156.912404561,
+          "maximum": 157.014415191,
+          "stdev": 0.07213240822612857
+        }
+      },
+      "memory": {
+        "resident_expert_bytes_per_gpu": [
+          4831838208,
+          4831838208,
+          4831838208,
+          4831838208
+        ],
+        "expert_budget_bytes_global": 23187161088
+      }
     },
     {
       "status": "PENDING",
