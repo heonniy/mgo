@@ -1,3 +1,30 @@
+**OWNER QWEN R2/R8 MAIN TABLE COMPLETE (2026-10-10).**
+Read `experiments/qwen_r2_r8_main_table_20261010/{PLAN.md,RESULTS.md,INFINITY_STALL.md}`.
+ShareGPT Qwen3/input512/output64/C30/local-B16 was measured on R2 GPUs0/1
+and R8 GPUs0–7 for main_OURS, DeepSpeed, repaired MoE-Infinity, and
+synchronous balanced llama.cpp. Two unfiltered target repeats per cell
+passed; R2 main_OURS added exactly one third target because its first-pair
+E2E differed by 3.35%, and reports the median. R8 main_OURS E2E differed by
+7.06% and is marked unstable, with no open-ended repeats. R8 MoE-Infinity
+native wait stalled when target speculative admission was enabled; both
+rank counts use unchanged C30/EAM eviction priorities with speculative
+transfer admission disabled. The final spec-off full jobs passed, with zero
+admitted candidates. Raw receipts are in `/home/hwlee/mgo-results/` and only
+provenance-backed summaries are committed. The managed inference loads on
+GPUs2/3/6/7 remain stopped; R2 jobs also pause/restore managed loads on
+0/1/4/5 to keep the host quiet.
+
+**OWNER QUIET R4 POLICY CONTROL COMPLETE (2026-10-10).**
+Read `experiments/main_ours_static_placement_20261010/QUIET_PAIR.md`.
+With owned model loads on GPUs2/3/6/7 stopped, the same frozen R4/C30/B8/
+input128/decode32/P2P-disabled route was replayed under grouped new_OURS
+BR/Near/Static and Ready-First main_OURS BR/Near/Static/seeded-random.
+Near regressed grouped TPOT by 0.58% but improved Ready-First TPOT by 1.90%
+versus BR. Random's first attempt used a different Near-captured route and
+is excluded; the BR-captured rerun has exact rank route hashes and tokens.
+The earlier separately confirmed 18-cell Static extension has only its
+first three cases complete and remains queued after the R2/R8 table.
+
 **OWNER R4 NEW_OURS CACHE SWEEP COMPLETE (2026-10-10).**
 Read `experiments/grouped_cache_ablation_20261010/{PLAN.md,RESULTS.md}`.
 On frozen Qwen ShareGPT R4/local-B16/input512/output64, physical GPUs

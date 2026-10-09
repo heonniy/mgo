@@ -1,6 +1,7 @@
 """Summarize complete, unfiltered R2/R8 Qwen main-table receipts."""
 
 import json
+import hashlib
 from pathlib import Path
 import statistics
 
@@ -32,6 +33,14 @@ def job(root, system, repeats, after=0):
 
 def read_row(world, system):
     root = ROOTS[world]
+    manifest_path = root / 'WORKLOADS.json'
+    manifest = json.loads(manifest_path.read_text())
+    cell = manifest['cells'][0]
+    assert manifest['status'] == 'FROZEN'
+    assert cell['global_requests'] == world * 16
+    assert cell['input_tokens'] == 512 and cell['output_tokens'] == 64
+    assert cell['cache_percent'] == 30
+    assert sum(cell['expert_slots_per_rank']) == 1843
     path = job(root, system, 2)
     status = json.loads((path / 'status.json').read_text())
     result = json.loads((path / 'result.json').read_text())
@@ -39,6 +48,7 @@ def read_row(world, system):
     assert result.get('headline_eligible', True)
     assert status['physical_gpus'] == ([0, 1] if world == 2 else list(range(8)))
     assert status['repeats'] == 2 and status['quiet_2367']
+    assert status['workload_sha256'] == hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     assert len(list(path.glob('repeat[1-9].json'))) == 2
     samples = [json.loads((path / f'repeat{i}.json').read_text()) for i in (1, 2)]
     assert all(row['status'] == 'PASS' and row['output_tokens'] == 64
@@ -77,6 +87,36 @@ def read_row(world, system):
         assert extra_row['global_requests'] == world * 16
         samples.append(extra_row)
         paths.append(extra)
+    for source in paths:
+        source_status = json.loads((source / 'status.json').read_text())
+        for repeat in range(1, source_status['repeats'] + 1):
+            if system == 'ours':
+                for rank in range(world):
+                    receipt = json.loads((source / f'repeat{repeat}_rank{rank}.json').read_text())
+                    assert receipt['expert_executor'] == 'native'
+                    assert receipt['policy'] == 'LA_CA_NEAR'
+                    assert receipt['prefetch_off'] and receipt['native_prefill']
+                    assert receipt['prefill_layout_fast'] and receipt['decode_layout_fast']
+                    assert receipt['grouped_decode_mode'] == 'off'
+                    assert receipt['expert_cache_start'] == 'empty'
+                    assert receipt['no_compile'] and receipt['validation']['status'] == 'PASS'
+                    assert receipt['validation']['controller']['issued'] == 0
+                    assert receipt['validation']['physical_slots'] == 1843
+                    assert receipt['validation']['main_slots'] == 1843 - 2 * world
+            elif system == 'deepspeed':
+                for rank in range(world):
+                    receipt = json.loads((source / f'repeat{repeat}_rank{rank}.json').read_text())
+                    assert receipt['rank'] == rank
+                    assert receipt['all_parameter_peak_bytes'] <= receipt['parameter_budget_bytes']
+                    assert receipt['kv_gpu_resident'] and receipt['finite_logits']
+            elif system == 'infinity':
+                receipt = json.loads((source / f'repeat{repeat}.json').read_text())
+                assert receipt['eam_candidates'] == 0 and receipt['kv_released']
+                assert receipt['cache_after']['peak_accounted_bytes'] <= sum(receipt['expert_budget_per_gpu'])
+            else:
+                config = json.loads((source / 'config.json').read_text())
+                assert config['expert_resident_bytes'] <= config['expert_budget_bytes']
+                assert config['synchronous_batch'] and config['cuda_graphs_runtime'] == 'off'
     metrics = {}
     for metric in METRICS:
         values = [(world * 16 * 64 / float(row['E2E'])) if metric == 'throughput'
@@ -97,7 +137,9 @@ def read_row(world, system):
 
 def fmt(row, key):
     metric = row['metrics'][key]
-    return f"{metric['reported']:.3f} [{metric['minimum']:.3f}, {metric['maximum']:.3f}]"
+    places = 4 if key == 'TPOT' else 3
+    return (f"{metric['reported']:.{places}f} "
+            f"[{metric['minimum']:.{places}f}, {metric['maximum']:.{places}f}]")
 
 
 def main():
@@ -127,11 +169,17 @@ def main():
             lines.append(f"| {world} | {row['system']} | {fmt(row, 'TTFT')} | "
                          f"{fmt(row, 'TPOT')} | {fmt(row, 'E2E')} | "
                          f"{fmt(row, 'throughput')} | {quality} |")
-    lines += ['', 'All target repeats are shown without outlier selection. '
+    lines += ['', 'All target repeats are preserved without outlier selection '
+              'in [RESULTS.json](RESULTS.json). '
               'The quality flag uses the relative difference of the first two '
               'TPOT and E2E values; '
               'TTFT variability is visible separately in its range. Raw paths, '
-              'source commits, and workload hashes are in [RESULTS.json](RESULTS.json).', '']
+              'source commits, and workload hashes are in the same JSON file.', '',
+              'main_OURS has the lowest E2E in both rank counts. At R2, '
+              'llama.cpp has the lowest TPOT but its approximately 74-second '
+              'TTFT makes its E2E longer than main_OURS. At R8, main_OURS '
+              'has the lowest TPOT as well, while its E2E pair is marked '
+              'unstable rather than treated as a precise point estimate.', '']
     (HERE / 'RESULTS.md').write_text('\n'.join(lines))
 
 

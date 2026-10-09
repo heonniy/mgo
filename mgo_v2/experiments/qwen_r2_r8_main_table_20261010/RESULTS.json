@@ -1,0 +1,564 @@
+{
+  "2": {
+    "ours": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/ours_full_v1",
+        "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/ours_full_v2"
+      ],
+      "source_commits": [
+        "338843406b0a82ad4a33a66c1a80d2f5f3319e36",
+        "338843406b0a82ad4a33a66c1a80d2f5f3319e36"
+      ],
+      "workload_sha256": "fe5f4e2b7c8392df73a51e209b199c2402583c3787b5ce36652d259c077fc006",
+      "physical_gpus": [
+        0,
+        1
+      ],
+      "system": "Ours",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.903622707,
+            2.257015769,
+            3.909684964
+          ],
+          "mean": 3.35677448,
+          "reported": 3.903622707,
+          "minimum": 2.257015769,
+          "maximum": 3.909684964,
+          "relative_range_pct": 49.23384650493411
+        },
+        "TPOT": {
+          "samples": [
+            0.6540713747142857,
+            0.6566434906507936,
+            0.650529182936508
+          ],
+          "mean": 0.6537480161005291,
+          "reported": 0.6540713747142857,
+          "minimum": 0.650529182936508,
+          "maximum": 0.6566434906507936,
+          "relative_range_pct": 0.9352697925962735
+        },
+        "E2E": {
+          "samples": [
+            45.110119314,
+            43.62555568,
+            44.893023489
+          ],
+          "mean": 44.542899494333334,
+          "reported": 44.893023489,
+          "minimum": 43.62555568,
+          "maximum": 45.110119314,
+          "relative_range_pct": 3.332885040833203
+        },
+        "throughput": {
+          "samples": [
+            45.40001292713051,
+            46.94496077075528,
+            45.619560475845766
+          ],
+          "mean": 45.98817805791052,
+          "reported": 45.619560475845766,
+          "minimum": 45.40001292713051,
+          "maximum": 46.94496077075528,
+          "relative_range_pct": 3.3594456420502166
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": true,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.392475282683476,
+        "E2E": 3.3460355918865448
+      }
+    },
+    "deepspeed": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/deepspeed_full_v1"
+      ],
+      "source_commits": [
+        "c634c0e26faec478088253ee6ecbbf33325446ac"
+      ],
+      "workload_sha256": "fe5f4e2b7c8392df73a51e209b199c2402583c3787b5ce36652d259c077fc006",
+      "physical_gpus": [
+        0,
+        1
+      ],
+      "system": "DeepSpeed-ZeRO-Inference",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.083815656,
+            5.464679564
+          ],
+          "mean": 5.77424761,
+          "reported": 5.77424761,
+          "minimum": 5.464679564,
+          "maximum": 6.083815656,
+          "relative_range_pct": 10.722368242881773
+        },
+        "TPOT": {
+          "samples": [
+            4.104389361444444,
+            4.127218260190476
+          ],
+          "mean": 4.115803810817461,
+          "reported": 4.115803810817461,
+          "minimum": 4.104389361444444,
+          "maximum": 4.127218260190476,
+          "relative_range_pct": 0.5546644056752968
+        },
+        "E2E": {
+          "samples": [
+            264.660345427,
+            265.479429956
+          ],
+          "mean": 265.06988769149996,
+          "reported": 265.06988769149996,
+          "minimum": 264.660345427,
+          "maximum": 265.479429956,
+          "relative_range_pct": 0.3090070079756834
+        },
+        "throughput": {
+          "samples": [
+            7.738220082407057,
+            7.714345327392903
+          ],
+          "mean": 7.72628270489998,
+          "reported": 7.72628270489998,
+          "minimum": 7.714345327392903,
+          "maximum": 7.738220082407057,
+          "relative_range_pct": 0.309007007975688
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.5546644056752968,
+        "E2E": 0.3090070079756834
+      }
+    },
+    "infinity": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/infinity_full_v1"
+      ],
+      "source_commits": [
+        "ca54903d21a38645ac445096a9bc643549e2778b"
+      ],
+      "workload_sha256": "fe5f4e2b7c8392df73a51e209b199c2402583c3787b5ce36652d259c077fc006",
+      "physical_gpus": [
+        0,
+        1
+      ],
+      "system": "MoE-Infinity-repaired",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            4.811093377,
+            4.648817656
+          ],
+          "mean": 4.7299555165000005,
+          "reported": 4.7299555165000005,
+          "minimum": 4.648817656,
+          "maximum": 4.811093377,
+          "relative_range_pct": 3.430808607690199
+        },
+        "TPOT": {
+          "samples": [
+            2.60113285484127,
+            2.5555027031904762
+          ],
+          "mean": 2.5783177790158733,
+          "reported": 2.5783177790158733,
+          "minimum": 2.5555027031904762,
+          "maximum": 2.60113285484127,
+          "relative_range_pct": 1.7697644573591111
+        },
+        "E2E": {
+          "samples": [
+            168.682463232,
+            165.645487957
+          ],
+          "mean": 167.16397559450002,
+          "reported": 167.16397559450002,
+          "minimum": 165.645487957,
+          "maximum": 168.682463232,
+          "relative_range_pct": 1.8167642066416163
+        },
+        "throughput": {
+          "samples": [
+            12.141155403826726,
+            12.363753611759359
+          ],
+          "mean": 12.252454507793043,
+          "reported": 12.252454507793043,
+          "minimum": 12.141155403826726,
+          "maximum": 12.363753611759359,
+          "relative_range_pct": 1.8167642066416267
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 1.7697644573591111,
+        "E2E": 1.8167642066416163
+      }
+    },
+    "llama": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/llama_full_v1"
+      ],
+      "source_commits": [
+        "ca54903d21a38645ac445096a9bc643549e2778b"
+      ],
+      "workload_sha256": "fe5f4e2b7c8392df73a51e209b199c2402583c3787b5ce36652d259c077fc006",
+      "physical_gpus": [
+        0,
+        1
+      ],
+      "system": "llama.cpp-sync",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            73.909625915,
+            73.801300009
+          ],
+          "mean": 73.855462962,
+          "reported": 73.855462962,
+          "minimum": 73.801300009,
+          "maximum": 73.909625915,
+          "relative_range_pct": 0.14667284132487296
+        },
+        "TPOT": {
+          "samples": [
+            0.2939452172539681,
+            0.2937100907936507
+          ],
+          "mean": 0.2938276540238094,
+          "reported": 0.2938276540238094,
+          "minimum": 0.2937100907936507,
+          "maximum": 0.2939452172539681,
+          "relative_range_pct": 0.08002189620258565
+        },
+        "E2E": {
+          "samples": [
+            92.428174602,
+            92.305035729
+          ],
+          "mean": 92.3666051655,
+          "reported": 92.3666051655,
+          "minimum": 92.305035729,
+          "maximum": 92.428174602,
+          "relative_range_pct": 0.1333153608702681
+        },
+        "throughput": {
+          "samples": [
+            22.15774582608369,
+            22.187305208491114
+          ],
+          "mean": 22.172525517287404,
+          "reported": 22.172525517287404,
+          "minimum": 22.15774582608369,
+          "maximum": 22.187305208491114,
+          "relative_range_pct": 0.13331536087026746
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.08002189620258565,
+        "E2E": 0.1333153608702681
+      }
+    }
+  },
+  "8": {
+    "ours": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_full_v2"
+      ],
+      "source_commits": [
+        "60d270001da277d129815cc55bc0431f1b5473a3"
+      ],
+      "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "system": "Ours",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.127230655,
+            1.816110473
+          ],
+          "mean": 2.471670564,
+          "reported": 2.471670564,
+          "minimum": 1.816110473,
+          "maximum": 3.127230655,
+          "relative_range_pct": 53.04591158289976
+        },
+        "TPOT": {
+          "samples": [
+            0.3912419037142857,
+            0.3820021732539683
+          ],
+          "mean": 0.386622038484127,
+          "reported": 0.386622038484127,
+          "minimum": 0.3820021732539683,
+          "maximum": 0.3912419037142857,
+          "relative_range_pct": 2.389861296201494
+        },
+        "E2E": {
+          "samples": [
+            27.775470589,
+            25.882247388
+          ],
+          "mean": 26.828858988500002,
+          "reported": 26.828858988500002,
+          "minimum": 25.882247388,
+          "maximum": 27.775470589,
+          "relative_range_pct": 7.0566668594125375
+        },
+        "throughput": {
+          "samples": [
+            294.93649707034314,
+            316.5103816988522
+          ],
+          "mean": 305.72343938459767,
+          "reported": 305.72343938459767,
+          "minimum": 294.93649707034314,
+          "maximum": 316.5103816988522,
+          "relative_range_pct": 7.056666859412531
+        }
+      },
+      "unstable": true,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 2.389861296201494,
+        "E2E": 7.0566668594125375
+      }
+    },
+    "deepspeed": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/deepspeed_full_v2"
+      ],
+      "source_commits": [
+        "1ab3d0ccac09134aedf7cabfa3ffb98ddccc70cd"
+      ],
+      "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "system": "DeepSpeed-ZeRO-Inference",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            7.084900024,
+            5.918446451
+          ],
+          "mean": 6.5016732375,
+          "reported": 6.5016732375,
+          "minimum": 5.918446451,
+          "maximum": 7.084900024,
+          "relative_range_pct": 17.940821237711425
+        },
+        "TPOT": {
+          "samples": [
+            4.544953364952381,
+            4.524041509857144
+          ],
+          "mean": 4.534497437404762,
+          "reported": 4.534497437404762,
+          "minimum": 4.524041509857144,
+          "maximum": 4.544953364952381,
+          "relative_range_pct": 0.46117249781059994
+        },
+        "E2E": {
+          "samples": [
+            293.416962016,
+            290.933061572
+          ],
+          "mean": 292.175011794,
+          "reported": 292.175011794,
+          "minimum": 290.933061572,
+          "maximum": 293.416962016,
+          "relative_range_pct": 0.8501413001572219
+        },
+        "throughput": {
+          "samples": [
+            27.919312993068516,
+            28.157679831010363
+          ],
+          "mean": 28.03849641203944,
+          "reported": 28.03849641203944,
+          "minimum": 27.919312993068516,
+          "maximum": 28.157679831010363,
+          "relative_range_pct": 0.8501413001572168
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.46117249781059994,
+        "E2E": 0.8501413001572219
+      }
+    },
+    "infinity": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/infinity_full_v4"
+      ],
+      "source_commits": [
+        "7e9452f9c12297ac7ca7a72dc3e29e4242004581"
+      ],
+      "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "system": "MoE-Infinity-repaired",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            9.54588835,
+            7.925414058
+          ],
+          "mean": 8.735651204,
+          "reported": 8.735651204,
+          "minimum": 7.925414058,
+          "maximum": 9.54588835,
+          "relative_range_pct": 18.55012584817941
+        },
+        "TPOT": {
+          "samples": [
+            3.6300756792539683,
+            3.6279479132857144
+          ],
+          "mean": 3.6290117962698414,
+          "reported": 3.6290117962698414,
+          "minimum": 3.6279479132857144,
+          "maximum": 3.6300756792539683,
+          "relative_range_pct": 0.05863210393642136
+        },
+        "E2E": {
+          "samples": [
+            238.240656143,
+            236.486132595
+          ],
+          "mean": 237.363394369,
+          "reported": 237.363394369,
+          "minimum": 236.486132595,
+          "maximum": 238.240656143,
+          "relative_range_pct": 0.7391719151405732
+        },
+        "throughput": {
+          "samples": [
+            34.38539891815479,
+            34.64050898083486
+          ],
+          "mean": 34.51295394949483,
+          "reported": 34.51295394949483,
+          "minimum": 34.38539891815479,
+          "maximum": 34.64050898083486,
+          "relative_range_pct": 0.7391719151405804
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.05863210393642136,
+        "E2E": 0.7391719151405732
+      }
+    },
+    "llama": {
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/llama_full_v1"
+      ],
+      "source_commits": [
+        "4bc91dc169b4871ab53ec90560708b7e9e946430"
+      ],
+      "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
+      "physical_gpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "system": "llama.cpp-sync",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            308.708416264,
+            308.776970328
+          ],
+          "mean": 308.74269329599997,
+          "reported": 308.74269329599997,
+          "minimum": 308.708416264,
+          "maximum": 308.776970328,
+          "relative_range_pct": 0.022204270898902426
+        },
+        "TPOT": {
+          "samples": [
+            0.8546981467936505,
+            0.8560900919206347
+          ],
+          "mean": 0.8553941193571426,
+          "reported": 0.8553941193571426,
+          "minimum": 0.8546981467936505,
+          "maximum": 0.8560900919206347,
+          "relative_range_pct": 0.16272558993394115
+        },
+        "E2E": {
+          "samples": [
+            362.554399512,
+            362.710646119
+          ],
+          "mean": 362.6325228155,
+          "reported": 362.6325228155,
+          "minimum": 362.554399512,
+          "maximum": 362.710646119,
+          "relative_range_pct": 0.04308676061013678
+        },
+        "throughput": {
+          "samples": [
+            22.59522987729972,
+            22.585496421608553
+          ],
+          "mean": 22.590363149454134,
+          "reported": 22.590363149454134,
+          "minimum": 22.585496421608553,
+          "maximum": 22.59522987729972,
+          "relative_range_pct": 0.043086760610135014
+        }
+      },
+      "unstable": false,
+      "third_repeat_used": false,
+      "pair_relative_ranges_pct": {
+        "TPOT": 0.16272558993394115,
+        "E2E": 0.04308676061013678
+      }
+    }
+  }
+}
