@@ -10,7 +10,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 RESULTS = Path('/home/hwlee/mgo-results/headline_r4_20261007')
 REFERENCE = RESULTS / 'main_ours_c30_b8_s14_d5_env2_quiet_pair_v1'
-LABEL = 'main_ours_c30_b8_s14_d5_env2_quiet_random_v1'
+LABEL = 'main_ours_c30_b8_s14_d5_env2_quiet_random_v2'
 OUTPUT = RESULTS / LABEL
 CELL = 'ShareGPT_R4_C30_B8_L128_O33_s14_d5'
 MANIFEST = Path('/home/hwlee/mgo-results/policy_gap_c60_20261008/FOLLOWUP_WORKLOADS.json')
@@ -20,7 +20,7 @@ def validate():
     result = json.loads((OUTPUT / 'result.json').read_text())
     assert result['status'] == 'PASS' and result['route_frozen']
     assert result['policy_modes'] == ['RANDOM_HASH']
-    assert result['capture_policy'] == 'LA_CA_NEAR'
+    assert result['capture_policy'] == 'BR'
     assert result['grouped_decode_mode'] == 'off' and result['prefetch'] == 'off'
     assert result['nccl_p2p_disable'] == '1'
     assert len(result['results']) == 2
@@ -37,7 +37,7 @@ def validate():
 def main():
     assert not OUTPUT.exists(), f'preserve earlier attempt: {OUTPUT}'
     env = os.environ.copy()
-    env.update(MGO_NATIVE_POLICY='LA_CA_NEAR',
+    env.update(MGO_NATIVE_POLICY='BR',
                MGO_NATIVE_COMPARE_POLICY='RANDOM_ONLY',
                MGO_NATIVE_GROUPED_MODE='off',
                MGO_NATIVE_PREFETCH='off',

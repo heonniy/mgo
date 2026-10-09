@@ -23,7 +23,7 @@ For the quiet-host confirmation cell `ShareGPT_R4_C30_B8_L128_O33_s14_d5`
 on the P2P-disabled transport, additionally measure a fixed-seed random
 owner baseline with `main_OURS`. Seed 42 permutes 128 expert owners within
 each layer, giving exactly 32 assigned experts per rank per layer; an
-expert's owner remains fixed throughout the replay. Freeze Near's routing
+expert's owner remains fixed throughout the replay. Freeze BR's routing
 and teacher tokens and require all rank hashes to match the BR/Near/Static
 quiet-host pair. Keep both unfiltered cold-cache repeats and do not mix this
 random owner result into the 18-cell Static sweep.

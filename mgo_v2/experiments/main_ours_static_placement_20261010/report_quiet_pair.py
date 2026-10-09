@@ -11,7 +11,7 @@ JOBS = {
     'new_OURS grouped': ROOT / 'grouped_frozen_policy_c30_b8_s14_d5_env2_quiet_v1',
     'main_OURS Ready-First': ROOT / 'main_ours_c30_b8_s14_d5_env2_quiet_pair_v1',
 }
-RANDOM_JOB = ROOT / 'main_ours_c30_b8_s14_d5_env2_quiet_random_v1'
+RANDOM_JOB = ROOT / 'main_ours_c30_b8_s14_d5_env2_quiet_random_v2'
 POLICIES = {'BR': 'BR', 'LA_CA_NEAR': 'Near', 'STATIC_MOD': 'Static'}
 
 

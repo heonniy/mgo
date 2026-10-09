@@ -47,7 +47,9 @@ def main(a):
  assert policy_comparison in ('0','1','CA_NEAR','BR_CA','CA_NATIVE','TRIPLE','BR_NEAR_STATIC','STATIC_ONLY','RANDOM_ONLY')
  compare_policy=policy_comparison!='0'
  policy_modes={'1':('BR','LA_CA_NEAR'),'CA_NEAR':('LA_CA_NEAR','CA'),'BR_CA':('BR','CA'),'CA_NATIVE':('CA','CA_NATIVE'),'TRIPLE':('BR','CA_NATIVE','LA_CA_NEAR'),'BR_NEAR_STATIC':('BR','LA_CA_NEAR','STATIC_MOD'),'STATIC_ONLY':('STATIC_MOD',),'RANDOM_ONLY':('RANDOM_HASH',)}.get(policy_comparison,())
- capture_policy='LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE','STATIC_ONLY','RANDOM_ONLY') else (policy_modes[0] if compare_policy else a.policy)
+ capture_policy=('BR' if policy_comparison=='RANDOM_ONLY' else
+                 'LA_CA_NEAR' if policy_comparison in ('BR_CA','CA_NATIVE','TRIPLE','STATIC_ONLY') else
+                 policy_modes[0] if compare_policy else a.policy)
  grouped_mode=os.environ.get('MGO_NATIVE_GROUPED_MODE','off')
  assert grouped_mode in ('off','hit_then_miss')
  if grouped_mode!='off':assert prefetch=='off' and policy_comparison=='BR_NEAR_STATIC'
@@ -79,7 +81,7 @@ def main(a):
   rows=json.loads(Path(spec[kind]['path']).read_text())['requests'][rank*a.local_batch:(rank+1)*a.local_batch]
   return torch.tensor([r['input_ids'] for r in rows],device='cuda')
  warm=inputs('warmup');target=inputs('target')
- warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else ([(name,native) for name in (('LA_CA_NEAR',)+policy_modes if policy_comparison in ('STATIC_ONLY','RANDOM_ONLY') else policy_modes)] if compare_policy else [('h0',None),('native',native)])
+ warm_modes=[('prefetch_on',native),('prefetch_off',native)] if compare_prefetch else ([(name,native) for name in ((capture_policy,)+policy_modes if policy_comparison in ('STATIC_ONLY','RANDOM_ONLY') else policy_modes)] if compare_policy else [('h0',None),('native',native)])
  for name,executor in warm_modes:
   if compare_policy:a.policy=name
   rt.native_executor=executor;reset()
