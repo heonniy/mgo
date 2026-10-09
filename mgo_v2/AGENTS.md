@@ -1,3 +1,16 @@
+**OWNER R4 NEW_OURS CACHE SWEEP COMPLETE (2026-10-10).**
+Read `experiments/grouped_cache_ablation_20261010/{PLAN.md,RESULTS.md}`.
+On frozen Qwen ShareGPT R4/local-B16/input512/output64, physical GPUs
+0/1/4/5, the strict hit-then-miss grouped decode candidate was measured at
+C20/C30/C40/C50 with two unfiltered clean targets each. Near, native
+prefill, compiled dense routing and prefetch OFF stayed fixed. TPOT means
+were 0.3499/0.3286/0.3025/0.2771 s/token, while first-target TTFT was
+systematically about 3.65 s versus second-target about 1.76 s; preserve
+the full range. The matching three baseline cache curves already exist in
+`experiments/qwen_cache_ablation_20261009/BASELINE_SWEEP_RESULTS.json`.
+All jobs passed and restored the eight owned model loads. Raw receipts are
+outside Git in `/home/hwlee/mgo-results/grouped_cache_ablation_20261010/`.
+
 **OWNER R4 GROUPED POLICY SCALING COMPLETE (2026-10-10).**
 Read `experiments/grouped_policy_scaling_20261009/{PLAN.md,REPORT.md}` for
 the detailed pre-optimization/current main_OURS versus strict hit-then-miss

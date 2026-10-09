@@ -13,6 +13,7 @@ import run_qwen_r8_job as guard
 
 
 ROOT = Path('/home/hwlee/mgo-results/expert_grouping_ablation_20261009')
+CACHE_ROOT = Path('/home/hwlee/mgo-results/grouped_cache_ablation_20261010')
 WORKLOADS = Path('/home/hwlee/mgo-results/qwen_cache_ablation_20261009/WORKLOADS.json')
 MAIN_TABLE_WORKLOADS = Path('/home/hwlee/mgo-results/main_table_2x2_20261008/ShareGPT/WORKLOADS.json')
 B64_ROOT = Path('/home/hwlee/mgo-results/ep_overhead_r4_b64_20261009')
@@ -20,12 +21,17 @@ PHYSICAL = (0, 1, 4, 5)
 CELL = 'Qwen3_ShareGPT_R4_C30_B16_L512_O64'
 B64_CELL = 'Qwen3_ShareGPT_R4_C30_B64_L512_O64'
 B8_CELL = 'Qwen3_ShareGPT_R4_C30_B8_L512_O64'
+CACHE_CELLS = tuple(f'Qwen3_ShareGPT_R4_C{cache}_B16_L512_O64'
+                    for cache in (20, 30, 40, 50))
+CACHE_SLOTS = {20: 1228, 30: 1843, 40: 2457, 50: 3072}
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--arm', choices=('A', 'B', 'C', 'N'), required=True)
-    parser.add_argument('--cell', choices=(B8_CELL, CELL, B64_CELL), default=CELL)
+    parser.add_argument('--cell',
+                        choices=tuple(dict.fromkeys((B8_CELL, CELL, B64_CELL) + CACHE_CELLS)),
+                        default=CELL)
     parser.add_argument('--workloads', type=Path)
     parser.add_argument('--output-root', type=Path)
     parser.add_argument('--policy', choices=('BR', 'CA_NATIVE', 'LA_CA_NEAR'), default='LA_CA_NEAR')
@@ -42,23 +48,27 @@ def main():
     assert not (args.smoke and args.diagnostic)
     assert not args.post_prefill_diagnostic or args.diagnostic
     assert not args.diagnostic or args.repeats == 1
-    workload_path = args.workloads or (WORKLOADS if args.cell == CELL else MAIN_TABLE_WORKLOADS)
-    root = args.output_root or (ROOT if args.cell == CELL else B64_ROOT)
+    workload_path = args.workloads or (WORKLOADS if args.cell in CACHE_CELLS else MAIN_TABLE_WORKLOADS)
+    root = args.output_root or (CACHE_ROOT if args.cell in CACHE_CELLS and args.cell != CELL
+                                else ROOT if args.cell == CELL else B64_ROOT)
     manifest = json.loads(workload_path.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     spec, = [row for row in manifest['cells'] if row['cell'] == args.cell]
-    expected_batch = {B8_CELL: 8, CELL: 16, B64_CELL: 64}[args.cell]
+    expected_batch = 16 if args.cell in CACHE_CELLS else {B8_CELL: 8, B64_CELL: 64}[args.cell]
+    expected_cache = int(args.cell.split('_C')[1].split('_')[0])
     assert (spec['local_batch'], spec['global_requests'], spec['input_tokens'],
             spec['output_tokens'], spec['cache_percent'], spec['expert_slots']) == (
-                expected_batch, expected_batch * 4, 512, 64, 30, 1843)
+                expected_batch, expected_batch * 4, 512, 64,
+                expected_cache, CACHE_SLOTS[expected_cache])
     for phase in ('warmup', 'target'):
         source = spec[phase]
         assert hashlib.sha256(Path(source['path']).read_bytes()).hexdigest() == source['sha256']
     assert guard.owner.host_available() >= 384 * 2**30
     kind = 'smoke' if args.smoke else 'diagnostic' if args.diagnostic else 'full'
     batch_label = str(expected_batch)
-    job_name = (f'r4_{args.arm.lower()}_{args.policy.lower()}_{batch_label}_{kind}_v{args.attempt}'
-                if args.output_root else f'r4_{args.arm.lower()}_{kind}_v{args.attempt}')
+    job_name = (f'r4_{args.arm.lower()}_{args.policy.lower()}_c{expected_cache}_{batch_label}_{kind}_v{args.attempt}'
+                if args.output_root or (args.cell in CACHE_CELLS and args.cell != CELL)
+                else f'r4_{args.arm.lower()}_{kind}_v{args.attempt}')
     output = root / 'jobs' / job_name
     assert not output.exists(), f'preserve previous attempt: {output}'
     output.mkdir(parents=True)
