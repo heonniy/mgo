@@ -1,22 +1,20 @@
-**OWNER R4 GROUPED POLICY SCALING ACTIVE (2026-10-10).**
-Read `experiments/grouped_policy_scaling_20261009/{PLAN.md,REPORT.md}` and
-`experiments/ep_overhead_r4_b64_20261009/PLAN.md`. The owner requests a
-detailed Markdown report comparing pre-optimization main_OURS, current
-Ready-First main_OURS, and strict hit-then-miss `new_OURS`, then B8/B16/B64
-at C30/input512/decode64 across BR, CA_NATIVE and Near. Use physical GPUs
-0/1/4/5 only, prefetch OFF, one guarded GPU job at a time, two clean primary
-repeats and separate full-decode diagnostics. The active serial queue is
-`scripts/run_grouped_policy_sweep.py`; progress and raw jobs are under
-`/home/hwlee/mgo-results/grouped_policy_scaling_20261009/`. Do not start a
-second GPU job while it runs. B64 matched A variants and initial grouped
-studies are under `/home/hwlee/mgo-results/ep_overhead_r4_b64_20261009/`.
-Strict N groups resident hits first and waits for all misses before a second
-grouped GEMM. A GPU-stream-wait candidate had exact tokens/cache/H2D but
-regressed primary TPOT, so N uses the measured faster host-side wait.
-Grouped BF16 can change generated tokens and later live routing; disclose
-that limit. Never add overlapping H2D DMA service to the 100% decode
-current-stream partition. Restore all eight owned background model loads
-after guarded jobs and check that unrelated GPU processes were not stopped.
+**OWNER R4 GROUPED POLICY SCALING COMPLETE (2026-10-10).**
+Read `experiments/grouped_policy_scaling_20261009/{PLAN.md,REPORT.md}` for
+the detailed pre-optimization/current main_OURS versus strict hit-then-miss
+`new_OURS` diagnosis, and B8/B16/B64 × BR/CA_NATIVE/Near comparison at
+C30/input512/decode64. The 11-cell serial queue passed, with two clean
+primary repeats and a separate full-decode diagnostic per cell on physical
+GPUs0/1/4/5, prefetch OFF. Raw receipts are under
+`/home/hwlee/mgo-results/grouped_policy_scaling_20261009/`; matched B64 A
+variants are under `/home/hwlee/mgo-results/ep_overhead_r4_b64_20261009/`.
+Strict N groups resident hits first, waits for all misses and then groups
+those misses. The stream-wait candidate had exact tokens/cache/H2D but
+regressed B64 primary TPOT. Grouped BF16 changes later live routing at B64,
+so do not present its A→N difference as a fixed-route scheduling gain.
+Never add overlapping H2D DMA service to the 100% current-stream partition
+or call collective spans pure NCCL wire time. All 22 guarded jobs restored
+the eight owned model loads and reported zero residual measured GPU
+processes before restoration.
 
 **OWNER R4 DECODE HOT-PATH FOLLOW-UP COMPLETE (2026-10-09).**
 Read `experiments/expert_grouping_ablation_20261009/DECODE_HOTPATH_OPTIMIZATION.md`.
