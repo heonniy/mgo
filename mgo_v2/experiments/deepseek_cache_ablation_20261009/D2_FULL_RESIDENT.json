@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "model": "DeepSeekV2Lite",
+  "scope": "C100 static e-mod-4 full-resident reference; changes owner map and peer traffic",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "fixed_continuation_sha256": "f6614fca1fbc1501fb39002fad57475d3ba8a8a9941e0562f2724e6c34fd6942",
+  "same_output_sequences_between_repeats": 64,
+  "tpot_mean_s_per_token": 0.24260053573809523,
+  "tpot_range_s_per_token": [
+    0.2411215672857143,
+    0.24407950419047617
+  ],
+  "relative_repeat_difference_percent": 1.2192623135652005,
+  "records": [
+    {
+      "label": "dca_d2_fullresident_fixedroute_r1_v1",
+      "source_commit": "e4177cbc70a3f5d98d2616fe5ce69c4fc8ac0d43",
+      "TPOT_s_per_token": 0.2411215672857143,
+      "TTFT_s": 0.851128398,
+      "E2E_s": 16.041787137,
+      "decode_groups": 102818,
+      "decode_waves": 6552,
+      "decode_h2d_bytes": 0,
+      "decode_dispatch_gib": 1.0149042289704084,
+      "decode_return_gib": 1.0104637145996094,
+      "peak_allocated_gib_max_rank": 12.296566486358643,
+      "per_rank_groups": [
+        25739,
+        25758,
+        25675,
+        25646
+      ]
+    },
+    {
+      "label": "dca_d2_fullresident_fixedroute_r1_v2",
+      "source_commit": "e4177cbc70a3f5d98d2616fe5ce69c4fc8ac0d43",
+      "TPOT_s_per_token": 0.24407950419047617,
+      "TTFT_s": 0.853383227,
+      "E2E_s": 16.230391991,
+      "decode_groups": 102818,
+      "decode_waves": 6552,
+      "decode_h2d_bytes": 0,
+      "decode_dispatch_gib": 1.0149042289704084,
+      "decode_return_gib": 1.0104637145996094,
+      "peak_allocated_gib_max_rank": 12.296566486358643,
+      "per_rank_groups": [
+        25739,
+        25758,
+        25675,
+        25646
+      ]
+    }
+  ]
+}
