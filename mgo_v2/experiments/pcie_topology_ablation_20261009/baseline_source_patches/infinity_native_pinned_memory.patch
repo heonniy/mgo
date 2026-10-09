@@ -1,0 +1,127 @@
+diff --git a/core/memory/host_caching_allocator.cpp b/core/memory/host_caching_allocator.cpp
+index 2800439..ac72750 100644
+--- a/core/memory/host_caching_allocator.cpp
++++ b/core/memory/host_caching_allocator.cpp
+@@ -8,6 +8,7 @@
+ // replaced c10::alloc_cpu with cudaHostAlloc
+ 
+ #include "host_caching_allocator.h"
++#include <algorithm>
+ #include <c10/util/Exception.h>
+ #include <cuda_runtime_api.h>
+ 
+@@ -15,6 +16,13 @@ namespace c10 {
+ namespace HostCachingAllocator {
+ 
+ std::mutex HostCachingAllocator::mutex_;
++size_t HostCachingAllocator::allocated_bytes_ = 0;
++size_t HostCachingAllocator::peak_allocated_bytes_ = 0;
++
++std::pair<size_t, size_t> HostCachingAllocator::pinned_memory_usage() {
++  std::lock_guard<std::mutex> guard(mutex_);
++  return {allocated_bytes_, peak_allocated_bytes_};
++}
+ ska::flat_hash_map<void*, size_t> HostCachingAllocator::allocation_map_;
+ 
+ inline void* HostCachingAllocator::allocate_and_cache(const size_t bytes) {
+@@ -30,6 +38,8 @@ inline void* HostCachingAllocator::allocate_and_cache(const size_t bytes) {
+   }
+ 
+   allocation_map_[ptr] = bytes;
++  allocated_bytes_ += bytes;
++  peak_allocated_bytes_ = std::max(peak_allocated_bytes_, allocated_bytes_);
+   return ptr;
+ }
+ 
+@@ -76,6 +86,7 @@ void HostCachingAllocator::record_free(void* ptr) {
+   std::lock_guard<std::mutex> guard(mutex_);
+   const auto& it = allocation_map_.find(ptr);
+   if (it != allocation_map_.end()) {
++    allocated_bytes_ -= it->second;
+     allocation_map_.erase(it);
+   }
+ }
+@@ -87,6 +98,7 @@ void HostCachingAllocator::free_cached() {
+       cudaFreeHost(ptr);
+       // When cached memory is return to OS, it must be removed
+       // from allocation_map.
++      allocated_bytes_ -= allocation_map_.at(ptr);
+       allocation_map_.erase(ptr);
+     }
+   }
+diff --git a/core/memory/host_caching_allocator.h b/core/memory/host_caching_allocator.h
+index f305052..49138f1 100644
+--- a/core/memory/host_caching_allocator.h
++++ b/core/memory/host_caching_allocator.h
+@@ -10,6 +10,7 @@
+ #pragma once
+ 
+ #include <mutex>
++#include <utility>
+ 
+ #include <c10/util/SmallVector.h>
+ #include <c10/util/flat_hash_map.h>
+@@ -84,9 +85,13 @@ class HostCachingAllocator {
+   // Since allocation_map, which is a global instance, is mutated/read via
+   // all public APIs we need a global mutex.
+   static std::mutex mutex_;
++  static size_t allocated_bytes_;
++  static size_t peak_allocated_bytes_;
+ 
+  public:
+   static void record_free(void* ptr);
++  // Actual cudaHostAlloc payload, including cached blocks; one untimed snapshot.
++  static std::pair<size_t, size_t> pinned_memory_usage();
+   virtual ~HostCachingAllocator();
+   // Checks the cache to see if allocation of size bytes can be found.
+   // If so return cached memory, else
+diff --git a/core/python/py_archer_prefetch.cpp b/core/python/py_archer_prefetch.cpp
+index d36b103..e611553 100644
+--- a/core/python/py_archer_prefetch.cpp
++++ b/core/python/py_archer_prefetch.cpp
+@@ -8,6 +8,7 @@
+ #include "prefetch/archer_prefetch_handle.h"
+ #include "model/moe.h"
+ #include "kernel/ops.h"
++#include "memory/host_caching_allocator.h"
+ 
+ void BindTensorStoreSurface(py::class_<ArcherPrefetchHandle>& cls);
+ 
+@@ -93,6 +94,13 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+       .def("get_topology_snapshot", &ArcherPrefetchHandle::GetTopologySnapshot)
+       .def("get_expert_policy_stats",
+            &ArcherPrefetchHandle::GetExpertPolicyStats)
++      .def("get_host_pinned_memory_stats", [](const ArcherPrefetchHandle&) {
++        const auto usage = c10::HostCachingAllocator::HostCachingAllocator::pinned_memory_usage();
++        py::dict result;
++        result["allocated_bytes"] = usage.first;
++        result["peak_allocated_bytes"] = usage.second;
++        return result;
++      })
+       .def("get_policy_stats", &ArcherPrefetchHandle::GetExpertPolicyStats)
+       .def("get_residency_manager_id",
+            &ArcherPrefetchHandle::GetResidencyManagerId)
+@@ -128,6 +136,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+            &ArcherPrefetchHandle::DrainPrefetchSamples)
+       .def("get_inflight_prefetch_bytes",
+            &ArcherPrefetchHandle::GetInflightPrefetchBytes)
++      .def("replace_expert_priorities", &ArcherPrefetchHandle::ReplaceExpertPriorities)
+       .def("replace_cache_candidates",
+            &ArcherPrefetchHandle::ReplaceCacheCandidates)
+       .def("enqueue_prefetch", &ArcherPrefetchHandle::EnqueuePrefetch)
+@@ -148,6 +157,15 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+            py::arg("starvation_limit"))
+       .def("get_expert_policy_stats",
+            &ArcherPrefetchHandle::GetExpertPolicyStats)
++      .def("get_host_pinned_memory_stats", [](const ArcherPrefetchHandle&) {
++        const auto usage = c10::HostCachingAllocator::HostCachingAllocator::pinned_memory_usage();
++        py::dict result;
++        result["allocated_bytes"] = usage.first;
++        result["peak_allocated_bytes"] = usage.second;
++        return result;
++      })
++      .def("clear_expert_cache_quiescent", &ArcherPrefetchHandle::ClearExpertCacheQuiescent)
++      .def("set_expert_budget", &ArcherPrefetchHandle::SetExpertBudget)
+       .def("reset_cache", &ArcherPrefetchHandle::ResetCache);
+   //    .def("set_node_cache_priority",
+   //    &ArcherPrefetchHandle::SetNodeCachePriority);

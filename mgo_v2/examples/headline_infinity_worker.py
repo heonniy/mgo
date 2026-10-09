@@ -70,6 +70,8 @@ def main(a):
    if file.suffix in ('.py','.so'):sources[str(file)]=hashlib.sha256(file.read_bytes()).hexdigest()
  write(a.output/'source_hashes.json',sources)
  model=MoE(model_path,cfg);engine=model.engine;p=engine.expert_prefetcher
+ if os.environ.get('MGO_PCIE_HOST')=='1':
+  assert hasattr(p.archer_engine,'get_host_pinned_memory_stats'),'Rebuild private native Infinity with the recorded pinned-cache telemetry patch before GPU warmup'
  # MoE-Infinity selects eager attention at load time. The full B64/L1024
  # DeepSeek prefill softmax OOMs, so select SDPA only for that cell. Qwen
  # already uses SDPA for every table cell.
@@ -216,6 +218,14 @@ def main(a):
   live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
   assert not tracer.trace
   stats=dict(p.archer_engine.get_expert_policy_stats())
+  host_pinned=None
+  if os.environ.get('MGO_PCIE_HOST')=='1':
+   # Native allocator counters include cached blocks and are read after end.
+   host_pinned=dict(p.archer_engine.get_host_pinned_memory_stats())
+   assert 0<=host_pinned['allocated_bytes']<=host_pinned['peak_allocated_bytes']
+   write(a.output/f'host_pinned_repeat{repeat}.json',dict(host_pinned,
+    scope='Native expert HostCachingAllocator cudaHostAlloc payload including cached blocks; excludes unrelated Torch/staging pinned buffers',
+    timing='Snapshot after generation endpoints; peak is process-lifetime'))
   write(a.output/f'eam_probe_repeat{repeat}.json',dict(actual_calls=p.eam_calls,
        expected_calls=routed_layers*n,model_family=model_family,
        candidate_count=p.eam_candidates,stats=stats))
@@ -227,6 +237,7 @@ def main(a):
   assert stats['resident_bytes']+stats['transition_reserved_bytes']+stats['workspace_bytes']<=sum(budgets)
   first,end=streamer.stamps[0],streamer.stamps[-1]
   result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(4)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(4)],host_rss_bytes=psutil.Process().memory_info().rss)
+  if host_pinned is not None:result.update(pinned_host_bytes=host_pinned['allocated_bytes'],pinned_host_peak_bytes=host_pinned['peak_allocated_bytes'],pinned_host_scope='native expert HostCachingAllocator; excludes other allocators')
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
   if repeat==0:

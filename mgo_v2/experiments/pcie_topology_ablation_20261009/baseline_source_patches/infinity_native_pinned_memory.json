@@ -1,0 +1,13 @@
+{
+  "status": "PREPARED_NOT_COMPILED",
+  "checkout": "/data2/esjung/tools/MoE-Infinity",
+  "base_commit": "9f819a6d43e043bded6e0692e5e58793e1623364",
+  "source_sha256": {
+    "core/memory/host_caching_allocator.h": "c846649b44fc9dec8bcef72baec42be7328c09d498fed3304e35522b19b92678",
+    "core/memory/host_caching_allocator.cpp": "7aec20bef63cb83f612a187c6e2d729c29829b37d91c54fb599aa2bb1a9bc54b",
+    "core/python/py_archer_prefetch.cpp": "d9909c1df0bbc149402ca81a24bd825c6699aa434b724bfd2af71a90371794ca"
+  },
+  "scope": "Successful native HostCachingAllocator cudaHostAlloc payload including free cached blocks; excludes unrelated PyTorch pinned buffers and separate native staging pools",
+  "timing": "O(1) counters under existing allocator lock; snapshot only after generation timing endpoints; allocation/admission/eviction/routing unchanged",
+  "verification": "Private native build and physical GPU warmup still required; no compiled or measured result claimed"
+}
