@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 4,
+  "completed": 5,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -92,9 +92,75 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "deepspeed",
-      "cache_percent": 20
+      "cache_percent": 20,
+      "label": "qca_baseline_c20_deepspeed_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.004636510133853808,
+      "reused_c30": false,
+      "source_commit": "a1d7861dacdcd4dde478218fe598e3d805ab9493",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "e5e53725408bb7ba941b08b9457e814935dbff95299ef22926a21b09ff5eae8e",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.37061134,
+            5.401679026
+          ],
+          "mean": 5.886145183,
+          "median": 5.886145183,
+          "minimum": 5.401679026,
+          "maximum": 6.37061134,
+          "stdev": 0.685138609740173
+        },
+        "TPOT": {
+          "samples": [
+            4.047225503666667,
+            4.0434160177619045
+          ],
+          "mean": 4.045320760714286,
+          "median": 4.045320760714286,
+          "minimum": 4.0434160177619045,
+          "maximum": 4.047225503666667,
+          "stdev": 0.0026937133160918904
+        },
+        "E2E": {
+          "samples": [
+            261.345818071,
+            260.136888145
+          ],
+          "mean": 260.741353108,
+          "median": 260.741353108,
+          "minimum": 260.136888145,
+          "maximum": 261.345818071,
+          "stdev": 0.8548425486539484
+        }
+      },
+      "memory": {
+        "peak_all_parameter_bytes_per_rank": [
+          [
+            2002153472,
+            2002153472,
+            2002153472,
+            2002153472
+          ],
+          [
+            2002153472,
+            2002153472,
+            2002153472,
+            2002153472
+          ]
+        ],
+        "parameter_budget_bytes_per_rank": [
+          2897215488,
+          2897215488,
+          2897215488,
+          2897215488
+        ]
+      }
     },
     {
       "status": "PENDING",

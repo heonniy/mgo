@@ -1,6 +1,6 @@
 {
   "configure_command": [
-    "cmake",
+    "/home/hwlee/mgo-tools/headline-r4/base-env/bin/cmake",
     "-S",
     "/home/hwlee/mgo-tools/headline-r4/llama.cpp",
     "-B",
@@ -8,7 +8,7 @@
     "-DGGML_CUDA_GRAPHS=ON"
   ],
   "backend_build_command": [
-    "cmake",
+    "/home/hwlee/mgo-tools/headline-r4/base-env/bin/cmake",
     "--build",
     "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build",
     "--config",
@@ -33,8 +33,8 @@
     "-o",
     "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-sync"
   ],
-  "source_sha256": "1acc1335db2d1b8f0dfb31d4c0dc6b295df63bc75b7a52b60b75252536c5f520",
-  "binary_sha256": "f0404c3c05d72e65b5480f23b56b3f12433292a52540edf749ff959a2bdb4d8e",
+  "source_sha256": "02d8515d02f51df6136dd51e61ee4d0c6961f344c88b0593b6a49459bcf9e8b7",
+  "binary_sha256": "859a1e49933810a44c0a46c6dfdd0b225929399a927fdcd4e7dc50ad45c15682",
   "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf",
   "cmake_flags": {
     "GGML_CUDA:BOOL": "ON",
@@ -45,8 +45,8 @@
   "cuda_graph_support": true,
   "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1",
   "llama_graph_reuse": false,
-  "baseline_policy_eligible": true,
-  "thread_policy": "headline fixed 32/32 with deterministic affinity",
   "headline_llama_graph_reuse": "OFF via LLAMA_GRAPH_REUSE_DISABLE=1",
-  "headline_expert_placement": "balanced3"
+  "headline_expert_placement": "balanced2/3/4/6",
+  "baseline_policy_eligible": true,
+  "thread_policy": "headline fixed 32/32 with deterministic affinity"
 }

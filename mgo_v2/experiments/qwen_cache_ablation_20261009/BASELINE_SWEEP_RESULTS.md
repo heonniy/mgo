@@ -5,7 +5,7 @@ ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. C30 reuses three validat
 | Cache | System | TTFT median [range], s | TPOT median [range], s/token | E2E median [range], s | Receipt |
 |---:|---|---:|---:|---:|---|
 | C20 | infinity | 5.207 [5.177, 5.247] | 3.143 [3.138, 3.144] | 203.185 [202.946, 203.291] | `qca_baseline_c20_infinity_r3_v1 (3 repeats; THREE)` |
-| C20 | deepspeed | pending | pending | pending | — |
+| C20 | deepspeed | 5.886 [5.402, 6.371] | 4.045 [4.043, 4.047] | 260.741 [260.137, 261.346] | `qca_baseline_c20_deepspeed_r2_v1 (2 repeats; TWO_STABLE)` |
 | C20 | llama | pending | pending | pending | — |
 | C30 | infinity | 5.192 [5.182, 5.219] | 3.227 [3.213, 3.264] | 208.505 [207.659, 210.809] | `mt2_qwen_sharegpt_b16_l512_infinity_r3_v3 (C30 reuse) (3 repeats; THREE)` |
 | C30 | deepspeed | 5.571 [5.451, 6.312] | 4.122 [4.091, 4.135] | 265.995 [263.176, 266.055] | `mt2_qwen_sharegpt_b16_l512_deepspeed_r3_v1 (C30 reuse) (3 repeats; THREE)` |
