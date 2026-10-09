@@ -37,8 +37,7 @@ def main(a):
   from pcie_host import affinity
   cpus=affinity(local)
  else:cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
- # Match OURS' non-overlapping per-rank CPU ranges. The live host exposes
- # one NUMA node; this controls CPU scheduling, not cross-NUMA placement.
+ # Match OURS' disjoint per-rank CPU ranges; the PCIe host has two NUMA nodes.
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
   except FileNotFoundError:pass
@@ -58,6 +57,12 @@ def main(a):
  if model_family!='Qwen3':
   from deepseek_moe_loop import install_compact_deepseek_moe
   assert install_compact_deepseek_moe(model)==26
+ if os.environ.get('MGO_PCIE_HOST')=='1' and model_family=='Qwen3':
+  # Different local routes call different expert modules on different ranks.
+  # ZeRO must gather the whole MoE block before those conditional calls.
+  from pcie_deepspeed_leaf import mark_qwen3_moe_leaves
+  leaf_receipt=mark_qwen3_moe_leaves(model,spec.get('expert_budget_bytes',17392730112)//4)
+  write(a.output/f'zero_leaf_rank{rank}.json',leaf_receipt)
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='engine_initialization',cell=a.cell))
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='budget_calibration',cell=a.cell))

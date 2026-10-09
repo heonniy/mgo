@@ -78,7 +78,9 @@ def run(a):
         command=[sys.executable,'-m','torch.distributed.run','--nproc_per_node=4',f'--master_port={port}']+command[1:]
     write(a.out/'launch.json',dict(argv=command,physical_gpus=list(GPUS),model=str(model),workload=spec,
           git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),conda_prefix=sys.prefix,
-          source_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),runtime='native baseline, no forced OURS serial phase order',
+          source_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),
+          adaptation_source_sha256={str(PKG/'scripts'/'pcie_deepspeed_leaf.py'):hashlib.sha256((PKG/'scripts'/'pcie_deepspeed_leaf.py').read_bytes()).hexdigest()} if a.system=='deepspeed' else {},
+          runtime='native baseline, no forced OURS serial phase order',
           primary_repeats=a.repeats,stability_policy='Five repeats predefined for baseline jobs; keep every repeat',
           environment={k:v for k,v in env.items() if k.startswith(('CUDA','MGO','NCCL','TORCH','OMP','MKL','CPATH'))}))
     process=None;resource=[];device_sampler=None
