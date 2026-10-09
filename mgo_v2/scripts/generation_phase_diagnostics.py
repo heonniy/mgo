@@ -9,9 +9,20 @@ class GenerationDiagnostics(PrefillDiagnostics):
  def mark(self):
   super().mark()
   self.rows[-1].update(event_index=self.rt.index,step=self.rt.index//48,layer=self.rt.index%48)
+ def token_ready(self,step):
+  self.mark()
+  self.rows[-1]['token_ready_index']=step
  def install(self,model):
   super().install(model)
+  if hasattr(self.rt.metadata,'collect_profiled'):
+   original_collect=self.rt.metadata.collect
+   def collect(event,selected,probs,frozen_gate=None):
+    return self.rt.metadata.collect_profiled(event,selected,probs,self.phase,frozen_gate)
+   self.rt.metadata.collect=collect
+   self.undo.append(lambda:setattr(self.rt.metadata,'collect',original_collect))
   self.wrap(self.rt.h2d,'wait_for_slot','required_h2d_exposed_wait')
+  grouped=getattr(self.rt,'grouped_executor',None)
+  if grouped is not None:self.wrap(grouped,'math','expert_grouped_gemm_kernels')
   self.cache_events=[];self.prefill_survivors=set()
   original=self.rt.plan_event
   def plan(layer,*args,**kwargs):

@@ -7,6 +7,11 @@ ready hit/miss grouped wave then remaining-miss grouped wave. Use the same
 frozen R8 ShareGPT Qwen local-B16/input512/output64 C30 workload on physical
 GPUs0–7. Preserve the main_OURS default, prefetch OFF, Near policy and all
 resource guards. Restore eight owned model-inference loads between jobs.
+The owner then added R4 physical GPUs0/1/4/5 on the frozen Qwen C30/local-B16/
+input512/output64 workload, plus a separate full-decode stage breakdown for
+each arm. Stop all eight owned model loads during R4 timing, restore all eight
+afterward, and report exclusive critical-path shares separately from overlapping
+H2D copy service. R8 A/B/C primaries passed; R4 and detailed diagnostics remain.
 
 **OWNER QWEN SHAREGPT R8 MAIN-SYSTEM COMPARISON STOPPED (2026-10-09).**
 Read `experiments/qwen_r8_sharegpt_b16_l512_20261009/PLAN.md`. The latest

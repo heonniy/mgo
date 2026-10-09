@@ -22,6 +22,8 @@ def generate_live(model,rt,ids,n):
    out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
    past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
+   if getattr(rt,'phase_diagnostic',None) and hasattr(rt.phase_diagnostic,'token_ready'):
+    rt.phase_diagnostic.token_ready(step)
    if step<n-1:ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
  if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.stop()
  actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n

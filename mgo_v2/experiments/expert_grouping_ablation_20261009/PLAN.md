@@ -33,3 +33,23 @@ Protect all eight GPUs and host memory with the existing launcher. Run one
 job at a time; restore the eight owned model-inference loads after every job.
 Keep raw prompts and token arrays outside Git. Commit only validation and
 aggregate findings.
+
+## Owner R4 extension and decode breakdown
+
+Also run A/B/C on R4 physical GPUs 0/1/4/5 with the already frozen Qwen
+ShareGPT C30/local-B16/input512/output64 workload from
+`qwen_cache_ablation_20261009`. Keep the other four owned model loads stopped
+throughout GPU measurement to avoid background interference, restoring all
+eight after each job. Use the same two-repeat stability rule and preserve all
+target samples.
+
+Separately instrument one full decode64 target per arm after a disjoint warmup.
+Break down the current-stream critical path into attention/dense/router,
+metadata packet pack/all-gather/device-to-host/CPU parse/gate history,
+placement controller, layout and GPU tensor preparation, demand H2D submit
+and exposed wait, forward dispatch/finish, expert execution, return exchange
+and combine, and residual. Report per-token milliseconds and percent of the
+instrumented decode critical path. H2D copy-stream service and per-rank totals
+can overlap other phases and must not be added to that partition. Keep
+instrumented timing separate from the unprofiled TPOT table and verify token,
+cache and H2D parity against its target.
