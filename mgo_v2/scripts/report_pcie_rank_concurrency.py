@@ -127,11 +127,27 @@ def main():
         ideal = sum(solo[gpu, payload] for gpu in GPUS)
         lines.append(f'| {payload} | {triple:.2f} | {control:.2f} | '
                      f'{all_ranks:.2f} | {100 * all_ranks / ideal:.1f}% |')
+    if GPUS == tuple(range(8)):
+        lines.extend(['', '## Two four-GPU groups and all eight', '',
+                      '| Payload | GPUs 0–3 aggregate | GPUs 4–7 aggregate | '
+                      'All 8 aggregate | GPUs 0–3 per-rank speed in all 8 | '
+                      'GPUs 4–7 per-rank speed in all 8 |',
+                      '|---|---:|---:|---:|---:|---:|'])
+        for payload in ('Qwen expert', 'DeepSeek expert'):
+            low = by[(0, 1, 2, 3), payload]['aggregate_gib_per_s']['median']
+            high = by[(4, 5, 6, 7), payload]['aggregate_gib_per_s']['median']
+            all_row = by[GPUS, payload]
+            all_aggregate = all_row['aggregate_gib_per_s']['median']
+            low_ranks = statistics.median(all_row['rank_gib_per_s'][str(g)]['median'] for g in range(4))
+            high_ranks = statistics.median(all_row['rank_gib_per_s'][str(g)]['median'] for g in range(4, 8))
+            lines.append(f'| {payload} | {low:.2f} | {high:.2f} | {all_aggregate:.2f} | '
+                         f'{low_ranks:.2f} | {high_ranks:.2f} |')
+        lines.extend(['', 'The two physical GPU groups have different effective H2D rates under '
+                      'these conditions. This observation does not identify the limiting PCIe, '
+                      'NUMA, IOMMU, or host-memory component.'])
     lines.extend(['', f'Maximum observed worker start skew: {max_skew:.3f} ms.',
                   'Individual rank and subset results, including full ranges, are in '
-                  '`RANK_COMBINATIONS.csv` and `RESULTS.json`.',
-                  'This benchmark cannot isolate whether PCIe links, host memory, '
-                  'IOMMU or the virtualized upstream fabric caused it.'])
+                  '`RANK_COMBINATIONS.csv` and `RESULTS.json`.'])
     if max_skew > 5:
         lines.append('Some subsets had >5 ms start skew; inspect those rows before interpreting them as simultaneous.')
     (ROOT / 'RESULTS.md').write_text('\n'.join(lines) + '\n')
