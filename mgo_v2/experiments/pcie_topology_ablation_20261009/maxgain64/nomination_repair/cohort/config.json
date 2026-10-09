@@ -1,0 +1,44 @@
+{
+  "arm": "R-NEAR",
+  "sequence": null,
+  "search_stage": "nomination",
+  "search_spec": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/maxgain64_search_attempt1/candidates_repaired/REPAIR_CANDIDATES.json",
+  "search_spec_sha256": "0901bbd3f5968dc72e32c13631cdd90fe42bac53f84f147a75ca0fa31883ec42",
+  "smoke": false,
+  "overlap": false,
+  "diagnostic": false,
+  "breakdown_reference": null,
+  "grouped_probe": false,
+  "git_head": "ac9cad234ec6510c08cb94afc89c3c0b9be220d4",
+  "base_commit": "7ddc55dff8d8a571a79a7fa415ad16fbc47e78dc",
+  "seed": 42,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "groups": [
+    [
+      0,
+      1
+    ],
+    [
+      4,
+      5
+    ]
+  ],
+  "conda_prefix": "/data2/esjung/envs/mgo-pcie",
+  "cache_slots": 1843,
+  "main_slots": [
+    459,
+    459,
+    459,
+    458
+  ],
+  "reserved_slots_per_rank": 2,
+  "source": "numa_shared_full_pinned",
+  "source_unique_bytes": 115964116992,
+  "controller": "native C++",
+  "phase_order": "metadata PLAN -> forward -> CPU rendezvous -> H2D -> CPU rendezvous -> compute -> CPU rendezvous -> return -> CPU rendezvous"
+}
