@@ -29,3 +29,8 @@ python mgo_v2/scripts/report_pcie_rank_concurrency.py --input mgo_v2/experiments
 
 `RAW.json` records each repeat for resumption; `RESULTS.json`, the two CSVs,
 the report, and PNG/PDF figure summarize every subset.
+
+For per-GPU speeds at every 2-, 4-, and 6-GPU combination, see
+`PER_RANK_2_4_6.xlsx` or `PER_RANK_2_4_6.csv`; the matching compact summary is
+`PER_RANK_2_4_6.md`. Regenerate these with
+`python mgo_v2/scripts/report_pcie_246_rank.py`.
