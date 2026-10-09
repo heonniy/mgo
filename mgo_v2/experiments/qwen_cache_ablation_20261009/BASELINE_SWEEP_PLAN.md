@@ -9,9 +9,12 @@ their cache curves can be compared with the completed main_OURS curve.
 The existing C30 three-repeat baseline jobs used the same warmup and target
 SHA-256, cache budget and worker settings as this frozen manifest. Verify
 their raw receipts and reuse those records with explicit provenance. Run the
-remaining C20/C40/C50 cells as guarded exclusive jobs. Preserve all target
-repeats and full ranges; use three unfiltered targets for compatibility with
-the C30 records and original Qwen sweep. Keep one GPU job at a time, at least
+remaining C20/C40/C50 cells as guarded exclusive jobs. C20 MoE-Infinity was
+already launched with three unfiltered targets; retain them. For remaining
+new cells, take two clean targets first and stop when TPOT and E2E differ by
+at most 2% relative to their mean. If either differs by more than 2%, assess
+one bounded third target under a fresh guarded attempt and preserve all raw
+records. Report the actual repeat count and full range. Keep one GPU job at a time, at least
 2 GiB free per owner GPU, host-memory guards, and restore owner inference
 loads after each job. Preserve failed attempts and resume under new labels.
 

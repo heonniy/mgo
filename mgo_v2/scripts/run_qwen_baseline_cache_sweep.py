@@ -48,9 +48,9 @@ def wait_on_running(paths):
     raise TimeoutError(f'guarded attempt did not finalize: {path}')
 
 
-def command(cell, system, label):
+def command(cell, system, label, repeats):
     common = [PYTHON, '-u', str(SUPERVISOR), '--workloads', str(MANIFEST),
-              '--label', label, '--cell', cell['cell'], '--repeats', '3']
+              '--label', label, '--cell', cell['cell'], '--repeats', str(repeats)]
     if system == 'infinity':
         return common + ['--system', 'MoE-Infinity-repaired', '--worker',
                          'headline_infinity_worker.py', '--python', INFINITY,
@@ -87,28 +87,61 @@ def main():
         assert cell['local_batch'] == 16 and cell['input_tokens'] == 512
         assert cell['output_tokens'] == 64
         for system in args.system or SYSTEMS:
-            prefix = f'qca_baseline_c{cap}_{system}_r3_v'
+            prefix = f'qca_baseline_c{cap}_{system}_'
             attempts = sorted(JOBS.glob(prefix + '*'))
             if not args.dry_run:
                 wait_on_running(attempts)
-            passed = [p for p in attempts if (p / 'status.json').exists() and
+            primary_attempts = [p for p in attempts if '_r2_v' in p.name or '_r3_v' in p.name]
+            passed = [p for p in primary_attempts if (p / 'status.json').exists() and
                       json.loads((p / 'status.json').read_text()).get('status') == 'PASS']
             if passed:
-                print('REUSE PASS', passed[-1].name, flush=True)
+                primary = passed[-1]
+                print('REUSE PASS', primary.name, flush=True)
+            else:
+                primary_prefix = prefix + 'r2_v'
+                number = max((int(p.name.rsplit('_v', 1)[1]) for p in primary_attempts
+                              if '_r2_v' in p.name), default=0) + 1
+                label = primary_prefix + str(number)
+                call = command(cell, system, label, 2)
+                print('RUN', label, flush=True)
+                if args.dry_run:
+                    print(json.dumps(call), flush=True)
+                    continue
+                if system == 'llama':
+                    ensure_llama_build()
+                env = dict(os.environ, MGO_MIN_GPU_FREE_MIB='2048')
+                subprocess.run(call, check=True, env=env)
+                primary = JOBS / label
+                assert json.loads((primary / 'status.json').read_text())['status'] == 'PASS'
+                print('PASS', label, flush=True)
+            if '_r3_v' in primary.name or args.dry_run:
                 continue
-            number = max((int(p.name.rsplit('_v', 1)[1]) for p in attempts), default=0) + 1
-            label = prefix + str(number)
-            call = command(cell, system, label)
-            print('RUN', label, flush=True)
-            if args.dry_run:
-                print(json.dumps(call), flush=True)
+            measurements = [json.loads((primary / f'repeat{i}.json').read_text()) for i in (1, 2)]
+            differences = {metric: abs(measurements[0][metric] - measurements[1][metric]) /
+                           ((measurements[0][metric] + measurements[1][metric]) / 2)
+                           for metric in ('TPOT', 'E2E')}
+            maximum = max(differences.values())
+            if maximum <= .02:
+                print('STABLE TWO', primary.name, differences, flush=True)
                 continue
+            if maximum > .05:
+                print('UNSTABLE >5%; NO MORE REPEATS', primary.name, differences, flush=True)
+                continue
+            follow_prefix = prefix + 'followup_r1_v'
+            followups = sorted(JOBS.glob(follow_prefix + '*'))
+            if any((p / 'status.json').exists() and
+                   json.loads((p / 'status.json').read_text()).get('status') == 'PASS'
+                   for p in followups):
+                print('REUSE THIRD', followups[-1].name, flush=True)
+                continue
+            label = follow_prefix + str(max((int(p.name.rsplit('_v', 1)[1])
+                                             for p in followups), default=0) + 1)
+            print('RUN THIRD', label, differences, flush=True)
             if system == 'llama':
                 ensure_llama_build()
             env = dict(os.environ, MGO_MIN_GPU_FREE_MIB='2048')
-            subprocess.run(call, check=True, env=env)
+            subprocess.run(command(cell, system, label, 1), check=True, env=env)
             assert json.loads((JOBS / label / 'status.json').read_text())['status'] == 'PASS'
-            print('PASS', label, flush=True)
 
 
 if __name__ == '__main__':

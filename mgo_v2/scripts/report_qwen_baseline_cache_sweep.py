@@ -36,20 +36,26 @@ def stats(values):
 
 def find_job(cap, system):
     if cap == 30:
-        return JOBS / OLD_C30[system], True
-    paths = sorted(JOBS.glob(f'qca_baseline_c{cap}_{system}_r3_v*'),
-                   key=lambda p: int(p.name.rsplit('_v', 1)[1]))
+        return JOBS / OLD_C30[system], None, True
+    prefix = f'qca_baseline_c{cap}_{system}_'
+    paths = sorted([p for p in JOBS.glob(prefix + '*')
+                    if '_r2_v' in p.name or '_r3_v' in p.name])
     passed = [p for p in paths if (p / 'status.json').exists() and
               read(p / 'status.json').get('status') == 'PASS']
-    return (passed[-1] if passed else None), False
+    followups = sorted(JOBS.glob(prefix + 'followup_r1_v*'))
+    thirds = [p for p in followups if (p / 'status.json').exists() and
+              read(p / 'status.json').get('status') == 'PASS']
+    return (passed[-1] if passed else None), (thirds[-1] if thirds else None), False
 
 
-def inspect(spec, system, job, reused, original_sha, current_sha):
+def inspect(spec, system, job, third, reused, original_sha, current_sha):
     status = read(job / 'status.json')
     assert status['status'] == 'PASS'
     assert status['workload_manifest_sha256'] == (original_sha if reused else current_sha)
     assert any(str(arg).endswith(WORKERS[system]) for arg in status['command'])
-    assert '--repeats' in status['command'] and status['command'][status['command'].index('--repeats') + 1] == '3'
+    assert '--repeats' in status['command']
+    count = int(status['command'][status['command'].index('--repeats') + 1])
+    assert count in (2, 3)
     assert reused or status.get('min_gpu_free_mib') == 2048
     assert not status.get('remaining_gpu_occupants')
     assert reused or {r['gpu'] for r in status['restored']} == {0, 1, 4, 5}
@@ -58,7 +64,13 @@ def inspect(spec, system, job, reused, original_sha, current_sha):
         assert spec[phase]['sha256'] == source_spec[phase]['sha256']
         assert hashlib.sha256(Path(spec[phase]['path']).read_bytes()).hexdigest() == spec[phase]['sha256']
     expected_ids = [row['request_id'] for row in read(Path(spec['target']['path']))['requests']]
-    repeats = [read(job / f'repeat{i}.json') for i in (1, 2, 3)]
+    repeats = [read(job / f'repeat{i}.json') for i in range(1, count + 1)]
+    if third:
+        third_status = read(third / 'status.json')
+        assert count == 2 and third_status['status'] == 'PASS'
+        assert third_status['workload_manifest_sha256'] == current_sha
+        assert third_status['command'][third_status['command'].index('--repeats') + 1] == '1'
+        repeats.append(read(third / 'repeat1.json'))
     assert all(r['status'] == 'PASS' and r['output_tokens'] == 64 and r['global_requests'] == 64 for r in repeats)
     memory = {}
     for i, record in enumerate(repeats, 1):
@@ -71,7 +83,9 @@ def inspect(spec, system, job, reused, original_sha, current_sha):
             memory.setdefault('peak_expert_bytes_per_gpu', []).append(peaks)
             memory['expert_budget_bytes_per_gpu'] = budgets
         elif system == 'deepspeed':
-            rr = [read(job / f'repeat{i}_rank{r}.json') for r in range(4)]
+            source = job if i <= count else third
+            source_i = i if i <= count else 1
+            rr = [read(source / f'repeat{source_i}_rank{r}.json') for r in range(4)]
             assert [rid for row in rr for rid in row['request_ids']] == expected_ids
             assert all(len(tokens) == 64 for row in rr for tokens in row['tokens'])
             assert all(0 <= row['all_parameter_peak_bytes'] <= row['parameter_budget_bytes'] for row in rr)
@@ -92,8 +106,17 @@ def inspect(spec, system, job, reused, original_sha, current_sha):
             assert cfg['cpu_threads'] == 32 and not cfg['op_offload']
             memory['resident_expert_bytes_per_gpu'] = [record['expert_resident_bytes'] // 4] * 4
             memory['expert_budget_bytes_global'] = spec['expert_budget_bytes']
+    relative = max(abs(repeats[0][metric] - repeats[1][metric]) /
+                   ((repeats[0][metric] + repeats[1][metric]) / 2)
+                   for metric in ('TPOT', 'E2E'))
+    stability = 'UNSTABLE' if relative > .05 else ('THIRD' if third else 'TWO_STABLE' if count == 2 else 'THREE')
+    if .02 < relative <= .05 and count == 2:
+        stability = 'THIRD_PENDING'
     return dict(status='PASS', system=system, cache_percent=spec['cache_percent'],
-                label=job.name, reused_c30=reused, source_commit=status['source_commit'],
+                label=job.name, third_label=third.name if third else None,
+                clean_target_repeats=len(repeats), stability=stability,
+                first_two_max_relative_difference=relative,
+                reused_c30=reused, source_commit=status['source_commit'],
                 workload_manifest_sha256=status['workload_manifest_sha256'],
                 target_sha256=spec['target']['sha256'],
                 metrics={name: stats([r[name] for r in repeats]) for name in ('TTFT', 'TPOT', 'E2E')},
@@ -108,8 +131,8 @@ def main():
     rows = []
     for spec in sorted(manifest['cells'], key=lambda c: c['cache_percent']):
         for system in SYSTEMS:
-            job, reused = find_job(spec['cache_percent'], system)
-            rows.append(inspect(spec, system, job, reused, original_sha, current_sha)
+            job, third, reused = find_job(spec['cache_percent'], system)
+            rows.append(inspect(spec, system, job, third, reused, original_sha, current_sha)
                         if job else dict(status='PENDING', system=system,
                                          cache_percent=spec['cache_percent']))
     result = dict(status='PASS' if all(r['status'] == 'PASS' for r in rows) else 'PARTIAL',
@@ -118,7 +141,7 @@ def main():
                   physical_gpus=[0, 1, 4, 5], rows=rows)
     (OUT / 'BASELINE_SWEEP_RESULTS.json').write_text(json.dumps(result, indent=2) + '\n')
     lines = ['# Qwen cache-capacity baseline sweep', '',
-             'ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. Three unfiltered clean target repeats per baseline cell. C30 is validated reuse of the earlier same-request, same-budget run; C20/C40/C50 are new guarded jobs.', '',
+             'ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. C30 reuses three validated same-request, same-budget targets. New cells take two clean targets, with one bounded third if TPOT or E2E differs by over 2% but no more than 5%; the already-started C20 MoE-Infinity job has three. All samples and full ranges are retained.', '',
              '| Cache | System | TTFT median [range], s | TPOT median [range], s/token | E2E median [range], s | Receipt |',
              '|---:|---|---:|---:|---:|---|']
     for row in rows:
@@ -128,7 +151,7 @@ def main():
         def fmt(name):
             x = row['metrics'][name]
             return f"{x['median']:.3f} [{x['minimum']:.3f}, {x['maximum']:.3f}]"
-        receipt = row['label'] + (' (C30 reuse)' if row['reused_c30'] else '')
+        receipt = row['label'] + (f" + {row['third_label']}" if row['third_label'] else '') + (' (C30 reuse)' if row['reused_c30'] else '') + f" ({row['clean_target_repeats']} repeats; {row['stability']})"
         lines.append(f"| C{row['cache_percent']} | {row['system']} | {fmt('TTFT')} | {fmt('TPOT')} | {fmt('E2E')} | `{receipt}` |")
     lines += ['', 'Expert residency/placement or live-parameter budget checks are recorded per cell in `BASELINE_SWEEP_RESULTS.json`. llama.cpp statically holds balanced full expert layers, so its quantized GPU residency is not a dynamic cache hit-rate measurement. DeepSpeed limits all live parameters, including non-experts, under its cap. Raw requests, tokens, logs and GPU resource samples remain outside Git.', '']
     (OUT / 'BASELINE_SWEEP_RESULTS.md').write_text('\n'.join(lines))
