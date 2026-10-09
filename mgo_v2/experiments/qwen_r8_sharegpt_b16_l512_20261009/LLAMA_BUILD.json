@@ -1,0 +1,39 @@
+{
+  "source_sha256": "bb890d2b20d42732b67176c0b814822ddbcff55d22d310a3a002462ada08155c",
+  "binary_sha256": "9ec8cd40a367036c0923a9ebab18b6a66da6a973628cb96053ed85e4959db7c3",
+  "cmake_flags": {
+    "GGML_CUDA:BOOL": "ON",
+    "GGML_CUDA_GRAPHS:BOOL": "ON"
+  },
+  "command": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_llama_sync_r8.cpp",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/ggml/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/vendor/nlohmann",
+    "-L/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-Wl,-rpath,/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-lllama",
+    "-lggml",
+    "-lggml-base",
+    "-lggml-cpu",
+    "-o",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-sync-r8"
+  ],
+  "cuda_graph_support": true,
+  "baseline_policy_eligible": true,
+  "expert_placement": "balanced1",
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf"
+}

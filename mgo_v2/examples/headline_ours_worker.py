@@ -31,7 +31,7 @@ def validate_state(rt):
  rt.h2d.synchronize();rt.arena.assert_consistent();assert not rt.controller.pending and not rt.mismatch.item()
  assert np.array_equal(rt.keys[rt.arena.main_physical[rt.rank]],rt.policy.slots[rt.rank,:rt.cap])
  state=array_hash(rt.policy.slots);roles=array_hash(np.concatenate(rt.arena.main_physical))
- digest=torch.tensor(list(bytes.fromhex(state+roles)),dtype=torch.uint8,device='cuda');all_digests=[torch.empty_like(digest) for _ in range(4)];dist.all_gather(all_digests,digest)
+ digest=torch.tensor(list(bytes.fromhex(state+roles)),dtype=torch.uint8,device='cuda');all_digests=[torch.empty_like(digest) for _ in range(rt.world)];dist.all_gather(all_digests,digest)
  assert all(torch.equal(digest,x) for x in all_digests)
  return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+rt.world*rt.args.arena_budget)
 
@@ -42,8 +42,9 @@ def main(a):
  assert not a.prefill_layout_fast or a.prefill_optimized
  assert not a.native_prefill or (a.expert_executor=='native' and a.prefill_optimized)
  assert not a.h2d_serial_ablation or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast)
- rank=int(os.environ['RANK']);assert dist.is_available() and int(os.environ['WORLD_SIZE'])==4
- physical=[0,1,4,5];assert os.environ['MGO_V2_PHYSICAL_GPUS']=='0,1,4,5'
+ rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (4,8)
+ physical=list(map(int,os.environ['MGO_V2_PHYSICAL_GPUS'].split(',')))
+ assert physical==([0,1,4,5] if world==4 else list(range(8)))
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
@@ -127,16 +128,16 @@ def main(a):
    hist=np.stack(rt.main_eviction_trace_histograms).astype(np.int32)
    gates=np.stack(rt.main_eviction_trace_gates).astype(np.float32)
    events=np.asarray(rt.main_eviction_trace_events,dtype=np.int32)
-   assert hist.shape==(48*n,4,128) and gates.shape==(48*n,128)
+   assert hist.shape==(48*n,world,128) and gates.shape==(48*n,128)
    assert np.array_equal(events,np.arange(48*n,dtype=np.int32))
    raw=hist.tobytes()+gates.tobytes()+events.tobytes()
    digest=np.frombuffer(hashlib.sha256(raw).digest(),np.uint8).copy()
-   d=torch.tensor(digest,device='cuda');all_d=torch.empty((4,32),dtype=torch.uint8,device='cuda')
+   d=torch.tensor(digest,device='cuda');all_d=torch.empty((world,32),dtype=torch.uint8,device='cuda')
    dist.all_gather_into_tensor(all_d.view(-1),d);assert bool((all_d==all_d[0]).all())
    if rank==0:
     np.savez_compressed(a.output/'main_eviction_trace.npz',histograms=hist,gates=gates,events=events)
     write(a.output/'main_eviction_trace_meta.json',dict(
-     status='PASS',cell=a.cell,source_policy=a.policy,local_batch=a.local_batch,global_requests=4*a.local_batch,
+     status='PASS',cell=a.cell,source_policy=a.policy,local_batch=a.local_batch,global_requests=world*a.local_batch,
      input_tokens=int(ids.shape[1]),output_tokens=n,events=int(len(events)),prefill_events=48,
      decode_events=int((n-1)*48),main_capacities=list(map(int,a.capacities)),
      captured_runtime_prefetch_P=int(a.arena_budget),captured_runtime_trigger=a.trigger,
@@ -153,9 +154,9 @@ def main(a):
   result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
-   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(x['release_ns'] for x in rr))==1
+   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(x['release_ns'] for x in rr))==1
    release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
-   row=dict(status='PASS',expert_executor=a.expert_executor,repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=4*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=4*a.local_batch,smoke=a.smoke)
+   row=dict(status='PASS',expert_executor=a.expert_executor,repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=world*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=world*a.local_batch,smoke=a.smoke)
    write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier()
  if a.post_generation_diagnostic:

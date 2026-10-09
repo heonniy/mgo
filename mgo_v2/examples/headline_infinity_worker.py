@@ -9,7 +9,7 @@ MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
 def sync():
- for gpu in range(4):torch.cuda.synchronize(gpu)
+ for gpu in range(torch.cuda.device_count()):torch.cuda.synchronize(gpu)
 class FiniteLogits:
  def __init__(self):self.flag=None
  def __call__(self,input_ids,scores):
@@ -24,11 +24,11 @@ class ClockStreamer:
   if self.prompt:self.prompt=False;return
   sync()
   if self.trim_floor_bytes:
-   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(torch.cuda.device_count())]
    if min(free_before)<self.trim_floor_bytes:
-    for gpu in range(4):
+    for gpu in range(torch.cuda.device_count()):
      with torch.cuda.device(gpu):torch.cuda.empty_cache()
-    free_after=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+    free_after=[torch.cuda.mem_get_info(g)[0] for g in range(torch.cuda.device_count())]
     with self.trim_log.open('a') as f:
      f.write(json.dumps(dict(token_index=len(self.stamps),free_before=free_before,
                              free_after=free_after,unix=time.time()))+'\n')
@@ -36,7 +36,10 @@ class ClockStreamer:
  def end(self):pass
 
 def main(a):
- assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5' and torch.cuda.device_count()==4
+ physical=list(map(int,os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
+ world=len(physical)
+ assert world in (4,8) and physical==([0,1,4,5] if world==4 else list(range(8)))
+ assert torch.cuda.device_count()==world
  torch.set_num_threads(8);torch.manual_seed(42)
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)
@@ -145,9 +148,9 @@ def main(a):
   if not diag_full_prefill:return
   row=dict(stage=stage,layer=module.layer_idx,token_index=(attention_checks[0]-1)//attention_layers,
            shape=list(hidden.shape),
-           allocated=[torch.cuda.memory_allocated(g) for g in range(4)],
-           reserved=[torch.cuda.memory_reserved(g) for g in range(4)],
-           free=[torch.cuda.mem_get_info(g)[0] for g in range(4)],
+           allocated=[torch.cuda.memory_allocated(g) for g in range(world)],
+           reserved=[torch.cuda.memory_reserved(g) for g in range(world)],
+           free=[torch.cuda.mem_get_info(g)[0] for g in range(world)],
            unix=time.time())
   with memory_trace_path.open('a') as f:f.write(json.dumps(row)+'\n')
  def attention_gpu(module,args,kwargs):
@@ -178,7 +181,7 @@ def main(a):
    tracer.trace_collection[:]=saved[0];tracer.collection_access[:]=saved[1];tracer.access_clock=saved[2]
   assert not tracer.trace
   before=p.reset_eam_residency();sync()
-  for gpu in range(4):torch.cuda.reset_peak_memory_stats(gpu)
+  for gpu in range(world):torch.cuda.reset_peak_memory_stats(gpu)
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   streamer=ClockStreamer(trim_floor_bytes,a.output/'allocator_trims.jsonl');finite=FiniteLogits();start=time.perf_counter_ns()
   with torch.no_grad():
@@ -196,15 +199,15 @@ def main(a):
   gc.collect();sync()
   assert kv_ref() is None and all(ref() is None for ref in kv_tensors),'previous batch KV retained'
   if trim_floor_bytes:
-   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
-   for gpu in range(4):
+   free_before=[torch.cuda.mem_get_info(g)[0] for g in range(world)]
+   for gpu in range(world):
     with torch.cuda.device(gpu):torch.cuda.empty_cache()
-   free_after=[torch.cuda.mem_get_info(g)[0] for g in range(4)]
+   free_after=[torch.cuda.mem_get_info(g)[0] for g in range(world)]
    with (a.output/'allocator_trims.jsonl').open('a') as f:
     f.write(json.dumps(dict(boundary=f'after_{phase}_{repeat}',
                             free_before=free_before,free_after=free_after,
                             unix=time.time()))+'\n')
-  live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(4)]
+  live_after_kv_release=[torch.cuda.memory_allocated(g) for g in range(world)]
   assert not tracer.trace
   stats=dict(p.archer_engine.get_expert_policy_stats())
   write(a.output/f'eam_probe_repeat{repeat}.json',dict(actual_calls=p.eam_calls,
@@ -217,7 +220,7 @@ def main(a):
   assert stats['peak_accounted_bytes'] <= sum(budgets)
   assert stats['resident_bytes']+stats['transition_reserved_bytes']+stats['workspace_bytes']<=sum(budgets)
   first,end=streamer.stamps[0],streamer.stamps[-1]
-  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(4)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(4)],host_rss_bytes=psutil.Process().memory_info().rss)
+  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(world)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(world)],host_rss_bytes=psutil.Process().memory_info().rss)
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
   if repeat==0:

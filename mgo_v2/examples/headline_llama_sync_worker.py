@@ -4,33 +4,35 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 TOOLS=Path('/home/hwlee/mgo-tools/headline-r4')
 TOPOLOGY=Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json')
-GPUS=[0,1,4,5]
+GPUS=list(map(int,os.environ.get('MGO_V2_PHYSICAL_GPUS','0,1,4,5').split(',')))
 def write(p,x):p.write_text(json.dumps(x,indent=2)+'\n')
 def balanced_affinity(threads):
- assert threads in (16,32,64) and threads%4==0
- fixed=json.loads(TOPOLOGY.read_text())['fixed_affinity'];per=threads//4;chosen=[];pools={}
+ assert threads in (16,32,64) and threads%len(GPUS)==0
+ fixed=json.loads(TOPOLOGY.read_text())['fixed_affinity'];per=threads//len(GPUS);chosen=[];pools={}
  for gpu in GPUS:
   pool=list(fixed[str(gpu)]);assert len(pool)>=per,(gpu,len(pool),per)
   pools[str(gpu)]=pool;chosen+=pool[:per]
  assert len(chosen)==threads and len(set(chosen))==threads
  return chosen,pools
 def main(a):
- assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
+ world=len(GPUS)
+ assert GPUS==([0,1,4,5] if world==4 else list(range(8)))
+ assert os.environ['CUDA_VISIBLE_DEVICES']==','.join(map(str,GPUS))
  spec=next(s for s in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if s['cell']==a.cell)
- binary=TOOLS/'llama.cpp/build/bin/headline-llama-sync'
- build_path=P/'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json'
+ binary=TOOLS/('llama.cpp/build/bin/headline-llama-sync-r8' if world==8 else 'llama.cpp/build/bin/headline-llama-sync')
+ build_path=P/('experiments/qwen_r8_sharegpt_b16_l512_20261009/LLAMA_BUILD.json' if world==8 else 'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json')
  build=json.loads(build_path.read_text())
- source=P/'examples/headline_llama_sync.cpp'
+ source=P/('examples/headline_llama_sync_r8.cpp' if world==8 else 'examples/headline_llama_sync.cpp')
  assert hashlib.sha256(source.read_bytes()).hexdigest()==build['source_sha256'],'llama sync source changed: rebuild and refresh LLAMA_BUILD.json'
  assert hashlib.sha256(binary.read_bytes()).hexdigest()==build['binary_sha256'],'llama sync binary does not match build receipt'
  assert build.get('cmake_flags',{}).get('GGML_CUDA_GRAPHS:BOOL')=='ON','A/B-capable llama build requires CUDA Graph support compiled in; rebuild first'
  assert build.get('cuda_graph_support') is True and build.get('baseline_policy_eligible') is True,'stale llama build receipt'
  per=int(a.expert_placement.removeprefix('balanced')) if a.expert_placement.startswith('balanced') else None
- layers=4*per if per is not None else spec['expert_slots']//128
+ layers=world*per if per is not None else spec['expert_slots']//128
  resident=layers*128*9*2**20
  assert resident<=spec['expert_budget_bytes']
  if per is not None:
-  assert {20:2,30:3,40:4,50:6}[spec['cache_percent']]==per
+  assert ({20:2,30:3,40:4,50:6}[spec['cache_percent']] if world==4 else 1)==per
   assert per*128<=min(spec['expert_slots_per_rank'])
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
@@ -44,7 +46,7 @@ def main(a):
  write(a.output/'config.json',dict(
   command=cmd,build=build,expert_budget_bytes=spec['expert_budget_bytes'],expert_resident_bytes=resident,
   gpu_expert_layers=layers,cpu_expert_layers=48-layers,expert_placement=a.expert_placement,
-  static_expert_bytes_per_gpu=([per*128*9*2**20]*4 if per is not None else None),
+  static_expert_bytes_per_gpu=([per*128*9*2**20]*world if per is not None else None),
   unused_expert_budget_bytes=spec['expert_budget_bytes']-resident,
   synchronous_batch=True,op_offload=False,
   cpu_threads=a.threads,cpu_batch_threads=a.threads,cpu_affinity=affinity,
@@ -64,15 +66,15 @@ def main(a):
  if per is not None:
   if per==3:assert placement['gpu_expert_layer_ids']==[2,6,10,14,18,22,26,30,34,38,42,46]
   counts=placement['gpu_expert_layers_by_device']
-  assert set(counts)=={'CUDA0','CUDA1','CUDA2','CUDA3'} and sorted(counts.values())==[per]*4,counts
+  assert set(counts)=={f'CUDA{i}' for i in range(world)} and sorted(counts.values())==[per]*world,counts
 
  lines=[s for s in (a.output/'run.log').read_text().splitlines() if 'KV buffer size' in s]
- assert len(lines)==4 and all(re.search(r'CUDA[0-3] KV buffer',s) for s in lines),lines
+ assert len(lines)==world and all(any(f'CUDA{i} KV buffer' in s for i in range(world)) for s in lines),lines
  write(a.output/'kv_placement.json',dict(status='PASS',buffers=lines))
 
  for r in range((1 if a.smoke else a.repeats)+1):
   result=json.loads((a.output/f'repeat{r}.json').read_text())
-  n=2 if a.smoke else 64;count=4 if a.smoke else spec['global_requests']
+  n=2 if a.smoke else 64;count=world if a.smoke else spec['global_requests']
   assert result['synchronous_batch'] and result['finite_logits'] and len(result['tokens'])==count
   assert result['cpu_threads']==a.threads==result['cpu_batch_threads']
   assert result['op_offload'] is False and result['offload_kqv'] is True
@@ -97,5 +99,5 @@ if __name__=='__main__':
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
  p.add_argument('--graph-reuse',choices=('on','off'),required=True)
- p.add_argument('--expert-placement',choices=('legacy_tail','balanced2','balanced3','balanced4','balanced6'),default='balanced3')
+ p.add_argument('--expert-placement',choices=('legacy_tail','balanced1','balanced2','balanced3','balanced4','balanced6'),default='balanced3')
  main(p.parse_args())

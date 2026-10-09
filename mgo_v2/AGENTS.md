@@ -1,3 +1,13 @@
+**OWNER QWEN SHAREGPT R8 MAIN-SYSTEM COMPARISON ACTIVE (2026-10-09).**
+Read `experiments/qwen_r8_sharegpt_b16_l512_20261009/PLAN.md`. The latest
+owner request authorizes one R8 run on physical GPUs0–7, Qwen3 only,
+ShareGPT local B16/input512/output64, C30, selected main_OURS plus repaired
+MoE-Infinity, DeepSpeed ZeRO-Inference, and synchronous balanced llama.cpp.
+Finish the four-system R8 comparison; preserve each failed attempt, repair
+reproducible R8 port errors, and restore the eight owned model-forward loads
+whenever no GPU job is active. Earlier R4-only GPU limits are superseded for
+this packet. Never stop foreign processes.
+
 **OWNER ALL-EIGHT PCIe CONCURRENCY CORRECTION COMPLETE (2026-10-09).**
 The latest user request includes physical GPU2: measure every nonempty subset
 of GPUs0–7 (255), both expert payloads, two repeats. Write separate outputs to

@@ -31,8 +31,10 @@ def generate(engine,ids,n,progress=None):
  return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,tokens=torch.stack(tokens,1).cpu().tolist(),finite_logits=True)
 
 def main(a):
- rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
- physical=[0,1,4,5]
+ rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);world=int(os.environ['WORLD_SIZE'])
+ assert world in (4,8)
+ physical=list(map(int,os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
+ assert physical==([0,1,4,5] if world==4 else list(range(8)))
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
  # Match OURS' non-overlapping per-rank CPU ranges. The live host exposes
  # one NUMA node; this controls CPU scheduling, not cross-NUMA placement.
@@ -41,7 +43,7 @@ def main(a):
   except FileNotFoundError:pass
  torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
  write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank CPU range matching OURS; single NUMA node'))
- deepspeed.init_distributed();assert dist.get_world_size()==4
+ deepspeed.init_distributed();assert dist.get_world_size()==world
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)
  assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
@@ -49,7 +51,7 @@ def main(a):
  assert (model_family=='Qwen3')==(model_path==MODEL)
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
  scale=spec.get('expert_budget_bytes',17392730112)/17392730112
- cfg=dict(train_batch_size=batch*4,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale),stage3_prefetch_bucket_size=int(1_000_000_000*scale),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
+ cfg=dict(train_batch_size=batch*world,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale*4/world),stage3_prefetch_bucket_size=int(1_000_000_000*scale*4/world),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
  dschf=HfDeepSpeedConfig(cfg)
  model=AutoModelForCausalLM.from_pretrained(model_path,torch_dtype=torch.bfloat16,attn_implementation='sdpa',local_files_only=True)
  if model_family!='Qwen3':
@@ -68,7 +70,7 @@ def main(a):
  assert all(p.dtype==torch.bfloat16 for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
- budget=spec.get('expert_budget_bytes',17392730112)//4;peak=[0];all_peak=[0];samples=[0];full_scans=[0]
+ budget=spec.get('expert_budget_bytes',17392730112)//world;peak=[0];all_peak=[0];samples=[0];full_scans=[0]
  records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
  def scan_residency():
   charged=all_charged=0
@@ -135,9 +137,9 @@ def main(a):
   row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,parameter_counter_offset_bytes=counter_offset[0],parameter_counter_corrections=counter_corrections[0],parameter_counter_full_scans=counter_full_scans[0],kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
   write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
   if rank==0:
-   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)];assert len(set(r['release_ns'] for r in rr))==1
+   rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(r['release_ns'] for r in rr))==1
    start=rr[0]['release_ns'];first=max(r['first_ns'] for r in rr);end=max(r['end_ns'] for r in rr)
-   result=dict(status='PASS',system='DeepSpeed-ZeRO-Inference',repeat=repeat,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=4*batch*n/((end-start)/1e9),global_requests=4*batch,output_tokens=n)
+   result=dict(status='PASS',system='DeepSpeed-ZeRO-Inference',repeat=repeat,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=world*batch*n/((end-start)/1e9),global_requests=world*batch,output_tokens=n)
    write(a.output/f'repeat{repeat}.json',result);print(json.dumps(result),flush=True)
   dist.barrier()
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='DeepSpeed-ZeRO-Inference',cell=a.cell,smoke=a.smoke))
