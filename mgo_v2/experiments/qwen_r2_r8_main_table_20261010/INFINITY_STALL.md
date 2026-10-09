@@ -28,3 +28,10 @@ R2 and R8. A low-cost per-token progress receipt and external 120-second
 watchdog now capture a native stall independently of the Python worker's
 GIL. The first spec-off job is a functional smoke; only subsequent
 untraced 64-token full runs are headline eligible.
+
+The untraced spec-off R8 full job (`infinity_full_v4`) subsequently completed
+both 64-token target repeats, with zero speculative candidates and C30
+budget validation in each. TPOT was 3.630076 and 3.627948 s/token; E2E
+was 238.241 and 236.486 s. This A/B result supports speculative admission
+as the cause of the earlier long-target stall. The short spec-on diagnostic
+also completed, so the data do not isolate a single native deadlock site.
