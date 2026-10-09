@@ -1,5 +1,6 @@
 """Summarize all H2D GPU combinations and render concurrency figures."""
 
+import argparse
 import csv
 import json
 import statistics
@@ -16,8 +17,14 @@ GPUS = (0, 1, 3, 4, 5, 6, 7)
 
 
 def main():
+    global ROOT, GPUS
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=Path, default=ROOT)
+    args = parser.parse_args()
+    ROOT = args.input.resolve()
     result = json.loads((ROOT / 'RESULTS.json').read_text())
-    assert result['status'] == 'PASS' and result['count'] == 254
+    GPUS = tuple(result['physical_gpus'])
+    assert result['status'] == 'PASS' and result['count'] == 2 * (2**len(GPUS) - 1)
     rows = result['rows']
     assert all(row['repeats'] == 2 for row in rows)
     by = {(tuple(row['gpus']), row['payload']): row for row in rows}
@@ -57,13 +64,13 @@ def main():
     for i, payload in enumerate(('Qwen expert', 'DeepSeek expert')):
         groups = [[row['aggregate_gib_per_s']['median'] for row in rows
                    if row['payload'] == payload and row['concurrent_ranks'] == count]
-                  for count in range(1, 8)]
+                  for count in range(1, len(GPUS) + 1)]
         ratio_groups = [[row['ratio_to_solo'] for row in table
                          if row['payload'] == payload and row['count'] == count]
-                        for count in range(1, 8)]
+                        for count in range(1, len(GPUS) + 1)]
         for j, values in enumerate((groups, ratio_groups)):
             ax = axes[i, j]
-            parts = ax.boxplot(values, positions=range(1, 8), widths=.56,
+            parts = ax.boxplot(values, positions=range(1, len(GPUS) + 1), widths=.56,
                                patch_artist=True, showfliers=True, whis=(0, 100))
             color = '#0072B2' if j == 0 else '#E69F00'
             for patch in parts['boxes']:
@@ -78,7 +85,7 @@ def main():
         axes[i, 1].set_ylabel('Rank speed / same-rank solo speed')
     for ax in axes[1]:
         ax.set_xlabel('Simultaneous GPU count')
-    fig.suptitle('Pinned-host H2D · all 127 subsets of GPUs 0,1,3,4,5,6,7', fontsize=12)
+    fig.suptitle(f'Pinned-host H2D · all {2**len(GPUS)-1} subsets of GPUs {",".join(map(str, GPUS))}', fontsize=12)
     fig.savefig(ROOT / 'pcie_concurrency.png', dpi=240, facecolor='white')
     fig.savefig(ROOT / 'pcie_concurrency.pdf', facecolor='white')
     plt.close(fig)
@@ -98,9 +105,9 @@ def main():
                      f"{row['rank_ratio_to_solo_median']:.3f} "
                      f"[{row['rank_ratio_to_solo_min']:.3f}, {row['rank_ratio_to_solo_max']:.3f}] |")
     max_skew = max(row['max_start_skew_ms'] for row in rows)
-    lines.extend(['', '## Per-rank solo versus seven-way', '',
-                  '| GPU | Qwen solo | Qwen seven-way | Qwen ratio | '
-                  'DeepSeek solo | DeepSeek seven-way | DeepSeek ratio |',
+    lines.extend(['', f'## Per-rank solo versus {len(GPUS)}-way', '',
+                  f'| GPU | Qwen solo | Qwen {len(GPUS)}-way | Qwen ratio | '
+                  f'DeepSeek solo | DeepSeek {len(GPUS)}-way | DeepSeek ratio |',
                   '|---:|---:|---:|---:|---:|---:|---:|'])
     for gpu in GPUS:
         q0 = solo[gpu, 'Qwen expert']
@@ -110,20 +117,19 @@ def main():
         lines.append(f'| {gpu} | {q0:.2f} | {q7:.2f} | {q7 / q0:.3f} | '
                      f'{d0:.2f} | {d7:.2f} | {d7 / d0:.3f} |')
     lines.extend(['', 'All bandwidth columns use GiB/s.', '', '## Combination effect', ''])
-    lines.append('| Payload | GPU 0+1+3 aggregate | GPU 0+1+4 aggregate | All 7 aggregate | '
-                 'All 7 / sum of solos |')
+    lines.append(f'| Payload | GPU 0+1+3 aggregate | GPU 0+1+4 aggregate | All {len(GPUS)} aggregate | '
+                 f'All {len(GPUS)} / sum of solos |')
     lines.append('|---|---:|---:|---:|---:|')
     for payload in ('Qwen expert', 'DeepSeek expert'):
         triple = by[(0, 1, 3), payload]['aggregate_gib_per_s']['median']
         control = by[(0, 1, 4), payload]['aggregate_gib_per_s']['median']
-        all_seven = by[tuple(GPUS), payload]['aggregate_gib_per_s']['median']
+        all_ranks = by[tuple(GPUS), payload]['aggregate_gib_per_s']['median']
         ideal = sum(solo[gpu, payload] for gpu in GPUS)
         lines.append(f'| {payload} | {triple:.2f} | {control:.2f} | '
-                     f'{all_seven:.2f} | {100 * all_seven / ideal:.1f}% |')
+                     f'{all_ranks:.2f} | {100 * all_ranks / ideal:.1f}% |')
     lines.extend(['', f'Maximum observed worker start skew: {max_skew:.3f} ms.',
                   'Individual rank and subset results, including full ranges, are in '
                   '`RANK_COMBINATIONS.csv` and `RESULTS.json`.',
-                  'The 0+1+3 penalty reproduces at both payload sizes and both repeats. '
                   'This benchmark cannot isolate whether PCIe links, host memory, '
                   'IOMMU or the virtualized upstream fabric caused it.'])
     if max_skew > 5:

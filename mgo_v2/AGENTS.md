@@ -1,4 +1,12 @@
-**OWNER PCIe CONCURRENCY FOLLOW-UP COMPLETE (2026-10-09).**
+**OWNER ALL-EIGHT PCIe CONCURRENCY CORRECTION ACTIVE (2026-10-09).**
+The latest user request includes physical GPU2: measure every nonempty subset
+of GPUs0–7 (255), both expert payloads, two repeats. Write separate outputs to
+`experiments/pcie_all8_concurrency_20261009`; preserve the completed seven-GPU
+study. Stop/restore only owned model loads on0/1/4/5 and never terminate
+foreign GPU processes. The latest all-eight instruction supersedes prior
+GPU0/1/4/5-only experiment limits for this microbenchmark.
+
+**OWNER PRIOR SEVEN-GPU PCIe CONCURRENCY FOLLOW-UP COMPLETE (2026-10-09).**
 Read `experiments/pcie_rank_concurrency_20261009/{README.md,RESULTS.md}`.
 The newer user-selected GPU set 0/1/3/4/5/6/7 completed all 127 nonempty
 subsets with two pinned-host H2D repeats at both expert sizes; GPU2 was

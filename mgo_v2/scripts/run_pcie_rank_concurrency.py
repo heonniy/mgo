@@ -198,10 +198,16 @@ def summarize(results):
 
 
 def main():
+    global EXPERIMENT, GPUS
     parser = argparse.ArgumentParser()
     parser.add_argument("--copies", type=int, default=256)
     parser.add_argument("--repeats", type=int, default=2)
+    parser.add_argument("--gpus", type=int, nargs="+", default=GPUS)
+    parser.add_argument("--output", type=Path, default=EXPERIMENT)
     args = parser.parse_args()
+    GPUS = tuple(args.gpus)
+    EXPERIMENT = args.output.resolve()
+    assert GPUS == tuple(sorted(set(GPUS))) and all(0 <= g <= 7 for g in GPUS)
     assert args.copies >= 32 and args.repeats in (2, 3)
     baseline = json.loads(BASELINES.read_text())
     assert sum(row.get("status") == "PASS" for row in baseline["rows"]) == 12, "baseline sweep still active"
@@ -209,7 +215,7 @@ def main():
     EXPERIMENT.mkdir(exist_ok=True)
     all_groups = [group for count in range(1, len(GPUS) + 1)
                   for group in itertools.combinations(GPUS, count)]
-    assert len(all_groups) == 127
+    assert len(all_groups) == 2**len(GPUS) - 1
     random.Random(20261009).shuffle(all_groups)
     stopped = []
     state = dict(status="RUNNING", gpus=GPUS, combinations=len(all_groups), started=time.time(),
@@ -233,7 +239,7 @@ def main():
         write(EXPERIMENT / "STATUS.json", state)
         results = run(all_groups, args.copies, args.repeats, EXPERIMENT / "RAW.json")
         rows = summarize(results)
-        assert len(rows) == 254
+        assert len(rows) == 2 * len(all_groups)
         write(EXPERIMENT / "RESULTS.json", dict(status="PASS", rows=rows,
                                                  count=len(rows), physical_gpus=GPUS,
                                                  pinned_host_source=True, repeats=args.repeats,
