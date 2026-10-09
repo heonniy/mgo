@@ -1,0 +1,123 @@
+"""Validate search evidence, report finalist medians and archive each experiment."""
+import argparse
+import csv
+import gzip
+import hashlib
+import json
+import shutil
+import subprocess
+from pathlib import Path
+import numpy as np
+from pcie_host import write
+from pcie_maxgain_select import verify_generation
+from pcie_policy_report import summarize_arm,expected_quota
+from pcie_tpot_optimization_report import partition
+from validate_pcie_phases import validate
+
+PKG=Path(__file__).resolve().parents[1];REPO=PKG.parent
+DEST=PKG/'experiments/pcie_topology_ablation_20261009/maxgain64'
+
+
+def sha(path):
+    h=hashlib.sha256()
+    with path.open('rb') as f:
+        for b in iter(lambda:f.read(8*1024*1024),b''):h.update(b)
+    return h.hexdigest()
+
+
+def validate_stage(root):
+    cohort=json.loads((root/'result.json').read_text());assert cohort['status']=='PASS'
+    assert json.loads((root/'status.json').read_text())['status']=='PASS'
+    spec=json.loads((root/'SEARCH_SPEC.json').read_text());stage=cohort['search_stage']
+    assert spec['status']=='FROZEN' and cohort['candidates']==[c['candidate'] for c in spec['candidates']]
+    assert sha(Path(cohort['search_spec']))==cohort['search_spec_sha256']
+    for arm in ('R-NEAR','G-NEAR'):
+        warm=root/'_warmup'/arm
+        for r in range(4):
+            group=json.loads((warm/f'grouped_repeat0_rank{r}.json').read_text())
+            assert len(group['checks'])==48 and all(c['finite'] and c['relative_l2']<=.01 for c in group['checks'])
+            receipt=json.loads((warm/f'repeat0_rank{r}.json').read_text())
+            assert receipt['metadata_wire_checks']==48 and receipt['finite_logits']
+    report=dict(status='PASS',stage=stage,root=str(root),arms={},selection_is_not_final_estimate=stage!='final')
+    for c in spec['candidates']:
+        for arm in (('G-NEAR',) if stage=='nomination' else ('R-NEAR','G-NEAR')):
+            path=root/c['candidate']/arm;n=16 if stage=='nomination' else 64
+            trace,ranks=verify_generation(path,1,n)
+            for event,row in enumerate(trace):np.testing.assert_array_equal(row[48:52],expected_quota(int(row[19]),event,arm=='G-NEAR'))
+            entry=dict(status='PASS',candidate_manifest=c['path'],candidate_manifest_sha256=c['sha256'])
+            assert sha(Path(c['path']))==c['sha256']
+            if stage=='final':
+                validate(path,(-1,));entry['live']=summarize_arm(path);entry['diagnostic']=partition(path)
+                for repeat in list(range(2,cohort['primary_repeats']+1))+[-1]:
+                    other,rr=verify_generation(path,repeat,64);np.testing.assert_array_equal(trace,other)
+                    assert [r['tokens'] for r in ranks]==[r['tokens'] for r in rr]
+                    assert [r['validation']['state_hash'] for r in ranks]==[r['validation']['state_hash'] for r in rr]
+            report['arms'][c['candidate']+'/'+arm]=entry
+    if stage=='final':
+        comparisons=[]
+        for c in spec['candidates']:
+            r=report['arms'][c['candidate']+'/R-NEAR']['live']['primary']['TPOT']
+            g=report['arms'][c['candidate']+'/G-NEAR']['live']['primary']['TPOT']
+            comparisons.append(dict(candidate=c['candidate'],R=r,G=g,gain_percent=(1-g['median']/r['median'])*100,
+                    request_ids=c['request_ids'],manifest_path=c['path'],manifest_sha256=c['sha256']))
+        comparisons.sort(key=lambda c:(-c['gain_percent'],c['candidate']))
+        report.update(comparisons=comparisons,best_observed=comparisons[0],
+             scope='Best observed among the preregistered screened candidates; no global-optimum or corpus-average claim',
+             trajectory_note='Independent live greedy R/G generations may change routing, miss counts and cache trajectories; same-input repetitions within each arm must match exactly')
+        with (root/'maxgain_table.csv').open('w',newline='') as f:
+            w=csv.writer(f);w.writerow(['candidate','R_median_s','G_median_s','gain_percent','R_sd','G_sd','R_min','R_max','G_min','G_max'])
+            for row in comparisons:w.writerow([row['candidate'],row['R']['median'],row['G']['median'],row['gain_percent'],row['R']['sd'],row['G']['sd'],row['R']['min'],row['R']['max'],row['G']['min'],row['G']['max']])
+        lines=['# Best observed real ShareGPT batch64','',report['scope']+'.','',
+            '| Candidate | R TPOT (s) | G TPOT (s) | Reduction |','|---|---:|---:|---:|']
+        for row in comparisons:lines.append(f"| {row['candidate']} | {row['R']['median']:.6f} | {row['G']['median']:.6f} | {row['gain_percent']:.3f}% |")
+        best=comparisons[0]
+        lines.extend(['',f"Winner token manifest: `{best['manifest_path']}`; SHA256 `{best['manifest_sha256']}`.",
+             '',report['trajectory_note']+'.',
+             '', 'Nomination and single-pair screen timing selected the finalists and do not enter the final median. All candidates and screen pairs remain reported. Finalist batches were frozen before counterordered final repetitions; selecting the largest final gain still has selection bias.',
+             '',f"Request source IDs (64): {best['request_ids']}"])
+        (root/'MAX_GAIN_RESULTS.md').write_text('\n'.join(lines)+'\n')
+    write(root/'maxgain_validation.json',report);return report
+
+
+def archive(root,report,commit):
+    stage=report['stage'];destination=DEST/stage;destination.mkdir(parents=True,exist_ok=False)
+    if commit:assert not subprocess.check_output(['git','diff','--cached','--name-only'],cwd=REPO,text=True).strip(),'Unrelated staged files present'
+    def copy_tree(source,target,external_captures=False):
+        target.mkdir(parents=True,exist_ok=True);inventory={}
+        for p in sorted(source.rglob('*')):
+            if not p.is_file():continue
+            rel=p.relative_to(source);digest=sha(p)
+            if external_captures and p.name=='current_routing.npz':
+                inventory[str(rel)]=dict(external_path=str(p),sha256=digest,bytes=p.stat().st_size,reason='Raw current-routing capture retained under data2; no input-token manifest in Git')
+                continue
+            dest=target/rel;dest.parent.mkdir(parents=True,exist_ok=True)
+            if p.stat().st_size>128*1024 and p.suffix in ('.npy','.csv','.json'):
+                dest=dest.with_name(dest.name+'.gz')
+                with p.open('rb') as src,dest.open('wb') as dst:
+                    with gzip.GzipFile(filename='',fileobj=dst,mode='wb',mtime=0) as gz:shutil.copyfileobj(src,gz)
+                with gzip.open(dest,'rb') as stream:
+                    h=hashlib.sha256()
+                    for b in iter(lambda:stream.read(8*1024*1024),b''):h.update(b)
+                assert h.hexdigest()==digest
+            else:shutil.copyfile(p,dest)
+            inventory[str(rel)]=dict(source_path=str(p),source_sha256=digest,stored_path=str(dest.relative_to(target)),stored_sha256=sha(dest),bytes=p.stat().st_size)
+        write(target/'SOURCE_INVENTORY.json',dict(status='PASS',files=inventory))
+    def checkpoint(path,message):
+        if commit:
+            subprocess.run(['git','add','--',str(path.relative_to(REPO))],cwd=REPO,check=True)
+            subprocess.run(['git','-c','user.name=Codex','-c','user.email=codex@openai.com','commit','-q','-m',message],cwd=REPO,check=True)
+    for key in report['arms']:
+        candidate,arm=key.split('/');copy_tree(root/candidate/arm,destination/candidate/arm,True)
+        checkpoint(destination/candidate/arm,f'Validate and archive best64 {stage} experiment {candidate} {arm}; preserve distinct selection and final evidence')
+    common=destination/'cohort';common.mkdir()
+    for p in root.iterdir():
+        if p.is_file():shutil.copyfile(p,common/p.name)
+    copy_tree(root/'_warmup',common/'warmups')
+    checkpoint(common,f'Archive best64 {stage} cohort, full64 warmup numerical gates and all-rank validation')
+    print(json.dumps(dict(status='PASS',stage=stage,destination=str(destination),committed=commit)),flush=True)
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--archive',action='store_true');p.add_argument('--commit',action='store_true')
+    a=p.parse_args();r=validate_stage(a.root)
+    if a.archive:archive(a.root,r,a.commit)

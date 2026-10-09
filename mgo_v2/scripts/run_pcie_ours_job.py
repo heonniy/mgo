@@ -32,7 +32,15 @@ ARMS={
 def run(a):
     out=a.out;out.mkdir(parents=True,exist_ok=False)
     source=PKG/'experiments/pcie_topology_ablation_20261009'
-    identity=dict(arm=a.arm,sequence=a.sequence,smoke=a.smoke,overlap=a.overlap,diagnostic=a.diagnostic,
+    search_stage=getattr(a,'search_stage',None);search_spec=getattr(a,'search_spec',None)
+    if search_stage:
+        assert search_spec and not a.sequence and not a.smoke and not a.overlap and not a.diagnostic
+        frozen=json.loads(search_spec.read_text());assert frozen['status']=='FROZEN'
+        write(out/'SEARCH_SPEC.json',frozen)
+    identity=dict(arm=a.arm,sequence=a.sequence,search_stage=search_stage,
+                  search_spec=str(search_spec) if search_spec else None,
+                  search_spec_sha256=hashlib.sha256(search_spec.read_bytes()).hexdigest() if search_spec else None,
+                  smoke=a.smoke,overlap=a.overlap,diagnostic=a.diagnostic,
                   breakdown_reference=str(a.breakdown_reference) if a.breakdown_reference else None,
                   grouped_probe=a.grouped_probe,
                   git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),
@@ -74,6 +82,11 @@ def run(a):
     if a.grouped_probe:
         assert a.breakdown_reference and a.sequence=='stage1'
         command[5]=str(PKG/'examples/pcie_grouped_probe_worker.py')
+    if search_stage:
+        command=[sys.executable,'-m','torch.distributed.run','--nproc_per_node=4',f'--master_port={port}',
+                 str(PKG/'examples/pcie_maxgain_worker.py'),'--output',str(out),
+                 '--search-spec',str(search_spec),'--search-stage',search_stage,
+                 '--numa-shared-source-root',str(pool)]
     site=DATA/'envs/mgo-pcie/lib/python3.11/site-packages/nvidia'
     env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',
              MGO_V2_NUMA_STRICT='1',CUDA_HOME=str(DATA/'envs/cuda121'),TORCH_CUDA_ARCH_LIST='8.9',MAX_JOBS='1',
@@ -85,7 +98,7 @@ def run(a):
              MGO_HEADLINE_WORKLOADS=str(DATA/'datasets/frozen_pcie_topology_20261009/WORKLOADS.json'),
              OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1',NCCL_DEBUG='INFO',
              NCCL_DEBUG_FILE=str(out/'nccl_rank%r_pid%p.log'))
-    source_paths=list((PKG/'mgo_v2').glob('*.py'))+list((PKG/'scripts').glob('*pcie*'))+[PKG/'examples/headline_ours_worker.py',PKG/'examples/pcie_sequence_worker.py',PKG/'examples/pcie_breakdown_worker.py',PKG/'examples/pcie_grouped_probe_worker.py',PKG/'examples/env_offload_worker.py']
+    source_paths=list((PKG/'mgo_v2').glob('*.py'))+list((PKG/'scripts').glob('*pcie*'))+[PKG/'examples/headline_ours_worker.py',PKG/'examples/pcie_sequence_worker.py',PKG/'examples/pcie_breakdown_worker.py',PKG/'examples/pcie_grouped_probe_worker.py',PKG/'examples/pcie_maxgain_worker.py',PKG/'examples/env_offload_worker.py']
     write(out/'launch.json',dict(argv=command,source_sha256={str(p.relative_to(REPO)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths if p.is_file()},environment={k:env[k] for k in env if k.startswith(('MGO','CUDA','TORCH','NCCL','OMP','MKL','CPATH','NUMBA'))}))
     process=None
     with gpu_experiment(f'{a.arm}: '+('smoke' if a.smoke else 'full frozen generation')):
@@ -97,7 +110,7 @@ def run(a):
                 while process.poll() is None:
                     if (ROOT/'STOP').exists():raise RuntimeError('Owner STOP file observed')
                     if time.monotonic()>deadline:raise TimeoutError(f'Job exceeded {a.timeout}s')
-                    if a.sequence and (out/'phase.json').exists():
+                    if (a.sequence or search_stage) and (out/'phase.json').exists():
                         phase=json.loads((out/'phase.json').read_text())
                         if 'generation_started_unix' in phase and time.time()-phase['generation_started_unix']>3600:
                             raise TimeoutError('Generation batch exceeded 3600s')
@@ -133,4 +146,6 @@ if __name__=='__main__':
     p.add_argument('--capture-decisions',action='store_true')
     p.add_argument('--breakdown-reference',type=Path)
     p.add_argument('--grouped-probe',action='store_true')
+    p.add_argument('--search-stage',choices=('nomination','screen','final'))
+    p.add_argument('--search-spec',type=Path)
     run(p.parse_args())

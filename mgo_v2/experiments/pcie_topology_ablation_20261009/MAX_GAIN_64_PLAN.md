@@ -34,6 +34,13 @@ global optimum among all combinatorial batches and not corpus-average gain.
    on common captured routing. This is nomination data, not serving performance;
    count proxies do not establish physical speedup. Freeze the nomination method
    before observing candidate timings.
+   Preregistered score: `1 - sum(G critical-group fetches) / sum(R critical-group
+   fetches)` over the 15 captured decode forwards (exclude prefill). Replay both
+   native C++ policies independently from empty caches on the captured G routes;
+   G's full 61-column trace and final cache hash must match the actual capture.
+   Break score ties by candidate label. Coincident lexical candidates use a
+   deterministic uniform fallback seed `100000 + candidate_position`, selected
+   before nomination; no timing-based replacement.
 5. Physically screen the top eight nominations at full64 output, one R/G pair
    each with alternating pair order. Then freeze the top three by observed TPOT
    benefit and run at least three counterordered unprofiled pairs for each;
