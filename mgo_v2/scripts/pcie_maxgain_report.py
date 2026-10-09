@@ -9,7 +9,7 @@ import shutil
 import subprocess
 from pathlib import Path
 import numpy as np
-from pcie_host import ROOT,write
+from pcie_host import write
 from pcie_maxgain_select import verify_generation
 from pcie_policy_report import summarize_arm,expected_quota
 from pcie_tpot_optimization_report import partition
@@ -43,13 +43,13 @@ def validate_stage(root):
     report=dict(status='PASS',stage=stage,root=str(root),arms={},selection_is_not_final_estimate=stage!='final')
     screen=None
     if stage=='final':
-        admin=ROOT/'ADMIN_GIT_PUSH_20261010.json'
+        admin=root/'ADMIN_GIT_PUSH.json'
         if admin.exists():
             receipt=json.loads(admin.read_text())
             assert receipt['status']=='PASS' and receipt['owner_requested_immediate_push_during_gpu_measurement']
+            assert receipt['cohort_root']==str(root),'Administrative activity belongs to another cohort'
             report['administrative_activity']=dict(source_path=str(admin),sha256=sha(admin),receipt=receipt,
                   timing_policy='Keep all unprofiled repetitions and the preregistered stability rule; no timing-based exclusion of concurrent administrative activity')
-            shutil.copyfile(admin,root/'ADMIN_GIT_PUSH.json')
         screen=Path(spec['selection_root'])
         assert json.loads((screen/'status.json').read_text())['status']=='PASS'
         launches=[json.loads((path/'launch.json').read_text()) for path in (screen,root)]
