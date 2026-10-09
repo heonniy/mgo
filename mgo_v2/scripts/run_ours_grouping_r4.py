@@ -1,4 +1,4 @@
-"""Guard the four-rank A/B/C Qwen run while keeping all eight GPUs quiet."""
+"""Guard four-rank Qwen runs while keeping all eight owned loads quiet."""
 
 import argparse
 import hashlib
@@ -14,37 +14,50 @@ import run_qwen_r8_job as guard
 
 ROOT = Path('/home/hwlee/mgo-results/expert_grouping_ablation_20261009')
 WORKLOADS = Path('/home/hwlee/mgo-results/qwen_cache_ablation_20261009/WORKLOADS.json')
+MAIN_TABLE_WORKLOADS = Path('/home/hwlee/mgo-results/main_table_2x2_20261008/ShareGPT/WORKLOADS.json')
+B64_ROOT = Path('/home/hwlee/mgo-results/ep_overhead_r4_b64_20261009')
 PHYSICAL = (0, 1, 4, 5)
 CELL = 'Qwen3_ShareGPT_R4_C30_B16_L512_O64'
+B64_CELL = 'Qwen3_ShareGPT_R4_C30_B64_L512_O64'
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--arm', choices=('A', 'B', 'C'), required=True)
+    parser.add_argument('--cell', choices=(CELL, B64_CELL), default=CELL)
+    parser.add_argument('--runtime-root', type=Path, default=guard.PKG.parent)
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--diagnostic', action='store_true')
+    parser.add_argument('--post-prefill-diagnostic', action='store_true')
     parser.add_argument('--compiled-dense', action='store_true')
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     args = parser.parse_args()
+    runtime_pkg = args.runtime_root.resolve() / 'mgo_v2'
+    assert (runtime_pkg / 'examples/headline_ours_worker.py').is_file()
     assert not (args.smoke and args.diagnostic)
+    assert not args.post_prefill_diagnostic or args.diagnostic
     assert not args.diagnostic or args.repeats == 1
-    manifest = json.loads(WORKLOADS.read_text())
+    workload_path = WORKLOADS if args.cell == CELL else MAIN_TABLE_WORKLOADS
+    root = ROOT if args.cell == CELL else B64_ROOT
+    manifest = json.loads(workload_path.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
-    spec, = [row for row in manifest['cells'] if row['cell'] == CELL]
+    spec, = [row for row in manifest['cells'] if row['cell'] == args.cell]
     assert (spec['local_batch'], spec['global_requests'], spec['input_tokens'],
-            spec['output_tokens'], spec['cache_percent'], spec['expert_slots']) == (16, 64, 512, 64, 30, 1843)
+            spec['output_tokens'], spec['cache_percent'], spec['expert_slots']) == (
+                (16, 64, 512, 64, 30, 1843) if args.cell == CELL
+                else (64, 256, 512, 64, 30, 1843))
     for phase in ('warmup', 'target'):
         source = spec[phase]
         assert hashlib.sha256(Path(source['path']).read_bytes()).hexdigest() == source['sha256']
     assert guard.owner.host_available() >= 384 * 2**30
     kind = 'smoke' if args.smoke else 'diagnostic' if args.diagnostic else 'full'
-    output = ROOT / 'jobs' / f'r4_{args.arm.lower()}_{kind}_v{args.attempt}'
+    output = root / 'jobs' / f'r4_{args.arm.lower()}_{kind}_v{args.attempt}'
     assert not output.exists(), f'preserve previous attempt: {output}'
     output.mkdir(parents=True)
     command = [guard.PYTHON, '-u', '-m', 'torch.distributed.run', '--standalone',
-               '--nproc_per_node=4', str(guard.PKG / 'examples/headline_ours_worker.py'),
-               '--cell', CELL, '--output', str(output), '--repeats', str(args.repeats),
+               '--nproc_per_node=4', str(runtime_pkg / 'examples/headline_ours_worker.py'),
+               '--cell', args.cell, '--output', str(output), '--repeats', str(args.repeats),
                '--expert-executor', 'native', '--native-prefill', '--prefetch-off',
                '--prefill-optimized', '--prefill-layout-fast', '--decode-layout-fast',
                '--policy', 'LA_CA_NEAR']
@@ -56,12 +69,14 @@ def main():
         command += ['--smoke']
     if args.diagnostic:
         command += ['--post-generation-diagnostic']
+    if args.post_prefill_diagnostic:
+        command += ['--post-prefill-diagnostic']
     env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(map(str, PHYSICAL)),
                MGO_V2_PHYSICAL_GPUS=','.join(map(str, PHYSICAL)),
-               MGO_HEADLINE_WORKLOADS=str(WORKLOADS), OMP_NUM_THREADS='2',
+               MGO_HEADLINE_WORKLOADS=str(workload_path), OMP_NUM_THREADS='2',
                MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
                TORCHINDUCTOR_COMPILE_THREADS='2', PYTHONFAULTHANDLER='1',
-               PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{guard.PKG}:{guard.PKG / "scripts"}:{guard.PKG / "examples"}')
+               PYTHONPATH=f'/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003/cpu_deps:{runtime_pkg}:{runtime_pkg / "scripts"}:{runtime_pkg / "examples"}')
     for key in list(env):
         if key.startswith('NCCL_'):
             del env[key]
@@ -71,8 +86,9 @@ def main():
     state = dict(status='RUNNING', arm=args.arm, kind=kind,
                  physical_gpus=PHYSICAL, command=command, started=time.time(),
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'],
-                                                       cwd=guard.PKG.parent, text=True).strip(),
-                 workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
+                                                       cwd=args.runtime_root, text=True).strip(),
+                 runtime_root=str(args.runtime_root.resolve()),
+                 workload_sha256=hashlib.sha256(workload_path.read_bytes()).hexdigest())
     guard.write(output / 'status.json', state)
     stopped = []
     process = None
@@ -87,7 +103,7 @@ def main():
             while process.poll() is None:
                 if time.time() - state['started'] > 7200:
                     raise TimeoutError('R4 grouping job exceeded 7200 seconds')
-                if (ROOT / 'STOP').exists() or (output / 'STOP').exists():
+                if (root / 'STOP').exists() or (output / 'STOP').exists():
                     raise RuntimeError('owner STOP')
                 available = guard.owner.host_available()
                 if available < 96 * 2**30:
