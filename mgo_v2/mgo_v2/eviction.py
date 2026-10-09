@@ -1,12 +1,26 @@
 from __future__ import annotations
 
 from collections import deque
+from itertools import islice
 from typing import Iterable
 
 import numpy as np
+from numba import njit
 
 from .cache import GlobalCacheState
 from .types import ExpertKey
+
+
+@njit(cache=True, nogil=True)
+def _advance_gate_sum(total: np.ndarray, added: np.ndarray, removed: np.ndarray) -> None:
+    """Keep the reference add-then-evict order for every history row."""
+    first_eviction = len(added) - len(removed)
+    for row in range(len(added)):
+        for expert in range(len(total)):
+            total[expert] += added[row, expert]
+        if row >= first_eviction:
+            for expert in range(len(total)):
+                total[expert] -= removed[row - first_eviction, expert]
 
 
 class GateHistory:
@@ -38,6 +52,30 @@ class GateHistory:
             self.sums[layer] += r
             if len(q) > self.window:
                 self.sums[layer] -= q.popleft()
+
+    def update_compiled(self, layer: int, probs: np.ndarray) -> None:
+        """Decode update with the same window and floating-point operation order.
+
+        This keeps ``rows`` identical to ``update`` so prefill, replay and cache
+        policy code can continue to inspect the canonical history.
+        """
+        if probs is None:
+            return
+        if probs.ndim != 2 or probs.shape[1] != self.num_experts:
+            raise ValueError("probs must be [tokens, experts]")
+        q = self.rows[layer]
+        if len(probs) >= self.window:
+            self.update(layer, probs)
+            return
+        added = np.asarray(probs, dtype=np.float64)
+        evictions = max(0, len(q) + len(added) - self.window)
+        removed = np.asarray(list(islice(q, evictions)), dtype=np.float64).reshape(
+            evictions, self.num_experts
+        )
+        _advance_gate_sum(self.sums[layer], added, removed)
+        q.extend(row.copy() for row in added)
+        for _ in range(evictions):
+            q.popleft()
 
     def score(self, layer: int, expert: int) -> float:
         n = max(1, len(self.rows[layer]))

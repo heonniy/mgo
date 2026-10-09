@@ -30,7 +30,7 @@ class LiveMetadata:
   assert np.all(headers==[1,event,self.batch])
   ids=raw[:,24:self.ids_end].copy().reshape(self.world*self.batch,self.topk)
   probs_all=raw[:,self.ids_end:].copy().view(np.float32).reshape(-1,self.experts)
-  layer=event%self.layers;self.history.update(layer,probs_all)
+  layer=event%self.layers;self.history.update_compiled(layer,probs_all)
   gates=(self.history.sums[layer]/max(1,len(self.history.rows[layer]))).astype(np.float32)
   hist=np.bincount((ids.astype(np.int64)+self.origins[:,None]*self.experts).ravel(),minlength=self.world*self.experts).reshape(self.world,self.experts)
   routes=SimpleNamespace(selected_experts=ids,routing_weights=self.weights,origin_ranks=self.origins,full_router_probs=None)
@@ -55,7 +55,7 @@ class LiveMetadata:
    ids=raw[:,24:self.ids_end].copy().reshape(self.world*self.batch,self.topk)
    probs_all=raw[:,self.ids_end:].copy().view(np.float32).reshape(-1,self.experts)
   with phase('metadata_gate_history'):
-   layer=event%self.layers;self.history.update(layer,probs_all)
+   layer=event%self.layers;self.history.update_compiled(layer,probs_all)
    gates=(self.history.sums[layer]/max(1,len(self.history.rows[layer]))).astype(np.float32)
   with phase('metadata_demand_histogram'):
    hist=np.bincount((ids.astype(np.int64)+self.origins[:,None]*self.experts).ravel(),minlength=self.world*self.experts).reshape(self.world,self.experts)
