@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 7,
+  "completed": 8,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -522,9 +522,75 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "deepspeed",
-      "cache_percent": 40
+      "cache_percent": 40,
+      "label": "qca_baseline_c40_deepspeed_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.00625081600729189,
+      "reused_c30": false,
+      "source_commit": "e902e535a1cc38fce98d0aa6432a10b9f434c0a4",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "c2f82c4eab4f15f445a50bd7e57a27c900543c159cd5536c6e96637fb6c6d4af",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.43301597,
+            5.4689942
+          ],
+          "mean": 5.951005085,
+          "median": 5.951005085,
+          "minimum": 5.4689942,
+          "maximum": 6.43301597,
+          "stdev": 0.681666330778458
+        },
+        "TPOT": {
+          "samples": [
+            4.117152540190476,
+            4.106162802888889
+          ],
+          "mean": 4.111657671539683,
+          "median": 4.111657671539683,
+          "minimum": 4.106162802888889,
+          "maximum": 4.117152540190476,
+          "stdev": 0.007770917769411098
+        },
+        "E2E": {
+          "samples": [
+            265.813626002,
+            264.157250782
+          ],
+          "mean": 264.985438392,
+          "median": 264.985438392,
+          "minimum": 264.157250782,
+          "maximum": 265.813626002,
+          "stdev": 1.1712341502513401
+        }
+      },
+      "memory": {
+        "peak_all_parameter_bytes_per_rank": [
+          [
+            4361449472,
+            4361449472,
+            4361449472,
+            4361449472
+          ],
+          [
+            4361449472,
+            4361449472,
+            4361449472,
+            4361449472
+          ]
+        ],
+        "parameter_budget_bytes_per_rank": [
+          5796790272,
+          5796790272,
+          5796790272,
+          5796790272
+        ]
+      }
     },
     {
       "status": "PENDING",
