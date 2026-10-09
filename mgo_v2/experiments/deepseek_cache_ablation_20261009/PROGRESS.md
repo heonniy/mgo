@@ -1,6 +1,6 @@
 # DeepSeek ShareGPT cache-capacity ablation
 
-Validated system cells: **15/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three unfiltered target repeats per completed row; values below are median [minimum, maximum] seconds, with TPOT in seconds per generated token.
+Validated system cells: **16/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three unfiltered target repeats per completed row; values below are median [minimum, maximum] seconds, with TPOT in seconds per generated token.
 
 | B/rank | Cache | System | TTFT | TPOT | E2E | Status |
 |---:|---:|---|---:|---:|---:|---|
@@ -19,7 +19,7 @@ Validated system cells: **15/16**. Input 512, output 64, R4 GPUs 0/1/4/5. Three 
 | 16 | 50% | main_OURS | 0.612 [0.609, 0.862] | 0.282 [0.282, 0.282] | 18.360 [18.358, 18.601] | PASS |
 | 16 | 50% | MoE-Infinity (repaired) | 1.624 [1.606, 1.848] | 1.240 [1.238, 1.243] | 79.824 [79.737, 79.920] | PASS |
 | 16 | 50% | DeepSpeed ZeRO-Inference | 4.827 [4.806, 5.978] | 4.689 [4.678, 4.828] | 301.390 [299.511, 309.011] | PASS |
-| 16 | 50% | llama.cpp balanced | — | — | — | PENDING |
+| 16 | 50% | llama.cpp balanced | 98.434 [98.246, 98.849] | 0.282 [0.281, 0.283] | 116.231 [115.987, 116.550] | PASS |
 
 main_OURS uses Near/native experts with prefetch OFF. DeepSeek MoE-Infinity uses EAM eviction priorities with speculative admission OFF. llama.cpp uses whole-layer balanced placement: 1/1/1/1 GPU expert layers at C20/C30, 2/2/2/2 at C40, and 3/3/3/3 at C50. C30 limits expert residency, not total HBM.
 
