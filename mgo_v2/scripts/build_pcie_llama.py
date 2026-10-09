@@ -33,7 +33,7 @@ def prepare_toolkit():
             if not directory.exists():continue
             for item in directory.iterdir():
                 target=TOOLKIT/name/item.name;link(item,target)
-                if '.so.' in item.name:link(item,TOOLKIT/name/item.name.split('.so.')[0]+'.so')
+                if '.so.' in item.name:link(item,TOOLKIT/name/(item.name.split('.so.')[0]+'.so'))
     driver=Path('/usr/lib/x86_64-linux-gnu/libcuda.so.1')
     assert driver.exists();link(driver,TOOLKIT/'lib/libcuda.so')
     assert all((TOOLKIT/'lib'/name).exists() for name in ('libcudadevrt.a','libcudart_static.a','libcublas.so','libcublasLt.so','libcusparse.so'))
