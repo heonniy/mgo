@@ -14,19 +14,25 @@ SYSTEMS = ('ours', 'deepspeed', 'infinity', 'llama')
 METRICS = ('TTFT', 'TPOT', 'E2E', 'throughput')
 
 
-def job(root, system):
+def job(root, system, repeats, after=0):
     candidates = sorted((root / 'jobs').glob(f'{system}_full_v*'),
                         key=lambda p: int(p.name.rsplit('_v', 1)[1]), reverse=True)
     for path in candidates:
         status_file = path / 'status.json'
-        if status_file.exists() and json.loads(status_file.read_text())['status'] == 'PASS':
+        if not status_file.exists() or int(path.name.rsplit('_v', 1)[1]) <= after:
+            continue
+        status = json.loads(status_file.read_text())
+        receipt = path / 'result.json'
+        if (status['status'] == 'PASS' and not status['smoke'] and
+                status['repeats'] == repeats and receipt.exists() and
+                json.loads(receipt.read_text()).get('headline_eligible', True)):
             return path
-    raise FileNotFoundError(f'no PASS full job for {system} under {root}')
+    raise FileNotFoundError(f'no eligible {repeats}-repeat job for {system} under {root}')
 
 
 def read_row(world, system):
     root = ROOTS[world]
-    path = job(root, system)
+    path = job(root, system, 2)
     status = json.loads((path / 'status.json').read_text())
     result = json.loads((path / 'result.json').read_text())
     assert result['status'] == 'PASS' and not status['smoke']
@@ -53,27 +59,45 @@ def read_row(world, system):
         assert audit['status'] == 'PASS'
         assert sorted(audit['gpu_expert_layers_by_device'].values()) == \
             ([7] * 2 if world == 2 else [1] * 8)
+    pair_ranges = {}
+    for key in ('TPOT', 'E2E'):
+        values = [float(row[key]) for row in samples]
+        pair_ranges[key] = 100 * (max(values) - min(values)) / statistics.mean(values)
+    unstable = max(pair_ranges.values()) > 5
+    third_advised = not unstable and max(pair_ranges.values()) > 2
+    paths = [path]
+    if third_advised:
+        extra = job(root, system, 1, after=int(path.name.rsplit('_v', 1)[1]))
+        extra_status = json.loads((extra / 'status.json').read_text())
+        assert extra_status['workload_sha256'] == status['workload_sha256']
+        assert extra_status['physical_gpus'] == status['physical_gpus']
+        assert extra_status['quiet_2367']
+        extra_row = json.loads((extra / 'repeat1.json').read_text())
+        assert extra_row['status'] == 'PASS' and extra_row['output_tokens'] == 64
+        assert extra_row['global_requests'] == world * 16
+        samples.append(extra_row)
+        paths.append(extra)
     metrics = {}
     for metric in METRICS:
         values = [(world * 16 * 64 / float(row['E2E'])) if metric == 'throughput'
                   else float(row[metric]) for row in samples]
         mean = statistics.mean(values)
-        metrics[metric] = dict(samples=values, mean=mean, minimum=min(values),
+        metrics[metric] = dict(samples=values, mean=mean,
+                               reported=statistics.median(values) if len(values) == 3 else mean,
+                               minimum=min(values),
                                maximum=max(values), relative_range_pct=100 *
                                (max(values) - min(values)) / mean)
-    unstable = max(metrics[key]['relative_range_pct'] for key in ('TPOT', 'E2E')) > 5
-    third_advised = not unstable and max(metrics[key]['relative_range_pct']
-                                         for key in ('TPOT', 'E2E')) > 2
-    return dict(path=str(path), source_commit=status['source_commit'],
+    return dict(paths=list(map(str, paths)),
+                source_commits=[json.loads((p / 'status.json').read_text())['source_commit'] for p in paths],
                 workload_sha256=status['workload_sha256'],
                 physical_gpus=status['physical_gpus'], system=result['system'],
                 metrics=metrics, unstable=unstable,
-                third_advised=third_advised)
+                third_repeat_used=third_advised, pair_relative_ranges_pct=pair_ranges)
 
 
 def fmt(row, key):
     metric = row['metrics'][key]
-    return f"{metric['mean']:.3f} [{metric['minimum']:.3f}, {metric['maximum']:.3f}]"
+    return f"{metric['reported']:.3f} [{metric['minimum']:.3f}, {metric['maximum']:.3f}]"
 
 
 def main():
@@ -83,9 +107,12 @@ def main():
     lines = ['# Qwen ShareGPT R2/R8 main table', '',
              'Input 512, 64 greedy output tokens, B16 per GPU, C30 expert '
              'budget. TPOT is seconds per decoded token and includes attention; '
-             'TPS is global output tokens divided by E2E seconds. Values are '
-             'the mean and full range of the two unfiltered target repeats '
-             'after warmup. R2 and R8 have different global batches (32 and '
+             'TPS is global output tokens divided by E2E seconds. Each cell '
+             'has two unfiltered target repeats after warmup; if the pair '
+             'differs by >2% but ≤5% in TPOT or E2E, exactly one third target '
+             'is added. The reported center is the mean of two or median of '
+             'three, followed by the full range. R2 and R8 have different '
+             'global batches (32 and '
              '128), so throughput is not a same-batch scaling comparison. '
              'MoE-Infinity uses EAM eviction priorities with speculative '
              'transfer admission disabled on both rank counts after the '
@@ -95,13 +122,14 @@ def main():
     for world in (2, 8):
         for system in SYSTEMS:
             row = data[str(world)][system]
-            quality = ('unstable (>5% TPOT/E2E range)' if row['unstable'] else
-                       'needs third (>2% range)' if row['third_advised'] else '≤2% TPOT/E2E range')
+            quality = ('unstable two-repeat pair (>5%)' if row['unstable'] else
+                       'third repeat; median shown' if row['third_repeat_used'] else '≤2% TPOT/E2E pair range')
             lines.append(f"| {world} | {row['system']} | {fmt(row, 'TTFT')} | "
                          f"{fmt(row, 'TPOT')} | {fmt(row, 'E2E')} | "
                          f"{fmt(row, 'throughput')} | {quality} |")
-    lines += ['', 'Both target repeats are shown without outlier selection. '
-              'The quality flag uses the relative full range of TPOT and E2E; '
+    lines += ['', 'All target repeats are shown without outlier selection. '
+              'The quality flag uses the relative difference of the first two '
+              'TPOT and E2E values; '
               'TTFT variability is visible separately in its range. Raw paths, '
               'source commits, and workload hashes are in [RESULTS.json](RESULTS.json).', '']
     (HERE / 'RESULTS.md').write_text('\n'.join(lines))
