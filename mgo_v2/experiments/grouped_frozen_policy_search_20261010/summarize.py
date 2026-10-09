@@ -22,28 +22,33 @@ def summarize():
     cases = []
     for spec in json.loads(MANIFEST.read_text())['cells']:
         cell = spec['cell']
-        path = OUTPUT / label(cell)
-        result = json.loads((path / 'result.json').read_text())
-        assert result['status'] == 'PASS' and result['route_frozen']
-        assert result['prefetch'] == 'off' and result['grouped_decode_mode'] == 'hit_then_miss'
-        assert result['compiled_dense'] and result['decode_steps'] == 32
-        policies = {}
-        for backend, display in POLICIES.items():
-            runs = [x for x in result['results'] if x['backend'] == backend]
-            assert len(runs) == 2 and all(x['status'] == 'PASS' for x in runs)
-            policies[display] = {key: metric(runs, key) for key in
-                                 ('TPOT', 'TTFT', 'E2E', 'decode_peer_bytes',
-                                  'decode_h2d_bytes', 'decode_main_hit_rate')}
-            policies[display]['token_agreement'] = [x['token_agreement_to_reference'] for x in runs]
-        br = policies['BR']['TPOT']
-        near = policies['Near']['TPOT']
-        case = {'cell': cell, 'label': label(cell), 'cache_percent': int(cell.split('_')[2][1:]),
-                'batch_per_rank': spec['local_batch'], 'seed': cell.split('_')[-2:],
-                'policies': policies,
-                'near_gain_pct': 100 * (br['mean'] - near['mean']) / br['mean'],
-                'near_faster_both_ranges': near['max'] < br['min'],
-                'raw_directory': str(path)}
-        cases.append(case)
+        for transport in ('nvswitch', 'env2'):
+            if transport == 'env2' and '_C30_' not in cell:
+                continue
+            path = OUTPUT / label(cell, transport)
+            result = json.loads((path / 'result.json').read_text())
+            assert result['status'] == 'PASS' and result['route_frozen']
+            assert result['prefetch'] == 'off' and result['grouped_decode_mode'] == 'hit_then_miss'
+            assert result['compiled_dense'] and result['decode_steps'] == 32
+            assert bool(result['nccl_p2p_disable']) == (transport == 'env2')
+            policies = {}
+            for backend, display in POLICIES.items():
+                runs = [x for x in result['results'] if x['backend'] == backend]
+                assert len(runs) == 2 and all(x['status'] == 'PASS' for x in runs)
+                policies[display] = {key: metric(runs, key) for key in
+                                     ('TPOT', 'TTFT', 'E2E', 'decode_peer_bytes',
+                                      'decode_h2d_bytes', 'decode_main_hit_rate')}
+                policies[display]['token_agreement'] = [x['token_agreement_to_reference'] for x in runs]
+            br = policies['BR']['TPOT']
+            near = policies['Near']['TPOT']
+            case = {'cell': cell, 'label': label(cell, transport), 'transport': transport,
+                    'cache_percent': int(cell.split('_')[2][1:]),
+                    'batch_per_rank': spec['local_batch'], 'seed': cell.split('_')[-2:],
+                    'policies': policies,
+                    'near_gain_pct': 100 * (br['mean'] - near['mean']) / br['mean'],
+                    'near_faster_both_ranges': near['max'] < br['min'],
+                    'raw_directory': str(path)}
+            cases.append(case)
     return {'status': 'PASS', 'method': 'two unfiltered runs per policy, frozen BR route, 32 decode steps',
             'cases': cases}
 
@@ -60,14 +65,14 @@ def main():
         'Each displayed TPOT is the mean of **two unfiltered runs** in the order '
         'BR/Near/Static/Static/Near/BR. Ranges are the full two-run ranges.',
         '',
-        '| Cache | B/rank | Seed | BR TPOT (s) | Near TPOT (s) | Static TPOT (s) | Near gain vs BR |',
-        '|---:|---:|---|---:|---:|---:|---:|',
+        '| Transport | Cache | B/rank | Seed | BR TPOT (s) | Near TPOT (s) | Static TPOT (s) | Near gain vs BR |',
+        '|---|---:|---:|---|---:|---:|---:|---:|',
     ]
     for case in result['cases']:
         def fmt(policy):
             value = case['policies'][policy]['TPOT']
             return f"{value['mean']:.4f} [{value['min']:.4f}, {value['max']:.4f}]"
-        lines.append(f"| C{case['cache_percent']} | {case['batch_per_rank']} | "
+        lines.append(f"| {case['transport']} | C{case['cache_percent']} | {case['batch_per_rank']} | "
                      f"{'/'.join(case['seed'])} | {fmt('BR')} | {fmt('Near')} | "
                      f"{fmt('Static')} | {case['near_gain_pct']:+.2f}% |")
     positive = [x for x in result['cases'] if x['near_gain_pct'] > 0]
