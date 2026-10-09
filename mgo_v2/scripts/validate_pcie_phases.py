@@ -7,9 +7,9 @@ import numpy as np
 from pcie_host import write
 
 
-def validate(root):
+def validate(root,repeats=(0,1)):
     groups=[]
-    for repeat in (0,1):
+    for repeat in repeats:
         ranks=[json.loads((root/f'phases_repeat{repeat}_rank{r}.json').read_text()) for r in range(4)]
         count=len(ranks[0]);assert count and all(len(rows)==count for rows in ranks)
         quotas=[np.load(root/f'quota_repeat{repeat}_rank{r}.npy') for r in range(4)]
@@ -44,4 +44,5 @@ def validate(root):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('root',type=Path);validate(p.parse_args().root)
+    p=argparse.ArgumentParser();p.add_argument('root',type=Path);p.add_argument('--repeat',type=int,action='append')
+    a=p.parse_args();validate(a.root,a.repeat if a.repeat is not None else (0,1))

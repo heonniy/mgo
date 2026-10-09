@@ -88,6 +88,16 @@ def active_leases():
 
 @contextlib.contextmanager
 def gpu_experiment(label):
+    import fcntl
+    ROOT.mkdir(parents=True,exist_ok=True)
+    with (ROOT/'gpu_experiment.lock').open('w') as lock:
+        try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError:raise RuntimeError('Another owned GPU experiment is active; GPU work must run serially')
+        with _leased_gpu_experiment(label):yield
+
+
+@contextlib.contextmanager
+def _leased_gpu_experiment(label):
     LEASES.mkdir(parents=True, exist_ok=True)
     pid = os.getpid()
     path = LEASES / f'{pid}.json'

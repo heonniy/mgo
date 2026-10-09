@@ -29,6 +29,13 @@ Only physical GPUs 0,1,4,5 are allowed. Ranks map to those devices in that order
 groups are A={0,1}/NUMA0 and B={4,5}/NUMA1. Stop only our burn before GPU work.
 Never stop unrelated workers, including those on GPUs 2,3,6,7.
 
+Before primary cohorts, correct the initial logical-CPU split: CPU0 and CPU32
+are SMT siblings. Assign eight physical cores and both siblings to each rank,
+and exclude the main/H2D cores' siblings from helper masks. Rank main CPUs are
+0,8,16,24. The first microbench and G3 diagnostics retain their original CPU
+receipts and are preflight evidence. Confirm the microbench under the corrected
+affinity and freeze its new directional calibration before G-NUMA-CA.
+
 For isolated decode: completed routing metadata and PLAN checksums -> completed
 forward token all-to-all -> CPU phase rendezvous -> mandatory expert H2D only
 -> completed copies on all ranks -> expert compute -> completed compute on all
@@ -61,7 +68,24 @@ Pre-register 30 timed samples per microbench cell after five warmups,
 randomized paired cell order with seed 20261009, and three unfiltered primary
 repeats per policy with counter-ordered arms. A maximum relative TPOT spread
 above 5% triggers exactly two additional repeats for every comparable arm.
-Keep every attempt. Each model job has a 3600-second bound; external baseline
+Keep every attempt. Each standalone model job or individual generation batch
+has a 3600-second bound. A persistent multi-arm cohort, which reuses only the
+model, compiled code and pinned source and resets cache/controller/KV state
+before each generation, has a 14400-second total bound. External baseline
 jobs have a 14400-second bound. Respect a STOP file in the raw-output root.
 Failures are repaired with a new attempt directory and receipt rather than
 overwriting evidence or silently changing the workload/cache budget.
+
+## Owner-approved Stage-II attribution
+
+The owner selected option 1: both controlled current-event placement replay
+and independent live generation. Live policy decisions change future residency,
+so equal quota formulas alone cannot guarantee identical future miss sets.
+For the controlled Stage-II comparison, capture G-NEAR current inputs and
+pre-admission state in a separate diagnostic run. Restore that exact state for
+G-BR, G-CA, G-NUMA-CA and G-NEAR at every event; enforce identical missing keys
+and rank quotas. Report this as conditional placement, not serving latency.
+Separately run all seven live arms with cold state and unprofiled repeats,
+and report their cache trajectories, fetch totals and generated token parity.
+Persistent cohorts run diagnostic passes after all primary repeats. Diagnostic
+repeat -1 is excluded from every primary statistic and stability decision.

@@ -56,6 +56,10 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0;self.h2d_global_barriers=0
   self.transport=FusedTokenRankTransport('exact')
   self.pcie_phase_trace=[]
+  self.pcie_decision_capture=None
+  if getattr(self.args,'pcie_capture_decisions',False) and self.rank==0:
+   from .pcie_decision_capture import DecisionCapture
+   self.pcie_decision_capture=DecisionCapture(self.policy)
   if hasattr(self,'metadata'):self.metadata.calls=0
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
@@ -85,6 +89,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    self.main_eviction_trace_events.append(int(self.index))
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
+   if self.pcie_decision_capture is not None:self.pcie_decision_capture.append(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)
    out,promotions,discards=self.controller.plan_current(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)
    controller_ms=(time.perf_counter()-start)*1000
    if self.index>=48 and (self.args.phase!='MEASURE' or getattr(self.args,'pcie_phase_diagnostic',False)):self.controller_times.append(controller_ms)
@@ -207,7 +212,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   assert self.h2d.metrics.get('background_copies',0)==0
   group=self.args.pcie_cpu_group
   diagnostic=getattr(self.args,'pcie_phase_diagnostic',False)
-  trace=dict(event=self.index,rank=self.rank,misses=self.current_global_fetch_count,local_fetches=len(e['fetches']),controller_ms=self.pcie_controller_last_ms) if diagnostic else None
+  trace=dict(event=self.index,rank=self.rank,misses=self.current_global_fetch_count,local_fetches=len(e['fetches']),expert_groups=len(e['groups']),controller_ms=self.pcie_controller_last_ms) if diagnostic else None
   def phase(name,fn):
    if diagnostic:
     begin=time.perf_counter_ns();fn_result=fn();trace[name]=[begin,time.perf_counter_ns()];return fn_result

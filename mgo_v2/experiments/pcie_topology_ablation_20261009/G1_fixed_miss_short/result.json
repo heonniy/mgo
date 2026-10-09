@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "scope": "Conditional current-event placement on the captured G-NEAR cache trajectory; future cache states restored, not independent model generation",
+  "capture": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G3_physical_core_short_attempt1/decision_capture_repeat1.npz",
+  "capture_sha256": "e2937a629811d8bac91d6efbde685e861f3810bb1c9c9d1d0b1df68069d322fc",
+  "reference": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G3_physical_core_short_attempt1/policy_trace_repeat1_rank0.npy",
+  "reference_sha256": "e00740ca1ebaf7701f9aec81fa87d40449d9214233da497a44ca48ef1190246d",
+  "measured_costs": [
+    [
+      0,
+      1033,
+      1105,
+      1133
+    ],
+    [
+      1028,
+      0,
+      1104,
+      1128
+    ],
+    [
+      1110,
+      1121,
+      0,
+      1007
+    ],
+    [
+      1116,
+      1110,
+      1000,
+      0
+    ]
+  ],
+  "identical_misses_and_per_rank_quotas_every_event": true,
+  "reference_near_all_outputs_exact": true,
+  "exact_only": true,
+  "main_capacities": [
+    459,
+    459,
+    459,
+    458
+  ],
+  "physical_cache_slots": 1843,
+  "arms": {
+    "G-BR": {
+      "events": 96,
+      "decode_events": 48,
+      "h2d_fetches": 212,
+      "h2d_bytes": 2000683008,
+      "cross_group_expert_routes": 734,
+      "within_group_expert_routes": 358,
+      "cross_group_token_rank_pairs": 351,
+      "within_group_token_rank_pairs": 168,
+      "forward_cross_group_activation_bytes": 1437696,
+      "projected_critical_rank_rows_mean": 11.791666666666666,
+      "adapter_plus_controller_us_mean": 89.93344791666668,
+      "adapter_plus_controller_us_median": 78.2135
+    },
+    "G-CA": {
+      "events": 96,
+      "decode_events": 48,
+      "h2d_fetches": 212,
+      "h2d_bytes": 2000683008,
+      "cross_group_expert_routes": 689,
+      "within_group_expert_routes": 342,
+      "cross_group_token_rank_pairs": 338,
+      "within_group_token_rank_pairs": 166,
+      "forward_cross_group_activation_bytes": 1384448,
+      "projected_critical_rank_rows_mean": 11.520833333333334,
+      "adapter_plus_controller_us_mean": 398.97496874999996,
+      "adapter_plus_controller_us_median": 224.18449999999999
+    },
+    "G-NUMA-CA": {
+      "events": 96,
+      "decode_events": 48,
+      "h2d_fetches": 212,
+      "h2d_bytes": 2000683008,
+      "cross_group_expert_routes": 673,
+      "within_group_expert_routes": 358,
+      "cross_group_token_rank_pairs": 333,
+      "within_group_token_rank_pairs": 170,
+      "forward_cross_group_activation_bytes": 1363968,
+      "projected_critical_rank_rows_mean": 11.75,
+      "adapter_plus_controller_us_mean": 317.41200000000003,
+      "adapter_plus_controller_us_median": 192.997
+    },
+    "G-NEAR": {
+      "events": 96,
+      "decode_events": 48,
+      "h2d_fetches": 212,
+      "h2d_bytes": 2000683008,
+      "cross_group_expert_routes": 704,
+      "within_group_expert_routes": 349,
+      "cross_group_token_rank_pairs": 350,
+      "within_group_token_rank_pairs": 172,
+      "forward_cross_group_activation_bytes": 1433600,
+      "projected_critical_rank_rows_mean": 11.270833333333334,
+      "adapter_plus_controller_us_mean": 92.18832291666666,
+      "adapter_plus_controller_us_median": 81.856
+    }
+  }
+}
