@@ -203,6 +203,16 @@ def main():
                 if max(x['temperature_c'] for x in gpu.values()) >= 85:
                     raise RuntimeError('GPU temperature reached 85 C')
                 phase = json.loads((output / 'phase.json').read_text()) if (output / 'phase.json').exists() else {'phase': 'loading'}
+                if args.system == 'infinity' and env.get('MGO_INFINITY_TRACE') == '1' and phase['phase'] in ('warmup', 'target'):
+                    repeat = phase['repeat']
+                    progress = output / f'progress_repeat{repeat}.json'
+                    clock = progress if progress.exists() else output / 'phase.json'
+                    idle = time.time() - clock.stat().st_mtime
+                    if idle > 120:
+                        os.kill(process.pid, signal.SIGUSR1)
+                        time.sleep(2)
+                        tokens = json.loads(progress.read_text())['tokens'] if progress.exists() else 0
+                        raise RuntimeError(f'MoE-Infinity stalled after token {tokens} of repeat {repeat}: {idle:.1f}s without progress')
                 resources.write(json.dumps(dict(unix=time.time(), phase=phase,
                                                 gpus=gpu, host_available=available)) + '\n')
                 resources.flush()

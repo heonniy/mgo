@@ -1,5 +1,5 @@
 """Owner-repaired BF16 MoE-Infinity, native requests and cold expert cache."""
-import argparse,copy,faulthandler,gc,hashlib,json,os,threading,time,weakref
+import argparse,copy,faulthandler,gc,hashlib,json,os,signal,time,weakref
 from pathlib import Path
 import torch,psutil
 from moe_infinity import MoE
@@ -18,9 +18,9 @@ class FiniteLogits:
   else:self.flag.logical_and_(finite)
   return scores
 class ClockStreamer:
- def __init__(self,trim_floor_bytes=0,trim_log=None,progress_path=None,progress_state=None):
+ def __init__(self,trim_floor_bytes=0,trim_log=None,progress_path=None,progress_values=None):
   self.stamps=[];self.prompt=True;self.trim_floor_bytes=trim_floor_bytes;self.trim_log=trim_log
-  self.progress_path=progress_path;self.progress_state=progress_state
+  self.progress_path=progress_path;self.progress_values=progress_values
  def put(self,value):
   if self.prompt:self.prompt=False;return
   sync()
@@ -34,10 +34,10 @@ class ClockStreamer:
      f.write(json.dumps(dict(token_index=len(self.stamps),free_before=free_before,
                              free_after=free_after,unix=time.time()))+'\n')
   self.stamps.append(time.perf_counter_ns())
-  if self.progress_state is not None:
-   self.progress_state['last']=time.monotonic()
-   self.progress_state['tokens']=len(self.stamps)
-   write(self.progress_path,dict(tokens=len(self.stamps),last_token_ns=self.stamps[-1]))
+  if self.progress_path is not None:
+   row=dict(tokens=len(self.stamps),last_token_ns=self.stamps[-1])
+   if self.progress_values is not None:row.update(self.progress_values())
+   write(self.progress_path,row)
  def end(self):pass
 
 def main(a):
@@ -51,6 +51,13 @@ def main(a):
  assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
  model_family=spec.get('model','Qwen3')
  diagnostic_mode=os.environ.get('MGO_INFINITY_TRACE')=='1'
+ disable_speculative=os.environ.get('MGO_INFINITY_DISABLE_SPECULATIVE')=='1'
+ debug_output_tokens=int(os.environ.get('MGO_INFINITY_DEBUG_OUTPUT_TOKENS','64'))
+ assert 2<=debug_output_tokens<=64
+ assert diagnostic_mode or debug_output_tokens==64
+ if diagnostic_mode:
+  stack_log=(a.output/'signal_stacks.txt').open('a')
+  faulthandler.register(signal.SIGUSR1,file=stack_log,all_threads=True)
  assert (model_family=='Qwen3')==(model_path==MODEL)
  expert_bytes=9*2**20 if model_family=='Qwen3' else 3*2048*1408*2
  routed_layers=48 if model_family=='Qwen3' else 26
@@ -63,7 +70,9 @@ def main(a):
  attention_backend='sdpa' if use_sdpa else 'eager'
  trim_floor_bytes=16*2**30 if model_family!='Qwen3' and use_sdpa else 0
  write(a.output/'config.json',dict(cfg,attention_backend=attention_backend,allocator_trim_floor_bytes=trim_floor_bytes,
-                                   diagnostic_trace=diagnostic_mode))
+                                   diagnostic_trace=diagnostic_mode,
+                                   debug_output_tokens=debug_output_tokens,
+                                   speculative_admission='disabled' if disable_speculative else 'enabled'))
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
  for root in roots:
@@ -85,6 +94,11 @@ def main(a):
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
  p.configure_eam_budget(budgets,expert_bytes)
+ if disable_speculative and model_family=='Qwen3':
+  p.eam_min_free_expert_slots=sum(budgets)//expert_bytes+1
+  write(a.output/'eam_policy.json',dict(speculative_admission='disabled',
+        eviction_priorities='enabled',expert_budget_per_gpu=budgets,
+        reason='R8 target native dispatch stall isolation'))
  if model_family!='Qwen3':
   # DeepSeek's 16.5 MiB experts made the former full-budget speculative
   # admission submit >11,000 transfers during a 26-layer two-token probe.
@@ -172,7 +186,7 @@ def main(a):
    trace_attention_memory(module,'after',hidden)
   attention_hooks +=[m.register_forward_hook(attention_done,with_kwargs=True) for name,m in model.model.named_modules() if name.endswith('.self_attn')]
  assert len(attention_hooks)==attention_layers*(2 if diag_full_prefill else 1)
- n=int(os.environ.get('MGO_DIAG_OUTPUT_TOKENS','2')) if a.smoke else 64
+ n=int(os.environ.get('MGO_DIAG_OUTPUT_TOKENS','2')) if a.smoke else debug_output_tokens
  assert 2<=n<=64
  repeats=1 if a.smoke else a.repeats;saved=None
  warmup_only=a.smoke and os.environ.get('MGO_DIAG_WARMUP_ONLY')=='1'
@@ -190,27 +204,12 @@ def main(a):
   before=p.reset_eam_residency();sync()
   for gpu in range(world):torch.cuda.reset_peak_memory_stats(gpu)
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
-  diagnostic=diagnostic_mode
-  progress_state=dict(last=time.monotonic(),tokens=0) if diagnostic else None
-  watcher_done=threading.Event() if diagnostic else None
-  if diagnostic:
-   def watch_progress():
-    while not watcher_done.wait(5):
-     idle=time.monotonic()-progress_state['last']
-     if idle<120:continue
-     with (a.output/f'stall_repeat{repeat}.txt').open('w') as trace:
-      faulthandler.dump_traceback(file=trace,all_threads=True)
-     write(a.output/f'stall_repeat{repeat}.json',dict(phase=phase,repeat=repeat,
-           tokens=progress_state['tokens'],idle_seconds=idle))
-     os._exit(124)
-   threading.Thread(target=watch_progress,daemon=True).start()
   streamer=ClockStreamer(trim_floor_bytes,a.output/'allocator_trims.jsonl',
-                         a.output/f'progress_repeat{repeat}.json' if diagnostic else None,
-                         progress_state)
+                         a.output/f'progress_repeat{repeat}.json' if diagnostic_mode else None,
+                         (lambda:dict(eam_candidates=p.eam_candidates,eam_calls=p.eam_calls)) if diagnostic_mode else None)
   finite=FiniteLogits();start=time.perf_counter_ns()
   with torch.no_grad():
    output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
-  if watcher_done is not None:watcher_done.set()
   kv=output.past_key_values
   assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in kv.layers)
   output=output.sequences
@@ -254,6 +253,7 @@ def main(a):
    saved=(tracer.trace_collection.copy(),tracer.collection_access.copy(),tracer.access_clock)
  write(a.output/'result.json',dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,smoke=a.smoke,
                                    primary_repeats=0 if warmup_only else repeats,
-                                   headline_eligible=not diagnostic_mode))
+                                   headline_eligible=not diagnostic_mode,
+                                   speculative_admission='disabled' if disable_speculative else 'enabled'))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);main(p.parse_args())
