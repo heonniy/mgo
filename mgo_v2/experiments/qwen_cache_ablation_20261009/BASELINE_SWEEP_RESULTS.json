@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 9,
+  "completed": 10,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -651,9 +651,75 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "infinity",
-      "cache_percent": 50
+      "cache_percent": 50,
+      "label": "qca_baseline_c50_infinity_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.006334415088127959,
+      "reused_c30": false,
+      "source_commit": "0848840b8cafbdddf398f12bbf85261344137517",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "ec22709eebbc256bada75fc3186b6070480d7b70e19cfa926569e2685e52da53",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.847553091,
+            5.276717196
+          ],
+          "mean": 5.5621351435,
+          "median": 5.5621351435,
+          "minimum": 5.276717196,
+          "maximum": 5.847553091,
+          "stdev": 0.4036419322991921
+        },
+        "TPOT": {
+          "samples": [
+            3.233529892174603,
+            3.2540774912222226
+          ],
+          "mean": 3.243803691698413,
+          "median": 3.243803691698413,
+          "minimum": 3.233529892174603,
+          "maximum": 3.2540774912222226,
+          "stdev": 0.014529346623674066
+        },
+        "E2E": {
+          "samples": [
+            209.559936298,
+            210.283599143
+          ],
+          "mean": 209.9217677205,
+          "median": 209.9217677205,
+          "minimum": 209.559936298,
+          "maximum": 210.283599143,
+          "stdev": 0.5117069049922544
+        }
+      },
+      "memory": {
+        "peak_expert_bytes_per_gpu": [
+          [
+            7247757312,
+            7247757312,
+            7247757312,
+            7247757312
+          ],
+          [
+            7247757312,
+            7247757312,
+            7247757312,
+            7247757312
+          ]
+        ],
+        "expert_budget_bytes_per_gpu": [
+          7247757312,
+          7247757312,
+          7247757312,
+          7247757312
+        ]
+      }
     },
     {
       "status": "PENDING",

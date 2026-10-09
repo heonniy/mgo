@@ -17,7 +17,7 @@ ShareGPT R4/local B16/input512/output64. All values below are median [full range
 | C40 | deepspeed | 5.951 [5.469, 6.433] | 4.112 [4.106, 4.117] | 264.985 [264.157, 265.814] | 2 |
 | C40 | llama | 129.525 [129.470, 129.580] | 0.436 [0.435, 0.436] | 156.963 [156.912, 157.014] | 2 |
 | C50 | main_OURS (post-cleanup) | 2.730 [1.763, 3.697] | 0.489 [0.488, 0.490] | 33.532 [32.620, 34.444] | 2 |
-| C50 | infinity | pending | pending | pending | — |
+| C50 | infinity | 5.562 [5.277, 5.848] | 3.244 [3.234, 3.254] | 209.922 [209.560, 210.284] | 2 |
 | C50 | deepspeed | pending | pending | pending | — |
 | C50 | llama | pending | pending | pending | — |
 

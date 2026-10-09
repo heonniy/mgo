@@ -13,7 +13,7 @@ ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. C30 reuses three validat
 | C40 | infinity | 5.548 [5.241, 5.577] | 3.204 [3.189, 3.269] | 207.416 [206.176, 211.501] | `qca_baseline_c40_infinity_r2_v1 + qca_baseline_c40_infinity_followup_r1_v2 (3 repeats; THIRD)` |
 | C40 | deepspeed | 5.951 [5.469, 6.433] | 4.112 [4.106, 4.117] | 264.985 [264.157, 265.814] | `qca_baseline_c40_deepspeed_r2_v1 (2 repeats; TWO_STABLE)` |
 | C40 | llama | 129.525 [129.470, 129.580] | 0.436 [0.435, 0.436] | 156.963 [156.912, 157.014] | `qca_baseline_c40_llama_r2_v1 (2 repeats; TWO_STABLE)` |
-| C50 | infinity | pending | pending | pending | — |
+| C50 | infinity | 5.562 [5.277, 5.848] | 3.244 [3.234, 3.254] | 209.922 [209.560, 210.284] | `qca_baseline_c50_infinity_r2_v1 (2 repeats; TWO_STABLE)` |
 | C50 | deepspeed | pending | pending | pending | — |
 | C50 | llama | pending | pending | pending | — |
 
