@@ -296,6 +296,7 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
     mask = torch.ones_like(ids)
     past = None
     tokens, stamps = [], []
+    after_prefill_counters = None
     diagnostic_steps = [] if runtime.diag else None
     diagnostic_events = [] if runtime.diag else None
     with torch.inference_mode():
@@ -315,6 +316,11 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
             tokens.append(next_ids)
             torch.cuda.synchronize()
             stamps.append(time.perf_counter_ns())
+            if step == 0:
+                after_prefill_counters = (
+                    runtime.h2d.metrics['bytes'], runtime.native_executor.groups,
+                    runtime.native_executor.waves, runtime.native_executor.waits,
+                    runtime.transport.forward_bytes, runtime.transport.return_bytes)
             if runtime.diag:
                 diagnostic_events.append({name: pairs[:] for name, pairs in
                                           runtime.diag_spans.items()})
@@ -345,6 +351,14 @@ def generate(model, runtime, ids, count, fixed_tokens=None):
                   output_tokens=count, finite_logits=True,
                   argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
                   tokens=actual.tolist())
+    assert after_prefill_counters is not None
+    result.update(
+        decode_h2d_bytes=runtime.h2d.metrics['bytes'] - after_prefill_counters[0],
+        decode_expert_groups=runtime.native_executor.groups - after_prefill_counters[1],
+        decode_expert_waves=runtime.native_executor.waves - after_prefill_counters[2],
+        decode_expert_wait_calls=runtime.native_executor.waits - after_prefill_counters[3],
+        decode_dispatch_bytes=runtime.transport.forward_bytes - after_prefill_counters[4],
+        decode_return_bytes=runtime.transport.return_bytes - after_prefill_counters[5])
     if fixed_tokens is not None:
         result['fixed_continuation'] = True
         result['fed_token_hash'] = hashlib.sha256(
