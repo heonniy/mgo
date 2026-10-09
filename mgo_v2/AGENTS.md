@@ -1,3 +1,13 @@
+**OWNER QWEN CACHE ABLATION ACTIVE (2026-10-09).**
+Read `experiments/qwen_cache_ablation_20261009/{PLAN.md,MATRIX.json,PROGRESS.md}`.
+Compare main_OURS only at C20/C30/C40/C50 on frozen ShareGPT Qwen3
+B16/input512/output64, R4 physical GPUs 0/1/4/5. Three unfiltered target
+repeats per cell. Selected native C++/compiled Near runtime, prefetch OFF,
+full pinned source, cache reset after warmup. One guarded GPU job at a time;
+preserve raw prompts and tokens outside Git, commit validated aggregates,
+diagnose C20/C50 exposed H2D wait separately after primary timing, and restore
+owner model inference loads. Repair failures and resume incomplete cells.
+
 **OWNER DEEPSEEK CACHE ABLATION COMPLETE (2026-10-09).**
 Read `experiments/deepseek_cache_ablation_20261009/{PLAN.md,MATRIX.json,RESULTS.md,PROGRESS.md,CACHE_PLATEAU_DIAG_RESULTS.md}`.
 Run the frozen ShareGPT DeepSeek-V2-Lite input512/output64 local-B16-only
