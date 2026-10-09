@@ -120,6 +120,7 @@ def main(a):
      validation=state,cache_before=empty,no_compile=before==dict(counters['stats']),triton_no_compile=jit_before==jit_after,
      debug_plan_checks=rt.debug_plan_checks,metadata_wire_checks=rt.metadata.wire_checks,
      peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),
+     host_rss_bytes=psutil.Process().memory_info().rss,
      pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in rows],
      forward_wire_bytes=rt.transport.forward_bytes,return_wire_bytes=rt.transport.return_bytes)
   write(path/f'repeat{repeat}_rank{rank}.json',result);dist.barrier(group=a.pcie_cpu_group)
