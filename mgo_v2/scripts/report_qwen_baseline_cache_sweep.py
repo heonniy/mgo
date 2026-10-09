@@ -117,7 +117,7 @@ def inspect(spec, system, job, third, reused, original_sha, current_sha):
                    ((repeats[0][metric] + repeats[1][metric]) / 2)
                    for metric in ('TPOT', 'E2E'))
     stability = 'UNSTABLE' if relative > .05 else ('THIRD' if third else 'TWO_STABLE' if count == 2 else 'THREE')
-    if .02 < relative <= .05 and count == 2:
+    if .02 < relative <= .05 and count == 2 and not third:
         stability = 'THIRD_PENDING'
     return dict(status='PASS', system=system, cache_percent=spec['cache_percent'],
                 label=job.name, third_label=third.name if third else None,

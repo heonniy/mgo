@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 6,
+  "completed": 7,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -442,9 +442,84 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "infinity",
-      "cache_percent": 40
+      "cache_percent": 40,
+      "label": "qca_baseline_c40_infinity_r2_v1",
+      "third_label": "qca_baseline_c40_infinity_followup_r1_v2",
+      "clean_target_repeats": 3,
+      "stability": "THIRD",
+      "first_two_max_relative_difference": 0.025495109240557146,
+      "reused_c30": false,
+      "source_commit": "3e745b425dc6ef4268e43811654341ee9d15df29",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "c2f82c4eab4f15f445a50bd7e57a27c900543c159cd5536c6e96637fb6c6d4af",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.577441396,
+            5.2410739,
+            5.547517189
+          ],
+          "mean": 5.455344161666667,
+          "median": 5.547517189,
+          "minimum": 5.2410739,
+          "maximum": 5.577441396,
+          "stdev": 0.1861657146661841
+        },
+        "TPOT": {
+          "samples": [
+            3.268620590015873,
+            3.1894461565238097,
+            3.2042551562539683
+          ],
+          "mean": 3.2207739675978835,
+          "median": 3.2042551562539683,
+          "minimum": 3.1894461565238097,
+          "maximum": 3.268620590015873,
+          "stdev": 0.04209276750059546
+        },
+        "E2E": {
+          "samples": [
+            211.500538567,
+            206.176181761,
+            207.415592033
+          ],
+          "mean": 208.36410412033334,
+          "median": 207.415592033,
+          "minimum": 206.176181761,
+          "maximum": 211.500538567,
+          "stdev": 2.7860276800962893
+        }
+      },
+      "memory": {
+        "peak_expert_bytes_per_gpu": [
+          [
+            5803868160,
+            5794430976,
+            5794430976,
+            5794430976
+          ],
+          [
+            5803868160,
+            5794430976,
+            5794430976,
+            5794430976
+          ],
+          [
+            5803868160,
+            5794430976,
+            5794430976,
+            5794430976
+          ]
+        ],
+        "expert_budget_bytes_per_gpu": [
+          5803868160,
+          5794430976,
+          5794430976,
+          5794430976
+        ]
+      }
     },
     {
       "status": "PENDING",

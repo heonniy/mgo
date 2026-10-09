@@ -11,5 +11,8 @@ no evidence of an OOM. The supervisor restored the four owner inference loads
 and left no GPU occupants. The earlier `qca_baseline_c40_infinity_r2_v1`
 target repeats both passed; their 3.269/3.189 s/token difference triggered
 this single third-target follow-up. Preserve the failed attempt and retry the
-one-target follow-up under a new label. If the fault repeats, inspect the
-MoE-Infinity native predictor/tracer path before running more cells.
+one-target follow-up under a new label. `qca_baseline_c40_infinity_followup_r1_v2`
+passed with 3.204255 s/token and the same C40 expert budget; the first
+fault did not repeat. Its successful target is the third C40 sample. The
+native fault mechanism remains unproven and the failed attempt remains
+excluded from performance statistics.
