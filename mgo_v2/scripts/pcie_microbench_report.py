@@ -14,6 +14,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('root',type=Path);a=parser.parse_args()
     summary=json.loads((a.root/'microbench_summary.json').read_text());cells={c['name']:c for c in summary['cells']}
+    source_note=f"{summary.get('source_bytes_per_node',144*2**20)/2**30:g} GiB pinned/node; {summary.get('source_layout','compact')} addresses"
     raw=list(csv.DictReader((a.root/'microbench_raw.csv').open()))
     samples={}
     for name in cells:
@@ -44,7 +45,7 @@ def main():
         names=['six_0','six_1','six_2','six_3'];labels=['2,2,1,1','1,2,1,2','2,1,2,1','1,1,2,2']
         axes[1].boxplot([samples[n] for n in names],tick_labels=labels,showfliers=True,medianprops={'color':blue},widths=.6)
         axes[1].set(title='Six fetches; physical GPU order 0,1,4,5',ylabel='Common start to last ready (ms)',ylim=(0,None))
-        fig.suptitle('Isolated H2D, verified local NUMA pinned sources',fontsize=13)
+        fig.suptitle('Isolated H2D, verified local NUMA pinned sources — '+source_note,fontsize=13)
         fig.text(.5,-.02,'30 samples per cell after 5 warmups; randomized repeat blocks. Boxes: quartiles; lines: medians; dots: outliers.',ha='center',fontsize=9)
         pdf.savefig(fig,bbox_inches='tight');fig.savefig(a.root/'microbench_preview.png',dpi=150,bbox_inches='tight');plt.close(fig)
         fig,axes=plt.subplots(1,2,figsize=(12,4.6),layout='constrained')
@@ -58,7 +59,7 @@ def main():
         axes[1].errorbar(range(8),v,yerr=np.abs(np.stack([v-ci[:,0],ci[:,1]-v])),fmt='o',color=blue,capsize=3)
         axes[1].axhline(1,color='#444444',linestyle='--');axes[1].set_xticks(range(8),counts)
         axes[1].set(title='Rank/group ratio of medians',xlabel='Global fetch count M',ylabel='Speedup ratio; paired bootstrap 95% CI')
-        fig.suptitle('One copy stream per GPU; M=4 and M=8 are negative controls',fontsize=13)
+        fig.suptitle('One copy stream per GPU; M=4 and M=8 are negative controls\n'+source_note,fontsize=13)
         pdf.savefig(fig,bbox_inches='tight');plt.close(fig)
         fig,axes=plt.subplots(1,2,figsize=(12,4.6),layout='constrained')
         for name,color,marker in [('rank',blue,'o'),('group',gold,'s')]:
@@ -69,7 +70,7 @@ def main():
         labels=['Local R','Local G','Remote R','Remote G','G2G+R','G2G+G']
         axes[1].boxplot([samples[n] for n in names],tick_labels=labels,medianprops={'color':blue},widths=.6)
         axes[1].set(title='M=6: source/overlap sensitivity',ylabel='H2D last-ready median (ms)',ylim=(0,None))
-        fig.suptitle('Remote pages verified; G2G overlap is a separate diagnostic',fontsize=13)
+        fig.suptitle('Remote pages verified; G2G overlap is a separate diagnostic\n'+source_note,fontsize=13)
         pdf.savefig(fig,bbox_inches='tight');plt.close(fig)
     text=['# Physical PCIe microbenchmark — 2026-10-09','',
           f"Pinned source per NUMA node: {summary.get('source_bytes_per_node',144*2**20)/2**30:g} GiB. Address layout: {summary.get('source_layout','compact')}. Unique physical source: {2*summary.get('source_bytes_per_node',144*2**20)/2**30:g} GiB.", '',

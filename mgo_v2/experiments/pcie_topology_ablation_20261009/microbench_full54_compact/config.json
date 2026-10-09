@@ -1,0 +1,30 @@
+{
+  "source_bytes_per_node": 57982058496,
+  "unique_source_bytes": 115964116992,
+  "source_layout": "compact",
+  "shared_pairs": [
+    [
+      0,
+      1
+    ],
+    [
+      4,
+      5
+    ]
+  ],
+  "seed": 20261009,
+  "argv": [
+    "mgo_v2/examples/pcie_h2d_microbench.py",
+    "--source-gib",
+    "54",
+    "--source-layout",
+    "compact",
+    "--out",
+    "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G2_full54_compact_attempt1"
+  ],
+  "conda_prefix": "/data2/esjung/envs/mgo-pcie",
+  "git_head": "e8c5b74cb0d25c4a28ff9bbafcb6fc3b28a46fb8",
+  "spread_address_rule": "base=((repeat+5)*211+M*73)%6144; source=(base+global_fetch_index*383)%6144; identical global source IDs for equal-M quota arms",
+  "registration": "54-GiB main cells register only the local shared pool per rank; remote controls register the other pool afterwards; 144-MiB legacy cells register both initially; no private payload copies",
+  "source_hash": "7fc64757415d9da110829f41cdd8eb5b737038e4acf2c42e3ce64910af5180cf"
+}
