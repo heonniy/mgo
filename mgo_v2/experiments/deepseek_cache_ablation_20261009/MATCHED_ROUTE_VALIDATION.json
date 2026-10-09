@@ -1,0 +1,382 @@
+{
+  "status": "PASS",
+  "model": "DeepSeekV2Lite",
+  "dataset": "ShareGPT",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "local_batch": 16,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "fixed_continuation_sha256": "f6614fca1fbc1501fb39002fad57475d3ba8a8a9941e0562f2724e6c34fd6942",
+  "route_sha256_per_rank": [
+    "130f72517ea5e47dd877b77d9302d0de655f2315c13e9db03c18fb3d5b44cb9a",
+    "741f9af8df657ef2a330f4515cbfd2cbeeab09d516b13d99452cc1163c4654c9",
+    "4efac8769ff163ff0899adb60e98de893066ae16ecc7f9c81309d6ce69ccc515",
+    "0f29858783c55eed335c6ed92a84858c3617d8924cbc97ebd4719549cfd7f0ce"
+  ],
+  "route_capture_label": "dca_d1_route_capture_c20_r1_v2",
+  "route_capture_matches_original_output_sequences": 64,
+  "alternating_order": "C20,C50 repeated three times",
+  "cases": {
+    "20": {
+      "tpot_samples_s_per_token": [
+        0.2875033744603175,
+        0.2885593887936508,
+        0.28810921338095236
+      ],
+      "tpot_median_s_per_token": 0.28810921338095236,
+      "tpot_full_range_s_per_token": [
+        0.2875033744603175,
+        0.2885593887936508
+      ],
+      "ttft_samples_s": [
+        0.840762654,
+        0.833671124,
+        0.858260191
+      ],
+      "e2e_samples_s": [
+        18.953475245,
+        19.012912618,
+        19.009140634
+      ],
+      "decode_distinct_expert_groups": 102818,
+      "decode_demand_copies": 86729,
+      "decode_rank_local_main_hit_rate": 0.156480382812348,
+      "decode_h2d_gib": 1397.48876953125,
+      "wave_samples": [
+        28608,
+        27725,
+        30779
+      ],
+      "dispatch_gib": 0.9696968197822571,
+      "return_gib": 0.9654541015625
+    },
+    "50": {
+      "tpot_samples_s_per_token": [
+        0.279644321031746,
+        0.28485593292063494,
+        0.279948999952381
+      ],
+      "tpot_median_s_per_token": 0.279948999952381,
+      "tpot_full_range_s_per_token": [
+        0.279644321031746,
+        0.28485593292063494
+      ],
+      "ttft_samples_s": [
+        0.833901861,
+        0.873999553,
+        0.861209877
+      ],
+      "e2e_samples_s": [
+        18.451494086,
+        18.819923327,
+        18.497996874
+      ],
+      "decode_distinct_expert_groups": 102818,
+      "decode_demand_copies": 54465,
+      "decode_rank_local_main_hit_rate": 0.4702775778560174,
+      "decode_h2d_gib": 877.60986328125,
+      "wave_samples": [
+        13640,
+        13365,
+        13590
+      ],
+      "dispatch_gib": 0.9828962031751871,
+      "return_gib": 0.9785957336425781
+    }
+  },
+  "within_capacity_sequence_agreement_of_64": {
+    "20": [
+      64,
+      64,
+      64
+    ],
+    "50": [
+      64,
+      64,
+      64
+    ]
+  },
+  "cross_capacity_sequence_agreement_of_64": [
+    35,
+    35,
+    35
+  ],
+  "records": [
+    {
+      "label": "dca_d1_fixedroute_c20_pair1_v1",
+      "status": "PASS",
+      "capacity_percent": 20,
+      "TPOT_s_per_token": 0.2875033744603175,
+      "decode_h2d_gib": 1397.48876953125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 28608,
+      "decode_dispatch_gib": 0.9696968197822571,
+      "decode_return_gib": 0.9654541015625,
+      "pair": 1,
+      "TTFT_s": 0.840762654,
+      "E2E_s": 18.953475245,
+      "source_commit": "609cee58b88bf1a0e856c617696779e165d775d3",
+      "per_rank_groups": [
+        26270,
+        25872,
+        25530,
+        25146
+      ],
+      "per_rank_waves": [
+        8717,
+        7306,
+        6392,
+        6193
+      ],
+      "per_rank_h2d_gib": [
+        359.0361328125,
+        352.30078125,
+        346.2421875,
+        339.90966796875
+      ],
+      "per_rank_wait_calls": [
+        923,
+        357,
+        99,
+        71
+      ],
+      "peak_allocated_gib": [
+        6.863027572631836,
+        6.860194206237793,
+        6.881655216217041,
+        6.893797397613525
+      ]
+    },
+    {
+      "label": "dca_d1_fixedroute_c50_pair1_v1",
+      "status": "PASS",
+      "capacity_percent": 50,
+      "TPOT_s_per_token": 0.279644321031746,
+      "decode_h2d_gib": 877.60986328125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 13640,
+      "decode_dispatch_gib": 0.9828962031751871,
+      "decode_return_gib": 0.9785957336425781,
+      "pair": 1,
+      "TTFT_s": 0.833901861,
+      "E2E_s": 18.451494086,
+      "source_commit": "c2d620dd4282f2038c8bf9af80e6a28f8fdfd8d0",
+      "per_rank_groups": [
+        26284,
+        25933,
+        25510,
+        25091
+      ],
+      "per_rank_waves": [
+        3540,
+        3289,
+        3276,
+        3535
+      ],
+      "per_rank_h2d_gib": [
+        229.17919921875,
+        222.7177734375,
+        216.3369140625,
+        209.3759765625
+      ],
+      "per_rank_wait_calls": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "peak_allocated_gib": [
+        8.876699447631836,
+        8.873866081237793,
+        8.895327091217041,
+        8.907469272613525
+      ]
+    },
+    {
+      "label": "dca_d1_fixedroute_c20_pair2_v1",
+      "status": "PASS",
+      "capacity_percent": 20,
+      "TPOT_s_per_token": 0.2885593887936508,
+      "decode_h2d_gib": 1397.48876953125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 27725,
+      "decode_dispatch_gib": 0.9696968197822571,
+      "decode_return_gib": 0.9654541015625,
+      "pair": 2,
+      "TTFT_s": 0.833671124,
+      "E2E_s": 19.012912618,
+      "source_commit": "c2d620dd4282f2038c8bf9af80e6a28f8fdfd8d0",
+      "per_rank_groups": [
+        26270,
+        25872,
+        25530,
+        25146
+      ],
+      "per_rank_waves": [
+        6952,
+        7658,
+        6806,
+        6309
+      ],
+      "per_rank_h2d_gib": [
+        359.0361328125,
+        352.30078125,
+        346.2421875,
+        339.90966796875
+      ],
+      "per_rank_wait_calls": [
+        233,
+        510,
+        236,
+        118
+      ],
+      "peak_allocated_gib": [
+        6.863027572631836,
+        6.860194206237793,
+        6.881655216217041,
+        6.893797397613525
+      ]
+    },
+    {
+      "label": "dca_d1_fixedroute_c50_pair2_v1",
+      "status": "PASS",
+      "capacity_percent": 50,
+      "TPOT_s_per_token": 0.28485593292063494,
+      "decode_h2d_gib": 877.60986328125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 13365,
+      "decode_dispatch_gib": 0.9828962031751871,
+      "decode_return_gib": 0.9785957336425781,
+      "pair": 2,
+      "TTFT_s": 0.873999553,
+      "E2E_s": 18.819923327,
+      "source_commit": "c2d620dd4282f2038c8bf9af80e6a28f8fdfd8d0",
+      "per_rank_groups": [
+        26284,
+        25933,
+        25510,
+        25091
+      ],
+      "per_rank_waves": [
+        3287,
+        3281,
+        3276,
+        3521
+      ],
+      "per_rank_h2d_gib": [
+        229.17919921875,
+        222.7177734375,
+        216.3369140625,
+        209.3759765625
+      ],
+      "per_rank_wait_calls": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "peak_allocated_gib": [
+        8.876699447631836,
+        8.873866081237793,
+        8.895327091217041,
+        8.907469272613525
+      ]
+    },
+    {
+      "label": "dca_d1_fixedroute_c20_pair3_v1",
+      "status": "PASS",
+      "capacity_percent": 20,
+      "TPOT_s_per_token": 0.28810921338095236,
+      "decode_h2d_gib": 1397.48876953125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 30779,
+      "decode_dispatch_gib": 0.9696968197822571,
+      "decode_return_gib": 0.9654541015625,
+      "pair": 3,
+      "TTFT_s": 0.858260191,
+      "E2E_s": 19.009140634,
+      "source_commit": "c2d620dd4282f2038c8bf9af80e6a28f8fdfd8d0",
+      "per_rank_groups": [
+        26270,
+        25872,
+        25530,
+        25146
+      ],
+      "per_rank_waves": [
+        6726,
+        10213,
+        7558,
+        6282
+      ],
+      "per_rank_h2d_gib": [
+        359.0361328125,
+        352.30078125,
+        346.2421875,
+        339.90966796875
+      ],
+      "per_rank_wait_calls": [
+        156,
+        1728,
+        166,
+        100
+      ],
+      "peak_allocated_gib": [
+        6.863027572631836,
+        6.860194206237793,
+        6.881655216217041,
+        6.893797397613525
+      ]
+    },
+    {
+      "label": "dca_d1_fixedroute_c50_pair3_v1",
+      "status": "PASS",
+      "capacity_percent": 50,
+      "TPOT_s_per_token": 0.279948999952381,
+      "decode_h2d_gib": 877.60986328125,
+      "decode_expert_groups": 102818,
+      "decode_expert_waves": 13590,
+      "decode_dispatch_gib": 0.9828962031751871,
+      "decode_return_gib": 0.9785957336425781,
+      "pair": 3,
+      "TTFT_s": 0.861209877,
+      "E2E_s": 18.497996874,
+      "source_commit": "c2d620dd4282f2038c8bf9af80e6a28f8fdfd8d0",
+      "per_rank_groups": [
+        26284,
+        25933,
+        25510,
+        25091
+      ],
+      "per_rank_waves": [
+        3496,
+        3299,
+        3280,
+        3515
+      ],
+      "per_rank_h2d_gib": [
+        229.17919921875,
+        222.7177734375,
+        216.3369140625,
+        209.3759765625
+      ],
+      "per_rank_wait_calls": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "peak_allocated_gib": [
+        8.876699447631836,
+        8.873866081237793,
+        8.895327091217041,
+        8.907469272613525
+      ]
+    }
+  ],
+  "causal_limit": "Selected expert IDs, BF16 router weights, full router probabilities and next-token inputs are fixed; cache capacity changes owner placement and peer payload slightly, so this is a controlled route comparison, not copy-only intervention."
+}
