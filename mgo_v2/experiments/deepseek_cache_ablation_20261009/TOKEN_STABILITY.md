@@ -16,6 +16,7 @@ All cells use the same 64 frozen target requests and start from an empty dynamic
 | 30% | llama.cpp balanced | 64/64 / 64/64 / 64/64 | 64/64 / 64/64 / 64/64 |
 | 40% | main_OURS | 64/64 / 64/64 / 64/64 | 64/64 / 64/64 / 64/64 |
 | 40% | MoE-Infinity (repaired) | 23/64 / 26/64 / 29/64 | 60/64 / 61/64 / 61/64 |
+| 40% | DeepSpeed ZeRO-Inference | 35/64 / 35/64 / 37/64 | 64/64 / 64/64 / 64/64 |
 
 ## C20 reference versus other cache sizes
 
@@ -28,6 +29,7 @@ Compare target repeat 2 at each cache size; first-token agreement, complete 64-t
 | MoE-Infinity (repaired) | C20→C30 | 61/64 | 20/64 | 2617/4096 |
 | MoE-Infinity (repaired) | C20→C40 | 61/64 | 23/64 | 2590/4096 |
 | DeepSpeed ZeRO-Inference | C20→C30 | 64/64 | 36/64 | 3177/4096 |
+| DeepSpeed ZeRO-Inference | C20→C40 | 64/64 | 31/64 | 2962/4096 |
 | llama.cpp balanced | C20→C30 | 64/64 | 64/64 | 4096/4096 |
 
 Capacity changes can alter BF16 execution order and, after a token diverges, later routing demand. Therefore the measured end-to-end results describe actual greedy runs at each capacity; traffic differences do not isolate capacity under a bit-identical future decode trajectory.
