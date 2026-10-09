@@ -68,6 +68,9 @@ def main(a):
    command+=['--native-prefill']
   if a.prefetch_off:
    assert a.worker=='headline_ours_worker.py';command+=['--prefetch-off']
+  if a.h2d_serial_ablation:
+   assert a.worker=='headline_ours_worker.py' and a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast
+   command+=['--h2d-serial-ablation']
   if a.llama_threads is not None:
    assert a.worker in llama_workers and a.ranks==1
    command+=['--threads',str(a.llama_threads)]
@@ -156,6 +159,7 @@ if __name__=='__main__':
  p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--native-prefill',action='store_true')
  p.add_argument('--prefetch-off',action='store_true')
+ p.add_argument('--h2d-serial-ablation',action='store_true')
  p.add_argument('--ours-final',action='store_true')
  p.add_argument('--post-generation-diagnostic',action='store_true')
  p.add_argument('--record-main-eviction-trace',action='store_true')
