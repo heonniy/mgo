@@ -41,6 +41,18 @@ def validate_stage(root):
             receipt=json.loads((warm/f'repeat0_rank{r}.json').read_text())
             assert receipt['metadata_wire_checks']==48 and receipt['finite_logits']
     report=dict(status='PASS',stage=stage,root=str(root),arms={},selection_is_not_final_estimate=stage!='final')
+    screen=None
+    if stage=='final':
+        screen=Path(spec['selection_root'])
+        assert json.loads((screen/'status.json').read_text())['status']=='PASS'
+        launches=[json.loads((path/'launch.json').read_text()) for path in (screen,root)]
+        active_paths=['mgo_v2/mgo_v2/'+name for name in ('decode_runtime.py','selected_runtime.py','pcie_grouped_decode.py','pcie_grouped_probe.py','grouped_expert.py','pcie_native_metadata.py')]
+        active_paths+=['mgo_v2/scripts/'+name for name in ('native_pcie_controller.cpp','native_pcie_metadata.cpp')]
+        active_paths+=['mgo_v2/examples/headline_ours_worker.py']
+        for path in active_paths:assert launches[0]['source_sha256'][path]==launches[1]['source_sha256'][path],path
+        for name in ('MGO_MODEL_PATH','MGO_EXPERT_STORE'):assert launches[0]['environment'][name]==launches[1]['environment'][name]
+        report['screen_final_active_runtime_parity']=dict(status='PASS',source_paths=active_paths,
+                scope='Same hot kernels/controller/metadata and generation function; receipt-only worker changes are recorded separately in launch source hashes')
     for c in spec['candidates']:
         for arm in (('G-NEAR',) if stage=='nomination' else ('R-NEAR','G-NEAR')):
             path=root/c['candidate']/arm;n=16 if stage=='nomination' else 64
@@ -49,6 +61,11 @@ def validate_stage(root):
             entry=dict(status='PASS',candidate_manifest=c['path'],candidate_manifest_sha256=c['sha256'])
             assert sha(Path(c['path']))==c['sha256']
             if stage=='final':
+                selected_trace,selected_ranks=verify_generation(screen/c['candidate']/arm,1,64)
+                np.testing.assert_array_equal(trace,selected_trace)
+                assert [r['tokens'] for r in ranks]==[r['tokens'] for r in selected_ranks]
+                assert [r['validation']['state_hash'] for r in ranks]==[r['validation']['state_hash'] for r in selected_ranks]
+                entry['screen_final_trajectory_exact']=True
                 validate(path,(-1,));entry['live']=summarize_arm(path);entry['diagnostic']=partition(path)
                 with np.load(path/'actual_fetches_repeat-1.npz') as capture:
                     fetches=capture['fetches'];assert int(capture['events'])==3072
