@@ -5,6 +5,6 @@ Full 64-token request agreement across the three target repeats (out of 64 reque
 | Cache | 1 versus 2 | 1 versus 3 | 2 versus 3 |
 |---:|---:|---:|---:|
 | 20% | 64/64 | 64/64 | 64/64 |
-| 30% | — | — | — |
+| 30% | 64/64 | 64/64 | 64/64 |
 | 40% | — | — | — |
 | 50% | — | — | — |
