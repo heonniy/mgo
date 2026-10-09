@@ -86,6 +86,8 @@ def main():
               'The executor change therefore reverses the observed policy '
               'ordering on this one frozen cell. It does not establish the '
               'same ordering for other batches, caches, or transports. '
+              'The first Random attempt used a Near-captured route and failed '
+              'the cross-job route-hash check; it is preserved but excluded. '
               'Per-run timings, peer/H2D bytes, and raw paths are in '
               '[QUIET_PAIR.json](QUIET_PAIR.json).', '']
     (HERE / 'QUIET_PAIR.md').write_text('\n'.join(lines))
