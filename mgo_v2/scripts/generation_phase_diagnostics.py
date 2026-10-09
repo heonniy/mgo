@@ -11,7 +11,9 @@ class GenerationDiagnostics(PrefillDiagnostics):
   self.rows[-1].update(event_index=self.rt.index,step=self.rt.index//48,layer=self.rt.index%48)
  def token_ready(self,step):
   self.mark()
-  self.rows[-1]['token_ready_index']=step
+  self.rows[-1].update(token_ready_index=step,
+                       forward_bytes=self.rt.transport.forward_bytes,
+                       return_bytes=self.rt.transport.return_bytes)
  def install(self,model):
   super().install(model)
   if hasattr(self.rt.metadata,'collect_profiled'):
@@ -51,5 +53,9 @@ class GenerationDiagnostics(PrefillDiagnostics):
   self.rt.h2d.synchronize()
   result=super().finish(wall_seconds)
   result['decode_cache_events']=self.cache_events
+  markers=[row for row in result['segments'] if 'token_ready_index' in row]
+  assert len(markers)>=2 and [row['token_ready_index'] for row in markers]==list(range(len(markers)))
+  result['decode_transport_bytes']={name:markers[-1][name]-markers[0][name]
+                                    for name in ('forward_bytes','return_bytes')}
   result['cache_definition']='Logical main hits and promoted-prefetch hits avoid a new demand copy, but can still wait for an in-flight H2D. Prefill survivors exclude keys evicted or demand-reloaded on this rank.'
   return result

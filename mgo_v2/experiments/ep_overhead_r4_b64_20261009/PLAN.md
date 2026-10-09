@@ -47,8 +47,11 @@ two expert execution schedules with two uninstrumented repetitions each:
   current-code baseline above).
 - N (`new_OURS`): execute **only resident cache hits** in one grouped GEMM
   wave; after that wave is submitted, wait for all current demand-miss H2D
-  transfers to complete and execute **all misses** in a second grouped GEMM
-  wave (`hit_then_miss`). An already-ready miss still belongs to wave two.
+  transfers and execute **all misses** in a second grouped GEMM wave
+  (`hit_then_miss`). An already-ready miss still belongs to wave two.
+  The stream-wait candidate (`hit_then_miss_stream`) preserves exact output,
+  cache and H2D but regressed TPOT in two B64 repetitions, so it remains a
+  diagnostic reference rather than the selected N schedule.
   If there are no hits or misses, omit the corresponding empty wave.
 
 The previously planned B (`serial_all`) run is retained as a secondary

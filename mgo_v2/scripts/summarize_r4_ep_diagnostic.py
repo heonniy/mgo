@@ -103,6 +103,7 @@ def rank_summary(primary, diagnostic, rank):
         decode_copy_count=len(decode_copies), decode_copy_bytes=bytes_,
         decode_copy_service_seconds=dma,
         mean_copy_service_ms=1000*dma/len(decode_copies) if decode_copies else 0,
+        decode_transport_bytes=profile.get('decode_transport_bytes'),
         copy_method=copy_method,
         prefill_phase_seconds=dict(prefill_phase) if prefill else None,
         prefill_fine_seconds=prefill['exclusive_stream_partition'] if prefill else None,
@@ -120,19 +121,20 @@ def main():
         assert receipt['status'] == 'PASS' and receipt['kind'] == kind
         assert len(receipt['restored_model_loads']) == 8
     ranks = [rank_summary(args.primary, args.diagnostic, rank) for rank in range(4)]
-    critical = max(ranks, key=lambda row: row['diagnostic_tpot_seconds'])
+    critical = max(ranks, key=lambda row: row['phase_seconds'].get('Expert execution', 0))
     total = sum(critical['phase_seconds'].values())
     assert total > 0
     result = dict(status='PASS', primary=str(args.primary), diagnostic=str(args.diagnostic),
-                  critical_rank=critical['rank'], critical_physical_gpu=critical['physical_gpu'],
-                  critical_phase_ms_per_token={k:v*1000/63 for k,v in critical['phase_seconds'].items()},
-                  critical_phase_percent={k:v/total*100 for k,v in critical['phase_seconds'].items()},
-                  critical_fine_ms_per_token={k:v*1000/63 for k,v in critical['fine_seconds'].items()},
+                  anchor_selection='rank with the longest expert-execution span; collective boundaries align total elapsed across ranks',
+                  anchor_rank=critical['rank'], anchor_physical_gpu=critical['physical_gpu'],
+                  anchor_phase_ms_per_token={k:v*1000/63 for k,v in critical['phase_seconds'].items()},
+                  anchor_phase_percent={k:v/total*100 for k,v in critical['phase_seconds'].items()},
+                  anchor_fine_ms_per_token={k:v*1000/63 for k,v in critical['fine_seconds'].items()},
                   ranks=ranks,
                   caveat='Diagnostic current-stream spans include peer/host waits and are inflated by instrumentation. DMA service overlaps and is not part of the 100% partition.')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2)+'\n')
-    print(json.dumps(dict(status='PASS', critical_gpu=result['critical_physical_gpu'],
+    print(json.dumps(dict(status='PASS', anchor_gpu=result['anchor_physical_gpu'],
                           diagnostic_tpot_ms=critical['diagnostic_tpot_seconds']*1000,
                           decode_copies=[row['decode_copy_count'] for row in ranks])))
 

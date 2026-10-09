@@ -64,7 +64,8 @@ def weight_scatter(Y, RW, Rows, Cols, Meta, Out, STRIDE: tl.constexpr,
 
 class GroupedExpertExecutor:
     def __init__(self, cache, kernel, max_rows=4096, schedule='ready_wave'):
-        if schedule not in ('ready_wave', 'serial_all', 'two_wave', 'hit_then_miss'):
+        if schedule not in ('ready_wave', 'serial_all', 'two_wave',
+                            'hit_then_miss', 'hit_then_miss_stream'):
             raise ValueError(f'unknown grouped schedule: {schedule}')
         self.cache, self.kernel, self.max_rows = cache, kernel, max_rows
         self.schedule = schedule
@@ -103,7 +104,7 @@ class GroupedExpertExecutor:
         self.events+=1
         while pending:
             tick=time.perf_counter() if self.diagnostic else 0
-            if self.schedule=='hit_then_miss' and wave_number==0:
+            if self.schedule in ('hit_then_miss','hit_then_miss_stream') and wave_number==0:
                 selected=[i for i in pending if layer*128+groups[i][0] not in fetched]
                 # The first grouped wave contains resident hits only. Even an
                 # already-finished demand copy belongs to the second wave.
@@ -112,9 +113,10 @@ class GroupedExpertExecutor:
                 else:
                     wave_number+=1
                     continue
-            elif self.schedule=='serial_all' or (self.schedule in ('two_wave','hit_then_miss') and wave_number):
+            elif self.schedule=='serial_all' or (self.schedule in ('two_wave','hit_then_miss','hit_then_miss_stream') and wave_number):
                 started=time.perf_counter_ns()
-                rt.h2d.wait_slots([groups[i][3] for i in pending],host=True)
+                rt.h2d.wait_slots([groups[i][3] for i in pending],
+                                  host=self.schedule!='hit_then_miss_stream')
                 self.serial_wait_wall_ns+=time.perf_counter_ns()-started
                 selected=pending[:]
             else:
@@ -135,7 +137,7 @@ class GroupedExpertExecutor:
             selected_set=set(selected);pending=[i for i in pending if i not in selected_set]
             if wave_number==0:self.first_wave_groups+=len(selected)
             else:self.second_wave_groups+=len(selected)
-            if self.schedule=='hit_then_miss':
+            if self.schedule in ('hit_then_miss','hit_then_miss_stream'):
                 if wave_number==0:self.hit_first_groups+=len(selected)
                 else:self.miss_second_groups+=len(selected)
             self.waves+=1

@@ -14,12 +14,20 @@ profile one full decode per cell. Within each batch, compare policy effects
 on TPOT, MAIN hit/miss count, H2D bytes and copy service, routed token-expert
 rows, per-rank expert load, controller/index work, forward dispatch, grouped
 expert execution, return/combine, attention/dense and unclassified runtime.
-Use the slowest-rank current-stream partition for each diagnostic cell; sum
-its mutually exclusive segments to 100% of the separately instrumented TPOT.
+Use a rank with the largest expert-execution span as a representative
+current-stream partition for each diagnostic cell, and retain the partition
+for every rank. Collective boundaries align their total elapsed times, so
+the overall slowest rank alone does not identify the cause. Sum mutually
+exclusive segments to 100% of each separately instrumented TPOT.
 Copy-stream service may overlap these spans and must not be added to 100%.
 Report copy service and exposed wait separately. Collective intervals contain
 peer arrival and host submission, so do not label them pure network wire
 time. Show both absolute ms/token and growth from B8 to B16 to B64.
+The second grouped wave is ordered behind the first and all miss-copy
+completion. A GPU-stream-wait implementation with identical tokens/cache/H2D
+was measured separately and regressed B64 TPOT, so the primary N schedule
+keeps the faster host-side wait. Do not assume that moving a wait to the GPU
+automatically shortens the end-to-end critical path.
 
 Use the current main_OURS C++ Ready-First individual expert executor as the
 causal baseline for the Near policy. At B64, compare default metadata/index
