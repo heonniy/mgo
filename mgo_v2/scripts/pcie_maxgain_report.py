@@ -49,6 +49,28 @@ def validate_stage(root):
             assert sha(Path(c['path']))==c['sha256']
             if stage=='final':
                 validate(path,(-1,));entry['live']=summarize_arm(path);entry['diagnostic']=partition(path)
+                with np.load(path/'actual_fetches_repeat-1.npz') as capture:
+                    fetches=capture['fetches'];assert int(capture['events'])==3072
+                assert fetches.shape[1]==7 and np.all(fetches[:,5]==0)
+                counts=np.zeros((3072,4),np.int64)
+                np.add.at(counts,(fetches[:,0],fetches[:,1]),1)
+                np.testing.assert_array_equal(counts,trace[:,48:52])
+                assert np.all(fetches[:,2]//128==fetches[:,0]%48)
+                capacities=np.array([459,459,459,458],np.int64)
+                assert np.all(fetches[:,3]>=0) and np.all(fetches[:,3]<capacities[fetches[:,1]])
+                assert np.all(fetches[:,6]>=0) and np.all(fetches[:,6]<capacities[fetches[:,1]]+2)
+                with (path/'assigned_experts.csv').open('w',newline='') as stream:
+                    writer=csv.writer(stream);writer.writerow(['event','layer','phase','rank','physical_gpu','expert_id','key','logical_main_slot','physical_slot','victim','replica'])
+                    for event,rank,key,slot,victim,rep,physical in fetches:
+                        writer.writerow([event,event%48,'prefill' if event<48 else 'decode',rank,[0,1,4,5][rank],key%128,key,slot,physical,victim,rep])
+                with (path/'phase_timing.jsonl').open('w') as stream:
+                    for rank in range(4):
+                        for event in json.loads((path/f'phases_repeat-1_rank{rank}.json').read_text()):
+                            stream.write(json.dumps(dict(event,physical_gpu=[0,1,4,5][rank],diagnostic=True))+'\n')
+                entry['actual_assignment_validation']=dict(status='PASS',events=3072,fetches=len(fetches),
+                     every_rank_quota_exact=True,legal_main_and_physical_slots=True,no_replication=True,
+                     scope='Actual diagnostic controller fetches; diagnostic tokens/cache/full policy trace match unprofiled repeats',
+                     additional_diagnostic_overhead='Copying assignment arrays is diagnostic-only and included in PLAN residual')
                 for repeat in list(range(2,cohort['primary_repeats']+1))+[-1]:
                     other,rr=verify_generation(path,repeat,64);np.testing.assert_array_equal(trace,other)
                     assert [r['tokens'] for r in ranks]==[r['tokens'] for r in rr]
@@ -122,7 +144,7 @@ def archive(root,report,commit):
                 inventory[str(rel)]=dict(external_path=str(p),sha256=digest,bytes=p.stat().st_size,reason='Raw current-routing capture retained under data2; no input-token manifest in Git')
                 continue
             dest=target/rel;dest.parent.mkdir(parents=True,exist_ok=True)
-            if p.stat().st_size>128*1024 and p.suffix in ('.npy','.csv','.json'):
+            if p.stat().st_size>128*1024 and p.suffix in ('.npy','.csv','.json','.jsonl'):
                 dest=dest.with_name(dest.name+'.gz')
                 with p.open('rb') as src,dest.open('wb') as dst:
                     with gzip.GzipFile(filename='',fileobj=dst,mode='wb',mtime=0) as gz:shutil.copyfileobj(src,gz)

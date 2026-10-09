@@ -4,6 +4,7 @@ Selection and corpus preparation happen outside this GPU worker. Both placements
 use exactly the same grouped executor and native metadata implementation.
 """
 from pcie_sequence_worker import *
+from mgo_v2.pcie_actual_fetch_capture import ActualFetchCapture
 
 
 class CurrentRoutingCapture:
@@ -78,6 +79,7 @@ def main(a):
   a.phase='COUNTERS' if repeat==0 else 'MEASURE';a.validate_decode_layout=repeat==0
   grouped.validate=repeat==0;rt.metadata.validate_wire=repeat==0
   granular=GranularDiagnostic(rt,record_functions=False) if diagnostic else None
+  assigned=ActualFetchCapture(rt) if diagnostic and rank==0 else None
   rows,ids=inputs(candidate['path']);begin(rt);empty=validate_state(rt)
   assert np.all(rt.keys<0) and not rt.controller.pending
   write(path/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
@@ -89,6 +91,7 @@ def main(a):
   if repeat:
    with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
   else:result=generate_live(model,rt,ids,n)
+  if assigned:assigned.finish(path/'actual_fetches_repeat-1.npz')
   if granular:granular.close()
   if capture:capture.finish(path/'current_routing.npz')
   jit_after={f.__name__:sorted(f.cache[0]) for f in (projection,activate,weight_scatter,pack_current_metadata)}
