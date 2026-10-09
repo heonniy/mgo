@@ -28,3 +28,10 @@ owners. They consumed CPU time on the shared server. Only those 16 stale
 agents were terminated; no model process, active profiler parent, or other
 user's job was touched. Their contribution to the timing drift is a
 **hypothesis**, to be tested by the post-cleanup C20/C50 jobs.
+
+The post-cleanup C20 and C50 two-repeat jobs were internally stable, but
+their 2.86% TPOT difference was far smaller than the chronological primary
+sweep's apparent 25% difference. The original C30 and C40 jobs also had
+large timing ranges, so complete the four-capacity comparison with one
+two-repeat post-cleanup job each for C30 and C40 on the same frozen inputs.
+Do not add further repetitions when each pair is stable.

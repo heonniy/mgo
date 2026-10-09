@@ -1,0 +1,162 @@
+{
+  "status": "PASS",
+  "model": "Qwen3-30B-A3B-Instruct-2507",
+  "dataset": "ShareGPT",
+  "local_batch": 16,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "protocol": "Sequential post-cleanup C20, C50, C30, C40 jobs; two unfiltered clean target repeats each",
+  "mean_tpot_gain_c50_over_c20": 0.028610757871048498,
+  "cases": [
+    {
+      "cache_percent": 20,
+      "label": "qca_recheck_c20_b16_r2_v1",
+      "source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.613584645,
+            1.752389594
+          ],
+          "mean": 2.6829871195,
+          "minimum": 1.752389594,
+          "maximum": 3.613584645
+        },
+        "TPOT": {
+          "samples": [
+            0.5024876216984127,
+            0.5041606945714286
+          ],
+          "mean": 0.5033241581349206,
+          "minimum": 0.5024876216984127,
+          "maximum": 0.5041606945714286
+        },
+        "E2E": {
+          "samples": [
+            35.270304812,
+            33.514513352
+          ],
+          "mean": 34.392409082,
+          "minimum": 33.514513352,
+          "maximum": 35.270304812
+        }
+      },
+      "h2d_gib_all_ranks": 1913.009765625,
+      "request_output_h2d_and_cache_match_original": true
+    },
+    {
+      "cache_percent": 30,
+      "label": "qca_recheck_c30_b16_r2_v1",
+      "source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.631934443,
+            1.767412519
+          ],
+          "mean": 2.699673481,
+          "minimum": 1.767412519,
+          "maximum": 3.631934443
+        },
+        "TPOT": {
+          "samples": [
+            0.4935093447619047,
+            0.49602655685714286
+          ],
+          "mean": 0.4947679508095238,
+          "minimum": 0.4935093447619047,
+          "maximum": 0.49602655685714286
+        },
+        "E2E": {
+          "samples": [
+            34.723023163,
+            33.017085601
+          ],
+          "mean": 33.870054382,
+          "minimum": 33.017085601,
+          "maximum": 34.723023163
+        }
+      },
+      "h2d_gib_all_ranks": 1578.3134765625,
+      "request_output_h2d_and_cache_match_original": true
+    },
+    {
+      "cache_percent": 40,
+      "label": "qca_recheck_c40_b16_r2_v1",
+      "source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.611471162,
+            1.762025886
+          ],
+          "mean": 2.686748524,
+          "minimum": 1.762025886,
+          "maximum": 3.611471162
+        },
+        "TPOT": {
+          "samples": [
+            0.49275791257142854,
+            0.4932169575079365
+          ],
+          "mean": 0.4929874350396825,
+          "minimum": 0.49275791257142854,
+          "maximum": 0.4932169575079365
+        },
+        "E2E": {
+          "samples": [
+            34.655219654,
+            32.834694209
+          ],
+          "mean": 33.7449569315,
+          "minimum": 32.834694209,
+          "maximum": 34.655219654
+        }
+      },
+      "h2d_gib_all_ranks": 1246.4208984375,
+      "request_output_h2d_and_cache_match_original": true
+    },
+    {
+      "cache_percent": 50,
+      "label": "qca_recheck_c50_b16_r2_v1",
+      "source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.696634116,
+            1.762897156
+          ],
+          "mean": 2.7297656359999998,
+          "minimum": 1.762897156,
+          "maximum": 3.696634116
+        },
+        "TPOT": {
+          "samples": [
+            0.48805218988888893,
+            0.48979515514285715
+          ],
+          "mean": 0.48892367251587304,
+          "minimum": 0.48805218988888893,
+          "maximum": 0.48979515514285715
+        },
+        "E2E": {
+          "samples": [
+            34.443922079,
+            32.61999193
+          ],
+          "mean": 33.5319570045,
+          "minimum": 32.61999193,
+          "maximum": 34.443922079
+        }
+      },
+      "h2d_gib_all_ranks": 959.0009765625,
+      "request_output_h2d_and_cache_match_original": true
+    }
+  ]
+}
