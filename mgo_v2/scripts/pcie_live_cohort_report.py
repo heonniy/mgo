@@ -29,6 +29,35 @@ def sha(path):
     return h.hexdigest()
 
 
+def plot(report, root):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.4), layout='constrained')
+    x = np.arange(len(ARMS))
+    primary = [report['arms'][arm]['live']['primary']['TPOT'] for arm in ARMS]
+    med = np.array([s['median'] for s in primary])
+    axes[0].bar(x, med, color=['#0072B2' if arm.startswith('R-') else '#D55E00' for arm in ARMS])
+    axes[0].errorbar(x, med, yerr=np.array([[s['median']-s['min'] for s in primary],
+                    [s['max']-s['median'] for s in primary]]), fmt='none', ecolor='#333333', capsize=3)
+    axes[0].set(title='Unprofiled primary: medians and min–max', ylabel='TPOT (s/token)')
+    keys = ('metadata_plan', 'forward', 'h2d', 'compute', 'return', 'attention_router_other')
+    bottom = np.zeros(len(ARMS))
+    for key, color in zip(keys, ('#CC79A7', '#56B4E9', '#E69F00', '#009E73', '#0072B2', '#777777')):
+        values = np.array([report['arms'][arm]['diagnostic']['seconds_per_token'][key] for arm in ARMS])
+        axes[1].bar(x, values, bottom=bottom, color=color, label=key.replace('_', ' '))
+        bottom += values
+    np.testing.assert_allclose(bottom, [report['arms'][arm]['diagnostic']['TPOT'] for arm in ARMS])
+    axes[1].set(title='Separate timers-only diagnostic frontier partition', ylabel='Diagnostic TPOT (s/token)')
+    axes[1].legend(fontsize=8, ncol=2, loc='upper left', bbox_to_anchor=(0, -.3))
+    for ax in axes:
+        ax.set_xticks(x, ARMS, rotation=35, ha='right', fontsize=9)
+        ax.set_ylim(bottom=0); ax.spines[['top', 'right']].set_visible(False)
+        ax.grid(axis='y', alpha=.2); ax.set_axisbelow(True)
+    fig.suptitle(f"Seven live policies: common grouped GEMM + C++ metadata/controller\nOriginal frozen headline64; {report['primary_repeats']} primary repeats/arm; independent greedy trajectories")
+    fig.savefig(root/'live_cohort.pdf'); fig.savefig(root/'live_cohort.png', dpi=160); plt.close(fig)
+
+
 def run(root):
     cohort=json.loads((root/'result.json').read_text())
     assert cohort['status']=='PASS' and cohort['sequence']=='stage2_grouped' and cohort['arms']==ARMS
@@ -105,6 +134,19 @@ def run(root):
            '| Policy | TTFT (s) | TPOT (s) | E2E (s) | TPOT SD (s) | H2D (GiB) |',
            '|---|---:|---:|---:|---:|---:|']
     lines.extend(f'| {r[0]} | {r[2]:.6f} | {r[3]:.6f} | {r[4]:.6f} | {r[6]:.6f} | {r[9]:.3f} |' for r in rows)
+    lines.extend(['', '| Comparison | Right-arm TPOT reduction | Full token agreement |', '|---|---:|---:|'])
+    for c in report['comparisons']:
+        lines.append(f"| {c['left']} → {c['right']} | {c['right_reduction_percent']:.3f}% | {100*c['full_token_agreement']:.2f}% |")
+    phase_keys=('metadata_plan','forward','h2d','compute','return','attention_router_other')
+    lines.extend(['', '| Policy | Metadata/PLAN | Forward | H2D | Compute | Return | Attention/router/other |', '|---|---:|---:|---:|---:|---:|---:|'])
+    for arm in ARMS:
+        phases=report['arms'][arm]['diagnostic']['seconds_per_token']
+        lines.append('| '+arm+' | '+' | '.join(f'{phases[k]:.6f}' for k in phase_keys)+' |')
+    lines.extend(['', 'Phase entries are seconds/token from one separate diagnostic per arm. Their endpoint partition sums to diagnostic TPOT and includes global waiting. It is distinct from primary medians and does not establish a causal attribution of primary gaps.', '',
+                  '| Policy | Metadata CPU ms/layer | Controller CPU ms/layer | PLAN residual CPU ms/layer |', '|---|---:|---:|---:|'])
+    for arm in ARMS:
+        calls=report['arms'][arm]['diagnostic']['nested_cpu_calls']
+        lines.append('| '+arm+' | '+' | '.join(f"{calls[k]['max_rank_mean_ms']:.4f}" for k in ('metadata_call','controller_call','plan_residual_checksum_slots_glue'))+' |')
     lines.extend(['','All primary repetitions are retained. Diagnostics and warmups do not enter these statistics.',
                   '',report['rss_note']+'.','',
                   'Actual assigned experts and quota rows are joined only after diagnostic tokens/cache/full traces match all primaries. Nested CPU spans are not summed as separate phases; diagnostic frontier partitions cover the complete diagnostic TPOT.',
@@ -112,6 +154,7 @@ def run(root):
                   '', 'MoE-Infinity, DeepSpeed and llama.cpp results are not included in this OURS-only table. Their required new-host measurements remain pending.'])
     (root/'RESULTS.md').write_text('\n'.join(lines)+'\n')
     write(root/'live_cohort_validation.json',report)
+    plot(report,root)
     return report
 
 
