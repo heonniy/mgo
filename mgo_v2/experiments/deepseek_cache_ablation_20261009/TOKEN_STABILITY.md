@@ -20,6 +20,7 @@ All cells use the same 64 frozen target requests and start from an empty dynamic
 | 40% | llama.cpp balanced | 64/64 / 64/64 / 64/64 | 64/64 / 64/64 / 64/64 |
 | 50% | main_OURS | 64/64 / 64/64 / 64/64 | 64/64 / 64/64 / 64/64 |
 | 50% | MoE-Infinity (repaired) | 28/64 / 28/64 / 24/64 | 61/64 / 60/64 / 59/64 |
+| 50% | DeepSpeed ZeRO-Inference | 36/64 / 35/64 / 33/64 | 64/64 / 64/64 / 64/64 |
 
 ## C20 reference versus other cache sizes
 
@@ -35,6 +36,7 @@ Compare target repeat 2 at each cache size; first-token agreement, complete 64-t
 | MoE-Infinity (repaired) | C20→C50 | 58/64 | 27/64 | 2804/4096 |
 | DeepSpeed ZeRO-Inference | C20→C30 | 64/64 | 36/64 | 3177/4096 |
 | DeepSpeed ZeRO-Inference | C20→C40 | 64/64 | 31/64 | 2962/4096 |
+| DeepSpeed ZeRO-Inference | C20→C50 | 64/64 | 32/64 | 3151/4096 |
 | llama.cpp balanced | C20→C30 | 64/64 | 64/64 | 4096/4096 |
 | llama.cpp balanced | C20→C40 | 63/64 | 44/64 | 3415/4096 |
 
