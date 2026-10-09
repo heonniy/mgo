@@ -129,7 +129,7 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--arm',choices=list(ARMS),required=True);p.add_argument('--out',type=Path,required=True)
     p.add_argument('--smoke',action='store_true');p.add_argument('--overlap',action='store_true');p.add_argument('--diagnostic',action='store_true')
     p.add_argument('--repeats',type=int,choices=range(1,6),default=1);p.add_argument('--timeout',type=int,default=3600)
-    p.add_argument('--sequence',choices=('stage1','stage2'))
+    p.add_argument('--sequence',choices=('stage1','stage2','optimize'))
     p.add_argument('--capture-decisions',action='store_true')
     p.add_argument('--breakdown-reference',type=Path)
     p.add_argument('--grouped-probe',action='store_true')
