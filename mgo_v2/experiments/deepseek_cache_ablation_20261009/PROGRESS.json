@@ -1,6 +1,6 @@
 {
   "status": "PARTIAL",
-  "completed": 7,
+  "completed": 8,
   "total": 16,
   "clean_target_repeats": 3,
   "source_manifest_sha256": "f9a5e7cfe106217ffba1bf76c94da76723753f365429d181ab7ce02822813785",
@@ -628,8 +628,54 @@
         2162688000,
         2145386496
       ],
-      "attempts": [],
-      "status": "PENDING"
+      "attempts": [
+        "dca_c30_b16_llama_r3_v1"
+      ],
+      "status": "PASS",
+      "selected_attempt": "dca_c30_b16_llama_r3_v1",
+      "source_commit": "d4671dd075174e0be76d9c5911ef2b11bbc849fb",
+      "sampled_peak_hbm_mib_by_physical_gpu": {
+        "0": 2755,
+        "1": 2645,
+        "4": 2645,
+        "5": 3127
+      },
+      "TTFT": {
+        "samples": [
+          145.45280391,
+          145.380949736,
+          145.242739953
+        ],
+        "median": 145.380949736,
+        "mean": 145.35883119966667,
+        "stdev": 0.10676440766833141,
+        "minimum": 145.242739953,
+        "maximum": 145.45280391
+      },
+      "TPOT": {
+        "samples": [
+          0.4127303425396823,
+          0.4138267985555556,
+          0.41349834607936486
+        ],
+        "median": 0.41349834607936486,
+        "mean": 0.41335182905820095,
+        "stdev": 0.000562720513935858,
+        "minimum": 0.4127303425396823,
+        "maximum": 0.4138267985555556
+      },
+      "E2E": {
+        "samples": [
+          171.45481549,
+          171.452038045,
+          171.293135756
+        ],
+        "median": 171.452038045,
+        "mean": 171.39999643033332,
+        "stdev": 0.09255447768429295,
+        "minimum": 171.293135756,
+        "maximum": 171.45481549
+      }
     },
     {
       "dataset": "ShareGPT",
