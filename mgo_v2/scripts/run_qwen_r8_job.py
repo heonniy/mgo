@@ -100,7 +100,7 @@ def restore_owned_loads(gpus):
     return restored
 
 
-def command(system, output, smoke, repeats):
+def command(system, output, smoke, repeats, ours_mode=None):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -113,6 +113,9 @@ def command(system, output, smoke, repeats):
         command += ['--expert-executor', 'native', '--native-prefill',
                     '--prefetch-off', '--prefill-optimized', '--prefill-layout-fast',
                     '--decode-layout-fast', '--policy', 'LA_CA_NEAR']
+        if ours_mode in ('B', 'C'):
+            command += ['--grouped-decode-mode',
+                        'serial_all' if ours_mode == 'B' else 'two_wave']
     elif system == 'llama':
         command += ['--threads', '32', '--cuda-graphs', 'off',
                     '--graph-reuse', 'off', '--expert-placement', 'balanced1']
@@ -125,7 +128,9 @@ def main():
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
+    parser.add_argument('--ours-mode', choices=('A', 'B', 'C'))
     args = parser.parse_args()
+    assert args.ours_mode is None or args.system == 'ours'
     manifest = json.loads(WORKLOADS.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     cell = manifest['cells'][0]
@@ -135,7 +140,8 @@ def main():
     for phase in ('warmup', 'target'):
         assert hashlib.sha256(Path(cell[phase]['path']).read_bytes()).hexdigest() == cell[phase]['sha256']
     assert owner.host_available() >= 384 * 2**30
-    output = ROOT / 'jobs' / f'{args.system}_{"smoke" if args.smoke else "full"}_v{args.attempt}'
+    label = args.system if args.ours_mode is None else f'ours_{args.ours_mode.lower()}'
+    output = ROOT / 'jobs' / f'{label}_{"smoke" if args.smoke else "full"}_v{args.attempt}'
     assert not output.exists(), f'preserve earlier attempt: {output}'
     output.mkdir(parents=True)
     worker, _, timeout = WORKERS[args.system]
@@ -155,11 +161,12 @@ def main():
     if args.system == 'llama':
         env.update(OMP_THREAD_LIMIT='32', GGML_CUDA_DISABLE_GRAPHS='1',
                    LLAMA_GRAPH_REUSE_DISABLE='1')
-    state = dict(status='RUNNING', system=args.system, smoke=args.smoke,
+    state = dict(status='RUNNING', system=args.system, ours_mode=args.ours_mode,
+                 smoke=args.smoke,
                  repeats=args.repeats, physical_gpus=PHYSICAL, started=time.time(),
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'],
                                                        cwd=PKG.parent, text=True).strip(),
-                 command=command(args.system, output, args.smoke, args.repeats),
+                 command=command(args.system, output, args.smoke, args.repeats, args.ours_mode),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []

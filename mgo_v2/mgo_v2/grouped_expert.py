@@ -63,8 +63,11 @@ def weight_scatter(Y, RW, Rows, Cols, Meta, Out, STRIDE: tl.constexpr,
 
 
 class GroupedExpertExecutor:
-    def __init__(self, cache, kernel, max_rows=4096):
+    def __init__(self, cache, kernel, max_rows=4096, schedule='ready_wave'):
+        if schedule not in ('ready_wave', 'serial_all', 'two_wave'):
+            raise ValueError(f'unknown grouped schedule: {schedule}')
         self.cache, self.kernel, self.max_rows = cache, kernel, max_rows
+        self.schedule = schedule
         # Bound from batch * world * top-k, not from future frozen events.
         self.x = torch.empty((max_rows,2048),device=cache.device,dtype=torch.bfloat16)
         self.gu = torch.empty((max_rows,1536),device=cache.device,dtype=torch.bfloat16)
@@ -75,6 +78,8 @@ class GroupedExpertExecutor:
         self.diagnostic = False
         self.records = []
         self.max_abs = 0.; self.max_rel = 0.; self.comparisons = 0
+        self.events = self.waves = self.first_wave_groups = self.second_wave_groups = 0
+        self.no_ready_events = self.serial_wait_wall_ns = 0
         self.workspace_bytes = sum(t.numel()*t.element_size() for t in (self.x,self.gu,self.act,self.y,self.out))
 
     def math(self, meta, sizes, rows):
@@ -92,11 +97,23 @@ class GroupedExpertExecutor:
         for size in sizes:dest.append(cursor);cursor+=size
         pending=list(range(len(groups)))
         waves=[];start=time.perf_counter() if self.diagnostic else 0
+        wave_number=0
+        self.events+=1
         while pending:
             tick=time.perf_counter() if self.diagnostic else 0
-            ready=rt.h2d.ready_many([groups[i][3] for i in pending])
-            selected=[i for i,ok in zip(pending,ready) if ok]
+            if self.schedule=='serial_all' or (self.schedule=='two_wave' and wave_number):
+                started=time.perf_counter_ns()
+                rt.h2d.wait_slots([groups[i][3] for i in pending],host=True)
+                self.serial_wait_wall_ns+=time.perf_counter_ns()-started
+                selected=pending[:]
+            else:
+                ready=rt.h2d.ready_many([groups[i][3] for i in pending])
+                selected=[i for i,ok in zip(pending,ready) if ok]
             if not selected:
+                if self.schedule=='two_wave':
+                    self.no_ready_events+=1
+                    wave_number+=1
+                    continue
                 # Existing stream wait semantics + one host wait allow physical
                 # completion to become visible to the subsequent batch query.
                 slot=groups[pending[0]][3]
@@ -105,6 +122,10 @@ class GroupedExpertExecutor:
                 continue
             wait_s=time.perf_counter()-tick if self.diagnostic else 0
             selected_set=set(selected);pending=[i for i in pending if i not in selected_set]
+            if wave_number==0:self.first_wave_groups+=len(selected)
+            else:self.second_wave_groups+=len(selected)
+            self.waves+=1
+            wave_number+=1
             slots=[groups[i][3] for i in selected]
             assert all(rt.keys[groups[i][3]]==layer*128+groups[i][0] for i in selected)
             rowidx=torch.cat([groups[i][1] for i in selected])
@@ -131,6 +152,12 @@ class GroupedExpertExecutor:
         return parts
 
     def receipt(self):
-        return dict(backend='triton_dynamic_grouped',graph_entries=0,max_rows=self.max_rows,
+        return dict(backend='triton_dynamic_grouped',schedule=self.schedule,
+                    events=self.events,waves=self.waves,
+                    first_wave_groups=self.first_wave_groups,
+                    second_wave_groups=self.second_wave_groups,
+                    no_ready_events=self.no_ready_events,
+                    serial_wait_wall_ns=self.serial_wait_wall_ns,
+                    graph_entries=0,max_rows=self.max_rows,
                     persistent_workspace_bytes=self.workspace_bytes,max_abs=self.max_abs,
                     max_relative=self.max_rel,expert_comparisons=self.comparisons)

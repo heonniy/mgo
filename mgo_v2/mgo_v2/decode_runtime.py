@@ -166,9 +166,10 @@ class DecodeOffloadRuntime(LiveRuntime):
    self.h2d.enqueue_demand(slot,key,self.experts[key]);self.keys[slot]=key
  def compute(self,packet,e,layer):
   if (self.index<48 and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
+  grouped=getattr(self,'grouped_executor',None)
+  if grouped is not None and self.index>=48:return grouped.compute(self,packet,e,layer)
   native=getattr(self,'native_executor',None)
   if native is not None and (self.index>=48 or getattr(self.args,'native_prefill',False)):return native.compute(self,packet,e,layer)
-  grouped=getattr(self,'grouped_executor',None)
   if grouped is not None:return grouped.compute(self,packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
   groups=e['groups'];parts=[None]*len(groups)

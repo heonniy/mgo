@@ -42,6 +42,7 @@ def main(a):
  assert not a.prefill_layout_fast or a.prefill_optimized
  assert not a.native_prefill or (a.expert_executor=='native' and a.prefill_optimized)
  assert not a.h2d_serial_ablation or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast)
+ assert a.grouped_decode_mode=='off' or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast and not a.h2d_serial_ablation)
  rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (4,8)
  physical=list(map(int,os.environ['MGO_V2_PHYSICAL_GPUS'].split(',')))
  assert physical==([0,1,4,5] if world==4 else list(range(8)))
@@ -54,6 +55,9 @@ def main(a):
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-(0 if a.capture_eviction_trace else 2) for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None)
+ if a.grouped_decode_mode!='off':
+  from mgo_v2.grouped_expert import GroupedExpertExecutor
+  rt.grouped_executor=GroupedExpertExecutor(rt.cache,rt.kernel,a.local_batch*world*8,schedule=a.grouped_decode_mode)
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+a.arena_budget)*EB
  from refactor_thread_affinity import configure
  configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
@@ -107,6 +111,7 @@ def main(a):
   from torch._dynamo.utils import counters
   before=dict(counters['stats'])
   native_before=(rt.native_executor.waves,rt.native_executor.groups,rt.native_executor.waits,rt.native_executor.serial_wait_wall_ns,rt.native_executor.serial_waited_copies) if rt.native_executor is not None else None
+  grouped_before=rt.grouped_executor.receipt() if getattr(rt,'grouped_executor',None) is not None else None
   if repeat and a.prefill_diagnostic:
    from prefill_phase_diagnostics import PrefillDiagnostics
    rt.phase_diagnostic=PrefillDiagnostics(rt);rt.phase_diagnostic.install(model)
@@ -150,8 +155,12 @@ def main(a):
   if native_before is not None:
    native_after=(rt.native_executor.waves,rt.native_executor.groups,rt.native_executor.waits,rt.native_executor.serial_wait_wall_ns,rt.native_executor.serial_waited_copies)
    native_counts=dict(zip(('waves','groups','waits','serial_wait_wall_ns','serial_waited_copies'),(end-start for start,end in zip(native_before,native_after))))
+  grouped_counts=None
+  if grouped_before is not None:
+   grouped_after=rt.grouped_executor.receipt()
+   grouped_counts={key:grouped_after[key]-grouped_before[key] for key in ('events','waves','first_wave_groups','second_wave_groups','no_ready_events','serial_wait_wall_ns')}
   result.update(expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
-  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts)
+  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(x['release_ns'] for x in rr))==1
@@ -190,4 +199,4 @@ def main(a):
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--native-prefill',action='store_true');p.add_argument('--prefetch-off',action='store_true');p.add_argument('--h2d-serial-ablation',action='store_true');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--native-prefill',action='store_true');p.add_argument('--prefetch-off',action='store_true');p.add_argument('--h2d-serial-ablation',action='store_true');p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave'),default='off');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'),default='LA_CA_NEAR');p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())

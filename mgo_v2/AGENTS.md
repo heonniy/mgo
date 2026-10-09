@@ -1,12 +1,23 @@
-**OWNER QWEN SHAREGPT R8 MAIN-SYSTEM COMPARISON ACTIVE (2026-10-09).**
+**OWNER MAIN_OURS EXPERT GROUPING A/B/C ACTIVE (2026-10-09).**
+The owner stopped the four-system Qwen R8 comparison during DeepSpeed target
+repeat 2. Do not resume that baseline queue. Read
+`experiments/expert_grouping_ablation_20261009/PLAN.md`. Compare A: current C++
+Ready-First individual expert GEMMs, B: all-H2D-then-one-grouped-wave, and C:
+ready hit/miss grouped wave then remaining-miss grouped wave. Use the same
+frozen R8 ShareGPT Qwen local-B16/input512/output64 C30 workload on physical
+GPUs0–7. Preserve the main_OURS default, prefetch OFF, Near policy and all
+resource guards. Restore eight owned model-inference loads between jobs.
+
+**OWNER QWEN SHAREGPT R8 MAIN-SYSTEM COMPARISON STOPPED (2026-10-09).**
 Read `experiments/qwen_r8_sharegpt_b16_l512_20261009/PLAN.md`. The latest
-owner request authorizes one R8 run on physical GPUs0–7, Qwen3 only,
+former owner request authorized one R8 run on physical GPUs0–7, Qwen3 only,
 ShareGPT local B16/input512/output64, C30, selected main_OURS plus repaired
 MoE-Infinity, DeepSpeed ZeRO-Inference, and synchronous balanced llama.cpp.
-Finish the four-system R8 comparison; preserve each failed attempt, repair
-reproducible R8 port errors, and restore the eight owned model-forward loads
-whenever no GPU job is active. Earlier R4-only GPU limits are superseded for
-this packet. Never stop foreign processes.
+Smoke checks passed for all four systems and the main_OURS full job passed.
+DeepSpeed full repeat 1 passed; the owner stopped repeat 2, and the guarded
+launcher restored all eight owned loads. MoE-Infinity and llama.cpp full jobs
+were not run. Preserve these partial records; do not use them as a finished
+four-system table. Never stop foreign processes.
 
 **OWNER ALL-EIGHT PCIe CONCURRENCY CORRECTION COMPLETE (2026-10-09).**
 The latest user request includes physical GPU2: measure every nonempty subset
