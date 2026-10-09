@@ -8,6 +8,7 @@ from mgo_v2.live_metadata import LiveMetadata
 from mgo_v2.pcie_grouped_decode import GroupedDecode
 from mgo_v2.pcie_native_metadata import NativeGateHistory,NativeLiveMetadata
 from mgo_v2.pcie_granular_diagnostic import GranularDiagnostic
+from mgo_v2.pcie_actual_fetch_capture import ActualFetchCapture
 from mgo_v2.grouped_expert import projection,activate,weight_scatter
 from mgo_v2.pcie_native_metadata import pack_current_metadata
 
@@ -34,8 +35,11 @@ def main(a):
  a.prefill_diagnostic=False;a.post_generation_diagnostic=False;a.post_prefill_diagnostic=False
  cohort=a.output
  arms=['R-NEAR','G-NEAR'] if a.sequence=='stage1' else ['G-BR','G-CA','G-NUMA-CA','G-NEAR','R-BR','R-CA']
- optimized=a.sequence=='optimize'
- if optimized:arms=[base+'__'+variant for variant in ('NATIVE','GROUPED','GROUPED_META') for base in ('R-NEAR','G-NEAR')]
+ optimization_cohort=a.sequence=='optimize'
+ grouped_stage2=a.sequence=='stage2_grouped'
+ optimized=optimization_cohort or grouped_stage2
+ if optimization_cohort:arms=[base+'__'+variant for variant in ('NATIVE','GROUPED','GROUPED_META') for base in ('R-NEAR','G-NEAR')]
+ if grouped_stage2:arms=['R-NEAR','G-NEAR','G-BR','G-CA','G-NUMA-CA','R-BR','R-CA']
  paths={arm:cohort/arm for arm in arms}
  for path in paths.values():path.mkdir(exist_ok=True)
  costs=np.asarray(json.loads((PKG/'experiments/pcie_topology_ablation_20261009/microbench_physical_cores/peer_costs.json').read_text())['matrix'],np.int64)
@@ -49,7 +53,7 @@ def main(a):
     w=rt.cache[slot];w.zero_();rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
  torch.cuda.synchronize()
  def reset(arm):
-  base=arm.split('__')[0];variant=arm.split('__')[-1] if optimized else 'NATIVE'
+  base=arm.split('__')[0];variant='GROUPED_META' if grouped_stage2 else (arm.split('__')[-1] if optimization_cohort else 'NATIVE')
   a.policy,a.pcie_quota_mode=ARMS[base];a.pcie_peer_costs=costs if base=='G-NUMA-CA' else None
   a.output=paths[arm];rt.reset();rt.event_offset=0
   rt.decode_layout_checks=0
@@ -69,13 +73,14 @@ def main(a):
  assert rt.transport.calls==144
  write(cohort/f'prefill_validation_rank{rank}.json',dict(status='PASS',output=checked,state=state,per_layer_numerics=rt.prefill_numerics))
  a.validate_prefill_optimized=False
- previous={}
+ previous={};previous_trace={}
  def generation(arm,repeat,diagnostic=False):
-  a.pcie_phase_diagnostic=diagnostic;a.pcie_capture_decisions=diagnostic and arm=='G-NEAR'
+  a.pcie_phase_diagnostic=diagnostic;a.pcie_capture_decisions=diagnostic and arm=='G-NEAR' and not grouped_stage2
   reset(arm);a.phase='COUNTERS' if repeat==0 else 'MEASURE';a.validate_decode_layout=repeat==0
   if grouped:grouped.validate=repeat==0 and grouped.enabled
   if isinstance(rt.metadata,NativeLiveMetadata):rt.metadata.validate_wire=repeat==0
   granular=GranularDiagnostic(rt,record_functions=False) if optimized and diagnostic else None
+  assigned=ActualFetchCapture(rt) if grouped_stage2 and diagnostic and rank==0 else None
   phase='warmup' if repeat==0 else 'target';rows,ids=input_ids(phase);begin(rt)
   empty=validate_state(rt);assert np.all(rt.keys<0) and not rt.controller.pending
   write(a.output/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
@@ -89,6 +94,7 @@ def main(a):
   if repeat:
    with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,64)
   else:result=generate_live(model,rt,ids,64)
+  if assigned:assigned.finish(a.output/'actual_fetches_repeat-1.npz')
   if granular:granular.close()
   jit_after={f.__name__:sorted(f.cache[0]) for f in (projection,activate,weight_scatter,pack_current_metadata)} if optimized else {}
   if repeat:assert jit_before==jit_after,'Triton JIT specialization occurred inside a primary/diagnostic'
@@ -100,6 +106,10 @@ def main(a):
    if expected is not None:assert expected==(result['argmax_hash'],state['state_hash'])
    previous[arm]=(result['argmax_hash'],state['state_hash'])
   trace=rt.policy.native_pcie.trace();assert trace.shape==(3072,61)
+  if repeat:
+   digest=hashlib.sha256(trace.tobytes()).hexdigest()
+   assert previous_trace.get(arm,digest)==digest,'Same-input policy trace changed between repetitions'
+   previous_trace[arm]=digest
   quotas=np.column_stack((trace[:,19],trace[:,48:52])).astype(np.int64)
   assert np.all(quotas[:,0]==quotas[:,1:].sum(axis=1))
   if a.pcie_quota_mode=='group_balanced':assert np.all(np.abs(quotas[:,1:3].sum(axis=1)-quotas[:,3:5].sum(axis=1))<=1)
@@ -151,7 +161,7 @@ def main(a):
    for arm in order:generation(arm,repeat)
  repeats=5 if extra.item() else 3
  for arm in arms[::-1]:generation(arm,-1,diagnostic=True)
- if optimized:
+ if optimization_cohort:
   parity=[]
   for base in ('R-NEAR','G-NEAR'):
    for repeat in list(range(1,repeats+1))+[-1]:
@@ -177,7 +187,7 @@ def main(a):
 
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True)
- p.add_argument('--sequence',choices=('stage1','stage2','optimize'),required=True);p.add_argument('--numa-shared-source-root',required=True)
+ p.add_argument('--sequence',choices=('stage1','stage2','stage2_grouped','optimize'),required=True);p.add_argument('--numa-shared-source-root',required=True)
  # Shared launcher argv also describes the frozen runtime explicitly.
  p.add_argument('--policy');p.add_argument('--expert-executor');p.add_argument('--pcie-quota-mode');p.add_argument('--repeats',type=int)
  for flag in ('native-prefill','prefetch-off','prefill-optimized','prefill-layout-fast','decode-layout-fast','pcie-native-controller','pcie-g2g-first-serial'):
