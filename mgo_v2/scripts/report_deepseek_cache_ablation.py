@@ -124,6 +124,14 @@ def verify_attempt(path, cell, system, expected_ids, manifest_digest):
                   sampled_peak_hbm_mib_by_physical_gpu=sampled_hbm)
     for metric in ('TTFT', 'TPOT', 'E2E'):
         result[metric] = summarize([row[metric] for row in samples[1:]])
+    if system == 'ours':
+        for key in ('h2d_bytes', 'remote_dispatch_bytes', 'remote_return_bytes'):
+            result[key] = summarize([
+                sum(read(path / f'repeat{repeat}_rank{rank}.json')[key] for rank in range(4))
+                for repeat in (1, 2, 3)])
+    if system == 'infinity':
+        result['evictions'] = summarize([
+            row['cache_after']['evictions'] for row in samples[1:]])
     return result
 
 
@@ -202,6 +210,28 @@ def main():
                   'and 3/3/3/3 at C50. C30 limits expert residency, not total HBM.',
                   '', 'Raw frozen token-ID manifests and request lists remain outside Git.'])
     (REPORT / 'PROGRESS.md').write_text('\n'.join(lines) + '\n')
+    activity = ['# Cache activity', '',
+                'These are separate implementation counters, not cross-system-equivalent miss counts. '
+                'main_OURS H2D and peer bytes are sums of all four ranks per complete measured batch; '
+                'MoE-Infinity evictions come from its EAM cache. Values are medians of the three '
+                'unfiltered target repeats with full ranges.', '',
+                '| B/rank | Cache | System | H2D GiB | Dispatch GiB | Return GiB | EAM evictions |',
+                '|---:|---:|---|---:|---:|---:|---:|']
+    for case in cases:
+        if case['system'] not in ('ours', 'infinity'):
+            continue
+        def activity_value(key, scale=1):
+            if case['status'] != 'PASS' or key not in case:
+                return '—'
+            row = case[key]
+            return (f'{row["median"] / scale:.3f} '
+                    f'[{row["minimum"] / scale:.3f}, {row["maximum"] / scale:.3f}]')
+        activity.append(f'| {case["local_batch"]} | {case["cache_percent"]}% | '
+                        f'{LABELS[case["system"]]} | {activity_value("h2d_bytes", 2**30)} | '
+                        f'{activity_value("remote_dispatch_bytes", 2**30)} | '
+                        f'{activity_value("remote_return_bytes", 2**30)} | '
+                        f'{activity_value("evictions")} |')
+    (REPORT / 'CACHE_ACTIVITY.md').write_text('\n'.join(activity) + '\n')
     print(f'{completed}/{total} validated cache-ablation rows')
 
 
