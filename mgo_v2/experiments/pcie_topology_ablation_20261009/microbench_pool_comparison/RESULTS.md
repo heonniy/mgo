@@ -1,5 +1,7 @@
 # NUMA shared pinned pool size comparison
 
+Effective bandwidth, including solo versus concurrent same-switch per-GPU loss and switch aggregate, is reported in [the bandwidth comparison](../microbench_effective_bandwidth/RESULTS.md). It converts all three raw measurement matrices and includes matched-payload cross-switch controls.
+
 | Source per NUMA | R 4:2 (ms) | G 3:3 (ms) | R/G | H2D latency reduction | Paired 95% CI |
 |---|---:|---:|---:|---:|---:|
 | 144MiB compact | 3.1609 | 2.4177 | 1.3074 | 23.51% | 1.3027–1.3171 |
