@@ -1,4 +1,14 @@
-**OWNER QWEN CACHE ABLATION ACTIVE (2026-10-09).**
+**OWNER QWEN THREE-BASELINE CACHE SWEEP ACTIVE (2026-10-09).**
+Read `experiments/qwen_cache_ablation_20261009/BASELINE_SWEEP_PLAN.md`.
+After the DeepSeek fixed-route/overlap diagnosis, complete Qwen C20/C30/C40/C50
+ShareGPT R4/B16/input512/output64 cache curves for repaired MoE-Infinity,
+DeepSpeed ZeRO-Inference and synchronous balanced llama.cpp. The matching C30
+baseline runs may be reused only after SHA/budget/runtime receipt checks.
+Use only GPUs0/1/4/5, one guarded job at a time, preserve three unfiltered
+target repeats and validate physical expert placement/residency. Restore owner
+inference loads after each job; repair and resume failed cells.
+
+**OWNER QWEN CACHE ABLATION COMPLETE (2026-10-09).**
 Read `experiments/qwen_cache_ablation_20261009/{PLAN.md,MATRIX.json,PROGRESS.md}`.
 Compare main_OURS only at C20/C30/C40/C50 on frozen ShareGPT Qwen3
 B16/input512/output64, R4 physical GPUs 0/1/4/5. Three unfiltered target
