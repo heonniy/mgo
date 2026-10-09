@@ -52,6 +52,42 @@ def write(path, value):
     tmp.replace(path)
 
 
+def save_route_capture(path, records, batch, count):
+    assert len(records) == LAYERS * count
+    prefill = records[:LAYERS]
+    decode = records[LAYERS:]
+    assert all(row[0] == index for index, row in enumerate(records))
+    assert all(row[1] == index % LAYERS for index, row in enumerate(records))
+    assert all(row[2].shape == (batch, TOPK) for row in decode)
+    arrays = {}
+    for name, rows in (('prefill', prefill), ('decode', decode)):
+        for field, offset in (('selected', 2), ('weight_bits', 3), ('probs', 4)):
+            values = [row[offset] for row in rows]
+            arrays[f'{name}_{field}'] = np.stack(values).reshape(
+                ((count - 1, LAYERS) if name == 'decode' else (LAYERS,))
+                + values[0].shape)
+    np.savez_compressed(path, **arrays)
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load_route_replay(path, batch, count):
+    sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    with np.load(path, allow_pickle=False) as data:
+        arrays = {name: data[name] for name in data.files}
+    assert set(arrays) == {f'{phase}_{field}' for phase in ('prefill', 'decode')
+                          for field in ('selected', 'weight_bits', 'probs')}
+    for phase, prefix, rows in (('prefill', (LAYERS,), batch * 512),
+                                ('decode', (count - 1, LAYERS), batch)):
+        assert arrays[f'{phase}_selected'].shape == prefix + (rows, TOPK)
+        assert arrays[f'{phase}_weight_bits'].shape == prefix + (rows, TOPK)
+        assert arrays[f'{phase}_probs'].shape == prefix + (rows, EXPERTS)
+        assert np.all((arrays[f'{phase}_selected'] >= 0) &
+                      (arrays[f'{phase}_selected'] < EXPERTS))
+        assert np.isfinite(arrays[f'{phase}_probs']).all()
+    tensors = {name: torch.from_numpy(value).to('cuda') for name, value in arrays.items()}
+    return tensors, sha
+
+
 def load_model_and_store():
     config = AutoConfig.from_pretrained(MODEL, local_files_only=True)
     config._attn_implementation = 'sdpa'
@@ -102,6 +138,10 @@ class DeepSeekRuntime:
         self.cache = torch.empty((self.cap + 2, EXPERT_ELEMENTS), dtype=torch.bfloat16,
                                  device='cuda')
         self.native_executor = DeepseekNativeExpertExecutor()
+        self.route_mode = 'none'
+        self.route_capture = []
+        self.route_replay = None
+        self.route_sha256 = None
         self.reset()
 
     def reset(self):
@@ -150,7 +190,26 @@ class DeepSeekRuntime:
             with torch.no_grad():
                 logits = torch.nn.functional.linear(hidden.float(), module.gate.weight.float())
                 probs = torch.softmax(logits, dim=-1)
-            return rt.execute(layer, hidden, selected, weights.to(torch.bfloat16), probs)
+            weights = weights.to(torch.bfloat16)
+            if rt.route_mode == 'capture':
+                rt.route_capture.append((
+                    rt.index, layer,
+                    selected.detach().cpu().numpy().copy(),
+                    weights.detach().view(torch.uint16).cpu().numpy().copy(),
+                    probs.detach().cpu().numpy().copy()))
+            elif rt.route_mode == 'replay':
+                assert rt.route_replay is not None
+                phase = 'prefill' if rt.index < LAYERS else 'decode'
+                if phase == 'prefill':
+                    indices = (layer,)
+                else:
+                    indices = (rt.index // LAYERS - 1, layer)
+                selected = rt.route_replay[f'{phase}_selected'][indices].to(torch.int64)
+                weights = rt.route_replay[f'{phase}_weight_bits'][indices].view(torch.bfloat16)
+                probs = rt.route_replay[f'{phase}_probs'][indices]
+                assert selected.shape == weights.shape == (hidden.shape[0], TOPK)
+                assert probs.shape == (hidden.shape[0], EXPERTS)
+            return rt.execute(layer, hidden, selected, weights, probs)
 
         return forward
 
@@ -223,7 +282,9 @@ class DeepSeekRuntime:
         self.h2d.close()
 
 
-def generate(model, runtime, ids, count):
+def generate(model, runtime, ids, count, fixed_tokens=None):
+    if fixed_tokens is not None:
+        assert fixed_tokens.shape == (len(ids), count)
     dist.barrier()
     torch.cuda.synchronize()
     release = torch.tensor([time.perf_counter_ns() + 200_000_000 if dist.get_rank() == 0
@@ -270,7 +331,8 @@ def generate(model, runtime, ids, count):
                     dispatch_bytes=runtime.transport.forward_bytes - previous[6],
                     return_bytes=runtime.transport.return_bytes - previous[7]))
             if step < count - 1:
-                ids = next_ids[:, None]
+                ids = (fixed_tokens[:, step, None] if fixed_tokens is not None
+                       else next_ids[:, None])
                 mask = torch.cat((mask, mask.new_ones((len(ids), 1))), 1)
     assert runtime.index == LAYERS * count
     actual = torch.stack(tokens, 1).cpu().numpy()
@@ -283,6 +345,10 @@ def generate(model, runtime, ids, count):
                   output_tokens=count, finite_logits=True,
                   argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
                   tokens=actual.tolist())
+    if fixed_tokens is not None:
+        result['fixed_continuation'] = True
+        result['fed_token_hash'] = hashlib.sha256(
+            fixed_tokens.cpu().numpy().tobytes()).hexdigest()
     if runtime.diag:
         result['diagnostic_steps'] = diagnostic_steps
     return result
@@ -309,6 +375,17 @@ def main(args):
     manifest = Path(os.environ['MGO_HEADLINE_WORKLOADS'])
     spec = next(x for x in json.loads(manifest.read_text())['cells'] if x['cell'] == args.cell)
     assert spec['model'] == 'DeepSeekV2Lite' and spec['model_path'] == str(MODEL)
+    assert args.route_mode == 'none' or (args.fixed_continuation and args.route_dir)
+    fixed_manifest = None
+    fixed_sha256 = None
+    if args.fixed_continuation:
+        path = Path(args.fixed_continuation)
+        fixed_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        fixed_manifest = json.loads(path.read_text())
+        assert fixed_manifest['model'] == 'DeepSeekV2Lite'
+        assert fixed_manifest['output_tokens'] == 64
+        assert len(fixed_manifest['ranks']) == 4
+        assert fixed_manifest['cell'].replace('C20', f'C{spec["cache_percent"]}') == args.cell
     batch = 1 if args.smoke else spec['local_batch']
     percent = spec['cache_percent']
     assert percent in (20, 30, 40, 50)
@@ -321,6 +398,20 @@ def main(args):
     model, pool, sources = load_model_and_store()
     runtime = DeepSeekRuntime(batch, capacities, sources, pool)
     runtime.install(model)
+    fixed = None
+    if fixed_manifest is not None and not args.smoke:
+        row = fixed_manifest['ranks'][rank]
+        assert row['rank'] == rank
+        target_rows = json.loads(Path(spec['target']['path']).read_text())['requests']
+        assert row['request_ids'] == [r['request_id'] for r in
+                                      target_rows[rank * batch:(rank + 1) * batch]]
+        fixed = torch.tensor(row['tokens'], dtype=torch.int64, device='cuda')
+        assert fixed.shape == (batch, 64)
+    if args.route_mode == 'replay':
+        assert not args.smoke
+        route_path = Path(args.route_dir) / f'route_rank{rank}.npz'
+        runtime.route_replay, runtime.route_sha256 = load_route_replay(
+            route_path, batch, 64)
     for repeat in range((1 if args.smoke else args.repeats) + 1):
         phase = 'warmup' if repeat == 0 else 'target'
         rows = json.loads(Path(spec[phase]['path']).read_text())['requests']
@@ -329,6 +420,8 @@ def main(args):
                             for r in local], device='cuda')
         if repeat:
             runtime.reset()
+        runtime.route_mode = args.route_mode if repeat else 'none'
+        runtime.route_capture = []
         assert np.all(runtime.keys < 0)
         gc.collect()
         torch.cuda.synchronize()
@@ -336,8 +429,14 @@ def main(args):
         if rank == 0:
             write(args.output / 'phase.json', dict(system='main_OURS', phase=phase,
                                                     repeat=repeat, cell=args.cell))
-        result = generate(model, runtime, ids, 2 if args.smoke else 64)
+        result = generate(model, runtime, ids, 2 if args.smoke else 64,
+                          fixed_tokens=fixed if repeat else None)
         runtime.h2d.synchronize()
+        if repeat and args.route_mode == 'capture':
+            route_path = Path(args.route_dir) / f'route_rank{rank}.npz'
+            assert not route_path.exists()
+            runtime.route_sha256 = save_route_capture(
+                route_path, runtime.route_capture, batch, 64)
         assert np.array_equal(runtime.keys[:runtime.cap],
                               runtime.policy.slots[rank, :runtime.cap])
         result.update(rank=rank, repeat=repeat, phase=phase,
@@ -350,7 +449,10 @@ def main(args):
                       pinned_host_bytes=pool.numel() * pool.element_size(),
                       h2d_bytes=runtime.h2d.metrics['bytes'],
                       remote_dispatch_bytes=runtime.transport.forward_bytes,
-                      remote_return_bytes=runtime.transport.return_bytes)
+                      remote_return_bytes=runtime.transport.return_bytes,
+                      route_mode=runtime.route_mode,
+                      route_sha256=runtime.route_sha256,
+                      fixed_continuation_manifest_sha256=fixed_sha256)
         write(args.output / f'repeat{repeat}_rank{rank}.json', result)
         dist.barrier()
         if rank == 0:
@@ -373,7 +475,9 @@ def main(args):
     if rank == 0:
         write(args.output / 'result.json', dict(status='PASS', system='main_OURS',
                                                 cell=args.cell, primary_repeats=args.repeats,
-                                                headline_eligible=not args.smoke))
+                                                headline_eligible=(not args.smoke and
+                                                                   args.route_mode == 'none' and
+                                                                   not args.fixed_continuation)))
     dist.barrier()
     dist.destroy_process_group()
 
@@ -384,4 +488,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--repeats', type=int, choices=range(1, 6), default=3)
+    parser.add_argument('--fixed-continuation')
+    parser.add_argument('--route-mode', choices=('none', 'capture', 'replay'),
+                        default='none')
+    parser.add_argument('--route-dir')
     main(parser.parse_args())
