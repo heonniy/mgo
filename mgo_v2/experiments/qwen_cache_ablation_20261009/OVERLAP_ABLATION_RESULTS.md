@@ -31,9 +31,28 @@ it does not isolate pure PCIe latency, because demand copies can still
 overlap dispatch in the serialized arm. The normal arm's tiny explicit H2D
 wait and this A/B together explain why halving H2D bytes need not halve TPOT.
 
-The C50 serialized follow-up will test how much cache-capacity gain appears
-when expert/H2D overlap is removed. The machine's earlier cross-job timing
-drift remains a limitation; the two repeats within each A/B arm were stable.
+The C50 serialized follow-up and a same-source normal C50 control also passed
+with exact request, all-token, H2D-byte, cache-hash and expert-group parity.
+Their two-repeat mean TPOTs were **504.952** and **484.263 ms/token**,
+respectively: disabling expert/H2D overlap cost **20.688 ms/token** at C50.
+The normal C50 arm used 5,982–6,072 native waves/rank, versus 3,072 in the
+serialized arm. The serialized host wait was 1.65–2.17 s/batch/rank.
 
-Validated per-rank counters and exact-parity receipt are in
-`OVERLAP_ABLATION.json`. Raw output tokens remain outside Git.
+| Cache | Normal ready-first, mean ms/token | Wait-all-H2D, mean ms/token | Serial penalty |
+|---:|---:|---:|---:|
+| C20 | 502.893 | 588.245 | 85.352 ms/token |
+| C50 | 484.263 | 504.952 | 20.688 ms/token |
+
+Within each cache capacity, changing only the wait behavior creates a
+controlled same-output comparison. Across capacities, later generated routes
+can differ, so the larger C20→C50 gain in the serialized arms is not a pure
+fixed-route estimate of copy-removal headroom. It does show why the normal
+runtime can halve copy bytes but improve TPOT modestly: ready-first execution
+already hides much of the transfer service. Even at C50, normal execution
+uses about two waves per routed layer, so fewer misses do not collapse the
+remaining scheduling and expert work. The machine's earlier cross-job timing
+drift remains a limitation; the two repeats within each arm were stable.
+
+Validated per-rank counters and exact-parity receipts are in
+`OVERLAP_ABLATION.json` and `OVERLAP_CAPACITY.json`. Raw output tokens remain
+outside Git.

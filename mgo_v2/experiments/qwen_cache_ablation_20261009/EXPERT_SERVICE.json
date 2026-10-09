@@ -1,0 +1,147 @@
+{
+  "status": "PASS",
+  "scope": "Standalone one-GPU synthetic Qwen expert, no model/dispatch/comm",
+  "source_commit": "2ec73fbfcfe277d9759d153528fc627a5749df18",
+  "physical_gpu": 0,
+  "expert_bytes": 9437184,
+  "copy_cuda_interval": {
+    "median_ms": 0.2141440063714981,
+    "p05_ms": 0.2136320024728775,
+    "p95_ms": 0.249439999461174,
+    "samples": 50
+  },
+  "gemm_cases": {
+    "1": {
+      "three_gemm_cuda_interval": {
+        "median_ms": 0.04716799966990948,
+        "p05_ms": 0.044096000492572784,
+        "p95_ms": 0.060447998344898224,
+        "samples": 50
+      },
+      "gate_gemm": {
+        "median_ms": 0.021584000438451767,
+        "p05_ms": 0.019999999552965164,
+        "p95_ms": 0.025855999439954758,
+        "samples": 50
+      },
+      "up_gemm": {
+        "median_ms": 0.020864000543951988,
+        "p05_ms": 0.019999999552965164,
+        "p95_ms": 0.023584000766277313,
+        "samples": 50
+      },
+      "down_gemm": {
+        "median_ms": 0.02131200022995472,
+        "p05_ms": 0.019360000267624855,
+        "p95_ms": 0.023104000836610794,
+        "samples": 50
+      }
+    },
+    "3": {
+      "three_gemm_cuda_interval": {
+        "median_ms": 0.046032000333070755,
+        "p05_ms": 0.04278400167822838,
+        "p95_ms": 0.05369599908590317,
+        "samples": 50
+      },
+      "gate_gemm": {
+        "median_ms": 0.0208320003002882,
+        "p05_ms": 0.019551999866962433,
+        "p95_ms": 0.02473600022494793,
+        "samples": 50
+      },
+      "up_gemm": {
+        "median_ms": 0.02062400057911873,
+        "p05_ms": 0.019071999937295914,
+        "p95_ms": 0.02502400055527687,
+        "samples": 50
+      },
+      "down_gemm": {
+        "median_ms": 0.020255999639630318,
+        "p05_ms": 0.019328000023961067,
+        "p95_ms": 0.024351999163627625,
+        "samples": 50
+      }
+    },
+    "5": {
+      "three_gemm_cuda_interval": {
+        "median_ms": 0.04491199925541878,
+        "p05_ms": 0.04265600070357323,
+        "p95_ms": 0.05036799982190132,
+        "samples": 50
+      },
+      "gate_gemm": {
+        "median_ms": 0.020560000091791153,
+        "p05_ms": 0.019360000267624855,
+        "p95_ms": 0.02252800017595291,
+        "samples": 50
+      },
+      "up_gemm": {
+        "median_ms": 0.02062400057911873,
+        "p05_ms": 0.019200000911951065,
+        "p95_ms": 0.02521600015461445,
+        "samples": 50
+      },
+      "down_gemm": {
+        "median_ms": 0.020239999517798424,
+        "p05_ms": 0.018912000581622124,
+        "p95_ms": 0.023423999547958374,
+        "samples": 50
+      }
+    },
+    "8": {
+      "three_gemm_cuda_interval": {
+        "median_ms": 0.045423999428749084,
+        "p05_ms": 0.04198399931192398,
+        "p95_ms": 0.05628800019621849,
+        "samples": 50
+      },
+      "gate_gemm": {
+        "median_ms": 0.02094399929046631,
+        "p05_ms": 0.01942400075495243,
+        "p95_ms": 0.030432000756263733,
+        "samples": 50
+      },
+      "up_gemm": {
+        "median_ms": 0.020719999447464943,
+        "p05_ms": 0.01945599913597107,
+        "p95_ms": 0.025248000398278236,
+        "samples": 50
+      },
+      "down_gemm": {
+        "median_ms": 0.020304000005126,
+        "p05_ms": 0.01894400082528591,
+        "p95_ms": 0.022495999932289124,
+        "samples": 50
+      }
+    },
+    "17": {
+      "three_gemm_cuda_interval": {
+        "median_ms": 0.0459199994802475,
+        "p05_ms": 0.04294399917125702,
+        "p95_ms": 0.05750399827957153,
+        "samples": 50
+      },
+      "gate_gemm": {
+        "median_ms": 0.020672000013291836,
+        "p05_ms": 0.019328000023961067,
+        "p95_ms": 0.025631999596953392,
+        "samples": 50
+      },
+      "up_gemm": {
+        "median_ms": 0.020368000492453575,
+        "p05_ms": 0.01961600035429001,
+        "p95_ms": 0.024288000538945198,
+        "samples": 50
+      },
+      "down_gemm": {
+        "median_ms": 0.020800000056624413,
+        "p05_ms": 0.019807999953627586,
+        "p95_ms": 0.026048000901937485,
+        "samples": 50
+      }
+    }
+  },
+  "interpretation": "CUDA event intervals include submission gaps; three-GEMM interval excludes activation, gather, weighting, and scheduler.",
+  "raw_result_path": "/home/hwlee/mgo-results/headline_r4_20261007/qca_expert_service_probe_v2/result.json"
+}

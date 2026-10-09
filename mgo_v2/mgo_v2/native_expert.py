@@ -33,8 +33,9 @@ class NativeExpertExecutor:
         mode, received, _, weights = packet
         assert mode == 'current'
         groups = event['groups']
-        if getattr(rt.args, 'h2d_serial_ablation', False) and rt.index >= 48:
-            assert getattr(rt.args, 'prefetch_off', False)
+        args = getattr(rt, 'args', None)
+        if getattr(args, 'h2d_serial_ablation', False) and rt.index >= 48:
+            assert getattr(args, 'prefetch_off', False)
             fetch_slots = [slot for _, slot, _, _ in event['fetches']]
             if fetch_slots:
                 started = time.perf_counter_ns()

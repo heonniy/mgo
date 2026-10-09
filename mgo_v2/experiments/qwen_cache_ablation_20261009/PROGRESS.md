@@ -1,5 +1,14 @@
 # Qwen3 ShareGPT main_OURS cache-capacity sweep
 
+**Interpretation update:** the original chronological TPOT medians below
+coincided with cross-job timing drift. Use the validated post-cleanup
+[two-repeat recheck](TIMING_RECHECK_RESULTS.md) for the current capacity
+comparison: C20/C30/C40/C50 mean TPOT was 503.324/494.768/492.987/488.924
+ms/token. The [overlap A/B](OVERLAP_ABLATION_RESULTS.md) directly shows that
+ready-first expert execution masks much of the H2D service. The
+[single-expert probe](EXPERT_SERVICE_RESULTS.md) separates one 9-MiB fetch
+from the three Qwen GEMMs. The original results remain below for auditability.
+
 Validated cells: **4/4**. R4 GPUs 0/1/4/5, B16/rank, input512/output64. Three unfiltered target repeats; figures are median [minimum, maximum] in seconds, with TPOT in seconds per token.
 
 | Cache | TTFT | TPOT | E2E | H2D GiB, four ranks | Status |
