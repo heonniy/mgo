@@ -26,6 +26,12 @@ def main(a):
  a.pcie_cpu_group=dist.new_group(backend='gloo')
  spec=next(x for x in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if x['cell']==a.cell)
  assert spec['global_requests']==64 and spec['local_batch']==16 and spec['input_tokens']==512
+ workload_receipts={}
+ for phase in ('warmup','target'):
+  source_path=Path(spec[phase]['path']);digest=hashlib.sha256(source_path.read_bytes()).hexdigest()
+  assert digest==spec[phase]['sha256'],'Frozen workload hash changed'
+  workload_receipts[phase]=dict(path=str(source_path),sha256=digest,bytes=source_path.stat().st_size)
+ if rank==0:write(a.output/'WORKLOAD_MANIFESTS.json',workload_receipts)
  a.local_batch=16;a.capacities=[459,459,459,458];a.seed=42;a.phase='COUNTERS';a.comm_mode='current'
  a.staging_cpu_team=cpus[1:3];a.debug_plan=True;a.live_routes=True;a.pcie_native_controller=True
  a.pcie_phase_diagnostic=False;a.pcie_g2g_first_serial=True;a.prefetch_off=True
@@ -69,12 +75,16 @@ def main(a):
  def input_ids(phase):
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests'][rank*16:(rank+1)*16]
   return rows,torch.tensor([r['input_ids'] for r in rows],device='cuda')
- # Same one-token prefill checks as the headline harness, outside every sample.
- reset(arms[0]);rows,ids=input_ids('warmup');a.validate_prefill_optimized=True;begin(rt)
- checked=generate_live(model,rt,ids,1);state=validate_state(rt)
- assert rt.prefill_metadata_checks==48 and rt.prefill_layout_checks==48 and len(rt.prefill_numerics)==48
- assert rt.transport.calls==144
- write(cohort/f'prefill_validation_rank{rank}.json',dict(status='PASS',output=checked,state=state,per_layer_numerics=rt.prefill_numerics))
+ # New live cohort validates prefill under each placement, outside all samples.
+ for arm in (arms if grouped_stage2 else arms[:1]):
+  reset(arm);rt.prefill_metadata_checks=0;rt.prefill_layout_checks=0;rt.prefill_numerics=[]
+  rows,ids=input_ids('warmup');a.validate_prefill_optimized=True;begin(rt)
+  checked=generate_live(model,rt,ids,1);state=validate_state(rt)
+  assert rt.prefill_metadata_checks==48 and rt.prefill_layout_checks==48 and len(rt.prefill_numerics)==48
+  assert rt.transport.calls==144
+  receipt=dict(status='PASS',arm=arm,output=checked,state=state,per_layer_numerics=rt.prefill_numerics)
+  if grouped_stage2:write(paths[arm]/f'prefill_validation_rank{rank}.json',receipt)
+  if arm==arms[0]:write(cohort/f'prefill_validation_rank{rank}.json',receipt)
  a.validate_prefill_optimized=False
  previous={};previous_trace={}
  def generation(arm,repeat,diagnostic=False):
