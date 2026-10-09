@@ -148,7 +148,7 @@ def eviction_figure():
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="outside lower center", ncol=3,
                frameon=False, fontsize=8)
-    fig.suptitle("MAIN decode cache · B16/rank · frozen traces · prefetch OFF", fontsize=12)
+    fig.suptitle("MAIN decode cache · B16/rank · frozen CPU replay · prefetch OFF", fontsize=12)
     fig.savefig(FIG / "two_model_eviction_hit_rate.png", dpi=240, facecolor="white")
     fig.savefig(FIG / "two_model_eviction_hit_rate.pdf", facecolor="white")
     plt.close(fig)
@@ -159,12 +159,13 @@ def main():
     FIG.mkdir(exist_ok=True)
     evictions = eviction_figure()
     with (FIG / "eviction_hit_rate_source.csv").open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=evictions[0]); writer.writeheader(); writer.writerows(evictions)
+        writer = csv.DictWriter(handle, fieldnames=evictions[0], lineterminator='\n')
+        writer.writeheader(); writer.writerows(evictions)
     rows = performance_rows()
     performance_figure(rows)
     (FIG / "performance_source.json").write_text(json.dumps(rows, indent=2) + "\n")
     with (FIG / "performance_source.csv").open("w", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator='\n')
         writer.writerow(["cache_percent", "system", "metric", "median", "minimum", "maximum", "n", "source"])
         for row in rows:
             for metric_name, val in row["metrics"].items():

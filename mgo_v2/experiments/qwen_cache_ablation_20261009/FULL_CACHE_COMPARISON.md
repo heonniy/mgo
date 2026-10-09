@@ -18,7 +18,7 @@ ShareGPT R4/local B16/input512/output64. All values below are median [full range
 | C40 | llama | 129.525 [129.470, 129.580] | 0.436 [0.435, 0.436] | 156.963 [156.912, 157.014] | 2 |
 | C50 | main_OURS (post-cleanup) | 2.730 [1.763, 3.697] | 0.489 [0.488, 0.490] | 33.532 [32.620, 34.444] | 2 |
 | C50 | infinity | 5.562 [5.277, 5.848] | 3.244 [3.234, 3.254] | 209.922 [209.560, 210.284] | 2 |
-| C50 | deepspeed | pending | pending | pending | — |
-| C50 | llama | pending | pending | pending | — |
+| C50 | deepspeed | 5.975 [5.560, 6.389] | 4.147 [4.143, 4.151] | 267.239 [267.063, 267.415] | 2 |
+| C50 | llama | 103.026 [102.973, 103.079] | 0.343 [0.343, 0.344] | 124.659 [124.628, 124.690] | 2 |
 
 main_OURS keeps native C++ expert execution, compiled prefill/decode index paths, Near placement, pinned CPU expert source and prefetch OFF. The three baselines retain their audited main-table implementations and their own memory semantics. Full raw per-target statistics, cache budgets and job provenance are in `BASELINE_SWEEP_RESULTS.json` and `TIMING_RECHECK.json`.

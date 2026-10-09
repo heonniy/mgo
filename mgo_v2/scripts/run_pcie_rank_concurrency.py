@@ -8,6 +8,7 @@ import argparse
 import itertools
 import json
 import multiprocessing as mp
+import os
 import random
 import statistics
 import subprocess
@@ -48,19 +49,21 @@ def gpu_free():
 
 def worker(gpu, commands, replies):
     try:
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu)
+        os.sched_setaffinity(0, {gpu * 24})
         import torch
 
         torch.set_num_threads(1)
-        torch.cuda.set_device(gpu)
+        torch.cuda.set_device(0)
         sizes = sorted({int(v) for v in SIZES.values()})
         buffers = {}
         for size in sizes:
             source = torch.empty(size, dtype=torch.uint8, pin_memory=True)
             source.fill_(gpu + 1)
-            dest = torch.empty(size, dtype=torch.uint8, device=f"cuda:{gpu}")
+            dest = torch.empty(size, dtype=torch.uint8, device='cuda:0')
             buffers[size] = (source, dest)
-        stream = torch.cuda.Stream(device=gpu)
-        replies.put(dict(event="initialized", gpu=gpu))
+        stream = torch.cuda.Stream(device=0)
+        replies.put(dict(event="initialized", gpu=gpu, cpu_core=gpu * 24))
         while True:
             command = commands.get()
             if command["event"] == "stop":
@@ -127,6 +130,11 @@ def run(combinations, copies, repeats, result_path):
         previous = json.loads(result_path.read_text()) if result_path.exists() else []
         complete = {(tuple(r["gpus"]), r["bytes"], r["repeat"]) for r in previous}
         for group in combinations:
+            permitted = {process.pid for process in processes.values()}
+            outsiders = [(g, pid) for g, pid in gpu_processes()
+                        if g in GPUS and pid not in permitted]
+            if outsiders:
+                raise RuntimeError(f"Another process appeared on a target GPU: {outsiders}")
             for name, size in SIZES.items():
                 for repeat in range(1, repeats + 1):
                     if (group, size, repeat) in complete:

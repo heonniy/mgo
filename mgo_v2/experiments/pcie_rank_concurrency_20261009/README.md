@@ -21,8 +21,9 @@ not a PCIe line-rate specification or a direct end-to-end prediction.
 Store every repeat in `RAW.json` for resumption, and aggregate median plus
 complete range in `RESULTS.json`. The runner checks at least 384 GiB host
 memory before setup, 96 GiB throughout, 2 GiB GPU free memory, and successful
-completion of the preceding baseline sweep. Pinned/device buffer usage is
-under 20 MiB per GPU. The final report should compare each rank's subset
+completion of the preceding baseline sweep. Device buffers total 25.5 MiB
+per GPU, plus the CUDA context; each worker also pins 25.5 MiB of host
+memory. The final report should compare each rank's subset
 throughput against its solo throughput at the same payload size, report
 cardinality and individual combinations, and flag start-skew or external
 activity that limits interpretation.

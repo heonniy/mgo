@@ -1,6 +1,6 @@
 {
-  "status": "PARTIAL",
-  "completed": 10,
+  "status": "PASS",
+  "completed": 12,
   "total": 12,
   "current_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
   "original_manifest_sha256": "2f8abdf47183518ac3ea032e8f452ada011961b8f0094039e5370e415cbb7424",
@@ -722,14 +722,133 @@
       }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "deepspeed",
-      "cache_percent": 50
+      "cache_percent": 50,
+      "label": "qca_baseline_c50_deepspeed_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.0018230478272000849,
+      "reused_c30": false,
+      "source_commit": "1f9476ed063ff973adbadee17c6f991cfffe0086",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "ec22709eebbc256bada75fc3186b6070480d7b70e19cfa926569e2685e52da53",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.388916839,
+            5.560240775
+          ],
+          "mean": 5.974578807,
+          "median": 5.974578807,
+          "minimum": 5.560240775,
+          "maximum": 6.388916839,
+          "stdev": 0.5859624642613779
+        },
+        "TPOT": {
+          "samples": [
+            4.14327586715873,
+            4.150836148603174
+          ],
+          "mean": 4.147056007880952,
+          "median": 4.147056007880952,
+          "minimum": 4.14327586715873,
+          "maximum": 4.150836148603174,
+          "stdev": 0.005345926277045481
+        },
+        "E2E": {
+          "samples": [
+            267.41529647,
+            267.062918137
+          ],
+          "mean": 267.23910730349996,
+          "median": 267.23910730349996,
+          "minimum": 267.062918137,
+          "maximum": 267.41529647,
+          "stdev": 0.2491691088075044
+        }
+      },
+      "memory": {
+        "peak_all_parameter_bytes_per_rank": [
+          [
+            5607682048,
+            5607682048,
+            5607682048,
+            5607682048
+          ],
+          [
+            5607682048,
+            5607682048,
+            5607682048,
+            5607682048
+          ]
+        ],
+        "parameter_budget_bytes_per_rank": [
+          7247757312,
+          7247757312,
+          7247757312,
+          7247757312
+        ]
+      }
     },
     {
-      "status": "PENDING",
+      "status": "PASS",
       "system": "llama",
-      "cache_percent": 50
+      "cache_percent": 50,
+      "label": "qca_baseline_c50_llama_r2_v1",
+      "third_label": null,
+      "clean_target_repeats": 2,
+      "stability": "TWO_STABLE",
+      "first_two_max_relative_difference": 0.002019157851695832,
+      "reused_c30": false,
+      "source_commit": "b11348e2bbc2e3f296ecaf2330eee9cfa6a33abe",
+      "workload_manifest_sha256": "51a8d36e9699bf09bda90f6f7f4ece71a9ea282e8efec3f5eea1cd9bcf94362d",
+      "target_sha256": "ec22709eebbc256bada75fc3186b6070480d7b70e19cfa926569e2685e52da53",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            102.973382156,
+            103.07894871
+          ],
+          "mean": 103.026165433,
+          "median": 103.026165433,
+          "minimum": 102.973382156,
+          "maximum": 103.07894871,
+          "stdev": 0.07464682619990035
+        },
+        "TPOT": {
+          "samples": [
+            0.34372076219047615,
+            0.3430274356825395
+          ],
+          "mean": 0.34337409893650783,
+          "median": 0.34337409893650783,
+          "minimum": 0.3430274356825395,
+          "maximum": 0.34372076219047615,
+          "stdev": 0.0004902558753383807
+        },
+        "E2E": {
+          "samples": [
+            124.627790174,
+            124.689677158
+          ],
+          "mean": 124.65873366599999,
+          "median": 124.65873366599999,
+          "minimum": 124.627790174,
+          "maximum": 124.689677158,
+          "stdev": 0.04376070605358151
+        }
+      },
+      "memory": {
+        "resident_expert_bytes_per_gpu": [
+          7247757312,
+          7247757312,
+          7247757312,
+          7247757312
+        ],
+        "expert_budget_bytes_global": 28991029248
+      }
     }
   ]
 }

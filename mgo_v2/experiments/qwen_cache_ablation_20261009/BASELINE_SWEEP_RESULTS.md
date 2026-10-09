@@ -14,7 +14,7 @@ ShareGPT, R4 GPUs 0/1/4/5, local B16/input512/output64. C30 reuses three validat
 | C40 | deepspeed | 5.951 [5.469, 6.433] | 4.112 [4.106, 4.117] | 264.985 [264.157, 265.814] | `qca_baseline_c40_deepspeed_r2_v1 (2 repeats; TWO_STABLE)` |
 | C40 | llama | 129.525 [129.470, 129.580] | 0.436 [0.435, 0.436] | 156.963 [156.912, 157.014] | `qca_baseline_c40_llama_r2_v1 (2 repeats; TWO_STABLE)` |
 | C50 | infinity | 5.562 [5.277, 5.848] | 3.244 [3.234, 3.254] | 209.922 [209.560, 210.284] | `qca_baseline_c50_infinity_r2_v1 (2 repeats; TWO_STABLE)` |
-| C50 | deepspeed | pending | pending | pending | — |
-| C50 | llama | pending | pending | pending | — |
+| C50 | deepspeed | 5.975 [5.560, 6.389] | 4.147 [4.143, 4.151] | 267.239 [267.063, 267.415] | `qca_baseline_c50_deepspeed_r2_v1 (2 repeats; TWO_STABLE)` |
+| C50 | llama | 103.026 [102.973, 103.079] | 0.343 [0.343, 0.344] | 124.659 [124.628, 124.690] | `qca_baseline_c50_llama_r2_v1 (2 repeats; TWO_STABLE)` |
 
 Expert residency/placement or live-parameter budget checks are recorded per cell in `BASELINE_SWEEP_RESULTS.json`. llama.cpp statically holds balanced full expert layers, so its quantized GPU residency is not a dynamic cache hit-rate measurement. DeepSpeed limits all live parameters, including non-experts, under its cap. Raw requests, tokens, logs and GPU resource samples remain outside Git.
