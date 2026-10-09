@@ -123,6 +123,34 @@ expert execution about 0.41 s, return/combine about 0.39–0.40 s and exposed
 H2D wait about 0.30 s. The optimizations studied here target decode and do
 not repair the prefill placement/index bottleneck.
 
+### HarMoEny applicability
+
+[HarMoEny](https://arxiv.org/pdf/2506.12417) exchanges small routing IDs,
+builds the same token/expert/rank schedule on each GPU (§4.1), transfers hot
+expert work to less loaded GPUs only beyond a compute-versus-transfer
+threshold (§4.2, §4.4), and overlaps expert fetch with earlier execution
+(§4.3). OURS already exchanges routing information, makes a deterministic
+multi-rank placement decision and has a separate H2D stream. Its Qwen3
+top-8 plus gate-history metadata is larger than the paper's top-1 example:
+at B64 each rank sends 33,304 B/layer, including 64×128 FP32 probability
+values. Only the last 128 of the global 256 probability rows survive in gate
+history; the probability payload from logical ranks 0 and 1 is a candidate
+for omission. This must preserve the exact gate-history reduction order,
+owner decisions, cache state and generated tokens, and must be timed because
+an additional collective may cost more than the bytes saved. The measured
+routing-metadata span includes rank and host waiting; it is not equivalent to
+the wire time of a 133 KiB packet.
+
+The more direct current `new_OURS` target is wave-local row/column index
+concatenation, Python metadata-list construction, GPU metadata-tensor
+creation, input gather and output weighting/scatter. On GPU 0 at B64 the
+grouped GEMM kernel subspan is about 14 ms/token while the surrounding
+expert-execution/preparation span is about 43 ms/token. This optimization is
+inferred from our profile, not implemented by the paper. The paper's
+replication/admission threshold must be recalibrated with this server's
+roughly 0.19–0.20 ms/expert fetch and actual grouped token-row compute;
+its performance numbers cannot be transferred directly to this model/GPU.
+
 ## Batch and policy scaling
 
 The guarded B8/B16/B64 × BR/CA_NATIVE/Near primary and diagnostic sweep is
