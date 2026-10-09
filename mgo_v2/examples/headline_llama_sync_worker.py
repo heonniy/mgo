@@ -16,13 +16,13 @@ def balanced_affinity(threads):
  return chosen,pools
 def main(a):
  world=len(GPUS)
- assert GPUS==([0,1,4,5] if world==4 else list(range(8)))
+ assert GPUS==([0,1] if world==2 else ([0,1,4,5] if world==4 else list(range(8))))
  assert os.environ['CUDA_VISIBLE_DEVICES']==','.join(map(str,GPUS))
  spec=next(s for s in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if s['cell']==a.cell)
- binary=TOOLS/('llama.cpp/build/bin/headline-llama-sync-r8' if world==8 else 'llama.cpp/build/bin/headline-llama-sync')
- build_path=P/('experiments/qwen_r8_sharegpt_b16_l512_20261009/LLAMA_BUILD.json' if world==8 else 'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json')
+ binary=TOOLS/('llama.cpp/build/bin/headline-llama-sync-r2' if world==2 else ('llama.cpp/build/bin/headline-llama-sync-r8' if world==8 else 'llama.cpp/build/bin/headline-llama-sync'))
+ build_path=P/('experiments/qwen_r2_r8_main_table_20261010/LLAMA_R2_BUILD.json' if world==2 else ('experiments/qwen_r8_sharegpt_b16_l512_20261009/LLAMA_BUILD.json' if world==8 else 'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json'))
  build=json.loads(build_path.read_text())
- source=P/('examples/headline_llama_sync_r8.cpp' if world==8 else 'examples/headline_llama_sync.cpp')
+ source=P/('examples/headline_llama_sync_r2.cpp' if world==2 else ('examples/headline_llama_sync_r8.cpp' if world==8 else 'examples/headline_llama_sync.cpp'))
  assert hashlib.sha256(source.read_bytes()).hexdigest()==build['source_sha256'],'llama sync source changed: rebuild and refresh LLAMA_BUILD.json'
  assert hashlib.sha256(binary.read_bytes()).hexdigest()==build['binary_sha256'],'llama sync binary does not match build receipt'
  assert build.get('cmake_flags',{}).get('GGML_CUDA_GRAPHS:BOOL')=='ON','A/B-capable llama build requires CUDA Graph support compiled in; rebuild first'
@@ -32,7 +32,7 @@ def main(a):
  resident=layers*128*9*2**20
  assert resident<=spec['expert_budget_bytes']
  if per is not None:
-  assert ({20:2,30:3,40:4,50:6}[spec['cache_percent']] if world==4 else 1)==per
+  assert (7 if world==2 else ({20:2,30:3,40:4,50:6}[spec['cache_percent']] if world==4 else 1))==per
   assert per*128<=min(spec['expert_slots_per_rank'])
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
@@ -99,5 +99,5 @@ if __name__=='__main__':
  p.add_argument('--threads',type=int,choices=(16,32,64),required=True)
  p.add_argument('--cuda-graphs',choices=('on','off'),required=True)
  p.add_argument('--graph-reuse',choices=('on','off'),required=True)
- p.add_argument('--expert-placement',choices=('legacy_tail','balanced1','balanced2','balanced3','balanced4','balanced6'),default='balanced3')
+ p.add_argument('--expert-placement',choices=('legacy_tail','balanced1','balanced2','balanced3','balanced4','balanced6','balanced7'),default='balanced3')
  main(p.parse_args())

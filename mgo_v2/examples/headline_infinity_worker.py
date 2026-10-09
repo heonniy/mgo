@@ -38,7 +38,7 @@ class ClockStreamer:
 def main(a):
  physical=list(map(int,os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
  world=len(physical)
- assert world in (4,8) and physical==([0,1,4,5] if world==4 else list(range(8)))
+ assert world in (2,4,8) and physical==([0,1] if world==2 else ([0,1,4,5] if world==4 else list(range(8))))
  assert torch.cuda.device_count()==world
  torch.set_num_threads(8);torch.manual_seed(42)
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)

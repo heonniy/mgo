@@ -107,7 +107,8 @@ def command(system, output, smoke, repeats, ours_mode=None):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
-        command += ['-m', 'torch.distributed.run', '--standalone', '--nproc_per_node=8']
+        command += ['-m', 'torch.distributed.run', '--standalone',
+                    f'--nproc_per_node={len(PHYSICAL)}']
     command += [str(PKG / 'examples' / worker), '--cell', CELL,
                 '--output', str(output), '--repeats', str(repeats)]
     if smoke:
@@ -121,7 +122,8 @@ def command(system, output, smoke, repeats, ours_mode=None):
                         'serial_all' if ours_mode == 'B' else 'two_wave']
     elif system == 'llama':
         command += ['--threads', '32', '--cuda-graphs', 'off',
-                    '--graph-reuse', 'off', '--expert-placement', 'balanced1']
+                    '--graph-reuse', 'off', '--expert-placement',
+                    'balanced7' if len(PHYSICAL) == 2 else 'balanced1']
     return command
 
 
@@ -139,7 +141,7 @@ def main():
     manifest = json.loads(WORKLOADS.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     cell = manifest['cells'][0]
-    assert cell['cell'] == CELL and cell['global_requests'] == 128
+    assert cell['cell'] == CELL and cell['global_requests'] == len(PHYSICAL) * 16
     assert cell['local_batch'] == 16 and cell['input_tokens'] == 512
     assert cell['output_tokens'] == 64 and cell['cache_percent'] == 30
     for phase in ('warmup', 'target'):

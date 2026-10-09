@@ -45,9 +45,9 @@ def main(a):
  assert not a.native_prefill or (a.expert_executor=='native' and a.prefill_optimized)
  assert not a.h2d_serial_ablation or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast)
  assert a.grouped_decode_mode=='off' or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast and not a.h2d_serial_ablation)
- rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (4,8)
+ rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (2,4,8)
  physical=list(map(int,os.environ['MGO_V2_PHYSICAL_GPUS'].split(',')))
- assert physical==([0,1,4,5] if world==4 else list(range(8)))
+ assert physical==([0,1] if world==2 else ([0,1,4,5] if world==4 else list(range(8))))
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)

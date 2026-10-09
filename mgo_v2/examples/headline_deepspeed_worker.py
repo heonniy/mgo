@@ -32,9 +32,9 @@ def generate(engine,ids,n,progress=None):
 
 def main(a):
  rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);world=int(os.environ['WORLD_SIZE'])
- assert world in (4,8)
+ assert world in (2,4,8)
  physical=list(map(int,os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
- assert physical==([0,1,4,5] if world==4 else list(range(8)))
+ assert physical==([0,1] if world==2 else ([0,1,4,5] if world==4 else list(range(8))))
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
  # Match OURS' non-overlapping per-rank CPU ranges. The live host exposes
  # one NUMA node; this controls CPU scheduling, not cross-NUMA placement.
