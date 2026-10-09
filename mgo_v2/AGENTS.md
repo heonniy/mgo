@@ -1,21 +1,25 @@
-**OWNER PCIe CONCURRENCY FOLLOW-UP (2026-10-09).**
-After the Qwen baseline cache sweep completes, run the pinned-host H2D
-microbenchmark in `experiments/pcie_rank_concurrency_20261009/README.md` on
-the user's newer GPU set 0/1/3/4/5/6/7 (all 127 nonempty subsets). GPU2 is
-excluded. Do not terminate other users' processes on 3/6/7. Also plot the
-validated Qwen OURS and baseline TTFT/TPOT/output-throughput cache sweep, and
-render LFU/LRU history-retained versus gate-score hit rates only from recorded
-data; do not rerun model or cache-policy experiments for that figure.
+**OWNER PCIe CONCURRENCY FOLLOW-UP COMPLETE (2026-10-09).**
+Read `experiments/pcie_rank_concurrency_20261009/{README.md,RESULTS.md}`.
+The newer user-selected GPU set 0/1/3/4/5/6/7 completed all 127 nonempty
+subsets with two pinned-host H2D repeats at both expert sizes; GPU2 was
+excluded. The owner model loads on 0/1/4/5 were restored, and no processes
+on 3/6/7 were terminated. Qwen C20–C50 four-system TTFT/TPOT/throughput
+figures and the Qwen/DeepSeek LFU/LRU/gate hit-rate figure are in
+`experiments/qwen_cache_ablation_20261009/figures`. DeepSeek policy rates
+were computed by CPU replay of an existing frozen route capture. No further
+GPU or policy experiments are queued by this packet.
 
-**OWNER QWEN THREE-BASELINE CACHE SWEEP ACTIVE (2026-10-09).**
+**OWNER QWEN THREE-BASELINE CACHE SWEEP COMPLETE (2026-10-09).**
 Read `experiments/qwen_cache_ablation_20261009/BASELINE_SWEEP_PLAN.md`.
 After the DeepSeek fixed-route/overlap diagnosis, complete Qwen C20/C30/C40/C50
 ShareGPT R4/B16/input512/output64 cache curves for repaired MoE-Infinity,
 DeepSpeed ZeRO-Inference and synchronous balanced llama.cpp. The matching C30
 baseline runs may be reused only after SHA/budget/runtime receipt checks.
-Use only GPUs0/1/4/5, one guarded job at a time, preserve three unfiltered
-target repeats and validate physical expert placement/residency. Restore owner
-inference loads after each job; repair and resume failed cells.
+The twelve baseline cells passed after two clean targets per new cell and a
+bounded third only for the C40 MoE-Infinity stability condition; validated
+older C30 rows had three targets. Physical placement and budgets passed,
+and owner inference loads were restored after each job. Read
+`experiments/qwen_cache_ablation_20261009/{BASELINE_SWEEP_RESULTS.md,FULL_CACHE_COMPARISON.md,FIGURE_NOTES.md}`.
 
 **OWNER QWEN CACHE ABLATION COMPLETE (2026-10-09).**
 Read `experiments/qwen_cache_ablation_20261009/{PLAN.md,MATRIX.json,PROGRESS.md}`.

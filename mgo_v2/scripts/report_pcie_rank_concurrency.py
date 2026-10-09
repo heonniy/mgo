@@ -45,7 +45,8 @@ def main():
             speeds = [row['aggregate_gib_per_s']['median'] for row in subsets]
             summaries.append(dict(payload=payload, simultaneous_ranks=count,
                                   combinations=len(subsets), aggregate_gib_per_s_median=statistics.median(speeds),
-                                  aggregate_gib_per_s_min=min(speeds), aggregate_gib_per_s_max=max(speeds),
+                                  aggregate_gib_per_s_min=min(row['aggregate_gib_per_s']['minimum'] for row in subsets),
+                                  aggregate_gib_per_s_max=max(row['aggregate_gib_per_s']['maximum'] for row in subsets),
                                   rank_ratio_to_solo_median=statistics.median(ratios),
                                   rank_ratio_to_solo_min=min(ratios), rank_ratio_to_solo_max=max(ratios)))
     with (ROOT / 'CARDINALITY.csv').open('w', newline='') as file:
@@ -83,8 +84,10 @@ def main():
     plt.close(fig)
     lines = ['# PCIe host-to-device concurrency', '',
              'Pinned rank-private host source; 256 sequential asynchronous copies per repeat; '
-             'two unfiltered repeats. This reports effective service under the measured host '
-             'and GPU conditions, not PCIe theoretical line rate or model E2E speed.', '',
+             'two unfiltered repeats. Each GPU worker was bound to its own CPU core. '
+             'This reports effective service under the measured host and GPU conditions, '
+             'not PCIe theoretical line rate or model E2E speed. Ranges include all '
+             'combinations of that cardinality and both repeats.', '',
              '| Payload | Active GPUs | Subsets | Aggregate GiB/s, median [min, max] | '
              'Rank speed / solo, median [min, max] |',
              '|---|---:|---:|---:|---:|']
@@ -95,9 +98,34 @@ def main():
                      f"{row['rank_ratio_to_solo_median']:.3f} "
                      f"[{row['rank_ratio_to_solo_min']:.3f}, {row['rank_ratio_to_solo_max']:.3f}] |")
     max_skew = max(row['max_start_skew_ms'] for row in rows)
+    lines.extend(['', '## Per-rank solo versus seven-way', '',
+                  '| GPU | Qwen solo | Qwen seven-way | Qwen ratio | '
+                  'DeepSeek solo | DeepSeek seven-way | DeepSeek ratio |',
+                  '|---:|---:|---:|---:|---:|---:|---:|'])
+    for gpu in GPUS:
+        q0 = solo[gpu, 'Qwen expert']
+        q7 = by[tuple(GPUS), 'Qwen expert']['rank_gib_per_s'][str(gpu)]['median']
+        d0 = solo[gpu, 'DeepSeek expert']
+        d7 = by[tuple(GPUS), 'DeepSeek expert']['rank_gib_per_s'][str(gpu)]['median']
+        lines.append(f'| {gpu} | {q0:.2f} | {q7:.2f} | {q7 / q0:.3f} | '
+                     f'{d0:.2f} | {d7:.2f} | {d7 / d0:.3f} |')
+    lines.extend(['', 'All bandwidth columns use GiB/s.', '', '## Combination effect', ''])
+    lines.append('| Payload | GPU 0+1+3 aggregate | GPU 0+1+4 aggregate | All 7 aggregate | '
+                 'All 7 / sum of solos |')
+    lines.append('|---|---:|---:|---:|---:|')
+    for payload in ('Qwen expert', 'DeepSeek expert'):
+        triple = by[(0, 1, 3), payload]['aggregate_gib_per_s']['median']
+        control = by[(0, 1, 4), payload]['aggregate_gib_per_s']['median']
+        all_seven = by[tuple(GPUS), payload]['aggregate_gib_per_s']['median']
+        ideal = sum(solo[gpu, payload] for gpu in GPUS)
+        lines.append(f'| {payload} | {triple:.2f} | {control:.2f} | '
+                     f'{all_seven:.2f} | {100 * all_seven / ideal:.1f}% |')
     lines.extend(['', f'Maximum observed worker start skew: {max_skew:.3f} ms.',
                   'Individual rank and subset results, including full ranges, are in '
-                  '`RANK_COMBINATIONS.csv` and `RESULTS.json`.'])
+                  '`RANK_COMBINATIONS.csv` and `RESULTS.json`.',
+                  'The 0+1+3 penalty reproduces at both payload sizes and both repeats. '
+                  'This benchmark cannot isolate whether PCIe links, host memory, '
+                  'IOMMU or the virtualized upstream fabric caused it.'])
     if max_skew > 5:
         lines.append('Some subsets had >5 ms start skew; inspect those rows before interpreting them as simultaneous.')
     (ROOT / 'RESULTS.md').write_text('\n'.join(lines) + '\n')
