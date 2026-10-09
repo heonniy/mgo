@@ -1,0 +1,45 @@
+NCCL version 2.21.5+cuda12.4
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controllerLA_CA_NEAR event=0 split_controller
+
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controller
+
+
+LA_CA_NEAR event=768 split_controller
+LA_CA_NEAR event=1536 split_controllerLA_CA_NEAR event=1536 split_controllerLA_CA_NEAR event=1536 split_controller
+
+
+LA_CA_NEAR event=1536 split_controller
+LA_CA_NEAR event=2304 split_controllerLA_CA_NEAR event=2304 split_controllerLA_CA_NEAR event=2304 split_controller
+
+
+LA_CA_NEAR event=2304 split_controller
+{"status": "PASS", "arm": "R-NEAR", "repeat": 0, "TTFT": 7.484148803, "TPOT": 2.9672134719365078, "E2E": 194.418597535, "throughput": 21.067943354866667, "output_tokens": 64, "global_requests": 64, "smoke": false, "profiled": false}
+LA_CA_NEAR event=0 split_controllerLA_CA_NEAR event=0 split_controllerLA_CA_NEAR event=0 split_controller
+
+
+LA_CA_NEAR event=0 split_controller
+LA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controllerLA_CA_NEAR event=768 split_controller
+
+
+LA_CA_NEAR event=768 split_controller
+LA_CA_NEAR event=1536 split_controllerLA_CA_NEAR event=1536 split_controllerLA_CA_NEAR event=1536 split_controller
+
+
+LA_CA_NEAR event=1536 split_controller
+LA_CA_NEAR event=2304 split_controllerLA_CA_NEAR event=2304 split_controllerLA_CA_NEAR event=2304 split_controller
+
+
+LA_CA_NEAR event=2304 split_controller
+{"status": "PASS", "arm": "G-NEAR", "repeat": 0, "TTFT": 7.407413362, "TPOT": 2.7961274687619047, "E2E": 183.563443894, "throughput": 22.31381103508422, "output_tokens": 64, "global_requests": 64, "smoke": false, "profiled": false}
+[rank3]:[W1009 21:13:27.074268797 collection.cpp:634] Warning: void cutlass::Kernel<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8>(cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8::Params) (function operator())
+[rank0]:[W1009 21:13:27.075602602 collection.cpp:634] Warning: void cutlass::Kernel<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8>(cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8::Params) (function operator())
+[rank2]:[W1009 21:13:27.078574837 collection.cpp:634] Warning: void cutlass::Kernel<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8>(cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8::Params) (function operator())
+[rank1]:[W1009 21:13:27.131917370 collection.cpp:634] Warning: void cutlass::Kernel<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8>(cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x1_tn_align8::Params) (function operator())
+{"status": "PASS", "arm": "G-NEAR", "repeat": -1, "TTFT": 6.580525109, "TPOT": 2.3448540243333333, "E2E": 154.306328642, "throughput": 26.544601482308398, "output_tokens": 64, "global_requests": 64, "smoke": false, "profiled": true}
+{"status": "PASS", "arm": "R-NEAR", "repeat": -1, "TTFT": 6.639033874, "TPOT": 2.352842496460317, "E2E": 154.868111151, "throughput": 26.44831120853734, "output_tokens": 64, "global_requests": 64, "smoke": false, "profiled": true}
