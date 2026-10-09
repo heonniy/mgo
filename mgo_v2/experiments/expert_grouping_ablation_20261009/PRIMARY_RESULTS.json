@@ -1,0 +1,410 @@
+{
+  "status": "PASS",
+  "cells": {
+    "R8": {
+      "label": "R8",
+      "world": 8,
+      "cell": "Qwen3_ShareGPT_R8_C30_B16_L512_O64",
+      "target_sha256": "4a2dcc9c2e671328a9a3939fc0dbf33c4a0edffecfdfebb863d4c61bcd4466d4",
+      "warmup_sha256": "88a97bd52f2b13631bc758d79ab6e6d15f44bc3490a07c417238fcf4327f7575",
+      "arms": {
+        "a": {
+          "job": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_a_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.141319002,
+                1.826307724
+              ],
+              "mean": 2.483813363,
+              "median": 2.483813363,
+              "minimum": 1.826307724,
+              "maximum": 3.141319002,
+              "relative_difference_percent": 52.943240325098444
+            },
+            "TPOT": {
+              "samples": [
+                0.3943691346190476,
+                0.3880623223968254
+              ],
+              "mean": 0.3912157285079365,
+              "median": 0.3912157285079365,
+              "minimum": 0.3880623223968254,
+              "maximum": 0.3943691346190476,
+              "relative_difference_percent": 1.6121059974443832
+            },
+            "E2E": {
+              "samples": [
+                27.986574483,
+                26.274234035
+              ],
+              "mean": 27.130404259,
+              "median": 27.130404259,
+              "minimum": 26.274234035,
+              "maximum": 27.986574483,
+              "relative_difference_percent": 6.3115183675597555
+            },
+            "throughput": {
+              "samples": [
+                292.71177882009465,
+                311.78834705846833
+              ],
+              "mean": 302.2500629392815,
+              "median": 302.2500629392815,
+              "minimum": 292.71177882009465,
+              "maximum": 311.78834705846833,
+              "relative_difference_percent": 6.311518367559758
+            }
+          },
+          "h2d_bytes": 1993595682816,
+          "h2d_copies": 211249,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "native_counts": {
+            "waves": 50461,
+            "groups": 318841,
+            "waits": 0
+          }
+        },
+        "b": {
+          "job": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_b_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.157184632,
+                1.848783586
+              ],
+              "mean": 2.502984109,
+              "median": 2.502984109,
+              "minimum": 1.848783586,
+              "maximum": 3.157184632,
+              "relative_difference_percent": 52.27364573731698
+            },
+            "TPOT": {
+              "samples": [
+                0.30943284085714284,
+                0.3080930080476191
+              ],
+              "mean": 0.30876292445238096,
+              "median": 0.30876292445238096,
+              "minimum": 0.3080930080476191,
+              "maximum": 0.30943284085714284,
+              "relative_difference_percent": 0.43393578160333907
+            },
+            "E2E": {
+              "samples": [
+                22.651453606,
+                21.258643093
+              ],
+              "mean": 21.9550483495,
+              "median": 21.9550483495,
+              "minimum": 21.258643093,
+              "maximum": 22.651453606,
+              "relative_difference_percent": 6.343919133440306
+            },
+            "throughput": {
+              "samples": [
+                361.65449434247665,
+                385.3491478342493
+              ],
+              "mean": 373.501821088363,
+              "median": 373.501821088363,
+              "minimum": 361.65449434247665,
+              "maximum": 385.3491478342493,
+              "relative_difference_percent": 6.343919133440314
+            }
+          },
+          "h2d_bytes": 1993595682816,
+          "h2d_copies": 211249,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "grouped_counts": {
+            "events": 24192,
+            "waves": 24192,
+            "first_wave_groups": 312697,
+            "second_wave_groups": 0,
+            "no_ready_events": 0,
+            "serial_wait_wall_ns": 25225310296
+          }
+        },
+        "c": {
+          "job": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_c_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.173137005,
+                1.808131942
+              ],
+              "mean": 2.4906344735,
+              "median": 2.4906344735,
+              "minimum": 1.808131942,
+              "maximum": 3.173137005,
+              "relative_difference_percent": 54.805515523191445
+            },
+            "TPOT": {
+              "samples": [
+                0.30810860169841264,
+                0.3061042697619048
+              ],
+              "mean": 0.3071064357301587,
+              "median": 0.3071064357301587,
+              "minimum": 0.3061042697619048,
+              "maximum": 0.30810860169841264,
+              "relative_difference_percent": 0.6526505808132794
+            },
+            "E2E": {
+              "samples": [
+                22.583978912,
+                21.092700937
+              ],
+              "mean": 21.838339924499998,
+              "median": 21.838339924499998,
+              "minimum": 21.092700937,
+              "maximum": 22.583978912,
+              "relative_difference_percent": 6.828714912194238
+            },
+            "throughput": {
+              "samples": [
+                362.73501812593264,
+                388.38079696232313
+              ],
+              "mean": 375.5579075441279,
+              "median": 375.5579075441279,
+              "minimum": 362.73501812593264,
+              "maximum": 388.38079696232313,
+              "relative_difference_percent": 6.828714912194233
+            }
+          },
+          "h2d_bytes": 1993595682816,
+          "h2d_copies": 211249,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "grouped_counts": {
+            "events": 24192,
+            "waves": 48202,
+            "first_wave_groups": 199260,
+            "second_wave_groups": 113437,
+            "no_ready_events": 0,
+            "serial_wait_wall_ns": 16323701946
+          }
+        }
+      },
+      "token_mismatches_vs_A": {
+        "b": [
+          0,
+          0
+        ],
+        "c": [
+          0,
+          0
+        ]
+      },
+      "gain_B_vs_A_percent": 21.07604527303223,
+      "gain_C_vs_A_percent": 21.4994660614908,
+      "gain_C_vs_B_percent": 0.5364921080340701
+    },
+    "R4": {
+      "label": "R4",
+      "world": 4,
+      "cell": "Qwen3_ShareGPT_R4_C30_B16_L512_O64",
+      "target_sha256": "3b26dae335488ab942a2e5edffb053875f43372a3c048e6947b62d0d432477ff",
+      "warmup_sha256": "171127a6ff460a1c7011620e7ec66f4623c2aab249a6d01c027189bf60d52a69",
+      "arms": {
+        "a": {
+          "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_a_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.628349838,
+                1.754884337
+              ],
+              "mean": 2.6916170875,
+              "median": 2.6916170875,
+              "minimum": 1.754884337,
+              "maximum": 3.628349838,
+              "relative_difference_percent": 69.60371553964583
+            },
+            "TPOT": {
+              "samples": [
+                0.5001852681587301,
+                0.49957075815873014
+              ],
+              "mean": 0.49987801315873015,
+              "median": 0.49987801315873015,
+              "minimum": 0.49957075815873014,
+              "maximum": 0.5001852681587301,
+              "relative_difference_percent": 0.12293199217082326
+            },
+            "E2E": {
+              "samples": [
+                35.140021732,
+                33.227842101
+              ],
+              "mean": 34.1839319165,
+              "median": 34.1839319165,
+              "minimum": 33.227842101,
+              "maximum": 35.140021732,
+              "relative_difference_percent": 5.5937966284007965
+            },
+            "throughput": {
+              "samples": [
+                116.56225005319243,
+                123.27011749814261
+              ],
+              "mean": 119.91618377566752,
+              "median": 119.91618377566752,
+              "minimum": 116.56225005319243,
+              "maximum": 123.27011749814261,
+              "relative_difference_percent": 5.593796628400788
+            }
+          },
+          "h2d_bytes": 1694701191168,
+          "h2d_copies": 179577,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "native_counts": {
+            "waves": 24751,
+            "groups": 288138,
+            "waits": 0
+          }
+        },
+        "b": {
+          "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_b_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.649537329,
+                1.759901296
+              ],
+              "mean": 2.7047193125,
+              "median": 2.7047193125,
+              "minimum": 1.759901296,
+              "maximum": 3.649537329,
+              "relative_difference_percent": 69.86440420146185
+            },
+            "TPOT": {
+              "samples": [
+                0.34268379569841273,
+                0.3461852930952381
+              ],
+              "mean": 0.3444345443968254,
+              "median": 0.3444345443968254,
+              "minimum": 0.34268379569841273,
+              "maximum": 0.3461852930952381,
+              "relative_difference_percent": 1.0165929793590247
+            },
+            "E2E": {
+              "samples": [
+                25.238616458,
+                23.569574761
+              ],
+              "mean": 24.404095609499997,
+              "median": 24.404095609499997,
+              "minimum": 23.569574761,
+              "maximum": 25.238616458,
+              "relative_difference_percent": 6.839186846777793
+            },
+            "throughput": {
+              "samples": [
+                162.29098797139778,
+                173.78336442359372
+              ],
+              "mean": 168.03717619749574,
+              "median": 168.03717619749574,
+              "minimum": 162.29098797139778,
+              "maximum": 173.78336442359372,
+              "relative_difference_percent": 6.839186846777785
+            }
+          },
+          "h2d_bytes": 1694701191168,
+          "h2d_copies": 179577,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "grouped_counts": {
+            "events": 12096,
+            "waves": 12096,
+            "first_wave_groups": 282050,
+            "second_wave_groups": 0,
+            "no_ready_events": 0,
+            "serial_wait_wall_ns": 16305184229
+          }
+        },
+        "c": {
+          "job": "/home/hwlee/mgo-results/expert_grouping_ablation_20261009/jobs/r4_c_full_v1",
+          "status": "UNSTABLE_E2E",
+          "metrics": {
+            "TTFT": {
+              "samples": [
+                3.646924219,
+                1.756274119
+              ],
+              "mean": 2.701599169,
+              "median": 2.701599169,
+              "minimum": 1.756274119,
+              "maximum": 3.646924219,
+              "relative_difference_percent": 69.98262812983565
+            },
+            "TPOT": {
+              "samples": [
+                0.3507830692380952,
+                0.34044476952380953
+              ],
+              "mean": 0.3456139193809524,
+              "median": 0.3456139193809524,
+              "minimum": 0.34044476952380953,
+              "maximum": 0.3507830692380952,
+              "relative_difference_percent": 2.991285690345795
+            },
+            "E2E": {
+              "samples": [
+                25.746257581,
+                23.204294599
+              ],
+              "mean": 24.47527609,
+              "median": 24.47527609,
+              "minimum": 23.204294599,
+              "maximum": 25.746257581,
+              "relative_difference_percent": 10.3858398681704
+            },
+            "throughput": {
+              "samples": [
+                159.0910829317085,
+                176.5190483392897
+              ],
+              "mean": 167.8050656354991,
+              "median": 167.8050656354991,
+              "minimum": 159.0910829317085,
+              "maximum": 176.5190483392897,
+              "relative_difference_percent": 10.385839868170406
+            }
+          },
+          "h2d_bytes": 1694701191168,
+          "h2d_copies": 179577,
+          "source_commit": "fe816c5f8494e45f91c3b4a508c482ba994e5b27",
+          "grouped_counts": {
+            "events": 12096,
+            "waves": 24142,
+            "first_wave_groups": 186274,
+            "second_wave_groups": 95776,
+            "no_ready_events": 0,
+            "serial_wait_wall_ns": 12341346133
+          }
+        }
+      },
+      "token_mismatches_vs_A": {
+        "b": [
+          0,
+          0
+        ],
+        "c": [
+          0,
+          0
+        ]
+      },
+      "gain_B_vs_A_percent": 31.096280426429868,
+      "gain_C_vs_A_percent": 30.860347868269432,
+      "gain_C_vs_B_percent": -0.3424090304856797
+    }
+  },
+  "interpretation": "A versus B changes grouped backend and H2D scheduling together; B versus C isolates two-wave readiness within the same grouped backend. Two repeats do not establish a small B/C difference."
+}
