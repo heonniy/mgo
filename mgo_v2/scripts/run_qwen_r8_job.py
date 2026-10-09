@@ -59,10 +59,11 @@ def gpu_state():
              for line in output.splitlines())}
 
 
-def stop_owned_loads():
+def stop_owned_loads(quiet_2367=False):
     rows = json.loads((LOAD / 'processes.json').read_text())
     owned = [row for row in rows if row['gpu'] in PHYSICAL and owner.owned_idle(row['pid'])]
-    assert len(owned) == 8 and {row['gpu'] for row in owned} == set(PHYSICAL), owned
+    expected = {0, 1, 4, 5} if quiet_2367 else set(PHYSICAL)
+    assert len(owned) == len(expected) and {row['gpu'] for row in owned} == expected, owned
     outsiders = [(gpu, pid) for gpu, pid in apps()
                 if gpu in PHYSICAL and pid not in {row['pid'] for row in owned}]
     assert not outsiders, f'foreign compute process on R8 GPU: {outsiders}'
@@ -78,7 +79,9 @@ def stop_owned_loads():
     while any(gpu in PHYSICAL for gpu, _ in apps()) and time.monotonic() < deadline:
         time.sleep(1)
     assert not [(gpu, pid) for gpu, pid in apps() if gpu in PHYSICAL]
-    write(LOAD / 'processes.json', [row for row in rows if row not in owned])
+    # Prune stale receipts for loads intentionally stopped before this job.
+    write(LOAD / 'processes.json', [row for row in rows
+                                   if row not in owned and owner.owned_idle(row['pid'])])
     return [row['gpu'] for row in owned]
 
 
@@ -129,6 +132,8 @@ def main():
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C'))
+    parser.add_argument('--quiet-2367', action='store_true',
+                        help='Keep the four previously stopped model loads off GPUs 2/3/6/7')
     args = parser.parse_args()
     assert args.ours_mode is None or args.system == 'ours'
     manifest = json.loads(WORKLOADS.read_text())
@@ -164,6 +169,7 @@ def main():
     state = dict(status='RUNNING', system=args.system, ours_mode=args.ours_mode,
                  smoke=args.smoke,
                  repeats=args.repeats, physical_gpus=PHYSICAL, started=time.time(),
+                 quiet_2367=args.quiet_2367,
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'],
                                                        cwd=PKG.parent, text=True).strip(),
                  command=command(args.system, output, args.smoke, args.repeats, args.ours_mode),
@@ -172,7 +178,8 @@ def main():
     stopped = []
     process = None
     try:
-        stopped = stop_owned_loads()
+        stopped = stop_owned_loads(args.quiet_2367)
+        state['stopped_owned_load_gpus'] = stopped
         assert min(x['free_mib'] for x in gpu_state().values()) >= 2048
         with (output / 'run.log').open('w') as log, (output / 'resources.jsonl').open('w') as resources:
             process = subprocess.Popen(state['command'], env=env, stdout=log,
