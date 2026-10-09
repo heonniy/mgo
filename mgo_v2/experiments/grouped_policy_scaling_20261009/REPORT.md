@@ -155,5 +155,54 @@ its performance numbers cannot be transferred directly to this model/GPU.
 
 The guarded B8/B16/B64 × BR/CA_NATIVE/Near primary and diagnostic sweep is
 in progress. CA_NATIVE is the optimized implementation of CA in this
-comparison. The table and per-rank analysis below will be completed only
-after all cells pass and their diagnostic receipts are audited.
+comparison. Results are added by completed batch; no unfinished cell is
+inferred from another batch.
+
+### B8: completed primary and full-decode diagnosis
+
+| Path/policy | TTFT samples (s) | TPOT samples (s/token) | Mean TPOT | E2E samples (s) | TPOT repeat difference |
+|---|---:|---:|---:|---:|---:|
+| Current A, Near | 2.999 / 1.390 | 0.4349 / 0.4320 | 0.4334 | 30.396 / 28.606 | 0.7% |
+| Grouped N, BR | 3.041 / 1.358 | 0.2804 / 0.2655 | 0.2729 | 20.706 / 18.083 | 5.5% |
+| Grouped N, CA_NATIVE | 3.157 / 1.401 | 0.2975 / 0.2889 | 0.2932 | 21.902 / 19.603 | 2.9% |
+| Grouped N, Near | 3.018 / 1.383 | 0.2992 / 0.2675 | 0.2833 | 21.865 / 18.237 | 11.2% |
+
+Within B8 the current A and grouped N Near paths generated the same tokens
+and final cache state on all ranks in both target repeats; their diagnostic
+rank work, misses and transport also match. N Near's mean TPOT is 34.6%
+below A Near, but N additionally enables the opt-in compiled dense routing
+kernel. The B64 factorial above separates that candidate from the grouped
+execution effect. The two N Near samples have an 11.2% relative difference,
+so its apparent 3.8% mean disadvantage against BR is **not a stable policy
+ranking**. N BR's repeat difference is 5.5%, whereas CA_NATIVE's is 2.9%.
+No sample was deleted or replaced by the instrumented run.
+
+The full-decode diagnosis supplies exact work counts and a separate
+instrumented phase partition:
+
+| B8 path/policy | Four-rank MAIN demand misses / H2D copies | Four-rank H2D GiB | Four-rank off-rank forward+return GiB | Maximum rank token-expert rows | Mean controller CPU ms/token across ranks | Maximum rank copy-stream service ms/token |
+|---|---:|---:|---:|---:|---:|---:|
+| A Near | 127,977 | 1,124.8 | 1.92 | 197,407 | 8.0 | 103.3 |
+| N BR | 127,876 | 1,123.9 | 2.01 | 199,546 | 7.3 | 115.4 |
+| N CA_NATIVE | 127,648 | 1,121.9 | 1.67 | 228,581 | 10.1 | 110.6 |
+| N Near | 127,977 | 1,124.8 | 1.92 | 197,407 | 8.0 | 106.9 |
+
+CA_NATIVE lowers transported bytes 17% relative to BR, but increases the
+largest rank's expert token-row load 15% and controller CPU time about
+2.8 ms/token. Its H2D demand falls less than 0.2%. These measurements are
+consistent with communication savings being outweighed by controller and
+load cost at B8; they do **not** isolate the exact contribution to the 20 ms
+primary TPOT gap. BR has the lowest observed mean primary TPOT at B8, but
+the Near sample ranges overlap BR's and require cautious interpretation.
+
+The H2D copy-stream service is a separate, overlapping duration. N Near's
+two clean repeats have identical tokens and cache hashes, while GPU 0's
+grouped-executor serial H2D wait fell from 2.709 to 1.617 s and GPU 4's
+from 2.444 to 1.193 s. This accounts for part of its TPOT spread and
+identifies a real wait variation without establishing whether host-memory,
+PCIe, stream scheduling or peer arrival caused it. The diagnostic phases
+also contain peer waiting: for example, the N BR anchor rank reports
+74.8 ms/token in routing metadata and 88.5 ms/token in return/combine,
+although its primary TPOT is faster than CA_NATIVE. Do not treat those
+spans as isolated CPU parse or NCCL wire time, or compare diagnostic total
+TPOT directly as the policy result.
