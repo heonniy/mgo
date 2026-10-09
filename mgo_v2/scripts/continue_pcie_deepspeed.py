@@ -8,6 +8,7 @@ import sys
 import time
 import psutil
 from pcie_host import ROOT,write
+from pcie_receipts import read_receipt
 
 PKG=Path(__file__).resolve().parents[1];REPO=PKG.parent
 
@@ -64,7 +65,7 @@ def main(a):
             time.sleep(2)
         assert json.loads((a.predecessor/'result.json').read_text())['status']=='PASS'
         archived=PKG/'experiments/pcie_topology_ablation_20261009/stage2_grouped/cohort/live_cohort_validation.json'
-        receipt=json.loads(archived.read_text());assert receipt['status']=='PASS' and len(receipt['arms'])==7
+        receipt=read_receipt(archived);assert receipt['status']=='PASS' and len(receipt['arms'])==7
         completed.append('seven_policy_terminal_validated')
         script=PKG/'scripts/run_pcie_baseline_job.py'
         smoke=a.out/'smoke'

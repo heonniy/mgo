@@ -65,7 +65,7 @@ def run(a):
              MGO_LLAMA_BUILD_RECEIPT=str(ROOT/'LLAMA_BUILD.json'),MGO_TOPOLOGY_PATH=str(a.out/'cpu_topology.json'),
              CUDA_HOME=str(DATA/'envs/cuda121'),TORCH_CUDA_ARCH_LIST='8.9',MAX_JOBS='1',
              TORCH_EXTENSIONS_DIR=str(DATA/'cache/torch_extensions'),HF_HOME=str(DATA/'cache/huggingface'),
-             PYTHONPATH=':'.join([str(PKG),str(PKG/'scripts'),str(PKG/'examples'),str(DATA/'tools/MoE-Infinity')]),
+             PYTHONPATH=':'.join([str(PKG),str(PKG/'scripts'),str(PKG/'examples'),str(DATA/'tools/MoE-Infinity'),str(DATA/'tools/moe-store')]),
              CPATH=':'.join(str(p) for p in site.glob('*/include')),OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',
              OPENBLAS_NUM_THREADS='1',NCCL_DEBUG='INFO',NCCL_DEBUG_FILE=str(a.out/'nccl_rank%r_pid%p.log'))
     write(a.out/'cpu_topology.json',dict(fixed_affinity={str(gpu):affinity(rank) for rank,gpu in enumerate(GPUS)}))
@@ -97,8 +97,11 @@ def run(a):
                     free=available_bytes()
                     if free<128*2**30:raise RuntimeError('128-GiB available host headroom lost')
                     if time.monotonic()-last_sample>=1:
-                        children=psutil.Process(process.pid).children(recursive=True);rss={}
-                        for child in children:
+                        parent=psutil.Process(process.pid)
+                        # Single-process Infinity owns its model in the root
+                        # worker; descendants-only sampling would omit it.
+                        processes=[parent]+parent.children(recursive=True);rss={}
+                        for child in processes:
                             try:rss[str(child.pid)]=child.memory_info().rss
                             except psutil.NoSuchProcess:pass
                         resource.append(dict(unix=time.time(),available_host_bytes=free,rss_by_pid=rss,
