@@ -1,0 +1,1 @@
+Files above 128 KiB are stored as deterministic lossless gzip. RAW_ARTIFACTS.json records both original and stored SHA256. Decompress .gz files to their original names to use the validators. Other raw files remain at the recorded data2 paths.
