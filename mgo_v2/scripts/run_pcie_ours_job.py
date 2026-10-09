@@ -33,6 +33,7 @@ def run(a):
     out=a.out;out.mkdir(parents=True,exist_ok=False)
     source=PKG/'experiments/pcie_topology_ablation_20261009'
     identity=dict(arm=a.arm,sequence=a.sequence,smoke=a.smoke,overlap=a.overlap,diagnostic=a.diagnostic,
+                  breakdown_reference=str(a.breakdown_reference) if a.breakdown_reference else None,
                   git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),
                   base_commit='7ddc55dff8d8a571a79a7fa415ad16fbc47e78dc',seed=42,
                   physical_gpus=list(GPUS),groups=[[0,1],[4,5]],conda_prefix=sys.prefix,
@@ -65,6 +66,10 @@ def run(a):
         assert not a.smoke and not a.overlap and not a.diagnostic and a.arm=='R-NEAR'
         command[5]=str(PKG/'examples/pcie_sequence_worker.py')
         command+=['--sequence',a.sequence]
+    if a.breakdown_reference:
+        assert a.sequence=='stage1'
+        command[5]=str(PKG/'examples/pcie_breakdown_worker.py')
+        command+=['--reference-cohort',str(a.breakdown_reference)]
     site=DATA/'envs/mgo-pcie/lib/python3.11/site-packages/nvidia'
     env=dict(os.environ,CUDA_VISIBLE_DEVICES='0,1,4,5',MGO_V2_PHYSICAL_GPUS='0,1,4,5',
              MGO_V2_NUMA_STRICT='1',CUDA_HOME=str(DATA/'envs/cuda121'),TORCH_CUDA_ARCH_LIST='8.9',MAX_JOBS='1',
@@ -76,7 +81,7 @@ def run(a):
              MGO_HEADLINE_WORKLOADS=str(DATA/'datasets/frozen_pcie_topology_20261009/WORKLOADS.json'),
              OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1',NCCL_DEBUG='INFO',
              NCCL_DEBUG_FILE=str(out/'nccl_rank%r_pid%p.log'))
-    source_paths=list((PKG/'mgo_v2').glob('*.py'))+list((PKG/'scripts').glob('*pcie*'))+[PKG/'examples/headline_ours_worker.py',PKG/'examples/pcie_sequence_worker.py',PKG/'examples/env_offload_worker.py']
+    source_paths=list((PKG/'mgo_v2').glob('*.py'))+list((PKG/'scripts').glob('*pcie*'))+[PKG/'examples/headline_ours_worker.py',PKG/'examples/pcie_sequence_worker.py',PKG/'examples/pcie_breakdown_worker.py',PKG/'examples/env_offload_worker.py']
     write(out/'launch.json',dict(argv=command,source_sha256={str(p.relative_to(REPO)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths if p.is_file()},environment={k:env[k] for k in env if k.startswith(('MGO','CUDA','TORCH','NCCL','OMP','MKL','CPATH','NUMBA'))}))
     process=None
     with gpu_experiment(f'{a.arm}: '+('smoke' if a.smoke else 'full frozen generation')):
@@ -122,4 +127,5 @@ if __name__=='__main__':
     p.add_argument('--repeats',type=int,choices=range(1,6),default=1);p.add_argument('--timeout',type=int,default=3600)
     p.add_argument('--sequence',choices=('stage1','stage2'))
     p.add_argument('--capture-decisions',action='store_true')
+    p.add_argument('--breakdown-reference',type=Path)
     run(p.parse_args())
