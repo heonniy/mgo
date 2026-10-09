@@ -43,7 +43,9 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85)
  torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'));a.pcie_cpu_group=dist.new_group(backend='gloo')
- a.cell='R4_C30_B16_L512_O64';a.local_batch=16;a.capacities=[459,459,459,458];a.seed=42
+ batch=int(spec['local_batch']);global_batch=int(spec['global_requests']);outputs=int(spec['final_output_tokens'])
+ assert batch in (16,32,64) and global_batch==4*batch and outputs in (64,128,256)
+ a.cell=f'R4_C30_B{batch}_L512_O{outputs}';a.local_batch=batch;a.capacities=[459,459,459,458];a.seed=42
  a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=True;a.live_routes=True
  a.pcie_native_controller=True;a.pcie_phase_diagnostic=False;a.pcie_capture_decisions=False;a.pcie_g2g_first_serial=True
  a.prefetch_off=True;a.prefill_optimized=True;a.prefill_layout_fast=True;a.decode_layout_fast=True;a.native_prefill=True
@@ -61,20 +63,20 @@ def main(a):
  def reset(arm,path,diagnostic=False):
   a.policy,a.pcie_quota_mode=ARMS[arm];a.output=path;a.pcie_phase_diagnostic=diagnostic
   path.mkdir(parents=True,exist_ok=True);rt.reset();rt.event_offset=0;rt.decode_layout_checks=0
-  rt.gate_history=NativeGateHistory(48,128,128);rt.metadata=NativeLiveMetadata(16,rt.gate_history)
+  rt.gate_history=NativeGateHistory(48,128,128);rt.metadata=NativeLiveMetadata(batch,rt.gate_history)
   grouped.reset(True);write(cohort/f'affinity_rank{rank}.json',configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt))
  def inputs(path):
-  requests=json.loads(Path(path).read_text())['requests'];assert len(requests)==64
-  assert len({r['source_row'] for r in requests})==64
+  requests=json.loads(Path(path).read_text())['requests'];assert len(requests)==global_batch
+  assert len({r['source_row'] for r in requests})==global_batch
   assert all(len(r['input_ids'])==512 for r in requests)
-  rows=requests[rank*16:(rank+1)*16]
+  rows=requests[rank*batch:(rank+1)*batch]
   return rows,torch.tensor([r['input_ids'] for r in rows],device='cuda')
  reset('R-NEAR',cohort/'prefill_validation');rows,ids=inputs(warm['path']);a.validate_prefill_optimized=True;begin(rt)
  checked=generate_live(model,rt,ids,1);state=validate_state(rt)
  assert rt.prefill_metadata_checks==48 and rt.prefill_layout_checks==48 and len(rt.prefill_numerics)==48 and rt.transport.calls==144
  write(cohort/f'prefill_validation_rank{rank}.json',dict(status='PASS',output=checked,state=state,per_layer_numerics=rt.prefill_numerics))
  a.validate_prefill_optimized=False;previous={}
- def generation(candidate,arm,repeat,n=64,diagnostic=False,nomination=False):
+ def generation(candidate,arm,repeat,n=outputs,diagnostic=False,nomination=False):
   path=cohort/candidate['candidate']/arm;reset(arm,path,diagnostic)
   a.phase='COUNTERS' if repeat==0 else 'MEASURE';a.validate_decode_layout=repeat==0
   grouped.validate=repeat==0;rt.metadata.validate_wire=repeat==0
@@ -110,7 +112,7 @@ def main(a):
   np.save(path/f'policy_trace_repeat{repeat}_rank{rank}.npy',trace);np.save(path/f'quota_repeat{repeat}_rank{rank}.npy',quotas)
   if diagnostic:write(path/f'phases_repeat{repeat}_rank{rank}.json',rt.pcie_phase_trace)
   assert grouped.calls==(n-1)*48 and rt.metadata.calls==(n-1)*48
-  if repeat==0:assert rt.decode_layout_checks==3024 and len(grouped.checks)==48 and rt.metadata.wire_checks==48
+  if repeat==0:assert rt.decode_layout_checks==(n-1)*48 and len(grouped.checks)==48 and rt.metadata.wire_checks==48
   else:assert rt.metadata.wire_checks==0
   write(path/f'grouped_repeat{repeat}_rank{rank}.json',grouped.receipt())
   result.update(candidate=candidate['candidate'],arm=arm,rank=rank,physical_gpu=[0,1,4,5][rank],repeat=repeat,
@@ -129,8 +131,8 @@ def main(a):
    assert len({r['release_ns'] for r in rr})==1
    release=rr[0]['release_ns'];first=max(r['first_ns'] for r in rr);end=max(r['end_ns'] for r in rr)
    row=dict(status='PASS',candidate=candidate['candidate'],arm=arm,repeat=repeat,TTFT=(first-release)/1e9,
-      TPOT=(end-first)/1e9/(n-1),E2E=(end-release)/1e9,throughput=64*n/((end-release)/1e9),
-      output_tokens=n,global_requests=64,smoke=False,profiled=diagnostic or nomination,nomination=nomination)
+      TPOT=(end-first)/1e9/(n-1),E2E=(end-release)/1e9,throughput=global_batch*n/((end-release)/1e9),
+      output_tokens=n,decode_forwards=n-1,local_batch=batch,global_requests=global_batch,smoke=False,profiled=diagnostic or nomination,nomination=nomination)
    write(path/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
   dist.barrier(group=a.pcie_cpu_group)
  common=dict(candidate='_warmup',path=warm['path'])
@@ -142,7 +144,7 @@ def main(a):
   for j,c in enumerate(candidates):
    for arm in (('R-NEAR','G-NEAR') if j%2==0 else ('G-NEAR','R-NEAR')):generation(c,arm,1)
  else:
-  assert len(candidates)==3
+  assert len(candidates) in (3,4)
   for repeat in (1,2,3):
    for j,c in enumerate(candidates):
     for arm in (('R-NEAR','G-NEAR') if (j+repeat)%2 else ('G-NEAR','R-NEAR')):generation(c,arm,repeat)
@@ -178,7 +180,7 @@ def main(a):
           cell=a.cell,source='numa_shared_full_pinned',controller='native C++'))
   write(cohort/'result.json',dict(status='PASS',search_stage=a.search_stage,
        candidates=[c['candidate'] for c in candidates],primary_repeats=0 if a.search_stage=='nomination' else repeats,
-       output_tokens=16 if a.search_stage=='nomination' else 64,selection_stage=a.search_stage!='final',
+       output_tokens=16 if a.search_stage=='nomination' else outputs,local_batch=batch,global_requests=global_batch,selection_stage=a.search_stage!='final',
        search_spec=str(a.search_spec),search_spec_sha256=hashlib.sha256(a.search_spec.read_bytes()).hexdigest()))
  dist.barrier(group=a.pcie_cpu_group);grouped.close();rt.close();dist.destroy_process_group()
 

@@ -27,6 +27,9 @@ def expected_quota(m,event,group):
 def summarize_arm(root):
     result=json.loads((root/'result.json').read_text());assert result['status']=='PASS' and not result['profiled']
     repeats=result['primary_repeats'];assert repeats in (3,5)
+    shape=json.loads((root/'repeat1.json').read_text())
+    n=int(shape['output_tokens']);global_batch=int(shape['global_requests']);events=n*48
+    assert n in (64,128,256) and global_batch in (64,128,256)
     summaries=[];token_hashes=[];state_hashes=[]
     fields=['repeat','event','layer','phase','M','M_mod_4','q0','q1','q4','q5','group_A','group_B','H2D_bytes','group_A_bytes','group_B_bytes','first_fetches','reload_fetches','evictions','cross_group_expert_routes','within_group_expert_routes','cross_group_token_rank_pairs','within_group_token_rank_pairs','rank0_rows','rank1_rows','rank4_rows','rank5_rows']
     with (root/'quota_event_trace.csv').open('w',newline='') as stream:
@@ -35,16 +38,16 @@ def summarize_arm(root):
             primary=json.loads((root/f'repeat{repeat}.json').read_text());assert not primary['profiled']
             ranks=[json.loads((root/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(4)]
             assert all(x['finite_logits'] and x['no_compile'] and not x['profiled'] for x in ranks)
-            assert all(x['output_tokens']==64 and x['cache_before']['scheduler']['background_copies']==0 for x in ranks)
-            assert all(x['validation']['physical_slots']==1843 and x['debug_plan_checks']==3072 for x in ranks)
+            assert all(x['output_tokens']==n and x['cache_before']['scheduler']['background_copies']==0 for x in ranks)
+            assert all(x['validation']['physical_slots']==1843 and x['debug_plan_checks']==events for x in ranks)
             assert len({x['release_ns'] for x in ranks})==1
             release=ranks[0]['release_ns'];first=max(x['first_ns'] for x in ranks);end=max(x['end_ns'] for x in ranks)
-            for key,value in dict(TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/63,E2E=(end-release)/1e9).items():
+            for key,value in dict(TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-release)/1e9).items():
                 assert abs(primary[key]-value)<1e-10
             assert len({x['validation']['state_hash'] for x in ranks})==1
-            assert len({i for x in ranks for i in x['request_ids']})==64
+            assert len({i for x in ranks for i in x['request_ids']})==global_batch
             token_hashes.append([x['argmax_hash'] for x in ranks]);state_hashes.append(ranks[0]['validation']['state_hash'])
-            trace=np.load(root/f'policy_trace_repeat{repeat}_rank0.npy');assert trace.shape==(3072,61)
+            trace=np.load(root/f'policy_trace_repeat{repeat}_rank0.npy');assert trace.shape==(events,61)
             for r in range(1,4):np.testing.assert_array_equal(trace,np.load(root/f'policy_trace_repeat{repeat}_rank{r}.npy'))
             quota=np.load(root/f'quota_repeat{repeat}_rank0.npy');np.testing.assert_array_equal(quota[:,1:],trace[:,48:52])
             for event,row in enumerate(trace):

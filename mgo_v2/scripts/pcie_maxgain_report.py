@@ -30,17 +30,20 @@ def validate_stage(root):
     cohort=json.loads((root/'result.json').read_text());assert cohort['status']=='PASS'
     assert json.loads((root/'status.json').read_text())['status']=='PASS'
     spec=json.loads((root/'SEARCH_SPEC.json').read_text());stage=cohort['search_stage']
+    outputs=int(spec['final_output_tokens']);global_batch=int(spec['global_requests']);batch=int(spec['local_batch']);events=outputs*48
+    assert outputs in (64,128,256) and batch in (16,32,64) and global_batch==4*batch
     assert spec['status']=='FROZEN' and cohort['candidates']==[c['candidate'] for c in spec['candidates']]
     assert sha(Path(cohort['search_spec']))==cohort['search_spec_sha256']
     for arm in ('R-NEAR','G-NEAR'):
         warm=root/'_warmup'/arm
         for r in range(4):
             group=json.loads((warm/f'grouped_repeat0_rank{r}.json').read_text())
-            assert group['decode_calls']==3024 and group['all_ready'] and not group['expert_h2d_compute_overlap']
+            assert group['decode_calls']==(outputs-1)*48 and group['all_ready'] and not group['expert_h2d_compute_overlap']
             assert len(group['checks'])==48 and all(c['finite'] and c['relative_l2']<=.01 for c in group['checks'])
             receipt=json.loads((warm/f'repeat0_rank{r}.json').read_text())
             assert receipt['metadata_wire_checks']==48 and receipt['finite_logits']
-    report=dict(status='PASS',stage=stage,root=str(root),arms={},selection_is_not_final_estimate=stage!='final')
+    report=dict(status='PASS',stage=stage,root=str(root),local_batch=batch,global_requests=global_batch,
+                output_tokens=outputs,decode_forwards=outputs-1,arms={},selection_is_not_final_estimate=stage!='final')
     screen=None
     if stage=='final':
         for admin in sorted(root.glob('ADMIN_GIT_PUSH*.json')):
@@ -61,23 +64,23 @@ def validate_stage(root):
                 scope='Same hot kernels/controller/metadata and generation function; receipt-only worker changes are recorded separately in launch source hashes')
     for c in spec['candidates']:
         for arm in (('G-NEAR',) if stage=='nomination' else ('R-NEAR','G-NEAR')):
-            path=root/c['candidate']/arm;n=16 if stage=='nomination' else 64
+            path=root/c['candidate']/arm;n=16 if stage=='nomination' else outputs
             trace,ranks=verify_generation(path,1,n)
             for event,row in enumerate(trace):np.testing.assert_array_equal(row[48:52],expected_quota(int(row[19]),event,arm=='G-NEAR'))
             entry=dict(status='PASS',candidate_manifest=c['path'],candidate_manifest_sha256=c['sha256'])
             assert sha(Path(c['path']))==c['sha256']
             if stage=='final':
-                selected_trace,selected_ranks=verify_generation(screen/c['candidate']/arm,1,64)
+                selected_trace,selected_ranks=verify_generation(screen/c['candidate']/arm,1,outputs)
                 np.testing.assert_array_equal(trace,selected_trace)
                 assert [r['tokens'] for r in ranks]==[r['tokens'] for r in selected_ranks]
                 assert [r['validation']['state_hash'] for r in ranks]==[r['validation']['state_hash'] for r in selected_ranks]
                 entry['screen_final_trajectory_exact']=True
                 validate(path,(-1,));entry['live']=summarize_arm(path);entry['diagnostic']=partition(path)
                 with np.load(path/'actual_fetches_repeat-1.npz') as capture:
-                    fetches=capture['fetches'];assert int(capture['events'])==3072
+                    fetches=capture['fetches'];assert int(capture['events'])==events
                 assert fetches.shape[1]==7 and np.all(fetches[:,5]==0)
                 assert len(np.unique(fetches[:,0]*6144+fetches[:,2]))==len(fetches),'Duplicate mandatory expert within an event'
-                counts=np.zeros((3072,4),np.int64)
+                counts=np.zeros((events,4),np.int64)
                 np.add.at(counts,(fetches[:,0],fetches[:,1]),1)
                 np.testing.assert_array_equal(counts,trace[:,48:52])
                 assert np.all(fetches[:,2]//128==fetches[:,0]%48)
@@ -92,18 +95,18 @@ def validate_stage(root):
                     for rank in range(4):
                         for event in json.loads((path/f'phases_repeat-1_rank{rank}.json').read_text()):
                             stream.write(json.dumps(dict(event,physical_gpu=[0,1,4,5][rank],diagnostic=True))+'\n')
-                entry['actual_assignment_validation']=dict(status='PASS',events=3072,fetches=len(fetches),
+                entry['actual_assignment_validation']=dict(status='PASS',events=events,fetches=len(fetches),
                      every_rank_quota_exact=True,legal_main_and_physical_slots=True,no_replication=True,
                      scope='Actual diagnostic controller fetches; diagnostic tokens/cache/full policy trace match unprofiled repeats',
                      additional_diagnostic_overhead='Copying assignment arrays is diagnostic-only and included in PLAN residual')
                 for repeat in list(range(2,cohort['primary_repeats']+1))+[-1]:
-                    other,rr=verify_generation(path,repeat,64);np.testing.assert_array_equal(trace,other)
+                    other,rr=verify_generation(path,repeat,outputs);np.testing.assert_array_equal(trace,other)
                     assert [r['tokens'] for r in ranks]==[r['tokens'] for r in rr]
                     assert [r['validation']['state_hash'] for r in ranks]==[r['validation']['state_hash'] for r in rr]
                 # Identical per-arm trajectories let a separate diagnostic
                 # supply assignment detail without logging inside primaries.
                 offsets=np.r_[0,np.cumsum(counts.sum(axis=1))]
-                assignments=[json.dumps(fetches[offsets[event]:offsets[event+1],1:].tolist(),separators=(',',':')) for event in range(3072)]
+                assignments=[json.dumps(fetches[offsets[event]:offsets[event+1],1:].tolist(),separators=(',',':')) for event in range(events)]
                 quota_path=path/'quota_event_trace.csv'
                 with quota_path.open(newline='') as stream:
                     reader=csv.DictReader(stream);fields=list(reader.fieldnames);quota_rows=list(reader)
@@ -123,7 +126,7 @@ def validate_stage(root):
             token_arrays={}
             for arm in ('R-NEAR','G-NEAR'):
                 token_arrays[arm]=np.concatenate([np.asarray(json.loads((root/c['candidate']/arm/f'repeat1_rank{rank}.json').read_text())['tokens']) for rank in range(4)])
-            same=token_arrays['R-NEAR']==token_arrays['G-NEAR'];assert same.shape==(64,64)
+            same=token_arrays['R-NEAR']==token_arrays['G-NEAR'];assert same.shape==(global_batch,outputs)
             config=json.loads(Path('/data2/esjung/models/Qwen3-30B-A3B-Instruct-2507/config.json').read_text())
             eos=config['eos_token_id'];eos=eos if isinstance(eos,list) else [eos]
             eos_stats={}
@@ -131,7 +134,7 @@ def validate_stage(root):
                 hits=np.isin(array,eos);first=[int(np.flatnonzero(row)[0])+1 if row.any() else None for row in hits]
                 eos_stats[arm]=dict(eos_token_ids=eos,requests_with_eos=int(hits.any(axis=1).sum()),
                     total_eos_tokens=int(hits.sum()),first_eos_token_positions=first,
-                    early_stop=False,all_requests_generate_exactly64=True)
+                    early_stop=False,all_requests_generate_exactly_n=True,output_tokens=outputs)
             requests=json.loads(Path(c['path']).read_text())['requests']
             prefix_hashes=[hashlib.sha256(np.asarray(row['input_ids'],np.uint32).tobytes()).hexdigest() for row in requests]
             families=Counter(row['conversation_key'] for row in requests if row.get('conversation_key') is not None)
@@ -142,14 +145,14 @@ def validate_stage(root):
                     known_conversation_families=len(families),unknown_family_requests=unknown,
                     conversation_family_multiplicities=dict(families),source_dataset_sha256=spec['source_dataset_sha256'],
                     note='Distinct dataset split records and inputs can come from the same original conversation; they are not necessarily independent conversations')
-            assert provenance['distinct_source_rows']==64 and provenance['distinct_input_token_prefixes']==64
+            assert provenance['distinct_source_rows']==global_batch and provenance['distinct_input_token_prefixes']==global_batch
             if c.get('ordered_input_tokens_uint32_sha256'):assert provenance['ordered_input_tokens_uint32_sha256']==c['ordered_input_tokens_uint32_sha256']
             if c.get('conversation_families') is not None:assert len(families)==c['conversation_families'] and not unknown
             comparisons.append(dict(candidate=c['candidate'],R=r,G=g,gain_percent=(1-g['median']/r['median'])*100,
                     request_ids=c['request_ids'],manifest_path=c['path'],manifest_sha256=c['sha256'],
                     input_provenance=provenance,
                     R_G_full_token_agreement=float(same.mean()),R_G_first_token_agreement=float(same[:,0].mean()),
-                    matching_prefix_tokens=[int(np.flatnonzero(~row)[0]) if not row.all() else 64 for row in same],eos=eos_stats))
+                    matching_prefix_tokens=[int(np.flatnonzero(~row)[0]) if not row.all() else outputs for row in same],eos=eos_stats))
         comparisons.sort(key=lambda c:(-c['gain_percent'],c['candidate']))
         report.update(comparisons=comparisons,best_observed=comparisons[0],
              scope='Best observed among the preregistered screened candidates; no global-optimum or corpus-average claim',
@@ -157,7 +160,7 @@ def validate_stage(root):
         with (root/'maxgain_table.csv').open('w',newline='') as f:
             w=csv.writer(f);w.writerow(['candidate','R_median_s','G_median_s','gain_percent','R_sd','G_sd','R_min','R_max','G_min','G_max'])
             for row in comparisons:w.writerow([row['candidate'],row['R']['median'],row['G']['median'],row['gain_percent'],row['R']['sd'],row['G']['sd'],row['R']['min'],row['R']['max'],row['G']['min'],row['G']['max']])
-        lines=['# Best observed real ShareGPT batch64','',report['scope']+'.','',
+        lines=[f'# Best observed real ShareGPT: local B{batch}, global {global_batch}, output {outputs}','',report['scope']+'.','',
             '| Candidate | R TPOT (s) | G TPOT (s) | Reduction |','|---|---:|---:|---:|']
         for row in comparisons:lines.append(f"| {row['candidate']} | {row['R']['median']:.6f} | {row['G']['median']:.6f} | {row['gain_percent']:.3f}% |")
         best=comparisons[0]
@@ -165,9 +168,9 @@ def validate_stage(root):
              '',f"Winner provenance: {best['input_provenance']['distinct_source_rows']} distinct dataset source rows and {best['input_provenance']['distinct_input_token_prefixes']} distinct input prefixes, from {best['input_provenance']['known_conversation_families']} known original conversation families ({best['input_provenance']['unknown_family_requests']} rows with unknown family).",
              '',best['input_provenance']['note']+'. Exact family multiplicities and dataset hashes are retained in maxgain_validation.json.',
              '',report['trajectory_note']+'.',
-             '', 'R/G full token agreement, matching prefixes and EOS positions are retained in maxgain_validation.json. Every request runs all 64 output steps even if EOS occurs; any resulting routing/cache differences are part of live serving evidence, not proof of a same-trace quota-only speedup.',
+             '', f'R/G full token agreement, matching prefixes and EOS positions are retained in maxgain_validation.json. Every request runs all {outputs} output steps ({outputs-1} decode forwards following prefill) even if EOS occurs; any resulting routing/cache differences are part of live serving evidence, not proof of a same-trace quota-only speedup.',
              '', 'Nomination and single-pair screen timing selected the finalists and do not enter the final median. All candidates and screen pairs remain reported. Finalist batches were frozen before counterordered final repetitions; selecting the largest final gain still has selection bias.',
-             '',f"Request source IDs (64): {best['request_ids']}"])
+             '',f"Request source IDs ({global_batch}): {best['request_ids']}"])
         best_arms={arm:report['arms'][best['candidate']+'/'+arm] for arm in ('R-NEAR','G-NEAR')}
         lines.extend(['','## Winner live traffic and separate diagnostic breakdown','',
              '| Policy | Mean M | M mod 4 = 2 | H2D GiB | Group A/B H2D GiB | Reload fetches |','|---|---:|---:|---:|---:|---:|'])
@@ -199,15 +202,15 @@ def validate_stage(root):
         ax.set_xticks(x,[c['candidate']+'\n'+f"{c['input_provenance']['known_conversation_families']} original families\n{c['gain_percent']:.2f}% reduction" for c in comparisons],fontsize=9)
         ax.set_ylabel('Unprofiled median TPOT (s/token)');ax.set_ylim(bottom=0);ax.legend()
         ax.spines[['top','right']].set_visible(False);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
-        ax.set_title(f"ShareGPT batch64: three finalists, {cohort['primary_repeats']} repeats per arm\nGrouped decode + C++ metadata; median bars, min–max whiskers")
+        ax.set_title(f"ShareGPT local B{batch}, global {global_batch}, output {outputs}: {len(comparisons)} finalists, {cohort['primary_repeats']} repeats/arm\nGrouped decode + C++ metadata; median bars, min–max whiskers")
         fig.savefig(root/'maxgain64.pdf');fig.savefig(root/'maxgain64.png',dpi=160);plt.close(fig)
     write(root/'maxgain_validation.json',report);return report
 
 
-def archive(root,report,commit,label=None):
+def archive(root,report,commit,label=None,dest=None):
     stage=report['stage'];label=label or stage
     assert Path(label).name==label and label not in ('.','..')
-    destination=DEST/label;destination.mkdir(parents=True,exist_ok=False)
+    destination=(Path(dest) if dest else DEST)/label;destination.mkdir(parents=True,exist_ok=False)
     if commit:assert not subprocess.check_output(['git','diff','--cached','--name-only'],cwd=REPO,text=True).strip(),'Unrelated staged files present'
     def copy_tree(source,target,external_captures=False):
         target.mkdir(parents=True,exist_ok=True);inventory={}
@@ -235,7 +238,7 @@ def archive(root,report,commit,label=None):
             subprocess.run(['git','-c','user.name=Codex','-c','user.email=codex@openai.com','commit','-q','-m',message],cwd=REPO,check=True)
     for key in report['arms']:
         candidate,arm=key.split('/');copy_tree(root/candidate/arm,destination/candidate/arm,True)
-        checkpoint(destination/candidate/arm,f'Validate and archive best64 {stage} experiment {candidate} {arm}; preserve distinct selection and final evidence')
+        checkpoint(destination/candidate/arm,f"Validate and archive best-input B{report['local_batch']} O{report['output_tokens']} {stage} experiment {candidate} {arm}")
     common=destination/'cohort';common.mkdir()
     for p in root.iterdir():
         if p.is_file():shutil.copyfile(p,common/p.name)
@@ -245,6 +248,6 @@ def archive(root,report,commit,label=None):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--archive',action='store_true');p.add_argument('--commit',action='store_true');p.add_argument('--archive-label')
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--archive',action='store_true');p.add_argument('--commit',action='store_true');p.add_argument('--archive-label');p.add_argument('--archive-dest',type=Path)
     a=p.parse_args();r=validate_stage(a.root)
-    if a.archive:archive(a.root,r,a.commit,a.archive_label)
+    if a.archive:archive(a.root,r,a.commit,a.archive_label,a.archive_dest)

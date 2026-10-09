@@ -50,6 +50,10 @@ def run(a):
                   source='numa_shared_full_pinned',source_unique_bytes=108*2**30,
                   controller='native C++',phase_order='native overlap diagnostic' if a.overlap else 'metadata PLAN -> forward -> CPU rendezvous -> H2D -> CPU rendezvous -> compute -> CPU rendezvous -> return -> CPU rendezvous')
     write(out/'config.json',identity);write(out/'topology_before.json',topology())
+    if search_stage:
+        identity.update(local_batch=frozen['local_batch'],global_requests=frozen['global_requests'],
+                        input_tokens=frozen['input_tokens'],final_output_tokens=frozen['final_output_tokens'])
+        write(out/'config.json',identity)
     if (ROOT/'STOP').exists():raise RuntimeError('Owner STOP file exists')
     available=available_bytes()
     if available<(108+128)*2**30:raise RuntimeError('108-GiB shared source plus 128-GiB host headroom guard failed')

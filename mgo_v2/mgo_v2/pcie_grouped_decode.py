@@ -8,7 +8,10 @@ class GroupedDecode:
     def __init__(self,rt):
         assert rt.args.pcie_g2g_first_serial and rt.args.prefetch_off
         self.rt=rt;self.enabled=False;self.validate=False;self.checks=[];self.calls=0
-        self.grouped=AllReadyGrouped(rt.cache,rt.kernel,max_rows=512)
+        # Every global token can contribute to all eight selected experts.
+        # Keep the historical B16 workspace exactly unchanged; larger batches
+        # require a larger activation workspace, never more expert-cache slots.
+        self.grouped=AllReadyGrouped(rt.cache,rt.kernel,max_rows=rt.args.local_batch*rt.world*8)
         self.old_pack=module.pack_rank_partial_layout;self.old_compute=rt.compute
         def pack(event,*args,**kwargs):
             prepared=self.grouped.prepare(event) if self.enabled and rt.index>=48 else None

@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "historical_real_trace_verified": true,
+  "long_endpoint_shape_checks": [
+    {
+      "output_tokens": 128,
+      "events": 6144,
+      "partition_sums_to_recomputed_TPOT": true
+    },
+    {
+      "output_tokens": 256,
+      "events": 12288,
+      "partition_sums_to_recomputed_TPOT": true
+    }
+  ],
+  "reject_truncated_trace": true,
+  "scope": "CPU evidence/endpoint regression only; larger-batch GPU numerics and long generation still require physical warmup"
+}

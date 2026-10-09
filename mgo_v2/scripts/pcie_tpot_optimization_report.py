@@ -18,20 +18,21 @@ CALLS=('plan_event_call','metadata_call','controller_call','layout_cpu_call','in
 def partition(root):
     traces=[json.loads((root/f'phases_repeat-1_rank{r}.json').read_text()) for r in range(4)]
     ranks=[json.loads((root/f'repeat-1_rank{r}.json').read_text()) for r in range(4)]
-    assert all(len(t)==3072 for t in traces)
-    ends=np.array([[max(t[i][s][1] for t in traces) for s in STAGES] for i in range(3072)],np.int64)
-    entry=np.array([max(t[i]['moe_runtime'][0] for t in traces) for i in range(3072)],np.int64)
+    n=int(ranks[0]['output_tokens']);events=n*48;decode=n-1
+    assert all(r['output_tokens']==n for r in ranks) and all(len(t)==events for t in traces)
+    ends=np.array([[max(t[i][s][1] for t in traces) for s in STAGES] for i in range(events)],np.int64)
+    entry=np.array([max(t[i]['moe_runtime'][0] for t in traces) for i in range(events)],np.int64)
     assert np.all(np.diff(ends,axis=1)>=0) and np.all(entry[48:]>=ends[47:-1,-1])
     assert np.all(ends[:,0]>=entry)
     names=('metadata_plan','forward','h2d','compute','return','attention_router_other')
     values=np.column_stack((ends[48:,0]-entry[48:],np.diff(ends[48:],axis=1),entry[48:]-ends[47:-1,-1]))/1e9
     first=max(r['first_ns'] for r in ranks);last=max(r['end_ns'] for r in ranks)
     boundary=(last-ends[-1,-1])-(first-ends[47,-1])
-    phases=dict(zip(names,values.sum(axis=0)/63))
-    phases['attention_router_other']+=boundary/1e9/63
-    tpot=(last-first)/1e9/63
+    phases=dict(zip(names,values.sum(axis=0)/decode))
+    phases['attention_router_other']+=boundary/1e9/decode
+    tpot=(last-first)/1e9/decode
     assert abs(sum(phases.values())-tpot)<1e-9 and phases['attention_router_other']>=0
-    cpu=np.array([[[((t[i][c][1]-t[i][c][0])/1e6) for c in CALLS] for i in range(48,3072)] for t in traces])
+    cpu=np.array([[[((t[i][c][1]-t[i][c][0])/1e6) for c in CALLS] for i in range(48,events)] for t in traces])
     residual=cpu[:,:,0]-cpu[:,:,1:5].sum(axis=2)
     assert residual.min()>-1e-6,'Nested PLAN spans unexpectedly overlap'
     stats={c:dict(rank_mean_ms=cpu[:,:,col].mean(axis=1).tolist(),
@@ -43,7 +44,7 @@ def partition(root):
         writer=csv.writer(stream);writer.writerow(['event',*names])
         for event,row in enumerate(values,48):writer.writerow([event,*row])
     return dict(TPOT=tpot,seconds_per_token=phases,nested_cpu_calls=stats,
-                attention_boundary_adjustment_seconds_per_token=boundary/1e9/63,
+                attention_boundary_adjustment_seconds_per_token=boundary/1e9/decode,
                 scope='Separate timers-only diagnostic, no Torch profiler/record_function; endpoint partition includes rendezvous')
 
 def plot(report,out):

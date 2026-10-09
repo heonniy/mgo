@@ -30,7 +30,14 @@ def verify_generation(path,repeat,n):
         assert rank['validation']['scheduler']['background_copies']==0
         assert rank['expert_cache_start']=='empty' and rank['output_tokens']==n
         assert rank['metadata']=='native C++' and rank['expert_executor']=='grouped_decode_native_prefill'
+        tokens=np.asarray(rank['tokens']);batch=len(rank['request_ids'])
+        assert batch in (16,32,64) and tokens.shape==(batch,n)
+        assert rank['debug_plan_checks']==n*48
+        assert rank['pcie_g2g_first_serial'] and rank['prefetch_off'] and rank['pcie_native_controller']
+        assert rank['physical_gpu']==[0,1,4,5][r]
         assert np.array_equal(trace,np.load(path/f'policy_trace_repeat{repeat}_rank{r}.npy'))
+    assert len({len(r['request_ids']) for r in ranks})==1
+    assert len({i for r in ranks for i in r['request_ids']})==sum(len(r['request_ids']) for r in ranks)
     return trace,ranks
 
 
@@ -81,7 +88,7 @@ def main(a):
         for candidate in spec['candidates']:
             pair={}
             for arm in ('R-NEAR','G-NEAR'):
-                path=a.root/candidate['candidate']/arm;verify_generation(path,1,64)
+                path=a.root/candidate['candidate']/arm;verify_generation(path,1,int(spec['final_output_tokens']))
                 result=json.loads((path/'repeat1.json').read_text())
                 assert not result['profiled'] and not result['nomination'] and result['status']=='PASS'
                 pair[arm]=result['TPOT']
@@ -89,8 +96,15 @@ def main(a):
                         screen_gain_percent=(1-pair['G-NEAR']/pair['R-NEAR'])*100))
         ordered=sorted(rows,key=lambda row:(-row['screen_gain_percent'],row['candidate']))
         selected=[r['candidate'] for r in ordered[:3]]
-        method='Descending full64 unprofiled screen TPOT reduction; label tie-break; three finalists frozen BEFORE final repetitions'
+        method=f"Descending full{spec['final_output_tokens']} unprofiled screen TPOT reduction; label tie-break; three finalists frozen BEFORE final repetitions"
         assert len(selected)==3
+    # The previous winner is a prespecified matched-input length/batch control;
+    # keep it even when a fresh search selects other candidates.
+    anchor=spec.get('required_control_candidate')
+    if anchor and anchor not in selected:
+        assert anchor in {c['candidate'] for c in spec['candidates']}
+        selected.append(anchor)
+        method+='; retain prespecified previous-winner control independently of selection score'
     index={c['candidate']:c for c in spec['candidates']}
     subset=dict(spec,candidates=[index[label] for label in selected],
                 parent_spec=str(a.spec),parent_spec_sha256=sha(a.spec),selection_root=str(a.root),
