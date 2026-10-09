@@ -1,11 +1,12 @@
-**OWNER DEEPSEEK CACHE ABLATION ACTIVE (2026-10-09).**
-Read `experiments/deepseek_cache_ablation_20261009/{PLAN.md,MATRIX.json,PROGRESS.md}`.
+**OWNER DEEPSEEK CACHE ABLATION COMPLETE (2026-10-09).**
+Read `experiments/deepseek_cache_ablation_20261009/{PLAN.md,MATRIX.json,RESULTS.md,PROGRESS.md}`.
 Run the frozen ShareGPT DeepSeek-V2-Lite input512/output64 local-B16-only
 C20/C30/C40/C50 sweep for main_OURS, repaired MoE-Infinity, DeepSpeed
 ZeRO-Inference, and synchronous balanced llama.cpp. This newer owner request
 supersedes further main-table queue work. Use only physical GPUs0/1/4/5, one
 guarded job at a time; preserve raw request manifests outside Git and commit
-only validated aggregate rows. Repair failures and resume unfinished cells.
+only validated aggregate rows. All 16 system cells and 48 target repeats
+passed; no additional cache sweep is queued.
 
 **OWNER TWO-MODEL MAIN TABLE ACTIVE (2026-10-08).**
 Read `experiments/main_table_2x2_20261008/PLAN.md` and `MATRIX.json`.
