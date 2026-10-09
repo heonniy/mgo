@@ -7,7 +7,7 @@ from transformers import AutoModelForCausalLM
 from transformers.integrations import HfDeepSpeedConfig
 from deepspeed.runtime.zero.partition_parameters import ZeroParamStatus
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
-MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+MODEL=os.environ.get('MGO_MODEL_PATH','/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507')
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
 def release():
@@ -33,14 +33,17 @@ def generate(engine,ids,n,progress=None):
 def main(a):
  rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5'
  physical=[0,1,4,5]
- cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
+ if os.environ.get('MGO_PCIE_HOST')=='1':
+  from pcie_host import affinity
+  cpus=affinity(local)
+ else:cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[local])]
  # Match OURS' non-overlapping per-rank CPU ranges. The live host exposes
  # one NUMA node; this controls CPU scheduling, not cross-NUMA placement.
  for task in Path('/proc/self/task').iterdir():
   try:os.sched_setaffinity(int(task.name),cpus)
   except FileNotFoundError:pass
  torch.cuda.set_device(local);torch.set_num_threads(2);torch.manual_seed(42)
- write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank CPU range matching OURS; single NUMA node'))
+ write(a.output/f'affinity_rank{rank}.json',dict(physical_gpu=physical[local],cpus=cpus,mode='fixed per-rank physical CPU cores matching OURS' if os.environ.get('MGO_PCIE_HOST')=='1' else 'legacy fixed affinity'))
  deepspeed.init_distributed();assert dist.get_world_size()==4
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)

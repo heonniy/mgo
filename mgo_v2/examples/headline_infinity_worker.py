@@ -5,7 +5,7 @@ import torch,psutil
 from moe_infinity import MoE
 from transformers import LogitsProcessorList
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
-MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+MODEL=os.environ.get('MGO_MODEL_PATH','/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507')
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
 def sync():
@@ -37,6 +37,11 @@ class ClockStreamer:
 
 def main(a):
  assert os.environ['CUDA_VISIBLE_DEVICES']=='0,1,4,5' and torch.cuda.device_count()==4
+ if os.environ.get('MGO_PCIE_HOST')=='1':
+  from pcie_host import affinity
+  cpus=sorted({cpu for r in range(4) for cpu in affinity(r)[:8]})
+  os.sched_setaffinity(0,cpus)
+  write(a.output/'affinity.json',dict(cpus=cpus,physical_gpus=[0,1,4,5],policy='32 physical cores across both NUMA nodes; native Infinity threads inherit mask'))
  torch.set_num_threads(8);torch.manual_seed(42)
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)
@@ -47,6 +52,7 @@ def main(a):
  routed_layers=48 if model_family=='Qwen3' else 26
  attention_layers=48 if model_family=='Qwen3' else 27
  offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store' if model_family=='Qwen3' else '/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store'
+ offload_path=os.environ.get('MGO_INFINITY_STORE',offload_path)
  cfg=dict(offload_path=offload_path,device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
  # Eager is faster on DeepSeek cells that fit. Full B64/L1024 prefill needs
  # SDPA to avoid allocating the dense attention softmax matrix.
@@ -55,7 +61,10 @@ def main(a):
  trim_floor_bytes=16*2**30 if model_family!='Qwen3' and use_sdpa else 0
  write(a.output/'config.json',dict(cfg,attention_backend=attention_backend,allocator_trim_floor_bytes=trim_floor_bytes))
  sources={}
- roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
+ if os.environ.get('MGO_PCIE_HOST')=='1':
+  import moe_store
+  roots=[Path(os.environ['MGO_INFINITY_ROOT'])/'moe_infinity',Path(moe_store.__file__).parent]
+ else:roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
  for root in roots:
   for file in root.rglob('*'):
    if file.suffix in ('.py','.so'):sources[str(file)]=hashlib.sha256(file.read_bytes()).hexdigest()

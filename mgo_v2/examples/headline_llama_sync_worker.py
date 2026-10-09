@@ -2,8 +2,8 @@
 import argparse,hashlib,json,os,subprocess,re
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
-TOOLS=Path('/home/hwlee/mgo-tools/headline-r4')
-TOPOLOGY=Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json')
+TOOLS=Path(os.environ.get('MGO_BASELINE_TOOLS','/home/hwlee/mgo-tools/headline-r4'))
+TOPOLOGY=Path(os.environ.get('MGO_TOPOLOGY_PATH','/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json'))
 GPUS=[0,1,4,5]
 def write(p,x):p.write_text(json.dumps(x,indent=2)+'\n')
 def balanced_affinity(threads):
@@ -19,6 +19,7 @@ def main(a):
  spec=next(s for s in json.loads(Path(os.environ['MGO_HEADLINE_WORKLOADS']).read_text())['cells'] if s['cell']==a.cell)
  binary=TOOLS/'llama.cpp/build/bin/headline-llama-sync'
  build_path=P/'experiments/main_table_global_workload_20261006/expanded_matrix/LLAMA_BUILD.json'
+ build_path=Path(os.environ.get('MGO_LLAMA_BUILD_RECEIPT',str(build_path)))
  build=json.loads(build_path.read_text())
  source=P/'examples/headline_llama_sync.cpp'
  assert hashlib.sha256(source.read_bytes()).hexdigest()==build['source_sha256'],'llama sync source changed: rebuild and refresh LLAMA_BUILD.json'
@@ -34,7 +35,7 @@ def main(a):
  affinity,pools=balanced_affinity(a.threads)
  os.sched_setaffinity(0,set(affinity))
  assert set(os.sched_getaffinity(0))==set(affinity)
- cmd=[str(binary),str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf'),spec['warmup']['path'],spec['target']['path'],str(a.output),str(layers),str(1 if a.smoke else a.repeats),str(int(a.smoke)),str(a.threads),a.expert_placement]
+ cmd=[str(binary),os.environ.get('MGO_GGUF_PATH',str(TOOLS/'Qwen3-30B-A3B-Instruct-2507-BF16.gguf')),spec['warmup']['path'],spec['target']['path'],str(a.output),str(layers),str(1 if a.smoke else a.repeats),str(int(a.smoke)),str(a.threads),a.expert_placement]
  env=dict(os.environ)
  env['OMP_THREAD_LIMIT']=str(a.threads)
  env['LLAMA_GRAPH_REUSE_DISABLE']='1' if a.graph_reuse=='off' else '0'
