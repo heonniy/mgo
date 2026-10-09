@@ -1,0 +1,42 @@
+{
+  "source": "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_stage2_attempt1/OWNER_INTERRUPTION.json",
+  "sha256": "f234c6e514bc4ea8c93b6392ebee212e1a6a440b7defca16621ad54fdd401aeb",
+  "receipt": {
+    "status": "OWNER_INTERRUPTED",
+    "pid": 3726329,
+    "start_ticks": "494604955",
+    "argv": [
+      "/data2/esjung/envs/mgo-pcie/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--nproc_per_node=4",
+      "--master_port=56175",
+      "/home/esjung/mgo/mgo_v2/examples/pcie_sequence_worker.py",
+      "--cell",
+      "R4_C30_B16_L512_O64",
+      "--output",
+      "/data2/esjung/mgo-results/pcie_topology_ablation_20261009/G4_stage2_attempt1",
+      "--policy",
+      "LA_CA_NEAR",
+      "--expert-executor",
+      "native",
+      "--native-prefill",
+      "--prefetch-off",
+      "--prefill-optimized",
+      "--prefill-layout-fast",
+      "--decode-layout-fast",
+      "--pcie-native-controller",
+      "--pcie-quota-mode",
+      "rank_order",
+      "--numa-shared-source-root",
+      "/dev/shm/esjung_pcie_ours_3726309",
+      "--repeats",
+      "1",
+      "--pcie-g2g-first-serial",
+      "--sequence",
+      "stage2"
+    ],
+    "reason": "Owner prioritizes TPOT component diagnosis and bottleneck improvements for G-NEAR versus R-NEAR before baselines and remaining policy cohort.",
+    "unix": 1791549993.923566
+  }
+}
