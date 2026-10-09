@@ -90,4 +90,4 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', type=int, choices=(16, 64), action='append')
     args = parser.parse_args()
-    main(tuple(args.batch or (16, 64)))
+    main(tuple(args.batch or (16,)))

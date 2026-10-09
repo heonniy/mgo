@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "scope": "Short 4-request, 2-output-token infrastructure checks; not primary timing",
+  "checks": [
+    {
+      "label": "C20 OURS",
+      "attempt": "dca_c20_b16_ours_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS"
+    },
+    {
+      "label": "C20 DeepSpeed",
+      "attempt": "dca_c20_b16_deepspeed_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS",
+      "parameter_peak_vs_budget_bytes": [
+        [
+          996165632,
+          1436024832
+        ],
+        [
+          996165632,
+          1436024832
+        ],
+        [
+          996165632,
+          1436024832
+        ],
+        [
+          996165632,
+          1436024832
+        ]
+      ]
+    },
+    {
+      "label": "C20 MoE-Infinity",
+      "attempt": "dca_c20_b16_infinity_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS",
+      "expert_budget_per_gpu": [
+        1436024832,
+        1436024832,
+        1436024832,
+        1436024832
+      ]
+    },
+    {
+      "label": "C20 llama.cpp",
+      "attempt": "dca_c20_b16_llama_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS",
+      "gpu_expert_layers_by_device": {
+        "CUDA0": 1,
+        "CUDA1": 1,
+        "CUDA2": 1,
+        "CUDA3": 1
+      },
+      "expert_placement": "balanced4"
+    },
+    {
+      "label": "C40 llama.cpp",
+      "attempt": "dca_c40_b16_llama_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS",
+      "gpu_expert_layers_by_device": {
+        "CUDA0": 2,
+        "CUDA1": 2,
+        "CUDA2": 2,
+        "CUDA3": 2
+      },
+      "expert_placement": "balanced8"
+    },
+    {
+      "label": "C50 llama.cpp",
+      "attempt": "dca_c50_b16_llama_smoke_v1",
+      "source_commit": "9161a8a57ec808121ddec7f0f0b71872c5194cd6",
+      "output_tokens": 2,
+      "global_requests": 4,
+      "status": "PASS",
+      "gpu_expert_layers_by_device": {
+        "CUDA0": 3,
+        "CUDA1": 3,
+        "CUDA2": 3,
+        "CUDA3": 3
+      },
+      "expert_placement": "balanced12"
+    }
+  ]
+}

@@ -271,6 +271,8 @@ def main(args):
                       request_ids=[r['request_id'] for r in local],
                       expert_executor='native_deepseek', policy='LA_CA_NEAR',
                       prefetch_off=True, cache_start='empty',
+                      cache_capacity_slots=runtime.cap,
+                      physical_cache_slots=runtime.cache.shape[0],
                       peak_allocated_bytes=torch.cuda.max_memory_allocated(),
                       pinned_host_bytes=pool.numel() * pool.element_size(),
                       h2d_bytes=runtime.h2d.metrics['bytes'],
