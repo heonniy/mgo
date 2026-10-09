@@ -162,6 +162,26 @@ def main():
         lines.append(f"| C{row['cache_percent']} | {row['system']} | {fmt('TTFT')} | {fmt('TPOT')} | {fmt('E2E')} | `{receipt}` |")
     lines += ['', 'Expert residency/placement or live-parameter budget checks are recorded per cell in `BASELINE_SWEEP_RESULTS.json`. llama.cpp statically holds balanced full expert layers, so its quantized GPU residency is not a dynamic cache hit-rate measurement. DeepSpeed limits all live parameters, including non-experts, under its cap. Raw requests, tokens, logs and GPU resource samples remain outside Git.', '']
     (OUT / 'BASELINE_SWEEP_RESULTS.md').write_text('\n'.join(lines))
+    ours = read(OUT / 'TIMING_RECHECK.json')
+    assert ours['status'] == 'PASS' and sorted(c['cache_percent'] for c in ours['cases']) == [20, 30, 40, 50]
+    comparison = ['# Qwen C20–C50 four-system comparison', '',
+                  'ShareGPT R4/local B16/input512/output64. All values below are median [full range] over clean targets. main_OURS uses its later two-repeat post-cleanup timing recheck; baseline C30 uses validated earlier three-repeat measurements and other baseline cells use fresh guarded runs. This is an observational cross-system comparison across different execution dates, not a paired frozen-route intervention.', '',
+                  '| Cache | System | TTFT, s | TPOT, s/token | E2E, s | Targets |',
+                  '|---:|---|---:|---:|---:|---:|']
+    def metric_text(samples):
+        return f'{statistics.median(samples):.3f} [{min(samples):.3f}, {max(samples):.3f}]'
+    for cap in (20, 30, 40, 50):
+        ours_case = next(c for c in ours['cases'] if c['cache_percent'] == cap)
+        metrics = ours_case['metrics']
+        comparison.append(f"| C{cap} | main_OURS (post-cleanup) | {metric_text(metrics['TTFT']['samples'])} | {metric_text(metrics['TPOT']['samples'])} | {metric_text(metrics['E2E']['samples'])} | 2 |")
+        for row in [r for r in rows if r['cache_percent'] == cap]:
+            if row['status'] != 'PASS':
+                comparison.append(f"| C{cap} | {row['system']} | pending | pending | pending | — |")
+                continue
+            m = row['metrics']
+            comparison.append(f"| C{cap} | {row['system']} | {metric_text(m['TTFT']['samples'])} | {metric_text(m['TPOT']['samples'])} | {metric_text(m['E2E']['samples'])} | {row['clean_target_repeats']} |")
+    comparison += ['', 'main_OURS keeps native C++ expert execution, compiled prefill/decode index paths, Near placement, pinned CPU expert source and prefetch OFF. The three baselines retain their audited main-table implementations and their own memory semantics. Full raw per-target statistics, cache budgets and job provenance are in `BASELINE_SWEEP_RESULTS.json` and `TIMING_RECHECK.json`.', '']
+    (OUT / 'FULL_CACHE_COMPARISON.md').write_text('\n'.join(comparison))
     print(f"{result['status']} {result['completed']}/{result['total']}")
 
 
