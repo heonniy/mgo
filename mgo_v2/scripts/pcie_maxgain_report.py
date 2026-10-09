@@ -1,5 +1,6 @@
 """Validate search evidence, report finalist medians and archive each experiment."""
 import argparse
+from collections import Counter
 import csv
 import gzip
 import hashlib
@@ -108,8 +109,22 @@ def validate_stage(root):
                 eos_stats[arm]=dict(eos_token_ids=eos,requests_with_eos=int(hits.any(axis=1).sum()),
                     total_eos_tokens=int(hits.sum()),first_eos_token_positions=first,
                     early_stop=False,all_requests_generate_exactly64=True)
+            requests=json.loads(Path(c['path']).read_text())['requests']
+            prefix_hashes=[hashlib.sha256(np.asarray(row['input_ids'],np.uint32).tobytes()).hexdigest() for row in requests]
+            families=Counter(row['conversation_key'] for row in requests if row.get('conversation_key') is not None)
+            unknown=sum(row.get('conversation_key') is None for row in requests)
+            provenance=dict(distinct_source_rows=len({row['source_row'] for row in requests}),
+                    distinct_input_token_prefixes=len(set(prefix_hashes)),
+                    ordered_input_tokens_uint32_sha256=hashlib.sha256(np.asarray([row['input_ids'] for row in requests],np.uint32).tobytes()).hexdigest(),
+                    known_conversation_families=len(families),unknown_family_requests=unknown,
+                    conversation_family_multiplicities=dict(families),source_dataset_sha256=spec['source_dataset_sha256'],
+                    note='Distinct dataset split records and inputs can come from the same original conversation; they are not necessarily independent conversations')
+            assert provenance['distinct_source_rows']==64 and provenance['distinct_input_token_prefixes']==64
+            if c.get('ordered_input_tokens_uint32_sha256'):assert provenance['ordered_input_tokens_uint32_sha256']==c['ordered_input_tokens_uint32_sha256']
+            if c.get('conversation_families') is not None:assert len(families)==c['conversation_families'] and not unknown
             comparisons.append(dict(candidate=c['candidate'],R=r,G=g,gain_percent=(1-g['median']/r['median'])*100,
                     request_ids=c['request_ids'],manifest_path=c['path'],manifest_sha256=c['sha256'],
+                    input_provenance=provenance,
                     R_G_full_token_agreement=float(same.mean()),R_G_first_token_agreement=float(same[:,0].mean()),
                     matching_prefix_tokens=[int(np.flatnonzero(~row)[0]) if not row.all() else 64 for row in same],eos=eos_stats))
         comparisons.sort(key=lambda c:(-c['gain_percent'],c['candidate']))
@@ -124,10 +139,27 @@ def validate_stage(root):
         for row in comparisons:lines.append(f"| {row['candidate']} | {row['R']['median']:.6f} | {row['G']['median']:.6f} | {row['gain_percent']:.3f}% |")
         best=comparisons[0]
         lines.extend(['',f"Winner token manifest: `{best['manifest_path']}`; SHA256 `{best['manifest_sha256']}`.",
+             '',f"Winner provenance: {best['input_provenance']['distinct_source_rows']} distinct dataset source rows and {best['input_provenance']['distinct_input_token_prefixes']} distinct input prefixes, from {best['input_provenance']['known_conversation_families']} known original conversation families ({best['input_provenance']['unknown_family_requests']} rows with unknown family).",
+             '',best['input_provenance']['note']+'. Exact family multiplicities and dataset hashes are retained in maxgain_validation.json.',
              '',report['trajectory_note']+'.',
              '', 'R/G full token agreement, matching prefixes and EOS positions are retained in maxgain_validation.json. Every request runs all 64 output steps even if EOS occurs; any resulting routing/cache differences are part of live serving evidence, not proof of a same-trace quota-only speedup.',
              '', 'Nomination and single-pair screen timing selected the finalists and do not enter the final median. All candidates and screen pairs remain reported. Finalist batches were frozen before counterordered final repetitions; selecting the largest final gain still has selection bias.',
              '',f"Request source IDs (64): {best['request_ids']}"])
+        best_arms={arm:report['arms'][best['candidate']+'/'+arm] for arm in ('R-NEAR','G-NEAR')}
+        lines.extend(['','## Winner live traffic and separate diagnostic breakdown','',
+             '| Policy | Mean M | M mod 4 = 2 | H2D GiB | Group A/B H2D GiB | Reload fetches |','|---|---:|---:|---:|---:|---:|'])
+        for arm,entry in best_arms.items():
+            live=entry['live']['live_decode'][0]
+            groups='/'.join(f'{v/2**30:.3f}' for v in live['group_H2D_bytes'])
+            lines.append(f"| {arm} | {live['miss_mean']:.3f} | {live['M_mod_4_equals_2_fraction']*100:.2f}% | {live['H2D_bytes']/2**30:.3f} | {groups} | {live['reload_fetches']} |")
+        lines.extend(['','The live H2D and cache totals include changed greedy trajectories; identical miss sets are not assumed.',
+             '', '| Policy | Metadata/PLAN | Forward | H2D | Compute | Return | Attention/router/other |','|---|---:|---:|---:|---:|---:|---:|'])
+        for arm,entry in best_arms.items():
+            phases=entry['diagnostic']['seconds_per_token']
+            values=' | '.join(f'{phases[key]:.6f}' for key in ('metadata_plan','forward','h2d','compute','return','attention_router_other'))
+            lines.append(f'| {arm} | {values} |')
+        lines.extend(['','Phase values are seconds per token from separate timers-only diagnostics, including rendezvous and diagnostic assignment-copy overhead. Their endpoint sum equals diagnostic TPOT; they are excluded from unprofiled primary statistics. Differences between these separate diagnostics do not establish causal contributions to the primary R/G gap.',
+             '', 'R/G per-arm output agreement, actual expert assignments, all-rank stage completions, nested native controller/metadata call costs and all repetitions remain inspectable in the archived validation/analysis/CSV/JSONL artifacts.'])
         (root/'MAX_GAIN_RESULTS.md').write_text('\n'.join(lines)+'\n')
         import matplotlib
         matplotlib.use('Agg')
