@@ -1,0 +1,2679 @@
+{
+  "status": "PASS",
+  "method": "two unfiltered runs per policy, frozen BR route, 32 decode steps",
+  "cases": [
+    {
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s20_d7",
+      "label": "grouped_frozen_policy_c30_b8_s20_d7_v1",
+      "transport": "nvswitch",
+      "cache_percent": 30,
+      "batch_per_rank": 8,
+      "seed": [
+        "s20",
+        "d7"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.36007185509375,
+              0.35928999990625
+            ],
+            "mean": 0.3596809275,
+            "min": 0.35928999990625,
+            "max": 0.36007185509375,
+            "repeat_difference_pct": 0.21737465840470882
+          },
+          "TTFT": {
+            "values": [
+              1.478703612,
+              1.444779737
+            ],
+            "mean": 1.4617416744999998,
+            "min": 1.444779737,
+            "max": 1.478703612,
+            "repeat_difference_pct": 2.3207845539194785
+          },
+          "E2E": {
+            "values": [
+              13.001002975,
+              12.942059734
+            ],
+            "mean": 12.971531354500001,
+            "min": 12.942059734,
+            "max": 13.001002975,
+            "repeat_difference_pct": 0.45440464498088334
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1095389984,
+              1095389984
+            ],
+            "mean": 1095389984,
+            "min": 1095389984,
+            "max": 1095389984,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              616342487040,
+              616342487040
+            ],
+            "mean": 616342487040,
+            "min": 616342487040,
+            "max": 616342487040,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.45045143592807313,
+              0.45045143592807313
+            ],
+            "mean": 0.45045143592807313,
+            "min": 0.45045143592807313,
+            "max": 0.45045143592807313,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.36080122575,
+              0.3617752145
+            ],
+            "mean": 0.361288220125,
+            "min": 0.36080122575,
+            "max": 0.3617752145,
+            "repeat_difference_pct": 0.26958774068609354
+          },
+          "TTFT": {
+            "values": [
+              1.542001417,
+              1.46602448
+            ],
+            "mean": 1.5040129485,
+            "min": 1.46602448,
+            "max": 1.542001417,
+            "repeat_difference_pct": 5.0516145539687205
+          },
+          "E2E": {
+            "values": [
+              13.087640641,
+              13.042831344
+            ],
+            "mean": 13.0652359925,
+            "min": 13.042831344,
+            "max": 13.087640641,
+            "repeat_difference_pct": 0.34296584482456277
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1058442632,
+              1058442632
+            ],
+            "mean": 1058442632,
+            "min": 1058442632,
+            "max": 1058442632,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              616842657792,
+              616842657792
+            ],
+            "mean": 616842657792,
+            "min": 616842657792,
+            "max": 616842657792,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4500054694008061,
+              0.4500054694008061
+            ],
+            "mean": 0.4500054694008061,
+            "min": 0.4500054694008061,
+            "max": 0.4500054694008061,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9952651515151515,
+            0.9952651515151515
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.35902788121875,
+              0.3629176136875
+            ],
+            "mean": 0.360972747453125,
+            "min": 0.35902788121875,
+            "max": 0.3629176136875,
+            "repeat_difference_pct": 1.0775695661775888
+          },
+          "TTFT": {
+            "values": [
+              1.565413804,
+              1.437573247
+            ],
+            "mean": 1.5014935255,
+            "min": 1.437573247,
+            "max": 1.565413804,
+            "repeat_difference_pct": 8.51422632391498
+          },
+          "E2E": {
+            "values": [
+              13.054306003,
+              13.050936885
+            ],
+            "mean": 13.052621444,
+            "min": 13.050936885,
+            "max": 13.054306003,
+            "repeat_difference_pct": 0.025811811171072303
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1099497984,
+              1099497984
+            ],
+            "mean": 1099497984,
+            "min": 1099497984,
+            "max": 1099497984,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              618796154880,
+              618796154880
+            ],
+            "mean": 618796154880,
+            "min": 618796154880,
+            "max": 618796154880,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.44826367560563096,
+              0.44826367560563096
+            ],
+            "mean": 0.44826367560563096,
+            "min": 0.44826367560563096,
+            "max": 0.44826367560563096,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9962121212121212,
+            0.9962121212121212
+          ]
+        }
+      },
+      "near_gain_pct": -0.44686623674255804,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s20_d7_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s20_d7",
+      "label": "grouped_frozen_policy_c30_b8_s20_d7_env2_v1",
+      "transport": "env2",
+      "cache_percent": 30,
+      "batch_per_rank": 8,
+      "seed": [
+        "s20",
+        "d7"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.353226400625,
+              0.35323964325
+            ],
+            "mean": 0.3532330219375,
+            "min": 0.353226400625,
+            "max": 0.35323964325,
+            "repeat_difference_pct": 0.00374897707110852
+          },
+          "TTFT": {
+            "values": [
+              1.472209608,
+              1.458789205
+            ],
+            "mean": 1.4654994065,
+            "min": 1.458789205,
+            "max": 1.472209608,
+            "repeat_difference_pct": 0.9157562903455209
+          },
+          "E2E": {
+            "values": [
+              12.775454428,
+              12.762457789
+            ],
+            "mean": 12.7689561085,
+            "min": 12.762457789,
+            "max": 12.775454428,
+            "repeat_difference_pct": 0.10178309714250924
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1095389984,
+              1095389984
+            ],
+            "mean": 1095389984,
+            "min": 1095389984,
+            "max": 1095389984,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              616342487040,
+              616342487040
+            ],
+            "mean": 616342487040,
+            "min": 616342487040,
+            "max": 616342487040,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.45045143592807313,
+              0.45045143592807313
+            ],
+            "mean": 0.45045143592807313,
+            "min": 0.45045143592807313,
+            "max": 0.45045143592807313,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.35502871303125,
+              0.35378343475
+            ],
+            "mean": 0.354406073890625,
+            "min": 0.35378343475,
+            "max": 0.35502871303125,
+            "repeat_difference_pct": 0.3513704682257493
+          },
+          "TTFT": {
+            "values": [
+              1.582626294,
+              1.459698677
+            ],
+            "mean": 1.5211624855,
+            "min": 1.459698677,
+            "max": 1.582626294,
+            "repeat_difference_pct": 8.081162806193856
+          },
+          "E2E": {
+            "values": [
+              12.943545111,
+              12.780768589
+            ],
+            "mean": 12.86215685,
+            "min": 12.780768589,
+            "max": 12.943545111,
+            "repeat_difference_pct": 1.2655460814101445
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1058442632,
+              1058442632
+            ],
+            "mean": 1058442632,
+            "min": 1058442632,
+            "max": 1058442632,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              616842657792,
+              616842657792
+            ],
+            "mean": 616842657792,
+            "min": 616842657792,
+            "max": 616842657792,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4500054694008061,
+              0.4500054694008061
+            ],
+            "mean": 0.4500054694008061,
+            "min": 0.4500054694008061,
+            "max": 0.4500054694008061,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9952651515151515,
+            0.9952651515151515
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.358163935625,
+              0.35896764184375
+            ],
+            "mean": 0.358565788734375,
+            "min": 0.358163935625,
+            "max": 0.35896764184375,
+            "repeat_difference_pct": 0.2241447020327468
+          },
+          "TTFT": {
+            "values": [
+              1.55341885,
+              1.467358151
+            ],
+            "mean": 1.5103885005,
+            "min": 1.467358151,
+            "max": 1.55341885,
+            "repeat_difference_pct": 5.697918050323498
+          },
+          "E2E": {
+            "values": [
+              13.01466479,
+              12.95432269
+            ],
+            "mean": 12.98449374,
+            "min": 12.95432269,
+            "max": 13.01466479,
+            "repeat_difference_pct": 0.4647243181619781
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1099497984,
+              1099497984
+            ],
+            "mean": 1099497984,
+            "min": 1099497984,
+            "max": 1099497984,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              618796154880,
+              618796154880
+            ],
+            "mean": 618796154880,
+            "min": 618796154880,
+            "max": 618796154880,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.44826367560563096,
+              0.44826367560563096
+            ],
+            "mean": 0.44826367560563096,
+            "min": 0.44826367560563096,
+            "max": 0.44826367560563096,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9962121212121212,
+            0.9962121212121212
+          ]
+        }
+      },
+      "near_gain_pct": -0.3320901162328363,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s20_d7_env2_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+      "label": "grouped_frozen_policy_c30_b8_s14_d5_v1",
+      "transport": "nvswitch",
+      "cache_percent": 30,
+      "batch_per_rank": 8,
+      "seed": [
+        "s14",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.3570385929375,
+              0.35685305721875
+            ],
+            "mean": 0.356945825078125,
+            "min": 0.35685305721875,
+            "max": 0.3570385929375,
+            "repeat_difference_pct": 0.05197867735514487
+          },
+          "TTFT": {
+            "values": [
+              1.486574984,
+              1.461215311
+            ],
+            "mean": 1.4738951475,
+            "min": 1.461215311,
+            "max": 1.486574984,
+            "repeat_difference_pct": 1.7205886757287179
+          },
+          "E2E": {
+            "values": [
+              12.911809958,
+              12.880513142
+            ],
+            "mean": 12.896161549999999,
+            "min": 12.880513142,
+            "max": 12.911809958,
+            "repeat_difference_pct": 0.24268318816151416
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1091865320,
+              1091865320
+            ],
+            "mean": 1091865320,
+            "min": 1091865320,
+            "max": 1091865320,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              575677661184,
+              575677661184
+            ],
+            "mean": 575677661184,
+            "min": 575677661184,
+            "max": 575677661184,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4672215623253214,
+              0.4672215623253214
+            ],
+            "mean": 0.4672215623253214,
+            "min": 0.4672215623253214,
+            "max": 0.4672215623253214,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.3578599148125,
+              0.3578654614375
+            ],
+            "mean": 0.357862688125,
+            "min": 0.3578599148125,
+            "max": 0.3578654614375,
+            "repeat_difference_pct": 0.0015499310724526268
+          },
+          "TTFT": {
+            "values": [
+              1.582545646,
+              1.464472264
+            ],
+            "mean": 1.523508955,
+            "min": 1.464472264,
+            "max": 1.582545646,
+            "repeat_difference_pct": 7.750094386547268
+          },
+          "E2E": {
+            "values": [
+              13.03406292,
+              12.91616703
+            ],
+            "mean": 12.975114975,
+            "min": 12.91616703,
+            "max": 13.03406292,
+            "repeat_difference_pct": 0.90863079230633
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1057670328,
+              1057670328
+            ],
+            "mean": 1057670328,
+            "min": 1057670328,
+            "max": 1057670328,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              576574193664,
+              576574193664
+            ],
+            "mean": 576574193664,
+            "min": 576574193664,
+            "max": 576574193664,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4663918390162102,
+              0.4663918390162102
+            ],
+            "mean": 0.4663918390162102,
+            "min": 0.4663918390162102,
+            "max": 0.4663918390162102,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9867424242424243,
+            0.9867424242424243
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.36020498259375,
+              0.36086147925
+            ],
+            "mean": 0.360533230921875,
+            "min": 0.36020498259375,
+            "max": 0.36086147925,
+            "repeat_difference_pct": 0.18209047043218698
+          },
+          "TTFT": {
+            "values": [
+              1.650240228,
+              1.481980427
+            ],
+            "mean": 1.5661103275000001,
+            "min": 1.481980427,
+            "max": 1.650240228,
+            "repeat_difference_pct": 10.743802530731973
+          },
+          "E2E": {
+            "values": [
+              13.176799671,
+              13.029547763
+            ],
+            "mean": 13.103173717,
+            "min": 13.029547763,
+            "max": 13.176799671,
+            "repeat_difference_pct": 1.1237881079829954
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1097912296,
+              1097912296
+            ],
+            "mean": 1097912296,
+            "min": 1097912296,
+            "max": 1097912296,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              578065268736,
+              578065268736
+            ],
+            "mean": 578065268736,
+            "min": 578065268736,
+            "max": 578065268736,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.46501187814421463,
+              0.46501187814421463
+            ],
+            "mean": 0.46501187814421463,
+            "min": 0.46501187814421463,
+            "max": 0.46501187814421463,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9886363636363635,
+            0.9886363636363635
+          ]
+        }
+      },
+      "near_gain_pct": -0.2568633620170006,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s14_d5_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+      "label": "grouped_frozen_policy_c30_b8_s14_d5_env2_v1",
+      "transport": "env2",
+      "cache_percent": 30,
+      "batch_per_rank": 8,
+      "seed": [
+        "s14",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.3405203869375,
+              0.339745764125
+            ],
+            "mean": 0.34013307553125,
+            "min": 0.339745764125,
+            "max": 0.3405203869375,
+            "repeat_difference_pct": 0.22774110141746262
+          },
+          "TTFT": {
+            "values": [
+              1.466819194,
+              1.454582378
+            ],
+            "mean": 1.4607007859999999,
+            "min": 1.454582378,
+            "max": 1.466819194,
+            "repeat_difference_pct": 0.8377359769559218
+          },
+          "E2E": {
+            "values": [
+              12.363471576,
+              12.32644683
+            ],
+            "mean": 12.344959203,
+            "min": 12.32644683,
+            "max": 12.363471576,
+            "repeat_difference_pct": 0.2999179291819986
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1091865320,
+              1091865320
+            ],
+            "mean": 1091865320,
+            "min": 1091865320,
+            "max": 1091865320,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              575677661184,
+              575677661184
+            ],
+            "mean": 575677661184,
+            "min": 575677661184,
+            "max": 575677661184,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4672215623253214,
+              0.4672215623253214
+            ],
+            "mean": 0.4672215623253214,
+            "min": 0.4672215623253214,
+            "max": 0.4672215623253214,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.34011887421875,
+              0.3399046560625
+            ],
+            "mean": 0.340011765140625,
+            "min": 0.3399046560625,
+            "max": 0.34011887421875,
+            "repeat_difference_pct": 0.06300315995283369
+          },
+          "TTFT": {
+            "values": [
+              1.578055347,
+              1.453255799
+            ],
+            "mean": 1.515655573,
+            "min": 1.453255799,
+            "max": 1.578055347,
+            "repeat_difference_pct": 8.234030885590927
+          },
+          "E2E": {
+            "values": [
+              12.461859322,
+              12.330204793
+            ],
+            "mean": 12.396032057500001,
+            "min": 12.330204793,
+            "max": 12.461859322,
+            "repeat_difference_pct": 1.062069930033338
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1057670328,
+              1057670328
+            ],
+            "mean": 1057670328,
+            "min": 1057670328,
+            "max": 1057670328,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              576574193664,
+              576574193664
+            ],
+            "mean": 576574193664,
+            "min": 576574193664,
+            "max": 576574193664,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.4663918390162102,
+              0.4663918390162102
+            ],
+            "mean": 0.4663918390162102,
+            "min": 0.4663918390162102,
+            "max": 0.4663918390162102,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9867424242424243,
+            0.9867424242424243
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.34831838834375,
+              0.3431894025625
+            ],
+            "mean": 0.345753895453125,
+            "min": 0.3431894025625,
+            "max": 0.34831838834375,
+            "repeat_difference_pct": 1.4834209675434697
+          },
+          "TTFT": {
+            "values": [
+              1.550153854,
+              1.469434709
+            ],
+            "mean": 1.5097942815,
+            "min": 1.469434709,
+            "max": 1.550153854,
+            "repeat_difference_pct": 5.346367116969371
+          },
+          "E2E": {
+            "values": [
+              12.696342281,
+              12.451495591
+            ],
+            "mean": 12.573918936,
+            "min": 12.451495591,
+            "max": 12.696342281,
+            "repeat_difference_pct": 1.947258378602921
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1097912296,
+              1097912296
+            ],
+            "mean": 1097912296,
+            "min": 1097912296,
+            "max": 1097912296,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              578065268736,
+              578065268736
+            ],
+            "mean": 578065268736,
+            "min": 578065268736,
+            "max": 578065268736,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.46501187814421463,
+              0.46501187814421463
+            ],
+            "mean": 0.46501187814421463,
+            "min": 0.46501187814421463,
+            "max": 0.46501187814421463,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9886363636363635,
+            0.9886363636363635
+          ]
+        }
+      },
+      "near_gain_pct": 0.035665567200586,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s14_d5_env2_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B16_L128_O33_s22_d3",
+      "label": "grouped_frozen_policy_c30_b16_s22_d3_v1",
+      "transport": "nvswitch",
+      "cache_percent": 30,
+      "batch_per_rank": 16,
+      "seed": [
+        "s22",
+        "d3"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.420263267875,
+              0.42226816096875
+            ],
+            "mean": 0.421265714421875,
+            "min": 0.420263267875,
+            "max": 0.42226816096875,
+            "repeat_difference_pct": 0.47592125946004876
+          },
+          "TTFT": {
+            "values": [
+              1.567982444,
+              1.55167573
+            ],
+            "mean": 1.559829087,
+            "min": 1.55167573,
+            "max": 1.567982444,
+            "repeat_difference_pct": 1.0454167149403957
+          },
+          "E2E": {
+            "values": [
+              15.016407016,
+              15.064256881
+            ],
+            "mean": 15.0403319485,
+            "min": 15.016407016,
+            "max": 15.064256881,
+            "repeat_difference_pct": 0.3181436763752547
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2179893768,
+              2179893768
+            ],
+            "mean": 2179893768,
+            "min": 2179893768,
+            "max": 2179893768,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              874666524672,
+              874666524672
+            ],
+            "mean": 874666524672,
+            "min": 874666524672,
+            "max": 874666524672,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.36925882825313217,
+              0.36925882825313217
+            ],
+            "mean": 0.36925882825313217,
+            "min": 0.36925882825313217,
+            "max": 0.36925882825313217,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.42343226140625,
+              0.4227556469375
+            ],
+            "mean": 0.423093954171875,
+            "min": 0.4227556469375,
+            "max": 0.42343226140625,
+            "repeat_difference_pct": 0.15992061859506967
+          },
+          "TTFT": {
+            "values": [
+              1.723592929,
+              1.558896519
+            ],
+            "mean": 1.6412447239999999,
+            "min": 1.558896519,
+            "max": 1.723592929,
+            "repeat_difference_pct": 10.03484779519085
+          },
+          "E2E": {
+            "values": [
+              15.273425294,
+              15.087077221
+            ],
+            "mean": 15.1802512575,
+            "min": 15.087077221,
+            "max": 15.273425294,
+            "repeat_difference_pct": 1.2275690951289997
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2095490800,
+              2095490800
+            ],
+            "mean": 2095490800,
+            "min": 2095490800,
+            "max": 2095490800,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              874940203008,
+              874940203008
+            ],
+            "mean": 874940203008,
+            "min": 874940203008,
+            "max": 874940203008,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.3690614728159899,
+              0.3690614728159899
+            ],
+            "mean": 0.3690614728159899,
+            "min": 0.3690614728159899,
+            "max": 0.3690614728159899,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9900568181818181,
+            0.9900568181818181
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.4215571495,
+              0.42162906675
+            ],
+            "mean": 0.421593108125,
+            "min": 0.4215571495,
+            "max": 0.42162906675,
+            "repeat_difference_pct": 0.017058450106037914
+          },
+          "TTFT": {
+            "values": [
+              1.718741456,
+              1.555819561
+            ],
+            "mean": 1.6372805085,
+            "min": 1.555819561,
+            "max": 1.718741456,
+            "repeat_difference_pct": 9.950762508573527
+          },
+          "E2E": {
+            "values": [
+              15.20857024,
+              15.047949697
+            ],
+            "mean": 15.1282599685,
+            "min": 15.047949697,
+            "max": 15.20857024,
+            "repeat_difference_pct": 1.0617251642584389
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2190180200,
+              2190180200
+            ],
+            "mean": 2190180200,
+            "min": 2190180200,
+            "max": 2190180200,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              876893700096,
+              876893700096
+            ],
+            "mean": 876893700096,
+            "min": 876893700096,
+            "max": 876893700096,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.36765276331638796,
+              0.36765276331638796
+            ],
+            "mean": 0.36765276331638796,
+            "min": 0.36765276331638796,
+            "max": 0.36765276331638796,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9910037878787878,
+            0.9910037878787878
+          ]
+        }
+      },
+      "near_gain_pct": -0.4339873119057422,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b16_s22_d3_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B16_L128_O33_s22_d3",
+      "label": "grouped_frozen_policy_c30_b16_s22_d3_env2_v1",
+      "transport": "env2",
+      "cache_percent": 30,
+      "batch_per_rank": 16,
+      "seed": [
+        "s22",
+        "d3"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.40744322996875,
+              0.40922224590625
+            ],
+            "mean": 0.4083327379375,
+            "min": 0.40744322996875,
+            "max": 0.40922224590625,
+            "repeat_difference_pct": 0.4356780077164216
+          },
+          "TTFT": {
+            "values": [
+              1.693773402,
+              1.650026586
+            ],
+            "mean": 1.671899994,
+            "min": 1.650026586,
+            "max": 1.693773402,
+            "repeat_difference_pct": 2.6165928678147874
+          },
+          "E2E": {
+            "values": [
+              14.731956761,
+              14.745138455
+            ],
+            "mean": 14.738547608,
+            "min": 14.731956761,
+            "max": 14.745138455,
+            "repeat_difference_pct": 0.08943685870950455
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2179893768,
+              2179893768
+            ],
+            "mean": 2179893768,
+            "min": 2179893768,
+            "max": 2179893768,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              874666524672,
+              874666524672
+            ],
+            "mean": 874666524672,
+            "min": 874666524672,
+            "max": 874666524672,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.36925882825313217,
+              0.36925882825313217
+            ],
+            "mean": 0.36925882825313217,
+            "min": 0.36925882825313217,
+            "max": 0.36925882825313217,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.408499959875,
+              0.41056755684375
+            ],
+            "mean": 0.409533758359375,
+            "min": 0.408499959875,
+            "max": 0.41056755684375,
+            "repeat_difference_pct": 0.5048660645298176
+          },
+          "TTFT": {
+            "values": [
+              1.830691953,
+              1.650517852
+            ],
+            "mean": 1.7406049024999999,
+            "min": 1.650517852,
+            "max": 1.830691953,
+            "repeat_difference_pct": 10.351234834580746
+          },
+          "E2E": {
+            "values": [
+              14.902690669,
+              14.788679671
+            ],
+            "mean": 14.84568517,
+            "min": 14.788679671,
+            "max": 14.902690669,
+            "repeat_difference_pct": 0.7679739715240067
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2095490800,
+              2095490800
+            ],
+            "mean": 2095490800,
+            "min": 2095490800,
+            "max": 2095490800,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              874940203008,
+              874940203008
+            ],
+            "mean": 874940203008,
+            "min": 874940203008,
+            "max": 874940203008,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.3690614728159899,
+              0.3690614728159899
+            ],
+            "mean": 0.3690614728159899,
+            "min": 0.3690614728159899,
+            "max": 0.3690614728159899,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9900568181818181,
+            0.9900568181818181
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.4120818524375,
+              0.412443798875
+            ],
+            "mean": 0.41226282565625,
+            "min": 0.4120818524375,
+            "max": 0.412443798875,
+            "repeat_difference_pct": 0.0877950702743638
+          },
+          "TTFT": {
+            "values": [
+              1.813068981,
+              1.650599153
+            ],
+            "mean": 1.7318340669999999,
+            "min": 1.650599153,
+            "max": 1.813068981,
+            "repeat_difference_pct": 9.38137383343205
+          },
+          "E2E": {
+            "values": [
+              14.999688259,
+              14.848800717
+            ],
+            "mean": 14.924244488,
+            "min": 14.848800717,
+            "max": 14.999688259,
+            "repeat_difference_pct": 1.0110229842543943
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2190180200,
+              2190180200
+            ],
+            "mean": 2190180200,
+            "min": 2190180200,
+            "max": 2190180200,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              876893700096,
+              876893700096
+            ],
+            "mean": 876893700096,
+            "min": 876893700096,
+            "max": 876893700096,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.36765276331638796,
+              0.36765276331638796
+            ],
+            "mean": 0.36765276331638796,
+            "min": 0.36765276331638796,
+            "max": 0.36765276331638796,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9910037878787878,
+            0.9910037878787878
+          ]
+        }
+      },
+      "near_gain_pct": -0.2941278791265584,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b16_s22_d3_env2_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B64_L128_O33_s20_d5",
+      "label": "grouped_frozen_policy_c30_b64_s20_d5_v1",
+      "transport": "nvswitch",
+      "cache_percent": 30,
+      "batch_per_rank": 64,
+      "seed": [
+        "s20",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.486327121,
+              0.48772108496875
+            ],
+            "mean": 0.487024102984375,
+            "min": 0.486327121,
+            "max": 0.48772108496875,
+            "repeat_difference_pct": 0.2862207353205155
+          },
+          "TTFT": {
+            "values": [
+              2.176002471,
+              2.139485863
+            ],
+            "mean": 2.1577441669999997,
+            "min": 2.139485863,
+            "max": 2.176002471,
+            "repeat_difference_pct": 1.6923511396056945
+          },
+          "E2E": {
+            "values": [
+              17.738470343,
+              17.746560582
+            ],
+            "mean": 17.742515462500002,
+            "min": 17.738470343,
+            "max": 17.746560582,
+            "repeat_difference_pct": 0.04559803832269747
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8733525840,
+              8733525840
+            ],
+            "mean": 8733525840,
+            "min": 8733525840,
+            "max": 8733525840,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1130546331648,
+              1130546331648
+            ],
+            "mean": 1130546331648,
+            "min": 1130546331648,
+            "max": 1130546331648,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.31380669255707916,
+              0.31380669255707916
+            ],
+            "mean": 0.31380669255707916,
+            "min": 0.31380669255707916,
+            "max": 0.31380669255707916,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.48789877896875,
+              0.48944857640625
+            ],
+            "mean": 0.48867367768750003,
+            "min": 0.48789877896875,
+            "max": 0.48944857640625,
+            "repeat_difference_pct": 0.3171436294326198
+          },
+          "TTFT": {
+            "values": [
+              3.018925965,
+              2.149372606
+            ],
+            "mean": 2.5841492855,
+            "min": 2.149372606,
+            "max": 3.018925965,
+            "repeat_difference_pct": 33.649501748183745
+          },
+          "E2E": {
+            "values": [
+              18.631686892,
+              17.811727051
+            ],
+            "mean": 18.221706971499998,
+            "min": 17.811727051,
+            "max": 18.631686892,
+            "repeat_difference_pct": 4.499906854404346
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8608502968,
+              8608502968
+            ],
+            "mean": 8608502968,
+            "min": 8608502968,
+            "max": 8608502968,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1130952130560,
+              1130952130560
+            ],
+            "mean": 1130952130560,
+            "min": 1130952130560,
+            "max": 1130952130560,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.3135603899600188,
+              0.3135603899600188
+            ],
+            "mean": 0.3135603899600188,
+            "min": 0.3135603899600188,
+            "max": 0.3135603899600188,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9924242424242424,
+            0.9924242424242424
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.48549449575,
+              0.4873499309375
+            ],
+            "mean": 0.48642221334375,
+            "min": 0.48549449575,
+            "max": 0.4873499309375,
+            "repeat_difference_pct": 0.38144540619258543
+          },
+          "TTFT": {
+            "values": [
+              2.656534092,
+              2.147431604
+            ],
+            "mean": 2.401982848,
+            "min": 2.147431604,
+            "max": 2.656534092,
+            "repeat_difference_pct": 21.195092563791693
+          },
+          "E2E": {
+            "values": [
+              18.192357956,
+              17.742629394
+            ],
+            "mean": 17.967493675,
+            "min": 17.742629394,
+            "max": 18.192357956,
+            "repeat_difference_pct": 2.5030122182580765
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8768386328,
+              8768386328
+            ],
+            "mean": 8768386328,
+            "min": 8768386328,
+            "max": 8768386328,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1132877316096,
+              1132877316096
+            ],
+            "mean": 1132877316096,
+            "min": 1132877316096,
+            "max": 1132877316096,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.31239188461582523,
+              0.31239188461582523
+            ],
+            "mean": 0.31239188461582523,
+            "min": 0.31239188461582523,
+            "max": 0.31239188461582523,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9904119318181819,
+            0.9904119318181819
+          ]
+        }
+      },
+      "near_gain_pct": -0.3387049415042951,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b64_s20_d5_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C30_B64_L128_O33_s20_d5",
+      "label": "grouped_frozen_policy_c30_b64_s20_d5_env2_v1",
+      "transport": "env2",
+      "cache_percent": 30,
+      "batch_per_rank": 64,
+      "seed": [
+        "s20",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.499408141375,
+              0.49622481621875
+            ],
+            "mean": 0.49781647879687496,
+            "min": 0.49622481621875,
+            "max": 0.499408141375,
+            "repeat_difference_pct": 0.6394575695733299
+          },
+          "TTFT": {
+            "values": [
+              2.991500456,
+              2.988522525
+            ],
+            "mean": 2.9900114904999997,
+            "min": 2.988522525,
+            "max": 2.991500456,
+            "repeat_difference_pct": 0.09959597177005455
+          },
+          "E2E": {
+            "values": [
+              18.97256098,
+              18.867716644
+            ],
+            "mean": 18.920138812,
+            "min": 18.867716644,
+            "max": 18.97256098,
+            "repeat_difference_pct": 0.5541414734943823
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8733525840,
+              8733525840
+            ],
+            "mean": 8733525840,
+            "min": 8733525840,
+            "max": 8733525840,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1130546331648,
+              1130546331648
+            ],
+            "mean": 1130546331648,
+            "min": 1130546331648,
+            "max": 1130546331648,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.31380669255707916,
+              0.31380669255707916
+            ],
+            "mean": 0.31380669255707916,
+            "min": 0.31380669255707916,
+            "max": 0.31380669255707916,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.50123918325,
+              0.49899220946875
+            ],
+            "mean": 0.500115696359375,
+            "min": 0.49899220946875,
+            "max": 0.50123918325,
+            "repeat_difference_pct": 0.4492907936317622
+          },
+          "TTFT": {
+            "values": [
+              3.838739749,
+              2.966945166
+            ],
+            "mean": 3.4028424575000003,
+            "min": 2.966945166,
+            "max": 3.838739749,
+            "repeat_difference_pct": 25.61959872924855
+          },
+          "E2E": {
+            "values": [
+              19.878393613,
+              18.934695869
+            ],
+            "mean": 19.406544740999998,
+            "min": 18.934695869,
+            "max": 19.878393613,
+            "repeat_difference_pct": 4.86278086385085
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8608502968,
+              8608502968
+            ],
+            "mean": 8608502968,
+            "min": 8608502968,
+            "max": 8608502968,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1130952130560,
+              1130952130560
+            ],
+            "mean": 1130952130560,
+            "min": 1130952130560,
+            "max": 1130952130560,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.3135603899600188,
+              0.3135603899600188
+            ],
+            "mean": 0.3135603899600188,
+            "min": 0.3135603899600188,
+            "max": 0.3135603899600188,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9924242424242424,
+            0.9924242424242424
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.49739780203125,
+              0.49390347915625
+            ],
+            "mean": 0.49565064059374997,
+            "min": 0.49390347915625,
+            "max": 0.49739780203125,
+            "repeat_difference_pct": 0.7049971469448906
+          },
+          "TTFT": {
+            "values": [
+              3.501901217,
+              2.977997358
+            ],
+            "mean": 3.2399492875,
+            "min": 2.977997358,
+            "max": 3.501901217,
+            "repeat_difference_pct": 16.170125286258816
+          },
+          "E2E": {
+            "values": [
+              19.418630882,
+              18.782908691
+            ],
+            "mean": 19.1007697865,
+            "min": 18.782908691,
+            "max": 19.418630882,
+            "repeat_difference_pct": 3.328254296061479
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8768386328,
+              8768386328
+            ],
+            "mean": 8768386328,
+            "min": 8768386328,
+            "max": 8768386328,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              1132877316096,
+              1132877316096
+            ],
+            "mean": 1132877316096,
+            "min": 1132877316096,
+            "max": 1132877316096,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.31239188461582523,
+              0.31239188461582523
+            ],
+            "mean": 0.31239188461582523,
+            "min": 0.31239188461582523,
+            "max": 0.31239188461582523,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9904119318181819,
+            0.9904119318181819
+          ]
+        }
+      },
+      "near_gain_pct": -0.46186047678791703,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b64_s20_d5_env2_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C60_B8_L128_O33_s20_d7",
+      "label": "grouped_frozen_policy_c60_b8_s20_d7_v1",
+      "transport": "nvswitch",
+      "cache_percent": 60,
+      "batch_per_rank": 8,
+      "seed": [
+        "s20",
+        "d7"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.288220797,
+              0.28715912740625
+            ],
+            "mean": 0.287689962203125,
+            "min": 0.28715912740625,
+            "max": 0.288220797,
+            "repeat_difference_pct": 0.36903254657191814
+          },
+          "TTFT": {
+            "values": [
+              1.404805776,
+              1.404734872
+            ],
+            "mean": 1.4047703239999998,
+            "min": 1.404734872,
+            "max": 1.404805776,
+            "repeat_difference_pct": 0.005047373139125537
+          },
+          "E2E": {
+            "values": [
+              10.62787128,
+              10.593826949
+            ],
+            "mean": 10.6108491145,
+            "min": 10.593826949,
+            "max": 10.62787128,
+            "repeat_difference_pct": 0.3208445491273457
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1095981536,
+              1095981536
+            ],
+            "mean": 1095981536,
+            "min": 1095981536,
+            "max": 1095981536,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              211430670336,
+              211430670336
+            ],
+            "mean": 211430670336,
+            "min": 211430670336,
+            "max": 211430670336,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8104263798749376,
+              0.8104263798749376
+            ],
+            "mean": 0.8104263798749376,
+            "min": 0.8104263798749376,
+            "max": 0.8104263798749376,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.28973135940625,
+              0.28861072746875
+            ],
+            "mean": 0.2891710434375,
+            "min": 0.28861072746875,
+            "max": 0.28973135940625,
+            "repeat_difference_pct": 0.3875325565722534
+          },
+          "TTFT": {
+            "values": [
+              1.516165283,
+              1.410554898
+            ],
+            "mean": 1.4633600905000002,
+            "min": 1.410554898,
+            "max": 1.516165283,
+            "repeat_difference_pct": 7.21697862922551
+          },
+          "E2E": {
+            "values": [
+              10.787568784,
+              10.646098177
+            ],
+            "mean": 10.7168334805,
+            "min": 10.646098177,
+            "max": 10.787568784,
+            "repeat_difference_pct": 1.3200784285527436
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1072911008,
+              1072911008
+            ],
+            "mean": 1072911008,
+            "min": 1072911008,
+            "max": 1072911008,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              211053182976,
+              211053182976
+            ],
+            "mean": 211053182976,
+            "min": 211053182976,
+            "max": 211053182976,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8107648437566106,
+              0.8107648437566106
+            ],
+            "mean": 0.8107648437566106,
+            "min": 0.8107648437566106,
+            "max": 0.8107648437566106,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9962121212121212,
+            0.9962121212121212
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.29195019728125,
+              0.29290337596875
+            ],
+            "mean": 0.292426786625,
+            "min": 0.29195019728125,
+            "max": 0.29290337596875,
+            "repeat_difference_pct": 0.32595464269910757
+          },
+          "TTFT": {
+            "values": [
+              1.487494077,
+              1.405296067
+            ],
+            "mean": 1.446395072,
+            "min": 1.405296067,
+            "max": 1.487494077,
+            "repeat_difference_pct": 5.682957000561458
+          },
+          "E2E": {
+            "values": [
+              10.82990039,
+              10.778204098
+            ],
+            "mean": 10.804052244000001,
+            "min": 10.778204098,
+            "max": 10.82990039,
+            "repeat_difference_pct": 0.47848983726184957
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1100738600,
+              1100738600
+            ],
+            "mean": 1100738600,
+            "min": 1100738600,
+            "max": 1100738600,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              212487634944,
+              212487634944
+            ],
+            "mean": 212487634944,
+            "min": 212487634944,
+            "max": 212487634944,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8094786810062531,
+              0.8094786810062531
+            ],
+            "mean": 0.8094786810062531,
+            "min": 0.8094786810062531,
+            "max": 0.8094786810062531,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9914772727272727,
+            0.9914772727272727
+          ]
+        }
+      },
+      "near_gain_pct": -0.5148185300011578,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c60_b8_s20_d7_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C60_B8_L128_O33_s14_d5",
+      "label": "grouped_frozen_policy_c60_b8_s14_d5_v1",
+      "transport": "nvswitch",
+      "cache_percent": 60,
+      "batch_per_rank": 8,
+      "seed": [
+        "s14",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.2784087785,
+              0.27714477953125
+            ],
+            "mean": 0.27777677901562503,
+            "min": 0.27714477953125,
+            "max": 0.2784087785,
+            "repeat_difference_pct": 0.45504126487078056
+          },
+          "TTFT": {
+            "values": [
+              1.386668262,
+              1.378763815
+            ],
+            "mean": 1.3827160385,
+            "min": 1.378763815,
+            "max": 1.386668262,
+            "repeat_difference_pct": 0.5716609036064231
+          },
+          "E2E": {
+            "values": [
+              10.295749174,
+              10.24739676
+            ],
+            "mean": 10.271572967,
+            "min": 10.24739676,
+            "max": 10.295749174,
+            "repeat_difference_pct": 0.47074011113334313
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1097550792,
+              1097550792
+            ],
+            "mean": 1097550792,
+            "min": 1097550792,
+            "max": 1097550792,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              168264990720,
+              168264990720
+            ],
+            "mean": 168264990720,
+            "min": 168264990720,
+            "max": 168264990720,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8417460303371883,
+              0.8417460303371883
+            ],
+            "mean": 0.8417460303371883,
+            "min": 0.8417460303371883,
+            "max": 0.8417460303371883,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.27868849634375,
+              0.27761048821875
+            ],
+            "mean": 0.27814949228124997,
+            "min": 0.27761048821875,
+            "max": 0.27868849634375,
+            "repeat_difference_pct": 0.38756429722688457
+          },
+          "TTFT": {
+            "values": [
+              1.503348431,
+              1.393881332
+            ],
+            "mean": 1.4486148815000002,
+            "min": 1.393881332,
+            "max": 1.503348431,
+            "repeat_difference_pct": 7.556673647218772
+          },
+          "E2E": {
+            "values": [
+              10.421380314,
+              10.277416955
+            ],
+            "mean": 10.3493986345,
+            "min": 10.277416955,
+            "max": 10.421380314,
+            "repeat_difference_pct": 1.3910311515114988
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1064308856,
+              1064308856
+            ],
+            "mean": 1064308856,
+            "min": 1064308856,
+            "max": 1064308856,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              167604387840,
+              167604387840
+            ],
+            "mean": 167604387840,
+            "min": 167604387840,
+            "max": 167604387840,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8423673302741708,
+              0.8423673302741708
+            ],
+            "mean": 0.8423673302741708,
+            "min": 0.8423673302741708,
+            "max": 0.8423673302741708,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.990530303030303,
+            0.990530303030303
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.281002867375,
+              0.2788348714375
+            ],
+            "mean": 0.27991886940625,
+            "min": 0.2788348714375,
+            "max": 0.281002867375,
+            "repeat_difference_pct": 0.774508678924949
+          },
+          "TTFT": {
+            "values": [
+              1.462831391,
+              1.382708252
+            ],
+            "mean": 1.4227698215,
+            "min": 1.382708252,
+            "max": 1.462831391,
+            "repeat_difference_pct": 5.631489914196209
+          },
+          "E2E": {
+            "values": [
+              10.454923147,
+              10.305424138
+            ],
+            "mean": 10.3801736425,
+            "min": 10.305424138,
+            "max": 10.454923147,
+            "repeat_difference_pct": 1.440236109229434
+          },
+          "decode_peer_bytes": {
+            "values": [
+              1097230368,
+              1097230368
+            ],
+            "mean": 1097230368,
+            "min": 1097230368,
+            "max": 1097230368,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              169765502976,
+              169765502976
+            ],
+            "mean": 169765502976,
+            "min": 169765502976,
+            "max": 169765502976,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.8403347919088997,
+              0.8403347919088997
+            ],
+            "mean": 0.8403347919088997,
+            "min": 0.8403347919088997,
+            "max": 0.8403347919088997,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.990530303030303,
+            0.990530303030303
+          ]
+        }
+      },
+      "near_gain_pct": -0.13417725806517838,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c60_b8_s14_d5_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C60_B16_L128_O33_s22_d3",
+      "label": "grouped_frozen_policy_c60_b16_s22_d3_v1",
+      "transport": "nvswitch",
+      "cache_percent": 60,
+      "batch_per_rank": 16,
+      "seed": [
+        "s22",
+        "d3"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.3246535875,
+              0.3239272329375
+            ],
+            "mean": 0.32429041021875,
+            "min": 0.3239272329375,
+            "max": 0.3246535875,
+            "repeat_difference_pct": 0.22398274497542772
+          },
+          "TTFT": {
+            "values": [
+              1.504971185,
+              1.4902605
+            ],
+            "mean": 1.4976158425000001,
+            "min": 1.4902605,
+            "max": 1.504971185,
+            "repeat_difference_pct": 0.9822735966416605
+          },
+          "E2E": {
+            "values": [
+              11.893885985,
+              11.855931954
+            ],
+            "mean": 11.874908969500002,
+            "min": 11.855931954,
+            "max": 11.893885985,
+            "repeat_difference_pct": 0.319615342715322
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2194690784,
+              2194690784
+            ],
+            "mean": 2194690784,
+            "min": 2194690784,
+            "max": 2194690784,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              396484411392,
+              396484411392
+            ],
+            "mean": 396484411392,
+            "min": 396484411392,
+            "max": 396484411392,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.715278060152618,
+              0.715278060152618
+            ],
+            "mean": 0.715278060152618,
+            "min": 0.715278060152618,
+            "max": 0.715278060152618,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.32620156596875,
+              0.32536645859375
+            ],
+            "mean": 0.32578401228125,
+            "min": 0.32536645859375,
+            "max": 0.32620156596875,
+            "repeat_difference_pct": 0.25633774019549715
+          },
+          "TTFT": {
+            "values": [
+              1.676215408,
+              1.49970945
+            ],
+            "mean": 1.587962429,
+            "min": 1.49970945,
+            "max": 1.676215408,
+            "repeat_difference_pct": 11.115247739907321
+          },
+          "E2E": {
+            "values": [
+              12.114665519,
+              11.911436125
+            ],
+            "mean": 12.013050822,
+            "min": 11.911436125,
+            "max": 12.114665519,
+            "repeat_difference_pct": 1.691738401937154
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2105522536,
+              2105522536
+            ],
+            "mean": 2105522536,
+            "min": 2105522536,
+            "max": 2105522536,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              396371165184,
+              396371165184
+            ],
+            "mean": 396371165184,
+            "min": 396371165184,
+            "max": 396371165184,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.7153593841065886,
+              0.7153593841065886
+            ],
+            "mean": 0.7153593841065886,
+            "min": 0.7153593841065886,
+            "max": 0.7153593841065886,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9910037878787878,
+            0.9910037878787878
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.33011097978125,
+              0.3287781498125
+            ],
+            "mean": 0.329444564796875,
+            "min": 0.3287781498125,
+            "max": 0.33011097978125,
+            "repeat_difference_pct": 0.4045688140497279
+          },
+          "TTFT": {
+            "values": [
+              1.640319672,
+              1.494976422
+            ],
+            "mean": 1.567648047,
+            "min": 1.494976422,
+            "max": 1.640319672,
+            "repeat_difference_pct": 9.271420984968064
+          },
+          "E2E": {
+            "values": [
+              12.203871025,
+              12.015877216
+            ],
+            "mean": 12.109874120499999,
+            "min": 12.015877216,
+            "max": 12.203871025,
+            "repeat_difference_pct": 1.5524010169664586
+          },
+          "decode_peer_bytes": {
+            "values": [
+              2191256496,
+              2191256496
+            ],
+            "mean": 2191256496,
+            "min": 2191256496,
+            "max": 2191256496,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              397975486464,
+              397975486464
+            ],
+            "mean": 397975486464,
+            "min": 397975486464,
+            "max": 397975486464,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.7142072947586712,
+              0.7142072947586712
+            ],
+            "mean": 0.7142072947586712,
+            "min": 0.7142072947586712,
+            "max": 0.7142072947586712,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9910037878787878,
+            0.9910037878787878
+          ]
+        }
+      },
+      "near_gain_pct": -0.46057546428600193,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c60_b16_s22_d3_v1"
+    },
+    {
+      "cell": "ShareGPT_R4_C60_B64_L128_O33_s20_d5",
+      "label": "grouped_frozen_policy_c60_b64_s20_d5_v1",
+      "transport": "nvswitch",
+      "cache_percent": 60,
+      "batch_per_rank": 64,
+      "seed": [
+        "s20",
+        "d5"
+      ],
+      "policies": {
+        "BR": {
+          "TPOT": {
+            "values": [
+              0.39127438934375,
+              0.3865923025
+            ],
+            "mean": 0.388933345921875,
+            "min": 0.3865923025,
+            "max": 0.39127438934375,
+            "repeat_difference_pct": 1.2038275691306959
+          },
+          "TTFT": {
+            "values": [
+              2.106188555,
+              2.096812701
+            ],
+            "mean": 2.101500628,
+            "min": 2.096812701,
+            "max": 2.106188555,
+            "repeat_difference_pct": 0.44615042579944264
+          },
+          "E2E": {
+            "values": [
+              14.626969014,
+              14.467766381
+            ],
+            "mean": 14.5473676975,
+            "min": 14.467766381,
+            "max": 14.626969014,
+            "repeat_difference_pct": 1.0943741597138494
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8789386424,
+              8789386424
+            ],
+            "mean": 8789386424,
+            "min": 8789386424,
+            "max": 8789386424,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              584293810176,
+              584293810176
+            ],
+            "mean": 584293810176,
+            "min": 584293810176,
+            "max": 584293810176,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.6457015982741157,
+              0.6457015982741157
+            ],
+            "mean": 0.6457015982741157,
+            "min": 0.6457015982741157,
+            "max": 0.6457015982741157,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            1.0,
+            1.0
+          ]
+        },
+        "Near": {
+          "TPOT": {
+            "values": [
+              0.39376513559375,
+              0.390574453
+            ],
+            "mean": 0.392169794296875,
+            "min": 0.390574453,
+            "max": 0.39376513559375,
+            "repeat_difference_pct": 0.813597232665662
+          },
+          "TTFT": {
+            "values": [
+              2.894409511,
+              2.138475306
+            ],
+            "mean": 2.5164424085,
+            "min": 2.138475306,
+            "max": 2.894409511,
+            "repeat_difference_pct": 30.039797550963897
+          },
+          "E2E": {
+            "values": [
+              15.49489385,
+              14.636857802
+            ],
+            "mean": 15.065875826,
+            "min": 14.636857802,
+            "max": 15.49489385,
+            "repeat_difference_pct": 5.695228461389821
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8565270376,
+              8565270376
+            ],
+            "mean": 8565270376,
+            "min": 8565270376,
+            "max": 8565270376,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              584973287424,
+              584973287424
+            ],
+            "mean": 584973287424,
+            "min": 584973287424,
+            "max": 584973287424,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.6452895834644723,
+              0.6452895834644723
+            ],
+            "mean": 0.6452895834644723,
+            "min": 0.6452895834644723,
+            "max": 0.6452895834644723,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9918323863636364,
+            0.9918323863636364
+          ]
+        },
+        "Static": {
+          "TPOT": {
+            "values": [
+              0.3945330308125,
+              0.39458054003125
+            ],
+            "mean": 0.394556785421875,
+            "min": 0.3945330308125,
+            "max": 0.39458054003125,
+            "repeat_difference_pct": 0.012041161248605844
+          },
+          "TTFT": {
+            "values": [
+              2.59392391,
+              2.095248107
+            ],
+            "mean": 2.3445860085000003,
+            "min": 2.095248107,
+            "max": 2.59392391,
+            "repeat_difference_pct": 21.269247585378128
+          },
+          "E2E": {
+            "values": [
+              15.218980896,
+              14.721825388
+            ],
+            "mean": 14.970403141999999,
+            "min": 14.721825388,
+            "max": 15.218980896,
+            "repeat_difference_pct": 3.320922645063666
+          },
+          "decode_peer_bytes": {
+            "values": [
+              8770087040,
+              8770087040
+            ],
+            "mean": 8770087040,
+            "min": 8770087040,
+            "max": 8770087040,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_h2d_bytes": {
+            "values": [
+              585973628928,
+              585973628928
+            ],
+            "mean": 585973628928,
+            "min": 585973628928,
+            "max": 585973628928,
+            "repeat_difference_pct": 0.0
+          },
+          "decode_main_hit_rate": {
+            "values": [
+              0.6446830061058306,
+              0.6446830061058306
+            ],
+            "mean": 0.6446830061058306,
+            "min": 0.6446830061058306,
+            "max": 0.6446830061058306,
+            "repeat_difference_pct": 0.0
+          },
+          "token_agreement": [
+            0.9913589015151514,
+            0.9913589015151514
+          ]
+        }
+      },
+      "near_gain_pct": -0.8321344541257419,
+      "near_faster_both_ranges": false,
+      "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c60_b64_s20_d5_v1"
+    }
+  ],
+  "confirmation": {
+    "cell": "ShareGPT_R4_C30_B8_L128_O33_s14_d5",
+    "transport": "env2",
+    "raw_directory": "/home/hwlee/mgo-results/headline_r4_20261007/grouped_frozen_policy_c30_b8_s14_d5_env2_confirm_v1",
+    "same_trace_and_teacher_as_screen": true,
+    "policies": {
+      "BR": {
+        "TPOT": {
+          "values": [
+            0.2773269228125,
+            0.26059320284375
+          ],
+          "mean": 0.268960062828125,
+          "min": 0.26059320284375,
+          "max": 0.2773269228125,
+          "repeat_difference_pct": 6.221637440441648
+        },
+        "decode_peer_bytes": {
+          "values": [
+            1091865320,
+            1091865320
+          ],
+          "mean": 1091865320,
+          "min": 1091865320,
+          "max": 1091865320,
+          "repeat_difference_pct": 0.0
+        },
+        "decode_h2d_bytes": {
+          "values": [
+            575677661184,
+            575677661184
+          ],
+          "mean": 575677661184,
+          "min": 575677661184,
+          "max": 575677661184,
+          "repeat_difference_pct": 0.0
+        }
+      },
+      "Near": {
+        "TPOT": {
+          "values": [
+            0.274961086875,
+            0.2602622804375
+          ],
+          "mean": 0.26761168365625,
+          "min": 0.2602622804375,
+          "max": 0.274961086875,
+          "repeat_difference_pct": 5.492587706439888
+        },
+        "decode_peer_bytes": {
+          "values": [
+            1057670328,
+            1057670328
+          ],
+          "mean": 1057670328,
+          "min": 1057670328,
+          "max": 1057670328,
+          "repeat_difference_pct": 0.0
+        },
+        "decode_h2d_bytes": {
+          "values": [
+            576574193664,
+            576574193664
+          ],
+          "mean": 576574193664,
+          "min": 576574193664,
+          "max": 576574193664,
+          "repeat_difference_pct": 0.0
+        }
+      },
+      "Static": {
+        "TPOT": {
+          "values": [
+            0.278714198625,
+            0.29152625415625
+          ],
+          "mean": 0.285120226390625,
+          "min": 0.278714198625,
+          "max": 0.29152625415625,
+          "repeat_difference_pct": 4.493562485355563
+        },
+        "decode_peer_bytes": {
+          "values": [
+            1097912296,
+            1097912296
+          ],
+          "mean": 1097912296,
+          "min": 1097912296,
+          "max": 1097912296,
+          "repeat_difference_pct": 0.0
+        },
+        "decode_h2d_bytes": {
+          "values": [
+            578065268736,
+            578065268736
+          ],
+          "mean": 578065268736,
+          "min": 578065268736,
+          "max": 578065268736,
+          "repeat_difference_pct": 0.0
+        }
+      }
+    },
+    "near_gain_pct": 0.5013306279366416
+  }
+}

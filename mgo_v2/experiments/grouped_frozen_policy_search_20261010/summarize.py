@@ -49,8 +49,29 @@ def summarize():
                     'near_faster_both_ranges': near['max'] < br['min'],
                     'raw_directory': str(path)}
             cases.append(case)
+    confirmation_path = OUTPUT / 'grouped_frozen_policy_c30_b8_s14_d5_env2_confirm_v1'
+    confirmation = None
+    if (confirmation_path / 'result.json').exists():
+        measured = json.loads((confirmation_path / 'result.json').read_text())
+        assert measured['status'] == 'PASS' and measured['route_frozen']
+        first = OUTPUT / label('ShareGPT_R4_C30_B8_L128_O33_s14_d5', 'env2')
+        for rank in range(4):
+            prior = json.loads((first / f'trace_rank{rank}.json').read_text())
+            later = json.loads((confirmation_path / f'trace_rank{rank}.json').read_text())
+            assert prior['route_sha256'] == later['route_sha256']
+            assert prior['teacher_tokens'] == later['teacher_tokens']
+        confirmation = {'cell': measured['cell'], 'transport': 'env2',
+                        'raw_directory': str(confirmation_path),
+                        'same_trace_and_teacher_as_screen': True,
+                        'policies': {display: {key: metric(
+                            [run for run in measured['results'] if run['backend'] == backend], key)
+                            for key in ('TPOT', 'decode_peer_bytes', 'decode_h2d_bytes')}
+                            for backend, display in POLICIES.items()}}
+        br = confirmation['policies']['BR']['TPOT']['mean']
+        near = confirmation['policies']['Near']['TPOT']['mean']
+        confirmation['near_gain_pct'] = 100 * (br - near) / br
     return {'status': 'PASS', 'method': 'two unfiltered runs per policy, frozen BR route, 32 decode steps',
-            'cases': cases}
+            'cases': cases, 'confirmation': confirmation}
 
 
 def main():
@@ -86,6 +107,22 @@ def main():
                   'separate.', '']
     else:
         lines += ['No screened setting produced a positive Near mean gain.', '']
+    if result['confirmation']:
+        case = result['confirmation']
+        br = case['policies']['BR']['TPOT']
+        near = case['policies']['Near']['TPOT']
+        lines += [
+            '## Fresh confirmation of the largest screened mean gain', '',
+            f"The same env2 C30/B8 seed 14/5 and identical route/teacher were rerun in "
+            f"a fresh guarded job. BR was {br['mean']:.4f} [{br['min']:.4f}, {br['max']:.4f}] "
+            f"and Near was {near['mean']:.4f} [{near['min']:.4f}, {near['max']:.4f}] "
+            f"s/token, an observed Near mean gain of {case['near_gain_pct']:+.2f}%. "
+            f"Within that job, BR repeats differed by {br['repeat_difference_pct']:.1f}% "
+            f"and Near by {near['repeat_difference_pct']:.1f}%; their ranges overlap. "
+            'Both absolute TPOT means also shifted about 21% below the first job, despite '
+            'identical route and H2D bytes. Thus this seed is the best observed positive '
+            'candidate, **not a reliable Near speedup**. The full 12-cell screen found '
+            'no stable Near winner under these grouped settings.', '']
     lines += ['Full per-run values, peer/H2D bytes, decode hit rates, token agreement, '
               'and raw receipt paths are in [RESULTS.json](RESULTS.json).', '']
     (HERE / 'RESULTS.md').write_text('\n'.join(lines))
