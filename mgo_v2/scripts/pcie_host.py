@@ -29,11 +29,36 @@ def cpu_set(node):
 
 
 def affinity(rank):
-    # Two disjoint 16-CPU sets per node, derived from the real host.
+    # Keep every SMT sibling with its physical core's rank.
     all_cpus = cpu_set(NODES[rank])
-    half = len(all_cpus) // 2
+    cores = {}
+    for cpu in all_cpus:
+        root=Path(f'/sys/devices/system/cpu/cpu{cpu}/topology')
+        key=(int((root/'physical_package_id').read_text()),int((root/'core_id').read_text()))
+        cores.setdefault(key,[]).append(cpu)
+    groups=sorted(cores.values(),key=min)
+    assert len(groups)%2==0
+    half = len(groups) // 2
     pair_rank = rank % 2
-    return all_cpus[pair_rank * half:(pair_rank + 1) * half]
+    return sorted(cpu for group in groups[pair_rank*half:(pair_rank+1)*half] for cpu in group)
+
+
+def configure_pcie(cpus,staging_tid,isolated=True,fixed_team=None):
+    import threading
+    assert isolated and fixed_team is None  # Direct-pinned source needs no staging helper.
+    def core(cpu):
+        p=Path(f'/sys/devices/system/cpu/cpu{cpu}/topology')
+        return ((p/'physical_package_id').read_text().strip(),(p/'core_id').read_text().strip())
+    dedicated={core(cpu) for cpu in cpus[:3]}
+    helpers=[cpu for cpu in cpus if core(cpu) not in dedicated]
+    assert helpers and staging_tid!=threading.get_native_id()
+    for task in Path('/proc/self/task').iterdir():
+        try:os.sched_setaffinity(int(task.name),helpers)
+        except ProcessLookupError:pass
+    os.sched_setaffinity(threading.get_native_id(),[cpus[0]])
+    os.sched_setaffinity(staging_tid,[cpus[1]])
+    return dict(main=[cpus[0]],h2d=[cpus[1]],helpers=helpers,rank_cpu_pool=cpus,
+                policy='disjoint physical cores per rank; helpers exclude main/H2D SMT siblings')
 
 
 def available_bytes():

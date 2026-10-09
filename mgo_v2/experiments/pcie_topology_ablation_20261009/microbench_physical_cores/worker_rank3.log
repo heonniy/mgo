@@ -1,0 +1,15 @@
+[rank3]:[E1009 19:58:28.122623717 ProcessGroupNCCL.cpp:542] [Rank 1] Collective WorkNCCL(SeqNum=98, OpType=BROADCAST, NumelIn=9437184, NumelOut=9437184, Timeout(ms)=600000) raised the following async exception: NCCL error: unhandled system error (run with NCCL_DEBUG=INFO for details), NCCL version 2.21.5
+ncclSystemError: System call (e.g. socket, malloc) or external library call failed or device error. 
+Last error:
+
+Exception raised from checkForNCCLErrorsInternal at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:2027 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f547996c446 in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::checkForNCCLErrorsInternal(std::shared_ptr<c10d::NCCLComm>&) + 0x220 (0x7f542f1be2a0 in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::WorkNCCL::checkAndSetException() + 0x7c (0x7f542f1be4ec in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::WorkNCCL::isStarted() + 0x90 (0x7f542f1be7c0 in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: c10d::ProcessGroupNCCL::watchdogHandler() + 0x9f8 (0x7f542f1c6698 in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #5: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f542f1c793d in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0x145c0 (0x7f5479e575c0 in /data2/esjung/envs/mgo-pcie/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #7: <unknown function> + 0x94a83 (0x7f547af8ea83 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #8: <unknown function> + 0x1268e0 (0x7f547b0208e0 in /lib/x86_64-linux-gnu/libc.so.6)
+
