@@ -203,7 +203,7 @@ def main():
                 if max(x['temperature_c'] for x in gpu.values()) >= 85:
                     raise RuntimeError('GPU temperature reached 85 C')
                 phase = json.loads((output / 'phase.json').read_text()) if (output / 'phase.json').exists() else {'phase': 'loading'}
-                if args.system == 'infinity' and env.get('MGO_INFINITY_TRACE') == '1' and phase['phase'] in ('warmup', 'target'):
+                if args.system == 'infinity' and phase['phase'] in ('warmup', 'target'):
                     repeat = phase['repeat']
                     progress = output / f'progress_repeat{repeat}.json'
                     clock = progress if progress.exists() else output / 'phase.json'

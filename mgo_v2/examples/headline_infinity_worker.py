@@ -55,9 +55,8 @@ def main(a):
  debug_output_tokens=int(os.environ.get('MGO_INFINITY_DEBUG_OUTPUT_TOKENS','64'))
  assert 2<=debug_output_tokens<=64
  assert diagnostic_mode or debug_output_tokens==64
- if diagnostic_mode:
-  stack_log=(a.output/'signal_stacks.txt').open('a')
-  faulthandler.register(signal.SIGUSR1,file=stack_log,all_threads=True)
+ stack_log=(a.output/'signal_stacks.txt').open('a')
+ faulthandler.register(signal.SIGUSR1,file=stack_log,all_threads=True)
  assert (model_family=='Qwen3')==(model_path==MODEL)
  expert_bytes=9*2**20 if model_family=='Qwen3' else 3*2048*1408*2
  routed_layers=48 if model_family=='Qwen3' else 26
@@ -72,6 +71,7 @@ def main(a):
  write(a.output/'config.json',dict(cfg,attention_backend=attention_backend,allocator_trim_floor_bytes=trim_floor_bytes,
                                    diagnostic_trace=diagnostic_mode,
                                    debug_output_tokens=debug_output_tokens,
+                                   token_progress_receipt=True,
                                    speculative_admission='disabled' if disable_speculative else 'enabled'))
  sources={}
  roots=[Path('/home/hwlee/mgo-tools/headline-r4/MoE-Infinity/moe_infinity'),Path('/home/hwlee/mgo-tools/headline-r4/infinity-env/lib/python3.12/site-packages/moe_store/wrappers')]
@@ -205,7 +205,7 @@ def main(a):
   for gpu in range(world):torch.cuda.reset_peak_memory_stats(gpu)
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   streamer=ClockStreamer(trim_floor_bytes,a.output/'allocator_trims.jsonl',
-                         a.output/f'progress_repeat{repeat}.json' if diagnostic_mode else None,
+                         a.output/f'progress_repeat{repeat}.json',
                          (lambda:dict(eam_candidates=p.eam_candidates,eam_calls=p.eam_calls)) if diagnostic_mode else None)
   finite=FiniteLogits();start=time.perf_counter_ns()
   with torch.no_grad():

@@ -28,3 +28,13 @@ use two unfiltered clean target repeats per cell after disjoint warmup and
 cache reset. If TPOT or E2E differs by >2% but ≤5%, add exactly one third
 repeat; above 5%, mark unstable rather than repeat indefinitely. Keep raw
 receipts outside Git and commit only a provenance-backed summary.
+
+The R8 MoE-Infinity long target stalled after four tokens while the warmup
+completed. An eight-token diagnostic target queued 591,448 EAM speculative
+candidate transfers across 384 layer calls; its warmup queued zero. For the
+R2/R8 comparison, retain EAM cache budget and eviction priorities but
+disable speculative transfer admission in both rank counts, as already
+required for the DeepSeek baseline. A token progress receipt and external
+120-second no-progress guard are included so a native wait cannot silently
+consume the queue. Preserve the failing raw attempts and exclude diagnostic
+timings from the main table.

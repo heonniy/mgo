@@ -43,6 +43,11 @@ def read_row(world, system):
                     '--prefetch-off', '--policy', 'LA_CA_NEAR',
                     '--prefill-layout-fast', '--decode-layout-fast'))
         assert result['expert_executor'] == 'native' and result['policy'] == 'LA_CA_NEAR'
+    if system == 'infinity':
+        config = json.loads((path / 'config.json').read_text())
+        assert config['speculative_admission'] == 'disabled'
+        assert config['token_progress_receipt']
+        assert result['speculative_admission'] == 'disabled'
     if system == 'llama':
         audit = json.loads((path / 'placement_audit.json').read_text())
         assert audit['status'] == 'PASS'
@@ -81,7 +86,10 @@ def main():
              'TPS is global output tokens divided by E2E seconds. Values are '
              'the mean and full range of the two unfiltered target repeats '
              'after warmup. R2 and R8 have different global batches (32 and '
-             '128), so throughput is not a same-batch scaling comparison.', '',
+             '128), so throughput is not a same-batch scaling comparison. '
+             'MoE-Infinity uses EAM eviction priorities with speculative '
+             'transfer admission disabled on both rank counts after the '
+             'R8 long-target native wait stall; the expert budget is unchanged.', '',
              '| Ranks | System | TTFT (s) | TPOT (s/token) | E2E (s) | TPS | Repeat quality |',
              '|---:|---|---:|---:|---:|---:|---|']
     for world in (2, 8):
