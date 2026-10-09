@@ -100,7 +100,7 @@ def run(root,out):
         g=np.array([expected_quota(int(m),int(event),True) for m,event in zip(count,trace[:,52])])
         critical_r=r.reshape(-1,2,2).sum(axis=2).max(axis=1)
         critical_g=g.reshape(-1,2,2).sum(axis=2).max(axis=1)
-        count_proxy=dict(events_with_different_group_totals_fraction=float(np.mean(critical_r!=critical_g)),
+        count_proxy=dict(events_with_different_critical_group_counts_fraction=float(np.mean(critical_r!=critical_g)),
                          mean_critical_group_count_reduction_percent=float(np.mean((critical_r-critical_g)/np.maximum(1,critical_r)))*100,
                          scope='Count-only same-M counterfactual on this arm\'s live trace; not measured H2D speedup')
         report['arms'][arm]=dict(live=live,diagnostic=partition(path),same_m_quota_count_proxy=count_proxy)
