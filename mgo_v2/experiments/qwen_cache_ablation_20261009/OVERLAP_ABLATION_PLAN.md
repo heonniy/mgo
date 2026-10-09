@@ -23,3 +23,11 @@ finite logits, no recompilation, and identical copy bytes across arms. If
 output/routing diverges, report the mismatch and do not interpret the timing
 as a same-route causal comparison. A short smoke pass must precede the A/B.
 No primary table row is replaced by this intervention.
+
+After the C20 exact-parity A/B, run the same diagnostic-only serialized arm
+at C50 for two clean repeats. Compare its result with the already validated
+post-cleanup C50 normal arm, after checking that the optional-flag code did
+not change the default C20 result. This separates the observed cache-capacity
+benefit with ready-first overlap from the benefit when decode H2D/compute
+overlap is deliberately removed. The C50 serial arm must also match C50
+normal in all output tokens, demand-copy bytes and final cache state.

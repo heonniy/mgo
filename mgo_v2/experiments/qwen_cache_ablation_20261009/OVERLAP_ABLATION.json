@@ -1,0 +1,292 @@
+{
+  "status": "PASS",
+  "model": "Qwen3-30B-A3B-Instruct-2507",
+  "dataset": "ShareGPT",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "local_batch": 16,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "cache_percent": 20,
+  "source_commit": "0241e7099440d7140f90b16d45614ded71164162",
+  "exact_request_token_h2d_and_cache_parity": true,
+  "normal_tpot_mean_s_per_token": 0.5028928825158729,
+  "serialized_tpot_mean_s_per_token": 0.5882448466904762,
+  "normal_advantage_ms_per_token": 85.35196417460322,
+  "serial_slowdown_percent": 16.972195698536098,
+  "scope": "Current-layer demand copies waited after dispatch before native expert compute; no added global barrier; dispatch still overlaps H2D",
+  "arms": {
+    "normal": {
+      "label": "qca_overlap_c20_normal_r2_v1",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.685898654,
+            1.769900096
+          ],
+          "mean": 2.727899375,
+          "minimum": 1.769900096,
+          "maximum": 3.685898654
+        },
+        "TPOT": {
+          "samples": [
+            0.5022103155873016,
+            0.5035754494444444
+          ],
+          "mean": 0.5028928825158729,
+          "minimum": 0.5022103155873016,
+          "maximum": 0.5035754494444444
+        },
+        "E2E": {
+          "samples": [
+            35.325148536,
+            33.495153411
+          ],
+          "mean": 34.410150973499995,
+          "minimum": 33.495153411,
+          "maximum": 35.325148536
+        }
+      },
+      "ranks_per_repeat": [
+        [
+          {
+            "rank": 0,
+            "physical_gpu": 0,
+            "h2d_gib": 488.373046875,
+            "native_executor_counts": {
+              "waves": 6668,
+              "groups": 72972,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 1,
+            "physical_gpu": 1,
+            "h2d_gib": 481.5791015625,
+            "native_executor_counts": {
+              "waves": 6692,
+              "groups": 72246,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 2,
+            "physical_gpu": 4,
+            "h2d_gib": 474.9345703125,
+            "native_executor_counts": {
+              "waves": 6346,
+              "groups": 71548,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 3,
+            "physical_gpu": 5,
+            "h2d_gib": 468.123046875,
+            "native_executor_counts": {
+              "waves": 6320,
+              "groups": 70761,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          }
+        ],
+        [
+          {
+            "rank": 0,
+            "physical_gpu": 0,
+            "h2d_gib": 488.373046875,
+            "native_executor_counts": {
+              "waves": 7346,
+              "groups": 72972,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 1,
+            "physical_gpu": 1,
+            "h2d_gib": 481.5791015625,
+            "native_executor_counts": {
+              "waves": 6606,
+              "groups": 72246,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 2,
+            "physical_gpu": 4,
+            "h2d_gib": 474.9345703125,
+            "native_executor_counts": {
+              "waves": 6325,
+              "groups": 71548,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          },
+          {
+            "rank": 3,
+            "physical_gpu": 5,
+            "h2d_gib": 468.123046875,
+            "native_executor_counts": {
+              "waves": 6315,
+              "groups": 70761,
+              "waits": 0,
+              "serial_wait_wall_ns": 0,
+              "serial_waited_copies": 0
+            }
+          }
+        ]
+      ]
+    },
+    "serial": {
+      "label": "qca_overlap_c20_serial_r2_v1",
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.638567187,
+            1.75770453
+          ],
+          "mean": 2.6981358585,
+          "minimum": 1.75770453,
+          "maximum": 3.638567187
+        },
+        "TPOT": {
+          "samples": [
+            0.5883465705714286,
+            0.5881431228095239
+          ],
+          "mean": 0.5882448466904762,
+          "minimum": 0.5881431228095239,
+          "maximum": 0.5883465705714286
+        },
+        "E2E": {
+          "samples": [
+            40.704401133,
+            38.810721267
+          ],
+          "mean": 39.7575612,
+          "minimum": 38.810721267,
+          "maximum": 40.704401133
+        }
+      },
+      "ranks_per_repeat": [
+        [
+          {
+            "rank": 0,
+            "physical_gpu": 0,
+            "h2d_gib": 488.373046875,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 72972,
+              "waits": 0,
+              "serial_wait_wall_ns": 6079771876,
+              "serial_waited_copies": 54037
+            }
+          },
+          {
+            "rank": 1,
+            "physical_gpu": 1,
+            "h2d_gib": 481.5791015625,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 72246,
+              "waits": 0,
+              "serial_wait_wall_ns": 6082856825,
+              "serial_waited_copies": 53267
+            }
+          },
+          {
+            "rank": 2,
+            "physical_gpu": 4,
+            "h2d_gib": 474.9345703125,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 71548,
+              "waits": 0,
+              "serial_wait_wall_ns": 5592280242,
+              "serial_waited_copies": 52517
+            }
+          },
+          {
+            "rank": 3,
+            "physical_gpu": 5,
+            "h2d_gib": 468.123046875,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 70761,
+              "waits": 0,
+              "serial_wait_wall_ns": 5289255070,
+              "serial_waited_copies": 51749
+            }
+          }
+        ],
+        [
+          {
+            "rank": 0,
+            "physical_gpu": 0,
+            "h2d_gib": 488.373046875,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 72972,
+              "waits": 0,
+              "serial_wait_wall_ns": 6116846292,
+              "serial_waited_copies": 54037
+            }
+          },
+          {
+            "rank": 1,
+            "physical_gpu": 1,
+            "h2d_gib": 481.5791015625,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 72246,
+              "waits": 0,
+              "serial_wait_wall_ns": 6065836063,
+              "serial_waited_copies": 53267
+            }
+          },
+          {
+            "rank": 2,
+            "physical_gpu": 4,
+            "h2d_gib": 474.9345703125,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 71548,
+              "waits": 0,
+              "serial_wait_wall_ns": 5576274542,
+              "serial_waited_copies": 52517
+            }
+          },
+          {
+            "rank": 3,
+            "physical_gpu": 5,
+            "h2d_gib": 468.123046875,
+            "native_executor_counts": {
+              "waves": 3072,
+              "groups": 70761,
+              "waits": 0,
+              "serial_wait_wall_ns": 5293598583,
+              "serial_waited_copies": 51749
+            }
+          }
+        ]
+      ]
+    }
+  }
+}
