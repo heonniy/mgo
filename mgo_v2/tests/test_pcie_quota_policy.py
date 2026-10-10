@@ -98,3 +98,26 @@ def test_split_lookup_rows_are_valid():
     lut = np.asarray(data['quota_lut']['NEAR_SPLIT'])
     assert data['status'] == 'PASS' and lut.shape == (129, 8)
     assert all(lut[n].sum() == n and lut[n].min() >= 0 for n in range(129))
+
+
+def test_haq_fast_quota_prefers_fast_group_under_cap():
+    from haq_placement import hit_aware_quota_rank_cost, H2D_US_BY_RANK_R8
+    hits = np.zeros(8, np.int64)
+    q = hit_aware_quota_rank_cost(hits, 12, 8, H2D_US_BY_RANK_R8)
+    assert q.sum() == 12 and q.max() <= 2
+    assert np.array_equal(q, [1, 1, 1, 1, 2, 2, 2, 2])
+    # A hit-heavy fast rank (40 hits = 2.84 ms) never becomes the cheapest rank.
+    hits = np.array([0, 0, 0, 0, 40, 0, 0, 0], np.int64)
+    q = hit_aware_quota_rank_cost(hits, 12, 8, H2D_US_BY_RANK_R8)
+    assert q.sum() == 12 and q.max() <= 2 and q[4] == 0
+
+
+def test_haq_fast_policy_runs_in_controller_step():
+    p = Policy([16] * 8, np.zeros((48, 128, 128), np.float32), False, 21)
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    result = p.apply(0, selected, weights, origins,
+                     np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+    counts = np.bincount([row[0] for row in result[5]], minlength=8)
+    assert np.array_equal(counts, [1, 1, 1, 1, 2, 2, 2, 2])

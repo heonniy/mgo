@@ -38,6 +38,32 @@ def hit_aware_quota(hits, m, world, h2d_us=H2D_US, expert_us=EXPERT_US):
     return quota
 
 
+# Measured in-run 9 MiB DMA per copy on Kaist3 (R8 grouped diagnostics, 2026-10-11):
+# GPUs 0-3 ~250 us, GPUs 4-7 ~230 us.
+H2D_US_BY_RANK_R8 = np.array([250, 250, 250, 250, 230, 230, 230, 230], np.int64)
+
+
+@njit(cache=True)
+def hit_aware_quota_rank_cost(hits, m, world, h2d_us, expert_us=EXPERT_US):
+    # HAQ water-fill with a per-rank copy cost (PCIe-aware) and the same
+    # balanced per-rank cap ceil(m/world).
+    cap = (m + world - 1) // world
+    quota = np.zeros(world, np.int64)
+    cost = np.empty(world, np.int64)
+    for r in range(world):
+        cost[r] = hits[r] * expert_us
+    for _ in range(m):
+        best = -1
+        for r in range(world):
+            if quota[r] >= cap:
+                continue
+            if best < 0 or cost[r] + h2d_us[r] < cost[best] + h2d_us[best]:
+                best = r
+        quota[best] += 1
+        cost[best] += h2d_us[best] + expert_us
+    return quota
+
+
 @njit(cache=True)
 def worst_balanced_quota(hits, m, world):
     # Adversarial control: balanced +/-1 quota, remainder copies on the

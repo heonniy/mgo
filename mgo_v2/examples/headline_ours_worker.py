@@ -262,7 +262,7 @@ if __name__=='__main__':
  p.add_argument('--capture-decode-routes',action='store_true')
  p.add_argument('--frozen-decode-routes',type=Path)
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
-                'NEAR_PCIE','NEAR_FAST','NEAR_SPLIT'),default='LA_CA_NEAR')
+                'NEAR_PCIE','NEAR_FAST','NEAR_SPLIT','HAQ','HAQ_FAST'),default='LA_CA_NEAR')
  p.add_argument('--quota-table',type=Path)
  p.add_argument('--teacher-tokens',type=Path)
  p.add_argument('--cell',required=True)
