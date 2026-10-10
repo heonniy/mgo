@@ -92,7 +92,7 @@ def restore_owned_loads(gpus):
     return []
 
 
-def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False, inline_demand_h2d=False):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -112,6 +112,8 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
             command += ['--teacher-tokens', str(teacher_tokens)]
         if post_generation_diagnostic:
             command += ['--post-generation-diagnostic']
+        if inline_demand_h2d:
+            command += ['--inline-demand-h2d']
         if ours_mode in ('B', 'C', 'N'):
             command += ['--grouped-decode-mode',
                         {'B': 'serial_all', 'C': 'two_wave',
@@ -136,6 +138,8 @@ def main():
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
+    parser.add_argument('--inline-demand-h2d', action='store_true',
+                        help='submit each layer\'s demand copies in one pass on the caller thread')
     parser.add_argument('--post-generation-diagnostic', action='store_true',
                         help='untimed instrumented pass after the timed targets (not with teacher tokens)')
     parser.add_argument('--job-label')
@@ -192,7 +196,8 @@ def main():
                                                        cwd=PKG.parent, text=True).strip(),
                  command=command(args.system, output, args.smoke, args.repeats,
                                  args.ours_mode, args.ours_policy, args.quota_table,
-                                 args.teacher_tokens, args.post_generation_diagnostic),
+                                 args.teacher_tokens, args.post_generation_diagnostic,
+                                 args.inline_demand_h2d),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []

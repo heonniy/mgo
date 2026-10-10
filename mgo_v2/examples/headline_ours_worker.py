@@ -55,6 +55,7 @@ def main(a):
  assert not a.prefill_layout_fast or a.prefill_optimized
  assert not a.native_prefill or (a.expert_executor=='native' and a.prefill_optimized)
  assert not a.h2d_serial_ablation or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast)
+ assert not a.inline_demand_h2d or a.expert_executor=='native'
  assert a.grouped_decode_mode=='off' or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast and not a.h2d_serial_ablation)
  rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (2,4,8)
  assert a.policy not in ('NEAR_PCIE','NEAR_FAST','NEAR_SPLIT') or (a.quota_table is not None and world==8)
@@ -194,7 +195,7 @@ def main(a):
   if grouped_before is not None:
    grouped_after=rt.grouped_executor.receipt()
    grouped_counts={key:grouped_after[key]-grouped_before[key] for key in ('events','waves','first_wave_groups','second_wave_groups','hit_first_groups','miss_second_groups','no_ready_events','serial_wait_wall_ns')}
-  result.update(expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  result.update(inline_demand_h2d=a.inline_demand_h2d,expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
   result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense,teacher_tokens_path=str(a.teacher_tokens) if a.teacher_tokens else None,decode_policy=a.decode_policy,single_decode_step=a.single_decode_step)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
@@ -251,7 +252,8 @@ if __name__=='__main__':
  for flag in ('native-prefill','prefetch-off','h2d-serial-ablation','compiled-dense',
               'record-main-eviction-trace','capture-eviction-trace',
               'post-generation-diagnostic','smoke','prefill-optimized',
-              'prefill-diagnostic','post-prefill-diagnostic','prefill-layout-fast'):
+              'prefill-diagnostic','post-prefill-diagnostic','prefill-layout-fast',
+              'inline-demand-h2d'):
   p.add_argument('--'+flag,action='store_true')
  p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave',
                 'hit_then_miss','hit_then_miss_stream'),default='off')

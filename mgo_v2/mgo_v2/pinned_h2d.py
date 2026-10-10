@@ -161,24 +161,75 @@ class PriorityH2DScheduler:
         if t.counted:self.pending-=1;t.counted=False
     def _enqueue(self,slot,key,tensors,urgent,event_index=None):
         with self.cv:
-            self._check()
-            if self.stopping:raise RuntimeError('scheduler closed')
-            old=self.tickets.get(slot)
-            if old is not None and old.key==key and old.valid and old.state.state!='EMPTY':
-                if urgent and not old.state.urgent:
-                    old.state.demand();self.metrics['escalated']+=1
-                    if not old.submitted:self.urgent.append(old)
-                self.cv.notify_all();return old
-            t=CopyTicket(slot,key,tensors,urgent,self.profile,event_index)
-            if old is not None:
-                if old.submitted or old.state.state=='INFLIGHT':t.previous_copy=old.done
-                elif old.state.state=='QUEUED':
-                    if old.state.urgent:raise RuntimeError('overwriting unsubmitted current demand')
-                    # Superseded reservation: don't enqueue its staged bytes.
-                    old.state.state='EMPTY';self._retire_pending(old);self.metrics['canceled']+=1
-            t.previous_compute=self.compute_done.get(slot)
-            self.tickets[slot]=t;self.pending+=1
-            (self.urgent if urgent else self.background).append(t);self.cv.notify_all();return t
+            t,_=self._ticket_locked(slot,key,tensors,urgent,event_index,queue=True)
+            return t
+    def _ticket_locked(self,slot,key,tensors,urgent,event_index,queue):
+        # Returns (ticket, fresh). A fresh ticket is not queued when queue=False:
+        # the caller then owns its submission (inline demand path).
+        self._check()
+        if self.stopping:raise RuntimeError('scheduler closed')
+        old=self.tickets.get(slot)
+        if old is not None and old.key==key and old.valid and old.state.state!='EMPTY':
+            if urgent and not old.state.urgent:
+                old.state.demand();self.metrics['escalated']+=1
+                if not old.submitted:self.urgent.append(old)
+            self.cv.notify_all();return old,False
+        t=CopyTicket(slot,key,tensors,urgent,self.profile,event_index)
+        if old is not None:
+            if old.submitted or old.state.state=='INFLIGHT':t.previous_copy=old.done
+            elif old.state.state=='QUEUED':
+                if old.state.urgent:raise RuntimeError('overwriting unsubmitted current demand')
+                # Superseded reservation: don't enqueue its staged bytes.
+                old.state.state='EMPTY';self._retire_pending(old);self.metrics['canceled']+=1
+        t.previous_compute=self.compute_done.get(slot)
+        self.tickets[slot]=t;self.pending+=1
+        if queue:(self.urgent if urgent else self.background).append(t)
+        self.cv.notify_all();return t,True
+    def enqueue_demand_batch(self,items,event_index=None):
+        """Submit one layer's demand copies on the calling thread in a single pass.
+
+        Direct-pinned sources need no CPU staging, so the per-copy staging-thread
+        wakeup only adds latency and rank-specific jitter. Tickets, deduplication,
+        slot hazards (previous copy / previous compute) and completion events are
+        unchanged; only the submitting thread differs.
+        """
+        if not self.direct_pinned:raise RuntimeError('inline demand submission requires direct-pinned sources')
+        fresh=[]
+        with self.cv:
+            for slot,key,tensors in items:
+                t,new=self._ticket_locked(slot,key,tensors,True,event_index,queue=False)
+                if new:
+                    # Submitted before this call returns, so it is never counted as
+                    # pending: the staging worker must not wake up and spin on it.
+                    self._retire_pending(t)
+                    t.staging=True;t.state.start();fresh.append(t)
+                    if self.profile:now=time.perf_counter();t.staging_started_at=now;t.staging_finished_at=now
+        for t in fresh:self._launch(t,self._direct_source(t))
+        with self.cv:
+            for t in fresh:
+                t.staging=False;t.submitted=True;t.submitted_at=time.perf_counter()
+                self.metrics['copies']+=1;self.metrics['bytes']+=self.bytes_per_expert;self.metrics['urgent_copies']+=1
+                if self.profile:self.trace.append(t)
+                t.tensors=None
+            self.cv.notify_all()
+    def _direct_source(self,t):
+        tensors=tuple(t.tensors)
+        if len(tensors)!=1:
+            raise RuntimeError("direct-pinned source must be one flat expert tensor")
+        source=tensors[0]
+        if (source.device.type!="cpu" or not source.is_pinned()
+            or not source.is_contiguous() or source.dtype!=self.cache.dtype
+            or source.numel()!=self.cache.shape[1]):
+            raise RuntimeError("invalid direct-pinned expert source")
+        return source
+    def _launch(self,t,source):
+        with torch.cuda.stream(self.h2d_stream):
+            if t.stream_enter is not None:t.stream_enter.record(self.h2d_stream)
+            if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
+            if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
+            if t.begin is not None:t.begin.record(self.h2d_stream)
+            self.cache[t.slot].copy_(source,non_blocking=True)
+            t.done.record(self.h2d_stream)
     def enqueue_demand(self,slot,key,tensors,event_index=None):return self._enqueue(slot,key,tensors,True,event_index)
     def enqueue_prefetch(self,slot,key,tensors):return self._enqueue(slot,key,tensors,False)
     def promote(self,slot,key):
@@ -233,14 +284,7 @@ class PriorityH2DScheduler:
                     if t is None:continue
                 direct_source=None
                 if self.direct_pinned:
-                    tensors=tuple(t.tensors)
-                    if len(tensors)!=1:
-                        raise RuntimeError("direct-pinned source must be one flat expert tensor")
-                    direct_source=tensors[0]
-                    if (direct_source.device.type!="cpu" or not direct_source.is_pinned()
-                        or not direct_source.is_contiguous() or direct_source.dtype!=self.cache.dtype
-                        or direct_source.numel()!=self.cache.shape[1]):
-                        raise RuntimeError("invalid direct-pinned expert source")
+                    direct_source=self._direct_source(t)
                     if self.profile:
                         now=time.perf_counter();t.staging_started_at=now;t.staging_finished_at=now
                 else:
@@ -258,13 +302,7 @@ class PriorityH2DScheduler:
                     t.state.start()
                 # Direct-pinned mode retains the same queue, priority, slot
                 # hazards and completion events, but removes CPU staging.
-                with torch.cuda.stream(self.h2d_stream):
-                    if t.stream_enter is not None:t.stream_enter.record(self.h2d_stream)
-                    if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
-                    if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
-                    if t.begin is not None:t.begin.record(self.h2d_stream)
-                    self.cache[t.slot].copy_(direct_source if self.direct_pinned else self.stages[sid],non_blocking=True)
-                    t.done.record(self.h2d_stream)
+                self._launch(t,direct_source if self.direct_pinned else self.stages[sid])
                 with self.cv:
                     t.submitted=True;t.submitted_at=time.perf_counter();self._retire_pending(t)
                     if not self.direct_pinned:

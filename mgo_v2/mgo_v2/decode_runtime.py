@@ -161,6 +161,14 @@ class DecodeOffloadRuntime(LiveRuntime):
     self.h2d.enqueue_prefetch(physical,key,self.experts[key]);self.keys[physical]=key
  def apply_fetches(self,e):
   if not getattr(self.args,'physical_prefetch',False):return super().apply_fetches(e)
+  if getattr(self.args,'inline_demand_h2d',False):
+   # One-pass submission of this layer's demand copies on the calling thread.
+   items=[]
+   for key,slot,victim,rep in e['fetches']:
+    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
+    items.append((slot,key,self.experts[key]));self.keys[slot]=key
+   if items:self.h2d.enqueue_demand_batch(items,event_index=self.index)
+   return
   for key,slot,victim,rep in e['fetches']:
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
    self.h2d.enqueue_demand(slot,key,self.experts[key],event_index=self.index);self.keys[slot]=key
