@@ -122,9 +122,12 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
             command += ['--quota-table', str(quota_table)]
         if teacher_tokens is not None:
             command += ['--teacher-tokens', str(teacher_tokens)]
-        if ours_mode in ('B', 'C'):
+        if ours_mode in ('B', 'C', 'N'):
             command += ['--grouped-decode-mode',
-                        'serial_all' if ours_mode == 'B' else 'two_wave']
+                        {'B': 'serial_all', 'C': 'two_wave',
+                         'N': 'hit_then_miss'}[ours_mode]]
+        if ours_mode == 'N':
+            command += ['--compiled-dense']
     elif system == 'llama':
         command += ['--threads', '32', '--cuda-graphs', 'off',
                     '--graph-reuse', 'off', '--expert-placement',
@@ -138,7 +141,7 @@ def main():
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
-    parser.add_argument('--ours-mode', choices=('A', 'B', 'C'))
+    parser.add_argument('--ours-mode', choices=('A', 'B', 'C', 'N'))
     parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE'),
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)

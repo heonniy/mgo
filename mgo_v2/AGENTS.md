@@ -1,3 +1,13 @@
+**OWNER ACTIVE GROUPED R8 PCIe QUOTA FOLLOW-UP (2026-10-10).**
+Read `experiments/pcie_quota_grouped_r8_b16_20261010/PLAN.md`.
+Recheck the quota effect with strict hit-then-miss grouped `new_OURS`,
+compiled dense routing and the same R8/C30/local-B16/input512/output64
+ShareGPT workload. The R8 guard's new `N` arm selects this strict schedule;
+the older `C` arm remains the different ready/two-wave schedule. If PCIe
+lookup does not show a clear gain, screen a bounded frozen list of ShareGPT
+sample seeds and confirm the best observed candidate. Keep all runs and
+unfavorable repeats; do not promote a chosen seed as a general result.
+
 **OWNER R8 PCIe QUOTA LOOKUP COMPLETE (2026-10-10).**
 Read `experiments/pcie_quota_r8_b16_20261010/{REPORT.md,LOOKUP.json}`.
 All 255 nonempty GPU subsets were calibrated for one simultaneous 9 MiB
