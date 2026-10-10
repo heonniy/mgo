@@ -40,14 +40,21 @@ def main():
     parser.add_argument('--diagnostic', action='store_true')
     parser.add_argument('--post-prefill-diagnostic', action='store_true')
     parser.add_argument('--compiled-dense', action='store_true')
-    parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
+    parser.add_argument('--single-decode-step', action='store_true')
+    parser.add_argument('--decode-policy', choices=('BR', 'LA_CA', 'CA_NATIVE', 'LA_CA_NEAR'))
+    parser.add_argument('--capture-decode-routes', action='store_true')
+    parser.add_argument('--frozen-decode-routes', type=Path)
+    parser.add_argument('--repeats', type=int, choices=(1, 2, 3, 4), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     args = parser.parse_args()
     runtime_pkg = args.runtime_root.resolve() / 'mgo_v2'
     assert (runtime_pkg / 'examples/headline_ours_worker.py').is_file()
     assert not (args.smoke and args.diagnostic)
     assert not args.post_prefill_diagnostic or args.diagnostic
-    assert not args.diagnostic or args.repeats == 1
+    assert not args.diagnostic or args.single_decode_step or args.repeats == 1
+    assert not args.decode_policy or (args.single_decode_step and args.policy == 'BR')
+    assert not args.capture_decode_routes or (args.single_decode_step and args.diagnostic)
+    assert not args.frozen_decode_routes or args.single_decode_step
     workload_path = args.workloads or (WORKLOADS if args.cell in CACHE_CELLS else MAIN_TABLE_WORKLOADS)
     root = args.output_root or (CACHE_ROOT if args.cell in CACHE_CELLS and args.cell != CELL
                                 else ROOT if args.cell == CELL else B64_ROOT)
@@ -83,6 +90,14 @@ def main():
                                              'N': 'hit_then_miss'}[args.arm]]
     if args.compiled_dense:
         command += ['--compiled-dense']
+    if args.single_decode_step:
+        command += ['--single-decode-step']
+    if args.decode_policy:
+        command += ['--decode-policy', args.decode_policy]
+    if args.capture_decode_routes:
+        command += ['--capture-decode-routes']
+    if args.frozen_decode_routes:
+        command += ['--frozen-decode-routes', str(args.frozen_decode_routes.resolve())]
     if args.smoke:
         command += ['--smoke']
     if args.diagnostic:
@@ -111,7 +126,8 @@ def main():
     stopped = []
     process = None
     try:
-        stopped = guard.stop_owned_loads()
+        # This R4 job owns only 0/1/4/5; never require or stop other GPUs.
+        stopped = guard.stop_owned_loads(quiet_2367=True)
         assert min(guard.gpu_state()[gpu]['free_mib'] for gpu in PHYSICAL) >= 2048
         with (output / 'run.log').open('w') as log, (output / 'resources.jsonl').open('w') as resources:
             process = subprocess.Popen(command, env=env, stdout=log,

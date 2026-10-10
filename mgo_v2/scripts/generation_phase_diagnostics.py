@@ -3,6 +3,8 @@
 Current-stream spans include submission gaps and peer waits. Copy-stream
 service overlaps them and must not be added to the partition.
 """
+import hashlib
+import numpy as np
 from prefill_phase_diagnostics import PrefillDiagnostics
 
 class GenerationDiagnostics(PrefillDiagnostics):
@@ -26,6 +28,20 @@ class GenerationDiagnostics(PrefillDiagnostics):
   grouped=getattr(self.rt,'grouped_executor',None)
   if grouped is not None:self.wrap(grouped,'math','expert_grouped_gemm_kernels')
   self.cache_events=[];self.prefill_survivors=set()
+  self.placement_events=[];self.route_bytes=[]
+  original_current=self.rt.controller.plan_current
+  def current(event,selected,weights,origins,gates):
+   result=original_current(event,selected,weights,origins,gates)
+   if event>=48:
+    out=result[0];row=out[6];fetches=out[5]
+    self.placement_events.append(dict(event_index=event,layer=event%48,
+      local_expert_rows=int(row[27]),total_expert_rows=int(row[28]),
+      remote_expert_rows=int(row[29]),remote_rank_packets=int(row[30]),
+      rank_fetches=[sum(int(f[0])==r for f in fetches) for r in range(self.rt.world)]))
+    self.route_bytes.append(np.asarray(selected,dtype=np.int16).tobytes())
+   return result
+  self.rt.controller.plan_current=current
+  self.undo.append(lambda:setattr(self.rt.controller,'plan_current',original_current))
   original=self.rt.plan_event
   def plan(layer,*args,**kwargs):
    rt=self.rt;idx=rt.index
@@ -53,6 +69,8 @@ class GenerationDiagnostics(PrefillDiagnostics):
   self.rt.h2d.synchronize()
   result=super().finish(wall_seconds)
   result['decode_cache_events']=self.cache_events
+  result['decode_placement_events']=self.placement_events
+  result['decode_route_sha256']=hashlib.sha256(b''.join(self.route_bytes)).hexdigest()
   markers=[row for row in result['segments'] if 'token_ready_index' in row]
   assert len(markers)>=2 and [row['token_ready_index'] for row in markers]==list(range(len(markers)))
   result['decode_transport_bytes']={name:markers[-1][name]-markers[0][name]

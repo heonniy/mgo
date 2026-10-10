@@ -18,6 +18,12 @@ def generate_live(model,rt,ids,n,forced_next_ids=None):
  mask=torch.ones_like(ids);past=None;tokens=[];finite=torch.ones((),dtype=torch.bool,device='cuda');stamps=[]
  with torch.inference_mode():
   for step in range(n):
+   if step==1 and getattr(rt.args,'decode_policy',None):
+    # Pilot-only intervention: every arm shares the same prefill placement
+    # and cache state; change admission only for the first decode forward.
+    policy=rt.args.decode_policy
+    rt.controller.policy_name=policy
+    rt.policy.policy={'BR':0,'LA_CA':6,'CA_NATIVE':8,'LA_CA_NEAR':7}[policy]
    pos=torch.arange(mask.shape[1]-ids.shape[1],mask.shape[1],device='cuda')[None,:].expand(len(ids),-1)
    out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
    past=out.past_key_values;predicted=out.logits[:,-1].argmax(-1);tokens.append(predicted);finite.logical_and_(torch.isfinite(out.logits).all())
@@ -40,6 +46,9 @@ def validate_state(rt):
  return dict(status='PASS',state_hash=state,role_hash=roles,controller=dict(rt.controller.counters),scheduler=dict(rt.h2d.metrics),main_slots=sum(rt.args.capacities),physical_slots=sum(rt.args.capacities)+rt.world*rt.args.arena_budget)
 
 def main(a):
+ assert not a.decode_policy or a.single_decode_step
+ assert not a.capture_decode_routes or (a.single_decode_step and a.post_generation_diagnostic)
+ assert not a.frozen_decode_routes or a.single_decode_step
  assert not (a.capture_eviction_trace and a.record_main_eviction_trace)
  assert not a.capture_eviction_trace or (a.policy=='BR' and a.repeats==1 and not a.smoke and not a.post_generation_diagnostic and not a.decode_layout_fast)
  assert not a.prefill_diagnostic or a.prefill_optimized
@@ -71,6 +80,17 @@ def main(a):
  if a.grouped_decode_mode!='off':
   from mgo_v2.grouped_expert import GroupedExpertExecutor
   rt.grouped_executor=GroupedExpertExecutor(rt.cache,rt.kernel,a.local_batch*world*8,schedule=a.grouped_decode_mode)
+ assert not (a.capture_decode_routes and a.frozen_decode_routes)
+ if a.frozen_decode_routes is not None:
+  saved=torch.load(a.frozen_decode_routes/f'decode_routes_rank{rank}.pt',map_location='cpu',weights_only=True)
+  assert saved['cell']==a.cell and saved['rank']==rank and len(saved['routes'])==48
+  frozen=[tuple(t.to(device='cuda') for t in route) for route in saved['routes']]
+  original_execute=rt.execute
+  def replay_execute(layer,hidden,selected,weights,probs):
+   if rt.index>=48:
+    selected,weights,probs=frozen[layer]
+   return original_execute(layer,hidden,selected,weights,probs)
+  rt.execute=replay_execute
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+a.arena_budget)*EB
  from refactor_thread_affinity import configure
  configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
@@ -101,7 +121,7 @@ def main(a):
   assert rt.transport.calls==48*3
   write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,layout_exact_checks=getattr(rt,'prefill_layout_checks',0),per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
   a.validate_prefill_optimized=False;reset_live()
- n=257 if a.capture_eviction_trace else (1 if a.prefill_diagnostic else (2 if a.smoke else 64));repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
+ n=257 if a.capture_eviction_trace else (1 if a.prefill_diagnostic else (2 if a.smoke or a.single_decode_step else 64));repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
  for repeat in ((1,) if a.capture_eviction_trace else range(repeats+1)):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
@@ -175,7 +195,7 @@ def main(a):
    grouped_after=rt.grouped_executor.receipt()
    grouped_counts={key:grouped_after[key]-grouped_before[key] for key in ('events','waves','first_wave_groups','second_wave_groups','hit_first_groups','miss_second_groups','no_ready_events','serial_wait_wall_ns')}
   result.update(expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
-  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense,teacher_tokens_path=str(a.teacher_tokens) if a.teacher_tokens else None)
+  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense,teacher_tokens_path=str(a.teacher_tokens) if a.teacher_tokens else None,decode_policy=a.decode_policy,single_decode_step=a.single_decode_step)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(x['release_ns'] for x in rr))==1
@@ -188,9 +208,21 @@ def main(a):
   expected_tokens=result['tokens'];expected_state=validation
   reset_live();begin(rt);a.phase='MEASURE'
   if rank==0:write(a.output/'phase.json',dict(phase='post_generation_diagnostic',cell=a.cell,policy=a.policy))
+  captured=[]
+  if a.capture_decode_routes:
+   original_execute=rt.execute
+   def capture_execute(layer,hidden,selected,weights,probs):
+    if rt.index>=48:
+     captured.append((selected.detach().cpu().clone(),weights.detach().cpu().clone(),probs.detach().cpu().clone()))
+    return original_execute(layer,hidden,selected,weights,probs)
+   rt.execute=capture_execute
   rt.phase_diagnostic=GenerationDiagnostics(rt);rt.phase_diagnostic.install(model)
   with torch._dynamo.config.patch(error_on_recompile=True):check=generate_live(model,rt,ids,n)
   diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9);rt.phase_diagnostic=None
+  if a.capture_decode_routes:
+   rt.execute=original_execute
+   assert len(captured)==48
+   torch.save(dict(cell=a.cell,rank=rank,routes=captured),a.output/f'decode_routes_rank{rank}.pt')
   state=validate_state(rt)
   assert check['tokens']==expected_tokens and state['state_hash']==expected_state['state_hash'] and state['role_hash']==expected_state['role_hash']
   diagnostic.update(output=check,validation=state,token_and_cache_parity=True)
@@ -211,7 +243,7 @@ def main(a):
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,compiled_dense=a.compiled_dense,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
+ if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,decode_policy=a.decode_policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,compiled_dense=a.compiled_dense,headline_eligible=not (a.single_decode_step or a.decode_policy or a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser()
@@ -223,6 +255,10 @@ if __name__=='__main__':
   p.add_argument('--'+flag,action='store_true')
  p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave',
                 'hit_then_miss','hit_then_miss_stream'),default='off')
+ p.add_argument('--single-decode-step',action='store_true')
+ p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR'))
+ p.add_argument('--capture-decode-routes',action='store_true')
+ p.add_argument('--frozen-decode-routes',type=Path)
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
                 'NEAR_PCIE','NEAR_FAST'),default='LA_CA_NEAR')
  p.add_argument('--quota-table',type=Path)
