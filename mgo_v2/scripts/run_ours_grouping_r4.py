@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--post-prefill-diagnostic', action='store_true')
     parser.add_argument('--compiled-dense', action='store_true')
     parser.add_argument('--single-decode-step', action='store_true')
-    parser.add_argument('--decode-policy', choices=('BR', 'LA_CA', 'CA_NATIVE', 'LA_CA_NEAR'))
+    parser.add_argument('--decode-policy', choices=('BR', 'LA_CA', 'CA_NATIVE', 'LA_CA_NEAR', 'MISS_BAL_COMM', 'BW'))
     parser.add_argument('--capture-decode-routes', action='store_true')
     parser.add_argument('--frozen-decode-routes', type=Path)
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3, 4), default=2)

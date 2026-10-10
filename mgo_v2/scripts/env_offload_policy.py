@@ -5,6 +5,7 @@ from br_carep_cpu import balanced_assignment,choose_slot,place,ROW_BYTES,EXPERT_
 from old_ca_fanout_policy import fanout_assignment
 from la_placement import load_assignment,load_locality_near_assignment
 from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignment, load_fanout_assignment
+from mgo_v2.miss_quota_placement import assign_miss_quota
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
@@ -58,7 +59,10 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
-    if policy==9:
+    if policy==13 or policy==14:
+        assert 1<=world<=8 and not substitution
+        assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy==14)
+    elif policy==9:
         # Static expert owner: layer does not affect the canonical rank.
         assignment=misses%world
     elif policy==10:

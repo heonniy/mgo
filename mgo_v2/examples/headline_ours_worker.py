@@ -23,7 +23,7 @@ def generate_live(model,rt,ids,n,forced_next_ids=None):
     # and cache state; change admission only for the first decode forward.
     policy=rt.args.decode_policy
     rt.controller.policy_name=policy
-    rt.policy.policy={'BR':0,'LA_CA':6,'CA_NATIVE':8,'LA_CA_NEAR':7}[policy]
+    rt.policy.policy={'BR':0,'LA_CA':6,'CA_NATIVE':8,'LA_CA_NEAR':7,'MISS_BAL_COMM':13,'BW':14}[policy]
    pos=torch.arange(mask.shape[1]-ids.shape[1],mask.shape[1],device='cuda')[None,:].expand(len(ids),-1)
    out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
    past=out.past_key_values;predicted=out.logits[:,-1].argmax(-1);tokens.append(predicted);finite.logical_and_(torch.isfinite(out.logits).all())
@@ -256,7 +256,7 @@ if __name__=='__main__':
  p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave',
                 'hit_then_miss','hit_then_miss_stream'),default='off')
  p.add_argument('--single-decode-step',action='store_true')
- p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR'))
+ p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR','MISS_BAL_COMM','BW'))
  p.add_argument('--capture-decode-routes',action='store_true')
  p.add_argument('--frozen-decode-routes',type=Path)
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
