@@ -7,6 +7,7 @@ from old_ca_fanout_policy import fanout_assignment
 from la_placement import load_assignment,load_locality_near_assignment
 from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignment, load_fanout_assignment
 from mgo_v2.miss_quota_placement import assign_miss_quota
+from placement_controls import worst_assignment_with_quota,random_assignment_with_quota
 from haq_placement import hit_aware_quota,worst_balanced_quota,near_assignment_with_quota,hit_aware_quota_rank_cost,H2D_US_BY_RANK_R8
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
@@ -90,6 +91,13 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=np.empty(len(misses),np.int64)
         for i in range(len(misses)):
             assignment[i]=random_owners[layer*experts+misses[i]]
+    elif policy==22 or policy==23:
+        # FAST quota row with a stage-2 placement control: 22 = worst
+        # (max compute imbalance, then min locality), 23 = uniform random.
+        assert world==8 and not substitution and len(misses)<=128
+        quota=quota_lut[len(misses)]
+        if policy==22:assignment=worst_assignment_with_quota(demand,misses,owner,layer,quota)
+        else:assignment=random_assignment_with_quota(misses,quota)
     elif policy==11 or policy==12 or policy==20:
         assert world==8 and not substitution and len(misses)<=128
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota_lut[len(misses)])
@@ -166,7 +174,7 @@ class Policy:
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
         rng=np.random.default_rng(seed)
         self.random_owners=np.concatenate([rng.permutation(np.arange(e,dtype=np.int8)%w) for _ in range(l)])
-        if policy in (11,12,20):
+        if policy in (11,12,20,22,23):
             assert quota_lut is not None and w==8
             self.quota_lut=np.ascontiguousarray(quota_lut,dtype=np.int64)
             assert self.quota_lut.shape==(129,8)
@@ -184,7 +192,7 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        if self.policy==19:
+        if self.policy==19 or self.policy==23:
             # Stateless per-event draw: identical on every rank, independent
             # of earlier RNG use; MGO_RANDOM_SALT varies it across rounds.
             seed_rng(self.random_salt*1000003+event)

@@ -134,7 +134,7 @@ def main():
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C', 'N'))
-    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST'),
+    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM'),
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
@@ -148,7 +148,7 @@ def main():
     args = parser.parse_args()
     assert args.ours_mode is None or args.system == 'ours'
     assert args.system == 'ours' or (args.ours_policy == 'LA_CA_NEAR' and args.quota_table is None)
-    assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE','NEAR_SPLIT'))
+    assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','FAST_WORST','FAST_RANDOM'))
     assert args.teacher_tokens is None or (args.system == 'ours' and not args.smoke)
     assert not args.post_generation_diagnostic or (args.system == 'ours' and args.teacher_tokens is None)
     if args.quota_table is not None:

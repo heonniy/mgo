@@ -121,3 +121,38 @@ def test_haq_fast_policy_runs_in_controller_step():
                      np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
     counts = np.bincount([row[0] for row in result[5]], minlength=8)
     assert np.array_equal(counts, [1, 1, 1, 1, 2, 2, 2, 2])
+
+
+def test_placement_controls_respect_quota_and_order():
+    from placement_controls import worst_assignment_with_quota, random_assignment_with_quota
+    from la_placement import load_locality_near_assignment
+    rng = np.random.default_rng(3)
+    demand = rng.integers(0, 6, size=(128, 8)).astype(np.int64)
+    owner = np.zeros(48 * 128, np.int16)
+    misses = np.arange(20, dtype=np.int64)
+    quota = np.array([2, 2, 2, 2, 3, 3, 3, 3], np.int64)
+    near = load_locality_near_assignment(demand, misses, owner, 0, 200, quota)
+    worst = worst_assignment_with_quota(demand, misses, owner, 0, quota)
+    np.random.seed(5)
+    rand = random_assignment_with_quota(misses, quota)
+    for a in (near, worst, rand):
+        assert np.array_equal(np.bincount(a, minlength=8), quota)
+    rows = lambda a: np.bincount(a, weights=demand[misses].sum(1), minlength=8)
+    assert rows(worst).max() > rows(near).max()
+    local = lambda a: sum(int(demand[e, r]) for e, r in zip(misses, a))
+    assert local(worst) < local(near)
+
+
+def test_fast_random_policy_is_seeded_per_event():
+    quota = table([7, 6, 5, 4, 3, 2, 1, 0])
+    sim = np.zeros((48, 128, 128), np.float32)
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    outs = []
+    for _ in range(2):
+        p = Policy([16] * 8, sim, False, 23, quota_lut=quota)
+        r = p.apply(0, selected, weights, origins, np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+        outs.append([f[:2] for f in r[5]])
+        assert np.array_equal(np.bincount([f[0] for f in r[5]], minlength=8), quota[12])
+    assert outs[0] == outs[1]

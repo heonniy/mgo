@@ -58,7 +58,7 @@ def main(a):
  assert not a.inline_demand_h2d or a.expert_executor=='native'
  assert a.grouped_decode_mode=='off' or (a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast and not a.h2d_serial_ablation)
  rank=int(os.environ['RANK']);world=int(os.environ['WORLD_SIZE']);assert dist.is_available() and world in (2,4,8)
- assert a.policy not in ('NEAR_PCIE','NEAR_FAST','NEAR_SPLIT') or (a.quota_table is not None and world==8)
+ assert a.policy not in ('NEAR_PCIE','NEAR_FAST','NEAR_SPLIT','FAST_WORST','FAST_RANDOM') or (a.quota_table is not None and world==8)
  physical=list(map(int,os.environ['MGO_V2_PHYSICAL_GPUS'].split(',')))
  assert physical==([0,1] if world==2 else ([0,1,4,5] if world==4 else list(range(8))))
  cpus=json.loads(Path('/home/hwlee/mgo-results/timing_stability_numa_20261004/topology.json').read_text())['fixed_affinity'][str(physical[rank])]
@@ -262,7 +262,7 @@ if __name__=='__main__':
  p.add_argument('--capture-decode-routes',action='store_true')
  p.add_argument('--frozen-decode-routes',type=Path)
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
-                'NEAR_PCIE','NEAR_FAST','NEAR_SPLIT','HAQ','HAQ_FAST'),default='LA_CA_NEAR')
+                'NEAR_PCIE','NEAR_FAST','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM'),default='LA_CA_NEAR')
  p.add_argument('--quota-table',type=Path)
  p.add_argument('--teacher-tokens',type=Path)
  p.add_argument('--cell',required=True)
