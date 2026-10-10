@@ -39,3 +39,30 @@ GPU 4 had the most copies (30.4k vs 28.2k on GPU 7) and the longest wait.
 
 Microbenchmark H2D gains therefore overstate end-to-end gains. A quota table should be calibrated from in-run
 wait counters, not isolated synchronized copy bursts.
+
+## Diagnostic follow-up (post-generation instrumented pass, 1 live-token run per policy)
+
+`run_diag.py` (`--post-generation-diagnostic`), analysis in `analyze_diag.py` -> `DIAG_ANALYSIS.json`.
+One diagnostic run per policy. Copy events add overhead; tokens are live, not teacher-forced.
+
+1. **In-run DMA asymmetry is ~1.08-1.10x, not 1.25x.** Mean pure DMA per 9 MiB copy (begin->done on the copy stream):
+   NEAR 0.254 / 0.235 ms, FAST 0.248 / 0.230 ms, SPLIT 0.255 / 0.231 ms (GPUs 0-3 / 4-7).
+   GPUs 4-7 run at ~0.23 ms in the model run versus 0.20 ms in the synchronized burst.
+   Per-rank H2D busy time is most even under FAST (5.9-6.4 s). SPLIT pushes 4-7 to 6.2-6.8 s
+   versus 5.6-6.1 s on 0-3, so it overshoots.
+2. **Copies are submitted one at a time by a Python staging thread.** Median enqueue->submit is about 0.33 ms for
+   the first copy of a layer, then grows ~0.17-0.2 ms per copy (≈ DMA pace). Ranks given more copies
+   also wait longer in submission (FAST/SPLIT 4-7 mean 1.41/1.49 ms vs 0-3 1.09/1.08 ms). Slot dependencies
+   are negligible (0.01-0.04 ms). Copies therefore trickle out rather than burst, which is why the
+   synchronized microbenchmark overstates group contention.
+3. **The per-layer straggler is the rank with the slowest host submission, and it changes between runs.**
+   Share of layers where a rank had the largest (exposed H2D wait + grouped GEMM):
+   NEAR r1 41% / r6 23% / r0 23%; FAST r5 38% / r7 21% / r2 16%; SPLIT r5 63% / r4 17% / r6 14%.
+   The top straggler has the highest median submit delay in its run (e.g. r5: 1.83 ms FAST, 2.07 ms SPLIT,
+   vs ~0.8-1.2 ms elsewhere). Host-side submission jitter is a larger lever than the PCIe group split.
+4. Diagnostic wall time agrees with the timed order: NEAR 26.76 s, FAST 26.65 s, SPLIT 27.59 s.
+
+Implication: PCIe-aware quota is second order once FAST balances the groups. Next lever is the copy
+submission path: submit a layer's demand copies in one batch from native code instead of
+per-copy Python wakeups. That would cut the ~0.3 ms start latency and the rank-specific jitter
+for every policy.
