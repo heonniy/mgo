@@ -19,8 +19,10 @@ GPU memory, temperature, and foreign processes.
 
 If the PCIe lookup does not show a clear TPOT gain over the simple fast-rank
 quota, run a bounded ShareGPT sample-seed search with all eight GPUs under
-the same grouped mode. Freeze the candidate list before measuring, screen
-all candidates without dropping unfavorable repeats, and confirm the best
-observed seed in a fresh job. A selected seed is a workload example, not
-evidence of general advantage; report all screened seeds and any failed
-confirmation.
+the same grouped mode. The four frozen candidates are **11, 23, 37, 53**
+from the existing 256-request target pool; each selects 128 without
+replacement and keeps the disjoint warmup fixed. Their manifest hashes are
+in [SEEDS.json](SEEDS.json). Screen all candidates without dropping
+unfavorable repeats, and confirm the best observed seed in a fresh job.
+A selected seed is a workload example, not evidence of general advantage;
+report all screened seeds and any failed confirmation.
