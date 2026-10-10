@@ -9,7 +9,7 @@ def begin(rt):
  rt.event_offset+=rt.index;rt.index=0;rt.mismatch.zero_();rt.valid=None
  assert rt.event_offset%48==0
 
-def generate_live(model,rt,ids,n):
+def generate_live(model,rt,ids,n,forced_next_ids=None):
  dist.barrier();torch.cuda.synchronize()
  release=torch.tensor([time.perf_counter_ns()+200_000_000 if dist.get_rank()==0 else 0],device='cuda',dtype=torch.int64)
  dist.broadcast(release,0);start=int(release.item())
@@ -20,14 +20,16 @@ def generate_live(model,rt,ids,n):
   for step in range(n):
    pos=torch.arange(mask.shape[1]-ids.shape[1],mask.shape[1],device='cuda')[None,:].expand(len(ids),-1)
    out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
-   past=out.past_key_values;next_ids=out.logits[:,-1].argmax(-1);tokens.append(next_ids);finite.logical_and_(torch.isfinite(out.logits).all())
+   past=out.past_key_values;predicted=out.logits[:,-1].argmax(-1);tokens.append(predicted);finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
    if getattr(rt,'phase_diagnostic',None) and hasattr(rt.phase_diagnostic,'token_ready'):
     rt.phase_diagnostic.token_ready(step)
-   if step<n-1:ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
+   if step<n-1:
+    next_ids=forced_next_ids[:,step] if forced_next_ids is not None else predicted
+    ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
  if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.stop()
  actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n
- return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist())
+ return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist(),forced_continuation=forced_next_ids is not None)
 
 def validate_state(rt):
  rt.h2d.synchronize();rt.arena.assert_consistent();assert not rt.controller.pending and not rt.mismatch.item()
@@ -57,6 +59,14 @@ def main(a):
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-(0 if a.capture_eviction_trace else 2) for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
+ forced_tokens=None
+ if a.teacher_tokens is not None:
+  assert not a.smoke and world==8 and a.teacher_tokens.is_file()
+  teacher=json.loads(a.teacher_tokens.read_text())
+  assert teacher['status']=='FROZEN' and teacher['cell']==a.cell
+  assert teacher['output_tokens']==64 and teacher['local_batch']==a.local_batch
+  forced_tokens=torch.tensor(teacher['rank_tokens'][str(rank)],device='cuda',dtype=torch.int64)
+  assert tuple(forced_tokens.shape)==(a.local_batch,64)
  model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None)
  if a.grouped_decode_mode!='off':
   from mgo_v2.grouped_expert import GroupedExpertExecutor
@@ -95,6 +105,8 @@ def main(a):
  for repeat in ((1,) if a.capture_eviction_trace else range(repeats+1)):
   phase='warmup' if repeat==0 else 'target';rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   local=rows[rank:rank+1] if a.smoke else rows[rank*a.local_batch:(rank+1)*a.local_batch]
+  if repeat and forced_tokens is not None:
+   assert [r['request_id'] for r in local]==teacher['request_ids'][str(rank)]
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local],device='cuda')
   # Owner amendment: retain compiled code/full pinned source, clear expert state.
   if repeat:
@@ -124,7 +136,7 @@ def main(a):
    result=generate_live(model,rt,ids,n)
    capture.finish(a.output)
   elif repeat:
-   with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n)
+   with torch._dynamo.config.patch(error_on_recompile=True):result=generate_live(model,rt,ids,n,forced_tokens)
   else:result=generate_live(model,rt,ids,n)
   if repeat and a.prefill_diagnostic:
    diagnostic=rt.phase_diagnostic.finish((result['end_ns']-result['release_ns'])/1e9)
@@ -163,7 +175,7 @@ def main(a):
    grouped_after=rt.grouped_executor.receipt()
    grouped_counts={key:grouped_after[key]-grouped_before[key] for key in ('events','waves','first_wave_groups','second_wave_groups','hit_first_groups','miss_second_groups','no_ready_events','serial_wait_wall_ns')}
   result.update(expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
-  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense)
+  result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense,teacher_tokens_path=str(a.teacher_tokens) if a.teacher_tokens else None)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(x['release_ns'] for x in rr))==1
@@ -202,4 +214,24 @@ def main(a):
  if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,compiled_dense=a.compiled_dense,headline_eligible=not (a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--expert-executor',choices=('h0','native'),default='h0');p.add_argument('--native-prefill',action='store_true');p.add_argument('--prefetch-off',action='store_true');p.add_argument('--h2d-serial-ablation',action='store_true');p.add_argument('--compiled-dense',action='store_true');p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave','hit_then_miss','hit_then_miss_stream'),default='off');p.add_argument('--record-main-eviction-trace',action='store_true');p.add_argument('--capture-eviction-trace',action='store_true');p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR','NEAR_PCIE','NEAR_FAST'),default='LA_CA_NEAR');p.add_argument('--quota-table',type=Path);p.add_argument('--post-generation-diagnostic',action='store_true');p.add_argument('--cell',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--repeats',type=int,choices=range(1,6),default=3);p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true');g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false');p.set_defaults(decode_layout_fast=False);main(p.parse_args())
+ p=argparse.ArgumentParser()
+ p.add_argument('--expert-executor',choices=('h0','native'),default='h0')
+ for flag in ('native-prefill','prefetch-off','h2d-serial-ablation','compiled-dense',
+              'record-main-eviction-trace','capture-eviction-trace',
+              'post-generation-diagnostic','smoke','prefill-optimized',
+              'prefill-diagnostic','post-prefill-diagnostic','prefill-layout-fast'):
+  p.add_argument('--'+flag,action='store_true')
+ p.add_argument('--grouped-decode-mode',choices=('off','serial_all','two_wave',
+                'hit_then_miss','hit_then_miss_stream'),default='off')
+ p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
+                'NEAR_PCIE','NEAR_FAST'),default='LA_CA_NEAR')
+ p.add_argument('--quota-table',type=Path)
+ p.add_argument('--teacher-tokens',type=Path)
+ p.add_argument('--cell',required=True)
+ p.add_argument('--output',type=Path,required=True)
+ p.add_argument('--repeats',type=int,choices=range(1,6),default=3)
+ g=p.add_mutually_exclusive_group()
+ g.add_argument('--decode-layout-fast',dest='decode_layout_fast',action='store_true')
+ g.add_argument('--legacy-decode-layout',dest='decode_layout_fast',action='store_false')
+ p.set_defaults(decode_layout_fast=False)
+ main(p.parse_args())

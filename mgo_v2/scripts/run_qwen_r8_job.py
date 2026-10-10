@@ -104,7 +104,7 @@ def restore_owned_loads(gpus):
     return restored
 
 
-def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -120,6 +120,8 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
                     '--decode-layout-fast', '--policy', ours_policy]
         if quota_table is not None:
             command += ['--quota-table', str(quota_table)]
+        if teacher_tokens is not None:
+            command += ['--teacher-tokens', str(teacher_tokens)]
         if ours_mode in ('B', 'C'):
             command += ['--grouped-decode-mode',
                         'serial_all' if ours_mode == 'B' else 'two_wave']
@@ -140,6 +142,7 @@ def main():
     parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE'),
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
+    parser.add_argument('--teacher-tokens', type=Path)
     parser.add_argument('--job-label')
     parser.add_argument('--quiet-2367', action='store_true',
                         help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
@@ -147,9 +150,13 @@ def main():
     assert args.ours_mode is None or args.system == 'ours'
     assert args.system == 'ours' or (args.ours_policy == 'LA_CA_NEAR' and args.quota_table is None)
     assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE'))
+    assert args.teacher_tokens is None or (args.system == 'ours' and not args.smoke)
     if args.quota_table is not None:
         args.quota_table = args.quota_table.resolve()
         assert args.quota_table.is_file()
+    if args.teacher_tokens is not None:
+        args.teacher_tokens = args.teacher_tokens.resolve()
+        assert args.teacher_tokens.is_file()
     manifest = json.loads(WORKLOADS.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     cell = manifest['cells'][0]
@@ -188,7 +195,8 @@ def main():
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'],
                                                        cwd=PKG.parent, text=True).strip(),
                  command=command(args.system, output, args.smoke, args.repeats,
-                                 args.ours_mode, args.ours_policy, args.quota_table),
+                                 args.ours_mode, args.ours_policy, args.quota_table,
+                                 args.teacher_tokens),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []

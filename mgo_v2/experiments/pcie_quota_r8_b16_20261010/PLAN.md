@@ -31,3 +31,11 @@ If first-pair TPOT or E2E differs by >2%, add exactly one third repeat.
 Report TTFT, TPOT, E2E, TPS, predicted H2D change, actual fetch counters,
 output-token parity and controller overhead evidence. Do not claim the
 microbenchmark model guarantees an end-to-end gain.
+
+If live generation diverges across policies, preserve those measurements as
+service-level observations, then run a separate matched-token continuation
+control. The control supplies the original Near output tokens as the next
+input to every policy, including Near itself, while still computing and
+recording each policy's actual argmax. It reduces generated-text workload
+drift but does not guarantee bitwise-identical BF16 hidden states or router
+choices. Use clean committed code for all control cells.
