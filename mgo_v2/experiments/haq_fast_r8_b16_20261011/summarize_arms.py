@@ -32,7 +32,8 @@ def main():
             ranks = [json.loads((path / f'repeat{rep}_rank{r}.json').read_text()) for r in range(8)]
             assert all(x['phase'] == 'target' and x['forced_continuation'] and x['validation']['status'] == 'PASS'
                        and x['validation']['controller']['quota_violations'] == 0 for x in ranks)
-            wait = [x['grouped_executor_counts']['serial_wait_wall_ns'] / 1e9 for x in ranks]
+            # Grouped mode records the miss wait in grouped counts; serial mode in native counts.
+            wait = [((x.get('grouped_executor_counts') or x['native_executor_counts'])['serial_wait_wall_ns']) / 1e9 for x in ranks]
             rows[label].append(dict(attempt=job['attempt'], commit=st['source_commit'],
                                     copies=[x['validation']['scheduler']['copies'] for x in ranks],
                                     waitA=max(wait[:4]), waitB=max(wait[4:]),
