@@ -104,7 +104,7 @@ def restore_owned_loads(gpus):
     return restored
 
 
-def command(system, output, smoke, repeats, ours_mode=None):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -117,7 +117,9 @@ def command(system, output, smoke, repeats, ours_mode=None):
     if system == 'ours':
         command += ['--expert-executor', 'native', '--native-prefill',
                     '--prefetch-off', '--prefill-optimized', '--prefill-layout-fast',
-                    '--decode-layout-fast', '--policy', 'LA_CA_NEAR']
+                    '--decode-layout-fast', '--policy', ours_policy]
+        if quota_table is not None:
+            command += ['--quota-table', str(quota_table)]
         if ours_mode in ('B', 'C'):
             command += ['--grouped-decode-mode',
                         'serial_all' if ours_mode == 'B' else 'two_wave']
@@ -135,10 +137,19 @@ def main():
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C'))
+    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE'),
+                        default='LA_CA_NEAR')
+    parser.add_argument('--quota-table', type=Path)
+    parser.add_argument('--job-label')
     parser.add_argument('--quiet-2367', action='store_true',
                         help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
     args = parser.parse_args()
     assert args.ours_mode is None or args.system == 'ours'
+    assert args.system == 'ours' or (args.ours_policy == 'LA_CA_NEAR' and args.quota_table is None)
+    assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE'))
+    if args.quota_table is not None:
+        args.quota_table = args.quota_table.resolve()
+        assert args.quota_table.is_file()
     manifest = json.loads(WORKLOADS.read_text())
     assert manifest['status'] == 'FROZEN' and manifest['physical_gpus'] == list(PHYSICAL)
     cell = manifest['cells'][0]
@@ -148,7 +159,8 @@ def main():
     for phase in ('warmup', 'target'):
         assert hashlib.sha256(Path(cell[phase]['path']).read_bytes()).hexdigest() == cell[phase]['sha256']
     assert owner.host_available() >= 384 * 2**30
-    label = args.system if args.ours_mode is None else f'ours_{args.ours_mode.lower()}'
+    label = args.job_label or (args.system if args.ours_mode is None else f'ours_{args.ours_mode.lower()}')
+    assert label.replace('_','').isalnum() and label.islower()
     output = ROOT / 'jobs' / f'{label}_{"smoke" if args.smoke else "full"}_v{args.attempt}'
     assert not output.exists(), f'preserve earlier attempt: {output}'
     output.mkdir(parents=True)
@@ -175,7 +187,8 @@ def main():
                  quiet_2367=args.quiet_2367,
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'],
                                                        cwd=PKG.parent, text=True).strip(),
-                 command=command(args.system, output, args.smoke, args.repeats, args.ours_mode),
+                 command=command(args.system, output, args.smoke, args.repeats,
+                                 args.ours_mode, args.ours_policy, args.quota_table),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []

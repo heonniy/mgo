@@ -99,7 +99,7 @@ def load_assignment(demand, misses, owner, layer):
 
 
 @njit(cache=True)
-def load_locality_near_assignment(demand, misses, owner, layer, near_bps=200):
+def load_locality_near_assignment(demand, misses, owner, layer, near_bps=200, quota_override=None):
     """Low-cost LA-first, communication-second admission.
 
     1) Preserve the balanced miss-count quota used by BR/LA.
@@ -117,7 +117,8 @@ def load_locality_near_assignment(demand, misses, owner, layer, near_bps=200):
     m=len(misses)
     quota=np.empty(world,np.int64)
     for r in range(world):
-        quota[r]=m//world+(r<m%world)
+        quota[r]=m//world+(r<m%world) if quota_override is None else quota_override[r]
+    assert quota.sum()==m and quota.max()-quota.min()<=1
     remaining=quota.copy()
     loads=estimate_loads(demand,owner,layer)
     totals=np.empty(m,np.int64)

@@ -231,9 +231,18 @@ from .predictor import choose_candidates
 from .cache import SlotArena
 
 class DecodePrefetchController:
- def __init__(self,capacities,budget,policy,seed,predictor):
+ def __init__(self,capacities,budget,policy,seed,predictor,quota_table=None):
   self.world=len(capacities);self.policy_name=policy;self.seed=seed;self.budget=budget;self.predictor=predictor
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10}[policy],seed)
+  quota_lut=None
+  if policy in ('NEAR_PCIE','NEAR_FAST'):
+   import json
+   from pathlib import Path
+   if quota_table is None:raise ValueError('quota table required for PCIe quota policies')
+   data=json.loads(Path(quota_table).read_text())
+   if data.get('status')!='PASS' or data.get('physical_gpus')!=list(range(8)):
+    raise ValueError('invalid eight-GPU quota calibration')
+   quota_lut=np.asarray(data['quota_lut'][policy],dtype=np.int64)
+  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10,'NEAR_PCIE':11,'NEAR_FAST':12}[policy],seed,quota_lut)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):

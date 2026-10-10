@@ -49,7 +49,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   if isinstance(getattr(self,'h2d',None),PriorityH2DScheduler):
    self.h2d.close();self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"),cpu_team=getattr(self.args,"staging_cpu_team",None),direct_pinned=getattr(self.args,"direct_pinned_source",False))
   super().reset()
-  self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor)
+  self.controller=DecodePrefetchController(self.args.capacities,self.args.arena_budget,self.args.policy,self.args.seed,self.predictor,getattr(self.args,'quota_table',None))
   self.policy=self.controller.main;self.arena=self.controller.arena
   self.prefill_boundary=None;self.controller_times=[];self.debug_plan_checks=0;self.ready_metrics=dict(waits=0,ready_before_first_wait=0);self.unique_combine_layers=0;self.post_expert_barriers=0;self.h2d_global_barriers=0
   self.transport=FusedTokenRankTransport('exact')

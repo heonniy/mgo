@@ -1,0 +1,62 @@
+"""CPU-only checks for compiled PCIe quota lookup and Near assignment."""
+
+import sys
+from pathlib import Path
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+import mgo_v2  # initialize the package before importing its script adapter
+from env_offload_policy import Policy
+from la_placement import load_locality_near_assignment
+
+
+def table(extra_order):
+    rows = []
+    for n in range(129):
+        base, rem = divmod(n, 8)
+        selected = set(extra_order[:rem])
+        rows.append([base + int(rank in selected) for rank in range(8)])
+    return np.asarray(rows, dtype=np.int64)
+
+
+def test_compiled_near_uses_exact_quota_row():
+    quota = table([7, 6, 5, 4, 3, 2, 1, 0])
+    demand = np.arange(128 * 8, dtype=np.int64).reshape(128, 8) % 17
+    owner = np.zeros(48 * 128, dtype=np.int16)
+    for n in (0, 3, 8, 12, 31, 128):
+        misses = np.arange(n, dtype=np.int64)
+        assignment = load_locality_near_assignment(
+            demand, misses, owner, 0, 200, quota[n])
+        assert np.array_equal(np.bincount(assignment, minlength=8), quota[n])
+
+
+def test_policy_fetches_follow_lookup_not_rank_number():
+    quota = table([7, 6, 5, 4, 3, 2, 1, 0])
+    p = Policy([16] * 8, np.zeros((48, 128, 128), np.float32),
+               False, 11, quota_lut=quota)
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    result = p.apply(0, selected, weights, origins,
+                     np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+    counts = np.bincount([row[0] for row in result[5]], minlength=8)
+    assert np.array_equal(counts, quota[12])
+    assert np.array_equal(counts, [1, 1, 1, 1, 2, 2, 2, 2])
+
+
+def test_original_near_matches_identical_balanced_lookup():
+    quota = table(list(range(8)))
+    similarity = np.zeros((48, 128, 128), np.float32)
+    policies = [Policy([16] * 8, similarity, False, 7),
+                Policy([16] * 8, similarity, False, 11, quota_lut=quota)]
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    rows = [policy.apply(0, selected, weights, origins,
+                         np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+            for policy in policies]
+    for field in range(5):
+        assert np.array_equal(rows[0][field], rows[1][field])
+    assert rows[0][5] == rows[1][5]
+    assert np.array_equal(rows[0][6], rows[1][6])

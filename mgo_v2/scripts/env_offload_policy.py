@@ -8,7 +8,7 @@ from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignmen
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
-def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates,random_owners):
+def step(event,selected,weights,origins,gate_scores,similarity,capacities,substitution,policy,future,slots,owner,primary,last,seen,lost,birth,reuses,gates,random_owners,quota_lut):
     layers,experts=similarity.shape[:2];world=len(capacities);gate_eviction=True
     rank_fetches=np.zeros(world,np.int32)
     fetches=[(0,0,0,0,0)];fetches.pop()
@@ -66,6 +66,9 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=np.empty(len(misses),np.int64)
         for i in range(len(misses)):
             assignment[i]=random_owners[layer*experts+misses[i]]
+    elif policy==11 or policy==12:
+        assert world==8 and not substitution and len(misses)<=128
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota_lut[len(misses)])
     elif policy==7:
         assert 1<=world<=8 and not substitution
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
@@ -131,7 +134,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     return targets,effective,masses,lengths,destinations,fetches,row
 
 class Policy:
-    def __init__(self,capacities,similarity,substitution,policy,seed=42):
+    def __init__(self,capacities,similarity,substitution,policy,seed=42,quota_lut=None):
         self.capacities=np.asarray(capacities,np.int32);self.similarity=similarity
         self.substitution=substitution;self.policy=policy;w=len(capacities);l,e=similarity.shape[:2];k=l*e
         self.slots=np.full((w,max(capacities)),-1,np.int32);self.owner=np.zeros(k,np.int16);self.primary=np.full(k,-1,np.int8)
@@ -139,6 +142,13 @@ class Policy:
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
         rng=np.random.default_rng(seed)
         self.random_owners=np.concatenate([rng.permutation(np.arange(e,dtype=np.int8)%w) for _ in range(l)])
+        if policy in (11,12):
+            assert quota_lut is not None and w==8
+            self.quota_lut=np.ascontiguousarray(quota_lut,dtype=np.int64)
+            assert self.quota_lut.shape==(129,8)
+            for n in range(129):
+                assert self.quota_lut[n].sum()==n and self.quota_lut[n].max()-self.quota_lut[n].min()<=1
+        else:self.quota_lut=np.zeros((129,w),np.int64)
         seed_rng(seed)
     def apply(self,event,selected,weights,origins,gate_scores,future):
         if self.policy==8:
@@ -147,4 +157,4 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates,self.random_owners)
+        return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates,self.random_owners,self.quota_lut)
