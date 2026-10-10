@@ -10,7 +10,7 @@ All retained primary repeats determine medians. The short-routing proxy and sing
 |---|---:|---|---:|---:|---|---:|
 | 16/64 | 64 | HISTORICAL_PASS | 1.058425 / 1.008296 | 4.736% | family_3 | 4.736% |
 | 16/64 | 128 | PASS | 1.079430 / 1.062214 | 1.595% | previous_best_control | 1.595% |
-| 16/64 | 256 | PENDING | — | — | — | — |
+| 16/64 | 256 | PASS | 1.025316 / 1.018766 | 0.639% | mixed_0 | 2.025% |
 | 32/128 | 64 | PASS | 1.583033 / 1.528744 | 3.429% | previous_best_control | 3.429% |
 | 32/128 | 128 | PENDING | — | — | — | — |
 | 32/128 | 256 | PENDING | — | — | — | — |
