@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "started": 1791636084.8632305,
+  "system": "main_OURS",
+  "source_commit": "3943785ae8da2ea7f0b3c186d3462abbe5ca8fea",
+  "workload_manifest": "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/WORKLOADS.json",
+  "workload_manifest_sha256": "f9a5e7cfe106217ffba1bf76c94da76723753f365429d181ab7ce02822813785",
+  "requested_timeout_seconds": 5400,
+  "effective_timeout_seconds": 5400,
+  "nccl_p2p_disable": false,
+  "nccl_ib_disable": false,
+  "min_gpu_free_mib": 0,
+  "preflight_release_observations": [],
+  "command": [
+    "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+    "-u",
+    "-m",
+    "torch.distributed.run",
+    "--standalone",
+    "--nproc_per_node=4",
+    "/home/hwlee/mgo-haq/mgo_v2/examples/headline_ours_deepseek_multipolicy_worker.py",
+    "--cell",
+    "DeepSeekV2Lite_ShareGPT_R4_C40_B16_L512_O64",
+    "--output",
+    "/home/hwlee/mgo-results/haq_cache_ablation_20261010/ds_c40_RANDOM_r2"
+  ],
+  "pid": 3660221,
+  "worker_returncode": 0,
+  "result": {
+    "status": "PASS",
+    "system": "main_OURS",
+    "cell": "DeepSeekV2Lite_ShareGPT_R4_C40_B16_L512_O64",
+    "primary_repeats": 2,
+    "worker": "headline_ours_deepseek_multipolicy_worker.py",
+    "prefill_policy": "BR",
+    "decode_policy_schedule": [
+      "RANDOM",
+      "RANDOM"
+    ],
+    "h2d_serial_ablation": true,
+    "headline_eligible": false
+  },
+  "final_release_observations": [],
+  "remaining_gpu_occupants": [],
+  "finished": 1791636224.1786704,
+  "restored": []
+}
