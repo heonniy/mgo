@@ -59,9 +59,9 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
-    if policy==13 or policy==14:
+    if policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
-        assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy==14)
+        assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
     elif policy==9:
         # Static expert owner: layer does not affect the canonical rank.
         assignment=misses%world
