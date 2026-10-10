@@ -1,12 +1,17 @@
-**OWNER ACTIVE GROUPED R8 PCIe QUOTA FOLLOW-UP (2026-10-10).**
-Read `experiments/pcie_quota_grouped_r8_b16_20261010/PLAN.md`.
-Recheck the quota effect with strict hit-then-miss grouped `new_OURS`,
-compiled dense routing and the same R8/C30/local-B16/input512/output64
-ShareGPT workload. The R8 guard's new `N` arm selects this strict schedule;
-the older `C` arm remains the different ready/two-wave schedule. If PCIe
-lookup does not show a clear gain, screen a bounded frozen list of ShareGPT
-sample seeds and confirm the best observed candidate. Keep all runs and
-unfavorable repeats; do not promote a chosen seed as a general result.
+**OWNER GROUPED R8 PCIe QUOTA FOLLOW-UP COMPLETE (2026-10-10).**
+Read `experiments/pcie_quota_grouped_r8_b16_20261010/{PLAN.md,GROUPED_RESULTS.md,SEED_RESULTS.md}`.
+Strict hit-then-miss grouped `new_OURS` and compiled dense routing were used
+for the R8/C30/local-B16/input512/output64 ShareGPT comparison. Original
+Near, fast-rank quota and PCIe lookup had three unfiltered target repeats
+each; median TPOTs were 0.2848, 0.2804 and 0.2821 s/token. The PCIe lookup
+did not beat the simple fast-rank quota on that workload. Four frozen seeds
+were then screened; seed 23 had the largest single-shot lookup gain, but its
+fresh three-repeat confirmation yielded only 0.46% gain with overlapping
+ranges. Keep the main_OURS Near default and do not promote that selected
+seed as a general performance result. Managed model loads on GPUs0/1/4/5
+were restored; GPUs2/3/6/7 remain idle. The R2/R8 main-table report now
+also includes a separately measured R4 row and explicit old/new R4 code,
+prompt and repetition-protocol provenance.
 
 **OWNER R8 PCIe QUOTA LOOKUP COMPLETE (2026-10-10).**
 Read `experiments/pcie_quota_r8_b16_20261010/{REPORT.md,LOOKUP.json}`.
