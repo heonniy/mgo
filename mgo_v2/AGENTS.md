@@ -1,3 +1,10 @@
+**OWNER BACKGROUND MODEL LOAD DISABLED (2026-10-10).**
+The user ended the idle model workload. Do not launch or restore
+`model_inference_load.py` on any GPU between experiments. The managed
+0/1/4/5 loads were stopped and their process receipt cleared. Historical
+start/restore helpers now return an empty list. This current instruction
+overrides older notes below that mention restoring background loads.
+
 **OWNER GROUPED R8 PCIe QUOTA FOLLOW-UP COMPLETE (2026-10-10).**
 Read `experiments/pcie_quota_grouped_r8_b16_20261010/{PLAN.md,GROUPED_RESULTS.md,SEED_RESULTS.md}`.
 Strict hit-then-miss grouped `new_OURS` and compiled dense routing were used

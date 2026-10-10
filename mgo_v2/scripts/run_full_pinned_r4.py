@@ -70,19 +70,8 @@ def foreign_on_targets():
  return out
 
 def restore_target_idle(gpus):
- if not gpus:return []
- ps=[]
- envbase=dict(os.environ,OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
- for g in gpus:
-  # Do not start if any process appeared meanwhile.
-  if any(x['gpu']==g for x in foreign_on_targets()):continue
-  env=dict(envbase,CUDA_VISIBLE_DEVICES=str(g))
-  with (LOAD/f'gpu{g}.log').open('a') as log:
-   p=subprocess.Popen([PYTHON,'-u',str(IDLE_WORKER)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-  ps.append(dict(gpu=g,pid=p.pid))
- old=json.loads((LOAD/'processes.json').read_text()) if (LOAD/'processes.json').exists() else []
- write(LOAD/'processes.json',[r for r in old if r.get('gpu') not in gpus]+ps)
- return ps
+ # User disabled the background model load. Historical callers can continue.
+ return []
 
 def main():
  assert not ROOT.exists(),'preserve prior attempt; use a new root for rerun'

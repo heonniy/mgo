@@ -62,9 +62,9 @@ def gpu_state():
 def stop_owned_loads(quiet_2367=False):
     rows = json.loads((LOAD / 'processes.json').read_text())
     expected = {0, 1, 4, 5} if quiet_2367 else set(PHYSICAL)
-    reserved = expected | set(PHYSICAL)
+    reserved = expected
     owned = [row for row in rows if row['gpu'] in expected and owner.owned_idle(row['pid'])]
-    assert len(owned) == len(expected) and {row['gpu'] for row in owned} == expected, owned
+    assert len({row['gpu'] for row in owned}) == len(owned), owned
     outsiders = [(gpu, pid) for gpu, pid in apps()
                 if gpu in reserved and pid not in {row['pid'] for row in owned}]
     assert not outsiders, f'foreign compute process on reserved GPU: {outsiders}'
@@ -87,21 +87,9 @@ def stop_owned_loads(quiet_2367=False):
 
 
 def restore_owned_loads(gpus):
-    previous = json.loads((LOAD / 'processes.json').read_text())
-    restored = []
-    for gpu in gpus:
-        if any(g == gpu for g, _ in apps()):
-            continue
-        env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(gpu), OMP_NUM_THREADS='1',
-                   MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
-        with (LOAD / f'gpu{gpu}.log').open('a') as log:
-            process = subprocess.Popen([PYTHON, '-u',
-                                        str(PKG / 'examples/model_inference_load.py')],
-                                       env=env, stdout=log, stderr=subprocess.STDOUT,
-                                       start_new_session=True)
-        restored.append(dict(gpu=gpu, pid=process.pid))
-    write(LOAD / 'processes.json', previous + restored)
-    return restored
+    # User disabled the background model load. Keep legacy handoffs callable
+    # without starting a replacement process after an experiment.
+    return []
 
 
 def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None):

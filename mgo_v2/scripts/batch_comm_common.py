@@ -29,23 +29,12 @@ def stop_idle_load():
  assert not any(owned(r['pid']) for r in ps)
 
 def start_idle_load():
- # Never stop or compete with someone else's workload; existing guard also exits on arrival.
- uuids=subprocess.check_output(['nvidia-smi','--query-gpu=index,uuid','--format=csv,noheader'],text=True)
- apps=subprocess.check_output(['nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader,nounits'],text=True)
- busy={line.split(',')[0].strip() for line in apps.splitlines()}
- (LOAD/'STOP').unlink(missing_ok=True)
- old=json.loads((LOAD/'processes.json').read_text());ps=[r for r in old if owned(r['pid'])]
- restriction=LOAD/'owner_stopped_gpus.json'
- stopped=set(json.loads(restriction.read_text())['gpus']) if restriction.exists() else set()
- for line in uuids.splitlines():
-  g,uuid=[x.strip() for x in line.split(',')];g=int(g)
-  if g in stopped or uuid in busy or any(r['gpu']==g for r in ps):continue
-  env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(g),OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
-  with (LOAD/f'gpu{g}.log').open('a') as f:
-   p=subprocess.Popen([PYTHON,'-u',str(WORKER)],env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)
-  ps.append(dict(gpu=g,pid=p.pid))
- write(LOAD/'processes.json',ps)
- return ps
+ # User disabled the background model load. Leave STOP in place and never
+ # launch workers from historical experiment cleanup paths.
+ if (LOAD/'processes.json').exists():stop_idle_load()
+ (LOAD/'STOP').touch()
+ write(LOAD/'processes.json',[])
+ return []
 
 def run(label,worker,args=(),mode='T0',model=False,smoke=False):
  target=ROOT/label;target.mkdir(exist_ok=False)
