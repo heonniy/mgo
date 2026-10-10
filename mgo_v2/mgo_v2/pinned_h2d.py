@@ -117,6 +117,7 @@ class CopyTicket:
         self.state=TransferState(key)
         if urgent:self.state.demand()
         self.done=torch.cuda.Event(enable_timing=profile)
+        self.stream_enter=torch.cuda.Event(enable_timing=True) if profile else None
         self.begin=torch.cuda.Event(enable_timing=True) if profile else None
         self.submitted=False;self.staging=False;self.counted=True
         self.previous_copy=None;self.previous_compute=None
@@ -258,6 +259,7 @@ class PriorityH2DScheduler:
                 # Direct-pinned mode retains the same queue, priority, slot
                 # hazards and completion events, but removes CPU staging.
                 with torch.cuda.stream(self.h2d_stream):
+                    if t.stream_enter is not None:t.stream_enter.record(self.h2d_stream)
                     if t.previous_copy is not None:self.h2d_stream.wait_event(t.previous_copy)
                     if t.previous_compute is not None:self.h2d_stream.wait_event(t.previous_compute)
                     if t.begin is not None:t.begin.record(self.h2d_stream)
