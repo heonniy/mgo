@@ -92,7 +92,7 @@ def restore_owned_loads(gpus):
     return []
 
 
-def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False, inline_demand_h2d=False, h2d_serial_ablation=False):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False, inline_demand_h2d=False, h2d_serial_ablation=False, decode_policy=None):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -116,6 +116,8 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
             command += ['--inline-demand-h2d']
         if h2d_serial_ablation:
             command += ['--h2d-serial-ablation']
+        if decode_policy is not None:
+            command += ['--decode-policy', decode_policy]
         if ours_mode in ('B', 'C', 'N'):
             command += ['--grouped-decode-mode',
                         {'B': 'serial_all', 'C': 'two_wave',
@@ -136,7 +138,7 @@ def main():
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C', 'N'))
-    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM','RANDOM_QUOTA_NEAR'),
+    parser.add_argument('--ours-policy', choices=('BR','LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM','RANDOM_QUOTA_NEAR'),
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
@@ -146,6 +148,8 @@ def main():
                         help='submit each layer\'s demand copies in one pass on the caller thread')
     parser.add_argument('--post-generation-diagnostic', action='store_true',
                         help='untimed instrumented pass after the timed targets (not with teacher tokens)')
+    parser.add_argument('--decode-policy', choices=('HAQ', 'RANDOM'),
+                        help='policy switched in at decode step 1 (serial cache ablation uses --ours-policy BR)')
     parser.add_argument('--job-label')
     parser.add_argument('--quiet-2367', action='store_true',
                         help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
@@ -155,6 +159,7 @@ def main():
     assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','FAST_WORST','FAST_RANDOM'))
     assert args.teacher_tokens is None or (args.system == 'ours' and not args.smoke)
     assert not args.h2d_serial_ablation or (args.system == 'ours' and args.ours_mode == 'A')
+    assert args.decode_policy is None or args.system == 'ours'
     assert not args.post_generation_diagnostic or (args.system == 'ours' and args.teacher_tokens is None)
     if args.quota_table is not None:
         args.quota_table = args.quota_table.resolve()
@@ -202,7 +207,8 @@ def main():
                  command=command(args.system, output, args.smoke, args.repeats,
                                  args.ours_mode, args.ours_policy, args.quota_table,
                                  args.teacher_tokens, args.post_generation_diagnostic,
-                                 args.inline_demand_h2d, args.h2d_serial_ablation),
+                                 args.inline_demand_h2d, args.h2d_serial_ablation,
+                                 args.decode_policy),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []
