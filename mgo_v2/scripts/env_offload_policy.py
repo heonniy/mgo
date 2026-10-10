@@ -70,6 +70,10 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     elif policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
         assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
+    elif policy==18:
+        # Static contiguous block owner: rank = expert_id // (experts/world).
+        assert experts%world==0
+        assignment=misses//(experts//world)
     elif policy==9:
         # Static expert owner: layer does not affect the canonical rank.
         assignment=misses%world
@@ -100,7 +104,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min()
-    if policy!=9 and policy!=10 and policy!=16:assert row[44]-row[45]<=1
+    if policy!=9 and policy!=10 and policy!=16 and policy!=18:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0

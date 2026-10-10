@@ -1,0 +1,512 @@
+{
+ "status": "PASS",
+ "units": "TPOT seconds/token",
+ "cells": {
+  "DeepSeekV2Lite_ShareGPT_R4_C50_B16_L512_O64": {
+   "BW": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 1,
+      "TPOT": 0.3186873540793651,
+      "TTFT": 0.854948908,
+      "E2E": 20.932252215,
+      "argmax_hash": "18a8035a143a6255af40133da48aced9f31693228dba99480927367754f40be5",
+      "decode_fetches_per_rank": [
+       14271,
+       13860,
+       13458,
+       13018
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 8,
+      "TPOT": 0.3158131657301587,
+      "TTFT": 0.600786911,
+      "E2E": 20.497016352,
+      "argmax_hash": "18a8035a143a6255af40133da48aced9f31693228dba99480927367754f40be5",
+      "decode_fetches_per_rank": [
+       14271,
+       13860,
+       13458,
+       13018
+      ]
+     },
+     {
+      "job": "ds_static_c50_v1",
+      "target": 1,
+      "TPOT": 0.31809612301587303,
+      "TTFT": 0.87119622,
+      "E2E": 20.91125197,
+      "argmax_hash": "18a8035a143a6255af40133da48aced9f31693228dba99480927367754f40be5",
+      "decode_fetches_per_rank": [
+       14271,
+       13860,
+       13458,
+       13018
+      ]
+     },
+     {
+      "job": "ds_static_c50_v1",
+      "target": 6,
+      "TPOT": 0.318322175,
+      "TTFT": 0.595645707,
+      "E2E": 20.649942732,
+      "argmax_hash": "18a8035a143a6255af40133da48aced9f31693228dba99480927367754f40be5",
+      "decode_fetches_per_rank": [
+       14271,
+       13860,
+       13458,
+       13018
+      ]
+     }
+    ],
+    "n": 4,
+    "median": 0.3182091490079365,
+    "vs_BW_pct": 0.0,
+    "vs_BW_ms": 0.0,
+    "hashes": [
+     "18a8035a143a6255af40133da48aced9f31693228dba99480927367754f40be5"
+    ]
+   },
+   "BR": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 2,
+      "TPOT": 0.3200950157460317,
+      "TTFT": 0.614034845,
+      "E2E": 20.780020837,
+      "argmax_hash": "517a99110db96ab3ba3278c2f7b438370f4a0412903710852feebb5b4a4db409",
+      "decode_fetches_per_rank": [
+       14245,
+       13825,
+       13413,
+       13010
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 7,
+      "TPOT": 0.31511161150793654,
+      "TTFT": 0.599744448,
+      "E2E": 20.451775973,
+      "argmax_hash": "517a99110db96ab3ba3278c2f7b438370f4a0412903710852feebb5b4a4db409",
+      "decode_fetches_per_rank": [
+       14245,
+       13825,
+       13413,
+       13010
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.31760331362698413,
+    "vs_BW_pct": -0.19038905161625763,
+    "vs_BW_ms": -0.6058353809523798,
+    "hashes": [
+     "517a99110db96ab3ba3278c2f7b438370f4a0412903710852feebb5b4a4db409"
+    ]
+   },
+   "STATIC_BLOCK": {
+    "targets": [
+     {
+      "job": "ds_static_c50_v1",
+      "target": 2,
+      "TPOT": 0.32018740504761906,
+      "TTFT": 0.598172006,
+      "E2E": 20.769978524,
+      "argmax_hash": "33f9d0bab3634e25197834ffc602b92c5540f65275d7ef62afc2d7a26e02f381",
+      "decode_fetches_per_rank": [
+       13711,
+       13907,
+       12896,
+       14237
+      ]
+     },
+     {
+      "job": "ds_static_c50_v1",
+      "target": 5,
+      "TPOT": 0.31637937722222226,
+      "TTFT": 0.655912561,
+      "E2E": 20.587813326,
+      "argmax_hash": "33f9d0bab3634e25197834ffc602b92c5540f65275d7ef62afc2d7a26e02f381",
+      "decode_fetches_per_rank": [
+       13711,
+       13907,
+       12896,
+       14237
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.31828339113492066,
+    "vs_BW_pct": 0.02333123582889396,
+    "vs_BW_ms": 0.07424212698414756,
+    "hashes": [
+     "33f9d0bab3634e25197834ffc602b92c5540f65275d7ef62afc2d7a26e02f381"
+    ]
+   },
+   "LA_CA_NEAR": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 4,
+      "TPOT": 0.3099720286031746,
+      "TTFT": 0.600298839,
+      "E2E": 20.128536641,
+      "argmax_hash": "6e8b19e1cf627f43a1e210e25f15a3e03b87b99b41dbcf12fa98cf45fa242e8f",
+      "decode_fetches_per_rank": [
+       14247,
+       13809,
+       13420,
+       13006
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 5,
+      "TPOT": 0.30887923646031745,
+      "TTFT": 0.601723861,
+      "E2E": 20.061115758,
+      "argmax_hash": "6e8b19e1cf627f43a1e210e25f15a3e03b87b99b41dbcf12fa98cf45fa242e8f",
+      "decode_fetches_per_rank": [
+       14247,
+       13809,
+       13420,
+       13006
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.30942563253174604,
+    "vs_BW_pct": -2.7602966487840996,
+    "vs_BW_ms": -8.783516476190467,
+    "hashes": [
+     "6e8b19e1cf627f43a1e210e25f15a3e03b87b99b41dbcf12fa98cf45fa242e8f"
+    ]
+   },
+   "HAQ": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 3,
+      "TPOT": 0.3034828564603175,
+      "TTFT": 0.613574615,
+      "E2E": 19.732994572,
+      "argmax_hash": "389f3be9bbc43ba303a66c77b1bc3ca8681b0efbe3b96471e3106504bd94e1ca",
+      "decode_fetches_per_rank": [
+       13695,
+       13642,
+       13601,
+       13537
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c50_v1",
+      "target": 6,
+      "TPOT": 0.30304125396825393,
+      "TTFT": 0.599822082,
+      "E2E": 19.691421082,
+      "argmax_hash": "389f3be9bbc43ba303a66c77b1bc3ca8681b0efbe3b96471e3106504bd94e1ca",
+      "decode_fetches_per_rank": [
+       13695,
+       13642,
+       13601,
+       13537
+      ]
+     },
+     {
+      "job": "ds_static_c50_v1",
+      "target": 3,
+      "TPOT": 0.3054209581269841,
+      "TTFT": 0.640902518,
+      "E2E": 19.88242288,
+      "argmax_hash": "389f3be9bbc43ba303a66c77b1bc3ca8681b0efbe3b96471e3106504bd94e1ca",
+      "decode_fetches_per_rank": [
+       13695,
+       13642,
+       13601,
+       13537
+      ]
+     },
+     {
+      "job": "ds_static_c50_v1",
+      "target": 4,
+      "TPOT": 0.30707287304761904,
+      "TTFT": 0.620880669,
+      "E2E": 19.966471671,
+      "argmax_hash": "389f3be9bbc43ba303a66c77b1bc3ca8681b0efbe3b96471e3106504bd94e1ca",
+      "decode_fetches_per_rank": [
+       13695,
+       13642,
+       13601,
+       13537
+      ]
+     }
+    ],
+    "n": 4,
+    "median": 0.3044519072936508,
+    "vs_BW_pct": -4.323333177935307,
+    "vs_BW_ms": -13.757241714285717,
+    "hashes": [
+     "389f3be9bbc43ba303a66c77b1bc3ca8681b0efbe3b96471e3106504bd94e1ca"
+    ]
+   }
+  },
+  "DeepSeekV2Lite_ShareGPT_R4_C30_B16_L512_O64": {
+   "BW": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 1,
+      "TPOT": 0.3490699287936508,
+      "TTFT": 0.871388024,
+      "E2E": 22.862793538,
+      "argmax_hash": "770878c0caeed4b3b6a3de696b61eec46932bfef45652a3acf4a5e92cbb5833b",
+      "decode_fetches_per_rank": [
+       19637,
+       19229,
+       18836,
+       18417
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 8,
+      "TPOT": 0.3432788933174603,
+      "TTFT": 0.59914163,
+      "E2E": 22.225711909,
+      "argmax_hash": "770878c0caeed4b3b6a3de696b61eec46932bfef45652a3acf4a5e92cbb5833b",
+      "decode_fetches_per_rank": [
+       19637,
+       19229,
+       18836,
+       18417
+      ]
+     },
+     {
+      "job": "ds_static_c30_v1",
+      "target": 1,
+      "TPOT": 0.34313636650793655,
+      "TTFT": 0.860741542,
+      "E2E": 22.478332632,
+      "argmax_hash": "770878c0caeed4b3b6a3de696b61eec46932bfef45652a3acf4a5e92cbb5833b",
+      "decode_fetches_per_rank": [
+       19637,
+       19229,
+       18836,
+       18417
+      ]
+     },
+     {
+      "job": "ds_static_c30_v1",
+      "target": 6,
+      "TPOT": 0.34542374893650796,
+      "TTFT": 0.614061897,
+      "E2E": 22.37575808,
+      "argmax_hash": "770878c0caeed4b3b6a3de696b61eec46932bfef45652a3acf4a5e92cbb5833b",
+      "decode_fetches_per_rank": [
+       19637,
+       19229,
+       18836,
+       18417
+      ]
+     }
+    ],
+    "n": 4,
+    "median": 0.34435132112698413,
+    "vs_BW_pct": 0.0,
+    "vs_BW_ms": 0.0,
+    "hashes": [
+     "770878c0caeed4b3b6a3de696b61eec46932bfef45652a3acf4a5e92cbb5833b"
+    ]
+   },
+   "BR": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 2,
+      "TPOT": 0.34536349755555557,
+      "TTFT": 0.576314408,
+      "E2E": 22.334214754,
+      "argmax_hash": "07174bfac892cdbb087642f03ac989c2701b9d8b24b9363adbef1939a7996224",
+      "decode_fetches_per_rank": [
+       19603,
+       19181,
+       18772,
+       18396
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 7,
+      "TPOT": 0.34614851528571433,
+      "TTFT": 0.590055274,
+      "E2E": 22.397411737,
+      "argmax_hash": "07174bfac892cdbb087642f03ac989c2701b9d8b24b9363adbef1939a7996224",
+      "decode_fetches_per_rank": [
+       19603,
+       19181,
+       18772,
+       18396
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.345756006420635,
+    "vs_BW_pct": 0.40792214446967456,
+    "vs_BW_ms": 1.4046852936508425,
+    "hashes": [
+     "07174bfac892cdbb087642f03ac989c2701b9d8b24b9363adbef1939a7996224"
+    ]
+   },
+   "STATIC_BLOCK": {
+    "targets": [
+     {
+      "job": "ds_static_c30_v1",
+      "target": 2,
+      "TPOT": 0.34310450473015874,
+      "TTFT": 0.58115874,
+      "E2E": 22.196742538,
+      "argmax_hash": "c7d553ae6fcab02aecaac697da21e835c417bc6b17305a681e25f312fe793ba7",
+      "decode_fetches_per_rank": [
+       19308,
+       19249,
+       18772,
+       18924
+      ]
+     },
+     {
+      "job": "ds_static_c30_v1",
+      "target": 5,
+      "TPOT": 0.3412696354920635,
+      "TTFT": 0.597645253,
+      "E2E": 22.097632289,
+      "argmax_hash": "c7d553ae6fcab02aecaac697da21e835c417bc6b17305a681e25f312fe793ba7",
+      "decode_fetches_per_rank": [
+       19308,
+       19249,
+       18772,
+       18924
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.34218707011111116,
+    "vs_BW_pct": -0.6285008603393427,
+    "vs_BW_ms": -2.1642510158729755,
+    "hashes": [
+     "c7d553ae6fcab02aecaac697da21e835c417bc6b17305a681e25f312fe793ba7"
+    ]
+   },
+   "LA_CA_NEAR": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 4,
+      "TPOT": 0.340406308015873,
+      "TTFT": 0.591288641,
+      "E2E": 22.036886046,
+      "argmax_hash": "ff8c1a2b8980c7865df5a9a376c412d2b327618b82be5c36e009ff5361eb03f4",
+      "decode_fetches_per_rank": [
+       19606,
+       19198,
+       18804,
+       18430
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 5,
+      "TPOT": 0.3413492283968254,
+      "TTFT": 0.591528521,
+      "E2E": 22.09652991,
+      "argmax_hash": "ff8c1a2b8980c7865df5a9a376c412d2b327618b82be5c36e009ff5361eb03f4",
+      "decode_fetches_per_rank": [
+       19606,
+       19198,
+       18804,
+       18430
+      ]
+     }
+    ],
+    "n": 2,
+    "median": 0.3408777682063492,
+    "vs_BW_pct": -1.0087235644303028,
+    "vs_BW_ms": -3.473552920634948,
+    "hashes": [
+     "ff8c1a2b8980c7865df5a9a376c412d2b327618b82be5c36e009ff5361eb03f4"
+    ]
+   },
+   "HAQ": {
+    "targets": [
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 3,
+      "TPOT": 0.33492113793650796,
+      "TTFT": 0.589524196,
+      "E2E": 21.689555886,
+      "argmax_hash": "cf8a4574cd8d6895c16fa4d45b7f8f0d617439611f0a5415be707b924513524c",
+      "decode_fetches_per_rank": [
+       19106,
+       19040,
+       18973,
+       18887
+      ]
+     },
+     {
+      "job": "ds_haq_serial_c30_v1",
+      "target": 6,
+      "TPOT": 0.3351262680952381,
+      "TTFT": 0.591841539,
+      "E2E": 21.704796429,
+      "argmax_hash": "cf8a4574cd8d6895c16fa4d45b7f8f0d617439611f0a5415be707b924513524c",
+      "decode_fetches_per_rank": [
+       19106,
+       19040,
+       18973,
+       18887
+      ]
+     },
+     {
+      "job": "ds_static_c30_v1",
+      "target": 3,
+      "TPOT": 0.3377724163809524,
+      "TTFT": 0.589261381,
+      "E2E": 21.868923613,
+      "argmax_hash": "cf8a4574cd8d6895c16fa4d45b7f8f0d617439611f0a5415be707b924513524c",
+      "decode_fetches_per_rank": [
+       19106,
+       19040,
+       18973,
+       18887
+      ]
+     },
+     {
+      "job": "ds_static_c30_v1",
+      "target": 4,
+      "TPOT": 0.3354057526349206,
+      "TTFT": 0.581736485,
+      "E2E": 21.712298901,
+      "argmax_hash": "cf8a4574cd8d6895c16fa4d45b7f8f0d617439611f0a5415be707b924513524c",
+      "decode_fetches_per_rank": [
+       19106,
+       19040,
+       18973,
+       18887
+      ]
+     }
+    ],
+    "n": 4,
+    "median": 0.33526601036507936,
+    "vs_BW_pct": -2.6383841746767778,
+    "vs_BW_ms": -9.085310761904775,
+    "hashes": [
+     "cf8a4574cd8d6895c16fa4d45b7f8f0d617439611f0a5415be707b924513524c"
+    ]
+   }
+  }
+ }
+}
