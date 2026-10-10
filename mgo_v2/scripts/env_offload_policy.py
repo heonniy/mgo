@@ -1,4 +1,5 @@
 """Live one-event adapter of the frozen CPU policy, used only during PLAN."""
+import os
 import numpy as np
 from numba import njit
 from br_carep_cpu import balanced_assignment,choose_slot,place,ROW_BYTES,EXPERT_BYTES
@@ -70,6 +71,9 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     elif policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
         assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
+    elif policy==19:
+        # Fully random fetch rank: i.i.d. uniform per miss, no quota.
+        assignment=np.random.randint(0,world,len(misses))
     elif policy==18:
         # Static contiguous block owner: rank = expert_id // (experts/world).
         assert experts%world==0
@@ -104,7 +108,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min()
-    if policy!=9 and policy!=10 and policy!=16 and policy!=18:assert row[44]-row[45]<=1
+    if policy!=9 and policy!=10 and policy!=16 and policy!=18 and policy!=19:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0
@@ -166,6 +170,7 @@ class Policy:
                 assert self.quota_lut[n].sum()==n and self.quota_lut[n].max()-self.quota_lut[n].min()<=1
         else:self.quota_lut=np.zeros((129,w),np.int64)
         seed_rng(seed)
+        self.random_salt=int(os.environ.get('MGO_RANDOM_SALT','0'))
     def apply(self,event,selected,weights,origins,gate_scores,future):
         if self.policy==8:
             # Compile a CA-only copy of the unchanged replay kernel with the
@@ -173,4 +178,8 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
+        if self.policy==19:
+            # Stateless per-event draw: identical on every rank, independent
+            # of earlier RNG use; MGO_RANDOM_SALT varies it across rounds.
+            seed_rng(self.random_salt*1000003+event)
         return planner(event,selected,weights,origins,gate_scores,self.similarity,self.capacities,self.substitution,self.policy,future,self.slots,self.owner,self.primary,self.last,self.seen,self.lost,self.birth,self.reuses,self.gates,self.random_owners,self.quota_lut)

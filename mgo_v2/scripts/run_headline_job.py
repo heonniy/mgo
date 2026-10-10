@@ -162,7 +162,7 @@ if __name__=='__main__':
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))
- p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR','MISS_BAL_COMM','BW','MISS_CAP_COMM','HAQ','HAQ_WORST','STATIC_BLOCK'))
+ p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR','MISS_BAL_COMM','BW','MISS_CAP_COMM','HAQ','HAQ_WORST','STATIC_BLOCK','RANDOM'))
  p.add_argument('--decode-policy-schedule');p.add_argument('--teacher-tokens')
  p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--native-prefill',action='store_true')
