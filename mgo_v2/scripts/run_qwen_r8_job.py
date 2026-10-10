@@ -92,7 +92,7 @@ def restore_owned_loads(gpus):
     return []
 
 
-def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -110,6 +110,8 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
             command += ['--quota-table', str(quota_table)]
         if teacher_tokens is not None:
             command += ['--teacher-tokens', str(teacher_tokens)]
+        if post_generation_diagnostic:
+            command += ['--post-generation-diagnostic']
         if ours_mode in ('B', 'C', 'N'):
             command += ['--grouped-decode-mode',
                         {'B': 'serial_all', 'C': 'two_wave',
@@ -134,6 +136,8 @@ def main():
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
+    parser.add_argument('--post-generation-diagnostic', action='store_true',
+                        help='untimed instrumented pass after the timed targets (not with teacher tokens)')
     parser.add_argument('--job-label')
     parser.add_argument('--quiet-2367', action='store_true',
                         help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
@@ -142,6 +146,7 @@ def main():
     assert args.system == 'ours' or (args.ours_policy == 'LA_CA_NEAR' and args.quota_table is None)
     assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE','NEAR_SPLIT'))
     assert args.teacher_tokens is None or (args.system == 'ours' and not args.smoke)
+    assert not args.post_generation_diagnostic or (args.system == 'ours' and args.teacher_tokens is None)
     if args.quota_table is not None:
         args.quota_table = args.quota_table.resolve()
         assert args.quota_table.is_file()
@@ -187,7 +192,7 @@ def main():
                                                        cwd=PKG.parent, text=True).strip(),
                  command=command(args.system, output, args.smoke, args.repeats,
                                  args.ours_mode, args.ours_policy, args.quota_table,
-                                 args.teacher_tokens),
+                                 args.teacher_tokens, args.post_generation_diagnostic),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []
