@@ -92,7 +92,7 @@ def restore_owned_loads(gpus):
     return []
 
 
-def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False, inline_demand_h2d=False):
+def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_NEAR', quota_table=None, teacher_tokens=None, post_generation_diagnostic=False, inline_demand_h2d=False, h2d_serial_ablation=False):
     worker, python, _ = WORKERS[system]
     command = [python, '-u']
     if system in ('ours', 'deepspeed'):
@@ -114,6 +114,8 @@ def command(system, output, smoke, repeats, ours_mode=None, ours_policy='LA_CA_N
             command += ['--post-generation-diagnostic']
         if inline_demand_h2d:
             command += ['--inline-demand-h2d']
+        if h2d_serial_ablation:
+            command += ['--h2d-serial-ablation']
         if ours_mode in ('B', 'C', 'N'):
             command += ['--grouped-decode-mode',
                         {'B': 'serial_all', 'C': 'two_wave',
@@ -138,6 +140,8 @@ def main():
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
+    parser.add_argument('--h2d-serial-ablation', action='store_true',
+                        help='serial per-expert native decode that waits for all demand H2D first (use with --ours-mode A)')
     parser.add_argument('--inline-demand-h2d', action='store_true',
                         help='submit each layer\'s demand copies in one pass on the caller thread')
     parser.add_argument('--post-generation-diagnostic', action='store_true',
@@ -150,6 +154,7 @@ def main():
     assert args.system == 'ours' or (args.ours_policy == 'LA_CA_NEAR' and args.quota_table is None)
     assert (args.quota_table is not None) == (args.ours_policy in ('NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','FAST_WORST','FAST_RANDOM'))
     assert args.teacher_tokens is None or (args.system == 'ours' and not args.smoke)
+    assert not args.h2d_serial_ablation or (args.system == 'ours' and args.ours_mode == 'A')
     assert not args.post_generation_diagnostic or (args.system == 'ours' and args.teacher_tokens is None)
     if args.quota_table is not None:
         args.quota_table = args.quota_table.resolve()
@@ -197,7 +202,7 @@ def main():
                  command=command(args.system, output, args.smoke, args.repeats,
                                  args.ours_mode, args.ours_policy, args.quota_table,
                                  args.teacher_tokens, args.post_generation_diagnostic,
-                                 args.inline_demand_h2d),
+                                 args.inline_demand_h2d, args.h2d_serial_ablation),
                  workload_sha256=hashlib.sha256(WORKLOADS.read_bytes()).hexdigest())
     write(output / 'status.json', state)
     stopped = []
