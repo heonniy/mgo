@@ -316,13 +316,22 @@ class PriorityH2DScheduler:
         t=self.tickets[slot];self._submitted(t)
         torch.cuda.current_stream(device=self.device).wait_event(t.done)
     def wait_slots(self,slots,host=False):
+        if not host:
+            stream=torch.cuda.current_stream(device=self.device)
+            for slot in slots:
+                t=self.tickets[slot];self._submitted(t);stream.wait_event(t.done)
+            return
+        tickets=[]
         for slot in slots:
             t=self.tickets[slot];self._submitted(t)
-            if host:
-                t.done.synchronize()
-                with self.cv:
-                    if t.state.state=='INFLIGHT':t.state.complete()
-            else:torch.cuda.current_stream(device=self.device).wait_event(t.done)
+            tickets.append(t)
+        # Every ticket is recorded on this scheduler's one H2D stream.
+        # Its last submitted event implies all earlier copy events, even
+        # when the caller supplied the slots in a different order.
+        if tickets:max(tickets,key=lambda t:t.submitted_at).done.synchronize()
+        with self.cv:
+            for t in tickets:
+                if t.state.state=='INFLIGHT':t.state.complete()
     def record_slot_use(self,slot):
         event=torch.cuda.Event();event.record(torch.cuda.current_stream(device=self.device))
         with self.cv:self.compute_done[slot]=event
