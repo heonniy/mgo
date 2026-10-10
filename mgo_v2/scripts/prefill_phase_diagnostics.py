@@ -100,6 +100,8 @@ class PrefillDiagnostics:
    copies.append(dict(layer=t.key//128,key=t.key,slot=t.slot,event_index=getattr(t,'event_index',None),bytes=self.rt.h2d.bytes_per_expert,
      service_seconds=t.begin.elapsed_time(t.done)/1000,
      enqueue_to_submit_seconds=t.submitted_at-t.queued_at,
+     queue_to_worker_seconds=t.staging_started_at-t.queued_at,
+     worker_to_submit_seconds=t.submitted_at-t.staging_finished_at,
      stream_dependency_seconds=t.stream_enter.elapsed_time(t.begin)/1000,
      previous_compute_dependency=t.previous_compute is not None,
      previous_copy_dependency=t.previous_copy is not None))
