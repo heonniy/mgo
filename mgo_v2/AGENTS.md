@@ -1,13 +1,15 @@
-**OWNER ACTIVE R8 PCIe QUOTA LOOKUP (2026-10-10).**
-Read `experiments/pcie_quota_r8_b16_20261010/{PLAN.md,LOOKUP.json}`.
-The 255-subset one-copy Qwen pinned-H2D calibration, full-eight burst
-anchors and skew-triggered refinements are complete. The lookup uses a
-balanced 129x8 quota row selected in compiled Numba code; it is experimental
-and must not replace main_OURS without matched physical B16 evidence.
-Run original Near, fastest-rank Near and PCIe-table Near under the same
-frozen R8/C30/B16/input512/output64/prefetch-OFF guard. Preserve raw
-unfiltered repeats and token-parity findings. The managed model loads on
-GPUs2/3/6/7 remain stopped; only owned 0/1/4/5 loads may be paused/restored.
+**OWNER R8 PCIe QUOTA LOOKUP COMPLETE (2026-10-10).**
+Read `experiments/pcie_quota_r8_b16_20261010/{REPORT.md,LOOKUP.json}`.
+All 255 nonempty GPU subsets were calibrated for one simultaneous 9 MiB
+H2D copy per rank, with full-eight burst anchors and skew refinements.
+The 129x8 balanced quota lookup is selected in compiled Numba code.
+Original Near, fastest-rank Near and PCIe-table Near each had three full
+R8/C30/B16/input512/output64/prefetch-OFF repeats, plus a separate
+matched-next-token control because live generation diverged. In the control,
+fast-rank had the lowest observed median TPOT but the ranges overlapped;
+PCIe lookup did not improve TPOT. Keep main_OURS default Near unchanged.
+Raw receipts and unfiltered ranges are in the report. Managed model loads
+on GPUs2/3/6/7 remain stopped; only owned 0/1/4/5 loads may be paused/restored.
 
 **OWNER QWEN R2/R8 MAIN TABLE COMPLETE (2026-10-10).**
 Read `experiments/qwen_r2_r8_main_table_20261010/{PLAN.md,RESULTS.md,INFINITY_STALL.md}`.

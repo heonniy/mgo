@@ -1,0 +1,581 @@
+{
+  "status": "PASS",
+  "scope": "matched generated-token continuation, not frozen internal routing",
+  "teacher_sha256": "2181a040d289c4ec20c5f899925cf1adcea9998e6aaf93879f430b900243b795",
+  "lookup_sha256": "0c032a2e07371cc8a0cf65af2ab502887884a4c1a3575fef6e851a1d132d6eaa",
+  "policies": [
+    {
+      "name": "Original Near",
+      "policy": "LA_CA_NEAR",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_frozen_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_frozen_full_v2"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 2.639861244978349,
+        "E2E": 7.052652846556367
+      },
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.10242738,
+            1.846389439,
+            3.130797377
+          ],
+          "reported": 3.10242738,
+          "minimum": 1.846389439,
+          "maximum": 3.130797377
+        },
+        "TPOT": {
+          "samples": [
+            0.3941650231587302,
+            0.38389516842857146,
+            0.3880613455873016
+          ],
+          "reported": 0.3880613455873016,
+          "minimum": 0.38389516842857146,
+          "maximum": 0.3941650231587302
+        },
+        "E2E": {
+          "samples": [
+            27.934823839,
+            26.03178505,
+            27.578662149
+          ],
+          "reported": 27.578662149,
+          "minimum": 26.03178505,
+          "maximum": 27.934823839
+        },
+        "throughput": {
+          "samples": [
+            293.2540418802675,
+            314.6922112435006,
+            297.0412399173265
+          ],
+          "reported": 297.0412399173265,
+          "minimum": 293.2540418802675,
+          "maximum": 314.6922112435006
+        }
+      },
+      "audits": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_frozen_full_v1",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "mandatory_misses": 211249,
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "argmax_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_frozen_full_v1",
+          "repeat": 2,
+          "actual_vs_teacher_token_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "mandatory_misses": 211249,
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "argmax_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_frozen_full_v2",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "mandatory_misses": 211249,
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "argmax_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fast-rank quota",
+      "policy": "NEAR_FAST",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_frozen_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_frozen_full_v2"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 0.19515122428264167,
+        "E2E": 4.859659596999032
+      },
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.054373775,
+            1.809212713,
+            3.067732507
+          ],
+          "reported": 3.054373775,
+          "minimum": 1.809212713,
+          "maximum": 3.067732507
+        },
+        "TPOT": {
+          "samples": [
+            0.38387953082539683,
+            0.38313111549206347,
+            0.38791215879365076
+          ],
+          "reported": 0.38387953082539683,
+          "minimum": 0.38313111549206347,
+          "maximum": 0.38791215879365076
+        },
+        "E2E": {
+          "samples": [
+            27.238784217,
+            25.946472989,
+            27.506198511
+          ],
+          "reported": 27.238784217,
+          "minimum": 25.946472989,
+          "maximum": 27.506198511
+        },
+        "throughput": {
+          "samples": [
+            300.7476374399739,
+            315.726919935245,
+            297.8237794918821
+          ],
+          "reported": 300.7476374399739,
+          "minimum": 297.8237794918821,
+          "maximum": 315.726919935245
+        }
+      },
+      "audits": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_frozen_full_v1",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            18,
+            15,
+            15,
+            8,
+            9,
+            14,
+            9,
+            19
+          ],
+          "mandatory_misses": 211346,
+          "h2d_copies": [
+            25121,
+            25491,
+            25846,
+            26218,
+            27351,
+            26594,
+            26966,
+            27759
+          ],
+          "h2d_bytes": [
+            237071499264,
+            240563257344,
+            243913457664,
+            247424090112,
+            258116419584,
+            250972471296,
+            254483103744,
+            261966790656
+          ],
+          "argmax_hashes": [
+            "25ba57df9c2f8d5149b9ad553246e870a8adfa5827446e8bc8a064d02e512b1d",
+            "cc0b0b9b76171445c7382aa9b1cc10864b07dbdde2ce261fa13cdce659da218d",
+            "872746d1b657a636eb0f98fa55a9bdcd8b1ef20cfacd7378dae490d355384348",
+            "67c12b1ec3dc7e2f710c4837f705f70d3f594a1c59011feef1b1c8a42e910965",
+            "d40155ce7de0951f069cd12e6410b379685a1a741492ebe4877341d0c9706446",
+            "a14635610e5045f93587950d7649b6b988cf57c482f4bc6b03683ea1d083ad57",
+            "e4ad8feed42830f799a9dd54b9de134c9c2101a3da170dd59718ff3d4645a1b9",
+            "e46d590da362e1ae9a90b2419afce6f22730dd2ffc11da2cc63fa1a880b6c5a9"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_frozen_full_v1",
+          "repeat": 2,
+          "actual_vs_teacher_token_differences": [
+            18,
+            15,
+            15,
+            8,
+            9,
+            14,
+            9,
+            19
+          ],
+          "mandatory_misses": 211346,
+          "h2d_copies": [
+            25121,
+            25491,
+            25846,
+            26218,
+            27351,
+            26594,
+            26966,
+            27759
+          ],
+          "h2d_bytes": [
+            237071499264,
+            240563257344,
+            243913457664,
+            247424090112,
+            258116419584,
+            250972471296,
+            254483103744,
+            261966790656
+          ],
+          "argmax_hashes": [
+            "25ba57df9c2f8d5149b9ad553246e870a8adfa5827446e8bc8a064d02e512b1d",
+            "cc0b0b9b76171445c7382aa9b1cc10864b07dbdde2ce261fa13cdce659da218d",
+            "872746d1b657a636eb0f98fa55a9bdcd8b1ef20cfacd7378dae490d355384348",
+            "67c12b1ec3dc7e2f710c4837f705f70d3f594a1c59011feef1b1c8a42e910965",
+            "d40155ce7de0951f069cd12e6410b379685a1a741492ebe4877341d0c9706446",
+            "a14635610e5045f93587950d7649b6b988cf57c482f4bc6b03683ea1d083ad57",
+            "e4ad8feed42830f799a9dd54b9de134c9c2101a3da170dd59718ff3d4645a1b9",
+            "e46d590da362e1ae9a90b2419afce6f22730dd2ffc11da2cc63fa1a880b6c5a9"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_frozen_full_v2",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            18,
+            15,
+            15,
+            8,
+            9,
+            14,
+            9,
+            19
+          ],
+          "mandatory_misses": 211346,
+          "h2d_copies": [
+            25121,
+            25491,
+            25846,
+            26218,
+            27351,
+            26594,
+            26966,
+            27759
+          ],
+          "h2d_bytes": [
+            237071499264,
+            240563257344,
+            243913457664,
+            247424090112,
+            258116419584,
+            250972471296,
+            254483103744,
+            261966790656
+          ],
+          "argmax_hashes": [
+            "25ba57df9c2f8d5149b9ad553246e870a8adfa5827446e8bc8a064d02e512b1d",
+            "cc0b0b9b76171445c7382aa9b1cc10864b07dbdde2ce261fa13cdce659da218d",
+            "872746d1b657a636eb0f98fa55a9bdcd8b1ef20cfacd7378dae490d355384348",
+            "67c12b1ec3dc7e2f710c4837f705f70d3f594a1c59011feef1b1c8a42e910965",
+            "d40155ce7de0951f069cd12e6410b379685a1a741492ebe4877341d0c9706446",
+            "a14635610e5045f93587950d7649b6b988cf57c482f4bc6b03683ea1d083ad57",
+            "e4ad8feed42830f799a9dd54b9de134c9c2101a3da170dd59718ff3d4645a1b9",
+            "e46d590da362e1ae9a90b2419afce6f22730dd2ffc11da2cc63fa1a880b6c5a9"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PCIe lookup quota",
+      "policy": "NEAR_PCIE",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_frozen_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_frozen_full_v2"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 2.2929425760131608,
+        "E2E": 7.062636371888934
+      },
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.175036524,
+            1.823144625,
+            3.081671236
+          ],
+          "reported": 3.081671236,
+          "minimum": 1.823144625,
+          "maximum": 3.175036524
+        },
+        "TPOT": {
+          "samples": [
+            0.3956414272857143,
+            0.38667242360317455,
+            0.3913077987460317
+          ],
+          "reported": 0.3913077987460317,
+          "minimum": 0.38667242360317455,
+          "maximum": 0.3956414272857143
+        },
+        "E2E": {
+          "samples": [
+            28.100446443,
+            26.183507312,
+            27.734062557
+          ],
+          "reported": 27.734062557,
+          "minimum": 26.183507312,
+          "maximum": 28.100446443
+        },
+        "throughput": {
+          "samples": [
+            291.52561745298107,
+            312.8687040427764,
+            295.3768487095433
+          ],
+          "reported": 295.3768487095433,
+          "minimum": 291.52561745298107,
+          "maximum": 312.8687040427764
+        }
+      },
+      "audits": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_frozen_full_v1",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            17,
+            18,
+            11,
+            9,
+            20,
+            12,
+            9,
+            13
+          ],
+          "mandatory_misses": 211465,
+          "h2d_copies": [
+            25114,
+            25504,
+            25875,
+            26227,
+            27088,
+            26630,
+            27274,
+            27753
+          ],
+          "h2d_bytes": [
+            237005438976,
+            240685940736,
+            244187136000,
+            247509024768,
+            255634440192,
+            251312209920,
+            257389756416,
+            261910167552
+          ],
+          "argmax_hashes": [
+            "435c96ef1fde93a03f4392e79044a1f393569bb66b936630378e3e1fcfa8d36f",
+            "a05761ecb0e9b686f7ecd9f7048d8d20ac74b7ac56ad4141165bbcc4f92232ed",
+            "ed5a167d51eb0a4bcbe5a6814ad35ec4ea135168179d84b540dc52f12ba32071",
+            "bb70f9a8e9a5768ef9118bc3bad8ba694187677cf03c8b8b4f479ba9e990083b",
+            "395d70e71c85c39d551e133384623960964b9e7c04750e29d2a0ccb2685cd5fb",
+            "f3e462c470d095b1a312a703469ad3821430fb4f335ae2105e9edcc555fab91c",
+            "0afdecbdc06165150baec9e2b95dc5b340bafe065a048c8505db49610e96d58a",
+            "2ea9669ea2db84226935b8e8cf8f872cad9abda1e4679264c6edccd5fcea407d"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_frozen_full_v1",
+          "repeat": 2,
+          "actual_vs_teacher_token_differences": [
+            17,
+            18,
+            11,
+            9,
+            20,
+            12,
+            9,
+            13
+          ],
+          "mandatory_misses": 211465,
+          "h2d_copies": [
+            25114,
+            25504,
+            25875,
+            26227,
+            27088,
+            26630,
+            27274,
+            27753
+          ],
+          "h2d_bytes": [
+            237005438976,
+            240685940736,
+            244187136000,
+            247509024768,
+            255634440192,
+            251312209920,
+            257389756416,
+            261910167552
+          ],
+          "argmax_hashes": [
+            "435c96ef1fde93a03f4392e79044a1f393569bb66b936630378e3e1fcfa8d36f",
+            "a05761ecb0e9b686f7ecd9f7048d8d20ac74b7ac56ad4141165bbcc4f92232ed",
+            "ed5a167d51eb0a4bcbe5a6814ad35ec4ea135168179d84b540dc52f12ba32071",
+            "bb70f9a8e9a5768ef9118bc3bad8ba694187677cf03c8b8b4f479ba9e990083b",
+            "395d70e71c85c39d551e133384623960964b9e7c04750e29d2a0ccb2685cd5fb",
+            "f3e462c470d095b1a312a703469ad3821430fb4f335ae2105e9edcc555fab91c",
+            "0afdecbdc06165150baec9e2b95dc5b340bafe065a048c8505db49610e96d58a",
+            "2ea9669ea2db84226935b8e8cf8f872cad9abda1e4679264c6edccd5fcea407d"
+          ]
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_frozen_full_v2",
+          "repeat": 1,
+          "actual_vs_teacher_token_differences": [
+            17,
+            18,
+            11,
+            9,
+            20,
+            12,
+            9,
+            13
+          ],
+          "mandatory_misses": 211465,
+          "h2d_copies": [
+            25114,
+            25504,
+            25875,
+            26227,
+            27088,
+            26630,
+            27274,
+            27753
+          ],
+          "h2d_bytes": [
+            237005438976,
+            240685940736,
+            244187136000,
+            247509024768,
+            255634440192,
+            251312209920,
+            257389756416,
+            261910167552
+          ],
+          "argmax_hashes": [
+            "435c96ef1fde93a03f4392e79044a1f393569bb66b936630378e3e1fcfa8d36f",
+            "a05761ecb0e9b686f7ecd9f7048d8d20ac74b7ac56ad4141165bbcc4f92232ed",
+            "ed5a167d51eb0a4bcbe5a6814ad35ec4ea135168179d84b540dc52f12ba32071",
+            "bb70f9a8e9a5768ef9118bc3bad8ba694187677cf03c8b8b4f479ba9e990083b",
+            "395d70e71c85c39d551e133384623960964b9e7c04750e29d2a0ccb2685cd5fb",
+            "f3e462c470d095b1a312a703469ad3821430fb4f335ae2105e9edcc555fab91c",
+            "0afdecbdc06165150baec9e2b95dc5b340bafe065a048c8505db49610e96d58a",
+            "2ea9669ea2db84226935b8e8cf8f872cad9abda1e4679264c6edccd5fcea407d"
+          ]
+        }
+      ]
+    }
+  ]
+}

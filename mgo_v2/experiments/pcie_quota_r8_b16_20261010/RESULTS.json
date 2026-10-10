@@ -1,0 +1,518 @@
+{
+  "status": "PASS",
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
+  "lookup_sha256": "0c032a2e07371cc8a0cf65af2ab502887884a4c1a3575fef6e851a1d132d6eaa",
+  "policies": [
+    {
+      "label": "Original Near",
+      "policy": "LA_CA_NEAR",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_quota_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_quota_full_v2"
+      ],
+      "source_commits": [
+        "64e90907a81f2a41de37f1c72c51d8f3b5f95ad8",
+        "64e90907a81f2a41de37f1c72c51d8f3b5f95ad8"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 2.184256959870122,
+        "E2E": 6.8369153700843155
+      },
+      "initial_pair_above_5pct": true,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.121984476,
+            1.821954063,
+            3.102056645
+          ],
+          "reported": 3.102056645,
+          "minimum": 1.821954063,
+          "maximum": 3.121984476
+        },
+        "TPOT": {
+          "samples": [
+            0.390074382984127,
+            0.3816462026825397,
+            0.38979470814285716
+          ],
+          "reported": 0.38979470814285716,
+          "minimum": 0.3816462026825397,
+          "maximum": 0.390074382984127
+        },
+        "E2E": {
+          "samples": [
+            27.696670604,
+            25.865664832,
+            27.659123258
+          ],
+          "reported": 27.659123258,
+          "minimum": 25.865664832,
+          "maximum": 27.696670604
+        },
+        "throughput": {
+          "samples": [
+            295.7756228944318,
+            316.7132974624018,
+            296.1771392240563
+          ],
+          "reported": 296.1771392240563,
+          "minimum": 295.7756228944318,
+          "maximum": 316.7132974624018
+        }
+      },
+      "rank_receipts": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_quota_full_v1",
+          "repeat": 1,
+          "token_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ],
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "mandatory_misses": 211249
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_quota_full_v1",
+          "repeat": 2,
+          "token_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ],
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "mandatory_misses": 211249
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/near_quota_full_v2",
+          "repeat": 1,
+          "token_hashes": [
+            "1ea8f002e7aa4d085e906a06c50c71d7feac4c68720a51aa9cfa34837950f454",
+            "f5d4e1184867a17d76cf13ab90281c7b0767df924322d9115ac379c947708f04",
+            "cb0a6357cc6fb32f551457d35f0c0df54bfa486dd16ef7385fcbec665f472bd7",
+            "971b79b9caafef94cbf348762f6e4a0894e857ba0e467b26189e6b75f8af0670",
+            "24471d297be644e35dfe30744db22ad173282bbf68efc417973151bd3e937b45",
+            "597ef8488ab4e348e827ae6e3b305f1ec6a1fd12a3ee3a48d10d342222430319",
+            "007130ba6d40934b82419f061079753b0b7bfe35468200f1e2d7d6c428c9d81c",
+            "0bf2af5945e818d21ff1657192ee83eabbcbd57111b7869c6801ce45e4ef4604"
+          ],
+          "h2d_copies": [
+            27714,
+            27355,
+            26960,
+            26593,
+            26230,
+            25847,
+            25470,
+            25080
+          ],
+          "h2d_bytes": [
+            261542117376,
+            258154168320,
+            254426480640,
+            250963034112,
+            247537336320,
+            243922894848,
+            240365076480,
+            236684574720
+          ],
+          "mandatory_misses": 211249
+        }
+      ],
+      "token_parity_with_original_near": true
+    },
+    {
+      "label": "Fast-rank quota",
+      "policy": "NEAR_FAST",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_quota_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_quota_full_v2"
+      ],
+      "source_commits": [
+        "64e90907a81f2a41de37f1c72c51d8f3b5f95ad8",
+        "64e90907a81f2a41de37f1c72c51d8f3b5f95ad8"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 1.5346141952730554,
+        "E2E": 6.215407113822569
+      },
+      "initial_pair_above_5pct": true,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.110816577,
+            1.825512022,
+            3.089281865
+          ],
+          "reported": 3.089281865,
+          "minimum": 1.825512022,
+          "maximum": 3.110816577
+        },
+        "TPOT": {
+          "samples": [
+            0.38678266757142854,
+            0.38089224349206346,
+            0.3905985511428572
+          ],
+          "reported": 0.38678266757142854,
+          "minimum": 0.38089224349206346,
+          "maximum": 0.3905985511428572
+        },
+        "E2E": {
+          "samples": [
+            27.478124634,
+            25.821723362,
+            27.696990587
+          ],
+          "reported": 27.478124634,
+          "minimum": 25.821723362,
+          "maximum": 27.696990587
+        },
+        "throughput": {
+          "samples": [
+            298.12806037947894,
+            317.2522563716869,
+            295.7722058022087
+          ],
+          "reported": 298.12806037947894,
+          "minimum": 295.7722058022087,
+          "maximum": 317.2522563716869
+        }
+      },
+      "rank_receipts": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_quota_full_v1",
+          "repeat": 1,
+          "token_hashes": [
+            "ddd7294101fba1a71759c7e797642fe7ed368b499487745b6151a130dc30dec3",
+            "a02fb1eb9ac56d491d8fa99cb5fba8a9e1a03410f366a8f41d5a50f31b9a7301",
+            "46e3c96d140416f37183abf73ac8b2cf7e77bf9b4729d8887f995c970108203f",
+            "e2e27ccd9a87733451e2a6fa713c863202ff7c805a4731d35c050fbc2680ca8d",
+            "8499fe075734991604922bf2ed5d7a2a907f394930106fc82819058df1b6cf5f",
+            "f25ee7e107d309dfd93520912b59d6d02f850b581d1df5bd216d2a7dcc293c2c",
+            "c1fc683a698edfb80e59a5dd48ddb875067471d6af0b64c68be869c9a229b634",
+            "4945b15ba1fb107d82212f45c04f62b3d263afd88ccb6773644ee19a19442239"
+          ],
+          "h2d_copies": [
+            25029,
+            25409,
+            25754,
+            26161,
+            27297,
+            26555,
+            26922,
+            27678
+          ],
+          "h2d_bytes": [
+            236203278336,
+            239789408256,
+            243045236736,
+            246886170624,
+            257606811648,
+            250604421120,
+            254067867648,
+            261202378752
+          ],
+          "mandatory_misses": 210805
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_quota_full_v1",
+          "repeat": 2,
+          "token_hashes": [
+            "ddd7294101fba1a71759c7e797642fe7ed368b499487745b6151a130dc30dec3",
+            "a02fb1eb9ac56d491d8fa99cb5fba8a9e1a03410f366a8f41d5a50f31b9a7301",
+            "46e3c96d140416f37183abf73ac8b2cf7e77bf9b4729d8887f995c970108203f",
+            "e2e27ccd9a87733451e2a6fa713c863202ff7c805a4731d35c050fbc2680ca8d",
+            "8499fe075734991604922bf2ed5d7a2a907f394930106fc82819058df1b6cf5f",
+            "f25ee7e107d309dfd93520912b59d6d02f850b581d1df5bd216d2a7dcc293c2c",
+            "c1fc683a698edfb80e59a5dd48ddb875067471d6af0b64c68be869c9a229b634",
+            "4945b15ba1fb107d82212f45c04f62b3d263afd88ccb6773644ee19a19442239"
+          ],
+          "h2d_copies": [
+            25029,
+            25409,
+            25754,
+            26161,
+            27297,
+            26555,
+            26922,
+            27678
+          ],
+          "h2d_bytes": [
+            236203278336,
+            239789408256,
+            243045236736,
+            246886170624,
+            257606811648,
+            250604421120,
+            254067867648,
+            261202378752
+          ],
+          "mandatory_misses": 210805
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/fast_quota_full_v2",
+          "repeat": 1,
+          "token_hashes": [
+            "ddd7294101fba1a71759c7e797642fe7ed368b499487745b6151a130dc30dec3",
+            "a02fb1eb9ac56d491d8fa99cb5fba8a9e1a03410f366a8f41d5a50f31b9a7301",
+            "46e3c96d140416f37183abf73ac8b2cf7e77bf9b4729d8887f995c970108203f",
+            "e2e27ccd9a87733451e2a6fa713c863202ff7c805a4731d35c050fbc2680ca8d",
+            "8499fe075734991604922bf2ed5d7a2a907f394930106fc82819058df1b6cf5f",
+            "f25ee7e107d309dfd93520912b59d6d02f850b581d1df5bd216d2a7dcc293c2c",
+            "c1fc683a698edfb80e59a5dd48ddb875067471d6af0b64c68be869c9a229b634",
+            "4945b15ba1fb107d82212f45c04f62b3d263afd88ccb6773644ee19a19442239"
+          ],
+          "h2d_copies": [
+            25029,
+            25409,
+            25754,
+            26161,
+            27297,
+            26555,
+            26922,
+            27678
+          ],
+          "h2d_bytes": [
+            236203278336,
+            239789408256,
+            243045236736,
+            246886170624,
+            257606811648,
+            250604421120,
+            254067867648,
+            261202378752
+          ],
+          "mandatory_misses": 210805
+        }
+      ],
+      "token_parity_with_original_near": false
+    },
+    {
+      "label": "PCIe lookup quota",
+      "policy": "NEAR_PCIE",
+      "paths": [
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_quota_full_v1",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_quota_full_v2"
+      ],
+      "source_commits": [
+        "57cee06f07b8b71820940959902e13bfdafa6834",
+        "57cee06f07b8b71820940959902e13bfdafa6834"
+      ],
+      "first_pair_gap_pct": {
+        "TPOT": 1.9306945506917466,
+        "E2E": 6.666531992047233
+      },
+      "initial_pair_above_5pct": true,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.150155464,
+            1.838624614,
+            3.1405814
+          ],
+          "reported": 3.1405814,
+          "minimum": 1.838624614,
+          "maximum": 3.150155464
+        },
+        "TPOT": {
+          "samples": [
+            0.3875538892222222,
+            0.3801429487142857,
+            0.38868737906349204
+          ],
+          "reported": 0.3875538892222222,
+          "minimum": 0.3801429487142857,
+          "maximum": 0.38868737906349204
+        },
+        "E2E": {
+          "samples": [
+            27.566050485,
+            25.787630383,
+            27.627886281
+          ],
+          "reported": 27.566050485,
+          "minimum": 25.787630383,
+          "maximum": 27.627886281
+        },
+        "throughput": {
+          "samples": [
+            297.1771383955658,
+            317.67168515802905,
+            296.51200662548433
+          ],
+          "reported": 297.1771383955658,
+          "minimum": 296.51200662548433,
+          "maximum": 317.67168515802905
+        }
+      },
+      "rank_receipts": [
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_quota_full_v1",
+          "repeat": 1,
+          "token_hashes": [
+            "95c26df5dcdede12c4c0dfdc7d8637e77e6fd72802ff6a097b44671d2f9c22db",
+            "3bc45673532e2ab0f26b52cb98dd0d88bbd934a5bdfc3854b53b0323585d16cc",
+            "952b4720d27e533e0bd40ab4fde572643e3931d9108a4a691f8501e64c323d8c",
+            "264dc4f72b987d7861ea6f35a93375fee6eb8ef872bb50369f3066c0dff4c3a8",
+            "6f88e7b60c7d4fa7025c0312ed83c8257ebe3ec35794170d7e3264b1f51eb207",
+            "a6af738a21062dd2f1f47c1a3cf3dffb753630735ac2b2aa1b931c9994fdd84c",
+            "94dd481172f89b264977bb3ea4393ec5e85ce5c2115ab807d1c1ca6002c9d283",
+            "c953226828ef04232e23fcdf03a720ca3eb9d405d15bf04bb30b399f13166fa9"
+          ],
+          "h2d_copies": [
+            24990,
+            25355,
+            25751,
+            26158,
+            27015,
+            26557,
+            27190,
+            27641
+          ],
+          "h2d_bytes": [
+            235835228160,
+            239279800320,
+            243016925184,
+            246857859072,
+            254945525760,
+            250623295488,
+            256597032960,
+            260853202944
+          ],
+          "mandatory_misses": 210657
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_quota_full_v1",
+          "repeat": 2,
+          "token_hashes": [
+            "95c26df5dcdede12c4c0dfdc7d8637e77e6fd72802ff6a097b44671d2f9c22db",
+            "3bc45673532e2ab0f26b52cb98dd0d88bbd934a5bdfc3854b53b0323585d16cc",
+            "952b4720d27e533e0bd40ab4fde572643e3931d9108a4a691f8501e64c323d8c",
+            "264dc4f72b987d7861ea6f35a93375fee6eb8ef872bb50369f3066c0dff4c3a8",
+            "6f88e7b60c7d4fa7025c0312ed83c8257ebe3ec35794170d7e3264b1f51eb207",
+            "a6af738a21062dd2f1f47c1a3cf3dffb753630735ac2b2aa1b931c9994fdd84c",
+            "94dd481172f89b264977bb3ea4393ec5e85ce5c2115ab807d1c1ca6002c9d283",
+            "c953226828ef04232e23fcdf03a720ca3eb9d405d15bf04bb30b399f13166fa9"
+          ],
+          "h2d_copies": [
+            24990,
+            25355,
+            25751,
+            26158,
+            27015,
+            26557,
+            27190,
+            27641
+          ],
+          "h2d_bytes": [
+            235835228160,
+            239279800320,
+            243016925184,
+            246857859072,
+            254945525760,
+            250623295488,
+            256597032960,
+            260853202944
+          ],
+          "mandatory_misses": 210657
+        },
+        {
+          "path": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/pcie_quota_full_v2",
+          "repeat": 1,
+          "token_hashes": [
+            "95c26df5dcdede12c4c0dfdc7d8637e77e6fd72802ff6a097b44671d2f9c22db",
+            "3bc45673532e2ab0f26b52cb98dd0d88bbd934a5bdfc3854b53b0323585d16cc",
+            "952b4720d27e533e0bd40ab4fde572643e3931d9108a4a691f8501e64c323d8c",
+            "264dc4f72b987d7861ea6f35a93375fee6eb8ef872bb50369f3066c0dff4c3a8",
+            "6f88e7b60c7d4fa7025c0312ed83c8257ebe3ec35794170d7e3264b1f51eb207",
+            "a6af738a21062dd2f1f47c1a3cf3dffb753630735ac2b2aa1b931c9994fdd84c",
+            "94dd481172f89b264977bb3ea4393ec5e85ce5c2115ab807d1c1ca6002c9d283",
+            "c953226828ef04232e23fcdf03a720ca3eb9d405d15bf04bb30b399f13166fa9"
+          ],
+          "h2d_copies": [
+            24990,
+            25355,
+            25751,
+            26158,
+            27015,
+            26557,
+            27190,
+            27641
+          ],
+          "h2d_bytes": [
+            235835228160,
+            239279800320,
+            243016925184,
+            246857859072,
+            254945525760,
+            250623295488,
+            256597032960,
+            260853202944
+          ],
+          "mandatory_misses": 210657
+        }
+      ],
+      "token_parity_with_original_near": false
+    }
+  ]
+}
