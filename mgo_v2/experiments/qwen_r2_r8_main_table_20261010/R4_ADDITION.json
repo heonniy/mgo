@@ -1,0 +1,261 @@
+{
+  "status": "PASS",
+  "note": "Previously measured R4 C30 rows; separate protocol/date/source commits from R2/R8 extension",
+  "physical_gpus": [
+    0,
+    1,
+    4,
+    5
+  ],
+  "local_batch": 16,
+  "global_requests": 64,
+  "input_tokens": 512,
+  "output_tokens": 64,
+  "expert_slots": 1843,
+  "first64_target_input_ids_match_r8": true,
+  "r4_target_sha256": "3b26dae335488ab942a2e5edffb053875f43372a3c048e6947b62d0d432477ff",
+  "r8_target_sha256": "4a2dcc9c2e671328a9a3939fc0dbf33c4a0edffecfdfebb863d4c61bcd4466d4",
+  "source_recheck": "mgo_v2/experiments/qwen_cache_ablation_20261009/TIMING_RECHECK.json",
+  "source_baselines": "mgo_v2/experiments/qwen_cache_ablation_20261009/BASELINE_SWEEP_RESULTS.json",
+  "rows": [
+    {
+      "system": "Ours",
+      "source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+      "job_label": "qca_recheck_c30_b16_r2_v1",
+      "repeats": 2,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            3.631934443,
+            1.767412519
+          ],
+          "reported": 2.699673481,
+          "minimum": 1.767412519,
+          "maximum": 3.631934443
+        },
+        "TPOT": {
+          "samples": [
+            0.4935093447619047,
+            0.49602655685714286
+          ],
+          "reported": 0.4947679508095238,
+          "minimum": 0.4935093447619047,
+          "maximum": 0.49602655685714286
+        },
+        "E2E": {
+          "samples": [
+            34.723023163,
+            33.017085601
+          ],
+          "reported": 33.870054382,
+          "minimum": 33.017085601,
+          "maximum": 34.723023163
+        },
+        "TPS": {
+          "samples": [
+            117.96207895758906,
+            124.05698217882511
+          ],
+          "reported": 121.00953056820708,
+          "minimum": 117.96207895758906,
+          "maximum": 124.05698217882511
+        }
+      }
+    },
+    {
+      "system": "MoE-Infinity-repaired",
+      "source_commit": "ede66e16ff35beaf408fb4822bb47eb647b4de76",
+      "job_label": "mt2_qwen_sharegpt_b16_l512_infinity_r3_v3",
+      "repeats": 3,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            5.181730178,
+            5.21943652,
+            5.192269641
+          ],
+          "reported": 5.192269641,
+          "minimum": 5.181730178,
+          "maximum": 5.21943652
+        },
+        "TPOT": {
+          "samples": [
+            3.2639271783492063,
+            3.2133266036507937,
+            3.2271836794444444
+          ],
+          "reported": 3.2271836794444444,
+          "minimum": 3.2133266036507937,
+          "maximum": 3.2639271783492063
+        },
+        "E2E": {
+          "samples": [
+            210.809142414,
+            207.65901255,
+            208.504841446
+          ],
+          "reported": 208.504841446,
+          "minimum": 207.65901255,
+          "maximum": 210.809142414
+        },
+        "TPS": {
+          "samples": [
+            19.42989736164299,
+            19.724643537991245,
+            19.644627777436092
+          ],
+          "reported": 19.644627777436092,
+          "minimum": 19.42989736164299,
+          "maximum": 19.724643537991245
+        }
+      }
+    },
+    {
+      "system": "DeepSpeed-ZeRO-Inference",
+      "source_commit": "f10d59953ebc82bdcb1d87ae4d1787d073eebe0a",
+      "job_label": "mt2_qwen_sharegpt_b16_l512_deepspeed_r3_v1",
+      "repeats": 3,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            6.312381671,
+            5.450924912,
+            5.570741751
+          ],
+          "reported": 5.570741751,
+          "minimum": 5.450924912,
+          "maximum": 6.312381671
+        },
+        "TPOT": {
+          "samples": [
+            4.1219440317142855,
+            4.09087552684127,
+            4.1346727160952375
+          ],
+          "reported": 4.1219440317142855,
+          "minimum": 4.09087552684127,
+          "maximum": 4.1346727160952375
+        },
+        "E2E": {
+          "samples": [
+            265.994855669,
+            263.176083103,
+            266.055122865
+          ],
+          "reported": 265.994855669,
+          "minimum": 263.176083103,
+          "maximum": 266.055122865
+        },
+        "TPS": {
+          "samples": [
+            15.398794046968339,
+            15.563724300877814,
+            15.395305889593287
+          ],
+          "reported": 15.398794046968339,
+          "minimum": 15.395305889593287,
+          "maximum": 15.563724300877814
+        }
+      }
+    },
+    {
+      "system": "llama.cpp-sync",
+      "source_commit": "1f4751f63c2da72ed2a6bc60dcdcf9ae1c003b57",
+      "job_label": "mt2_qwen_sharegpt_b16_l512_llama_r3_v1",
+      "repeats": 3,
+      "metrics": {
+        "TTFT": {
+          "samples": [
+            145.069623064,
+            145.006625554,
+            145.184759153
+          ],
+          "reported": 145.069623064,
+          "minimum": 145.006625554,
+          "maximum": 145.184759153
+        },
+        "TPOT": {
+          "samples": [
+            0.4803461144444441,
+            0.48063358366666653,
+            0.4809642286984128
+          ],
+          "reported": 0.48063358366666653,
+          "minimum": 0.4803461144444441,
+          "maximum": 0.4809642286984128
+        },
+        "E2E": {
+          "samples": [
+            175.331428274,
+            175.286541325,
+            175.485505561
+          ],
+          "reported": 175.331428274,
+          "minimum": 175.286541325,
+          "maximum": 175.485505561
+        },
+        "TPS": {
+          "samples": [
+            23.361470560765394,
+            23.36745290903754,
+            23.340959054741997
+          ],
+          "reported": 23.361470560765394,
+          "minimum": 23.340959054741997,
+          "maximum": 23.36745290903754
+        }
+      }
+    }
+  ],
+  "legacy_expanded_comparison": {
+    "old_status": "/home/hwlee/mgo-results/headline_r4_20261007/expanded_R4_C30_B16_L512_O64_ours_v1/status.json",
+    "old_source_commit": "ac88798919cc915f8e1f0bc5f8b7adb40feedc2e",
+    "old_command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-u",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=4",
+      "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py",
+      "--cell",
+      "R4_C30_B16_L512_O64",
+      "--output",
+      "/home/hwlee/mgo-results/headline_r4_20261007/expanded_R4_C30_B16_L512_O64_ours_v1",
+      "--repeats",
+      "5",
+      "--prefill-optimized",
+      "--prefill-layout-fast"
+    ],
+    "old_reported_tpot_s": 0.755202,
+    "new_status": "/home/hwlee/mgo-results/headline_r4_20261007/qca_recheck_c30_b16_r2_v1/status.json",
+    "new_source_commit": "de853d992fe654291ddf903c1d903d467358f424",
+    "new_command": [
+      "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+      "-u",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nproc_per_node=4",
+      "/home/hwlee/mgo-main-table/mgo_v2/examples/headline_ours_worker.py",
+      "--cell",
+      "Qwen3_ShareGPT_R4_C30_B16_L512_O64",
+      "--output",
+      "/home/hwlee/mgo-results/headline_r4_20261007/qca_recheck_c30_b16_r2_v1",
+      "--repeats",
+      "2",
+      "--expert-executor",
+      "native",
+      "--native-prefill",
+      "--prefetch-off",
+      "--prefill-optimized",
+      "--prefill-layout-fast",
+      "--decode-layout-fast",
+      "--policy",
+      "LA_CA_NEAR"
+    ],
+    "aligned_requests_with_identical_input_ids": 0,
+    "aligned_request_count": 64,
+    "interpretation": "Different source code, execution flags, and prompt inputs; not a controlled A/B."
+  }
+}
