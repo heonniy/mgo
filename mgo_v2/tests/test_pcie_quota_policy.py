@@ -60,3 +60,41 @@ def test_original_near_matches_identical_balanced_lookup():
         assert np.array_equal(rows[0][field], rows[1][field])
     assert rows[0][5] == rows[1][5]
     assert np.array_equal(rows[0][6], rows[1][6])
+
+
+def test_split_policy_follows_unbalanced_lookup():
+    quota = table([7, 6, 5, 4, 3, 2, 1, 0])
+    quota[12] = [1, 1, 1, 0, 3, 2, 2, 2]
+    p = Policy([16] * 8, np.zeros((48, 128, 128), np.float32),
+               False, 20, quota_lut=quota)
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    result = p.apply(0, selected, weights, origins,
+                     np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+    counts = np.bincount([row[0] for row in result[5]], minlength=8)
+    assert np.array_equal(counts, [1, 1, 1, 0, 3, 2, 2, 2])
+
+
+def test_split_policy_matches_fast_on_balanced_rows():
+    quota = table([7, 6, 5, 4, 3, 2, 1, 0])
+    similarity = np.zeros((48, 128, 128), np.float32)
+    policies = [Policy([16] * 8, similarity, False, 12, quota_lut=quota),
+                Policy([16] * 8, similarity, False, 20, quota_lut=quota)]
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    rows = [policy.apply(0, selected, weights, origins,
+                         np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+            for policy in policies]
+    for field in range(5):
+        assert np.array_equal(rows[0][field], rows[1][field])
+
+
+def test_split_lookup_rows_are_valid():
+    import json
+    data = json.loads((Path(__file__).resolve().parents[1] /
+                       'experiments/pcie_haq_replay_20261010/SPLIT_LOOKUP.json').read_text())
+    lut = np.asarray(data['quota_lut']['NEAR_SPLIT'])
+    assert data['status'] == 'PASS' and lut.shape == (129, 8)
+    assert all(lut[n].sum() == n and lut[n].min() >= 0 for n in range(129))

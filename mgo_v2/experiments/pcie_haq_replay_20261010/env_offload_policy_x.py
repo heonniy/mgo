@@ -71,6 +71,9 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
     elif policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
         assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
+    elif policy==20:
+        # Externally supplied (possibly unbalanced) quota row; Near within quota.
+        assignment=near_assignment_with_quota(demand,misses,owner,layer,quota_lut[len(misses)])
     elif policy==19:
         # Fully random fetch rank: i.i.d. uniform per miss, no quota.
         assignment=np.random.randint(0,world,len(misses))
@@ -86,7 +89,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=np.empty(len(misses),np.int64)
         for i in range(len(misses)):
             assignment[i]=random_owners[layer*experts+misses[i]]
-    elif policy==11 or policy==12 or policy==20:
+    elif policy==11 or policy==12:
         assert world==8 and not substitution and len(misses)<=128
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota_lut[len(misses)])
     elif policy==7:
@@ -162,14 +165,12 @@ class Policy:
         self.birth=np.full((w,k),-1,np.int32);self.reuses=np.zeros((w,k),np.int32);self.gates=np.zeros((l,e),np.float32)
         rng=np.random.default_rng(seed)
         self.random_owners=np.concatenate([rng.permutation(np.arange(e,dtype=np.int8)%w) for _ in range(l)])
-        if policy in (11,12,20):
+        if policy in (11,12):
             assert quota_lut is not None and w==8
             self.quota_lut=np.ascontiguousarray(quota_lut,dtype=np.int64)
             assert self.quota_lut.shape==(129,8)
             for n in range(129):
-                # NEAR_SPLIT (20) rows may be unbalanced across ranks.
-                assert self.quota_lut[n].sum()==n and self.quota_lut[n].min()>=0
-                assert policy==20 or self.quota_lut[n].max()-self.quota_lut[n].min()<=1
+                assert self.quota_lut[n].sum()==n and self.quota_lut[n].max()-self.quota_lut[n].min()<=1
         else:self.quota_lut=np.zeros((129,w),np.int64)
         seed_rng(seed)
         self.random_salt=int(os.environ.get('MGO_RANDOM_SALT','0'))

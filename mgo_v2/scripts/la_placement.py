@@ -118,7 +118,8 @@ def load_locality_near_assignment(demand, misses, owner, layer, near_bps=200, qu
     quota=np.empty(world,np.int64)
     for r in range(world):
         quota[r]=m//world+(r<m%world) if quota_override is None else quota_override[r]
-    assert quota.sum()==m and quota.max()-quota.min()<=1
+    # An explicit override may be unbalanced (NEAR_SPLIT); callers validate it.
+    assert quota.sum()==m and (quota_override is not None or quota.max()-quota.min()<=1)
     remaining=quota.copy()
     loads=estimate_loads(demand,owner,layer)
     totals=np.empty(m,np.int64)
