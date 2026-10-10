@@ -6,6 +6,7 @@ from old_ca_fanout_policy import fanout_assignment
 from la_placement import load_assignment,load_locality_near_assignment
 from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignment, load_fanout_assignment
 from mgo_v2.miss_quota_placement import assign_miss_quota
+from haq_placement import hit_aware_quota,worst_balanced_quota,near_assignment_with_quota
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
@@ -59,7 +60,14 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             masses[t,position]+=w
     row[18]=raw_active.sum();row[19]=(active&(~resident)).sum();row[46]=protected.sum();row[47]=mapped.sum()
     misses=np.flatnonzero(active&(~resident))
-    if policy==13 or policy==14 or policy==15:
+    if policy==16 or policy==17:
+        assert 1<=world<=8 and not substitution
+        hits=np.zeros(world,np.int64)
+        for e in range(experts):
+            if active[e] and resident[e]:hits[primary[layer*experts+e]]+=1
+        quota=hit_aware_quota(hits,len(misses),world) if policy==16 else worst_balanced_quota(hits,len(misses),world)
+        assignment=near_assignment_with_quota(demand,misses,owner,layer,quota)
+    elif policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
         assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
     elif policy==9:
@@ -92,7 +100,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min()
-    if policy!=9 and policy!=10:assert row[44]-row[45]<=1
+    if policy!=9 and policy!=10 and policy!=16:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0

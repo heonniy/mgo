@@ -2,7 +2,7 @@
 import argparse,os,time,subprocess,signal,json,hashlib
 from pathlib import Path
 import run_full_pinned_r4 as c
-ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
+ROOT=Path(os.environ.get('MGO_HEADLINE_ROOT','/home/hwlee/mgo-results/headline_r4_20261007'))
 def wait_for_gpu_release(seconds=30):
  deadline=time.monotonic()+seconds
  observed=[]
@@ -13,7 +13,7 @@ def wait_for_gpu_release(seconds=30):
 def main(a):
  llama_workers=('headline_llama_sync_worker.py','headline_llama_deepseek_sync_worker.py')
  if a.ours_final:
-  assert a.worker=='headline_ours_worker.py' and a.ranks==4
+  assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.ranks==4
   assert a.expert_executor in (None,'native') and a.policy in (None,'LA_CA_NEAR')
   assert not a.legacy_decode_layout and not a.capture_eviction_trace
   a.expert_executor='native';a.native_prefill=True;a.prefetch_off=True
@@ -62,14 +62,14 @@ def main(a):
   command +=[str(c.P/'examples'/a.worker),'--cell',a.cell,'--output',str(out)]+(['--smoke'] if a.smoke else [])
   if a.repeats is not None:command+=['--repeats',str(a.repeats)]
   if a.expert_executor is not None:
-   assert a.worker=='headline_ours_worker.py';command+=['--expert-executor',a.expert_executor]
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--expert-executor',a.expert_executor]
   if a.native_prefill:
-   assert a.worker=='headline_ours_worker.py' and a.expert_executor=='native' and a.prefill_optimized
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.expert_executor=='native' and a.prefill_optimized
    command+=['--native-prefill']
   if a.prefetch_off:
-   assert a.worker=='headline_ours_worker.py';command+=['--prefetch-off']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--prefetch-off']
   if a.h2d_serial_ablation:
-   assert a.worker=='headline_ours_worker.py' and a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.expert_executor=='native' and a.prefetch_off and a.decode_layout_fast
    command+=['--h2d-serial-ablation']
   if a.llama_threads is not None:
    assert a.worker in llama_workers and a.ranks==1
@@ -90,25 +90,31 @@ def main(a):
    assert a.worker in llama_workers and a.ranks==1
    command+=['--expert-placement',a.llama_expert_placement]
   if a.prefill_optimized:
-   assert a.worker=='headline_ours_worker.py';command+=['--prefill-optimized']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--prefill-optimized']
   if a.prefill_diagnostic:
-   assert a.worker=='headline_ours_worker.py' and a.prefill_optimized;command+=['--prefill-diagnostic']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.prefill_optimized;command+=['--prefill-diagnostic']
   if a.prefill_layout_fast:
-   assert a.worker=='headline_ours_worker.py' and a.prefill_optimized;command+=['--prefill-layout-fast']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.prefill_optimized;command+=['--prefill-layout-fast']
   if a.post_prefill_diagnostic:
-   assert a.worker=='headline_ours_worker.py' and a.prefill_layout_fast;command+=['--post-prefill-diagnostic']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.prefill_layout_fast;command+=['--post-prefill-diagnostic']
   if a.legacy_decode_layout:
-   assert a.worker=='headline_ours_worker.py';command+=['--legacy-decode-layout']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--legacy-decode-layout']
   if a.decode_layout_fast:
-   assert a.worker=='headline_ours_worker.py';command+=['--decode-layout-fast']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--decode-layout-fast']
   if a.policy:
-   assert a.worker=='headline_ours_worker.py';command+=['--policy',a.policy]
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--policy',a.policy]
+  if a.teacher_tokens:
+   assert a.worker=='headline_ours_multipolicy_worker.py';command+=['--teacher-tokens',str(Path(a.teacher_tokens).resolve())]
+  if a.decode_policy_schedule:
+   assert a.worker=='headline_ours_multipolicy_worker.py';command+=['--decode-policy-schedule',a.decode_policy_schedule]
+  if a.decode_policy:
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--decode-policy',a.decode_policy]
   if a.post_generation_diagnostic:
-   assert a.worker=='headline_ours_worker.py';command+=['--post-generation-diagnostic']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--post-generation-diagnostic']
   if a.capture_eviction_trace:
-   assert a.worker=='headline_ours_worker.py';command+=['--capture-eviction-trace']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--capture-eviction-trace']
   if a.record_main_eviction_trace:
-   assert a.worker=='headline_ours_worker.py';command+=['--record-main-eviction-trace']
+   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--record-main-eviction-trace']
   state['command']=command
   with (out/'run.log').open('w') as log,(out/'resources.jsonl').open('w') as resources:
    proc=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);state['pid']=proc.pid;c.write(out/'status.json',state)
@@ -156,6 +162,8 @@ if __name__=='__main__':
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))
+ p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR','MISS_BAL_COMM','BW','MISS_CAP_COMM','HAQ','HAQ_WORST'))
+ p.add_argument('--decode-policy-schedule');p.add_argument('--teacher-tokens')
  p.add_argument('--expert-executor',choices=('h0','native'))
  p.add_argument('--native-prefill',action='store_true')
  p.add_argument('--prefetch-off',action='store_true')
