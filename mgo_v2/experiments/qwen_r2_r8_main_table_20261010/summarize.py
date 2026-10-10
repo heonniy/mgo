@@ -15,12 +15,13 @@ SYSTEMS = ('ours', 'deepspeed', 'infinity', 'llama')
 METRICS = ('TTFT', 'TPOT', 'E2E', 'throughput')
 
 
-def job(root, system, repeats, after=0):
+def job(root, system, repeats, after=0, before=None):
     candidates = sorted((root / 'jobs').glob(f'{system}_full_v*'),
                         key=lambda p: int(p.name.rsplit('_v', 1)[1]), reverse=True)
     for path in candidates:
         status_file = path / 'status.json'
-        if not status_file.exists() or int(path.name.rsplit('_v', 1)[1]) <= after:
+        attempt = int(path.name.rsplit('_v', 1)[1])
+        if not status_file.exists() or attempt <= after or (before and attempt >= before):
             continue
         status = json.loads(status_file.read_text())
         receipt = path / 'result.json'
@@ -74,10 +75,11 @@ def read_row(world, system):
         values = [float(row[key]) for row in samples]
         pair_ranges[key] = 100 * (max(values) - min(values)) / statistics.mean(values)
     unstable = max(pair_ranges.values()) > 5
-    third_advised = not unstable and max(pair_ranges.values()) > 2
+    third_advised = max(pair_ranges.values()) > 2
     paths = [path]
     if third_advised:
-        extra = job(root, system, 1, after=int(path.name.rsplit('_v', 1)[1]))
+        extra = job(root, system, 1, after=int(path.name.rsplit('_v', 1)[1]),
+                    before=3 if world == 2 and system == 'ours' else None)
         extra_status = json.loads((extra / 'status.json').read_text())
         assert extra_status['workload_sha256'] == status['workload_sha256']
         assert extra_status['physical_gpus'] == status['physical_gpus']
@@ -87,7 +89,19 @@ def read_row(world, system):
         assert extra_row['global_requests'] == world * 16
         samples.append(extra_row)
         paths.append(extra)
-    for source in paths:
+    confirmation_path = None
+    confirmation_row = None
+    if world == 2 and system == 'ours':
+        confirmation_path = job(root, system, 1, after=2, before=4)
+        confirmation_status = json.loads((confirmation_path / 'status.json').read_text())
+        assert confirmation_status['workload_sha256'] == status['workload_sha256']
+        assert confirmation_status['physical_gpus'] == status['physical_gpus']
+        assert confirmation_status['quiet_2367']
+        confirmation_row = json.loads((confirmation_path / 'repeat1.json').read_text())
+        assert confirmation_row['status'] == 'PASS'
+        assert confirmation_row['output_tokens'] == 64
+        assert confirmation_row['global_requests'] == world * 16
+    for source in paths + ([confirmation_path] if confirmation_path else []):
         source_status = json.loads((source / 'status.json').read_text())
         for repeat in range(1, source_status['repeats'] + 1):
             if system == 'ours':
@@ -127,12 +141,23 @@ def read_row(world, system):
                                minimum=min(values),
                                maximum=max(values), relative_range_pct=100 *
                                (max(values) - min(values)) / mean)
+    confirmation = None
+    if confirmation_row is not None:
+        confirmation = dict(path=str(confirmation_path),
+                            source_commit=confirmation_status['source_commit'],
+                            metrics={key: (world * 16 * 64 / float(confirmation_row['E2E'])
+                                           if key == 'throughput' else float(confirmation_row[key]))
+                                     for key in METRICS},
+                            relative_to_primary_median_pct={
+                                key: 100 * (float(confirmation_row[key]) - metrics[key]['reported']) /
+                                metrics[key]['reported'] for key in ('TTFT', 'TPOT', 'E2E')})
     return dict(paths=list(map(str, paths)),
                 source_commits=[json.loads((p / 'status.json').read_text())['source_commit'] for p in paths],
                 workload_sha256=status['workload_sha256'],
                 physical_gpus=status['physical_gpus'], system=result['system'],
                 metrics=metrics, unstable=unstable,
-                third_repeat_used=third_advised, pair_relative_ranges_pct=pair_ranges)
+                third_repeat_used=third_advised, pair_relative_ranges_pct=pair_ranges,
+                confirmation=confirmation)
 
 
 def fmt(row, key):
@@ -151,9 +176,10 @@ def main():
              'budget. TPOT is seconds per decoded token and includes attention; '
              'TPS is global output tokens divided by E2E seconds. Each cell '
              'has two unfiltered target repeats after warmup; if the pair '
-             'differs by >2% but ≤5% in TPOT or E2E, exactly one third target '
+             'differs by >2% in TPOT or E2E, exactly one third target '
              'is added. The reported center is the mean of two or median of '
-             'three, followed by the full range. R2 and R8 have different '
+             'three, followed by the full range. An initial gap above 5% '
+             'remains flagged even after the third repeat. R2 and R8 have different '
              'global batches (32 and '
              '128), so throughput is not a same-batch scaling comparison. '
              'MoE-Infinity uses EAM eviction priorities with speculative '
@@ -164,12 +190,26 @@ def main():
     for world in (2, 8):
         for system in SYSTEMS:
             row = data[str(world)][system]
-            quality = ('unstable two-repeat pair (>5%)' if row['unstable'] else
+            quality = ('initial pair >5%; third repeat, median shown' if row['unstable'] else
                        'third repeat; median shown' if row['third_repeat_used'] else '≤2% TPOT/E2E pair range')
             lines.append(f"| {world} | {row['system']} | {fmt(row, 'TTFT')} | "
                          f"{fmt(row, 'TPOT')} | {fmt(row, 'E2E')} | "
                          f"{fmt(row, 'throughput')} | {quality} |")
-    lines += ['', 'All target repeats are preserved without outlier selection '
+    r2_confirmation = data['2']['ours']['confirmation']
+    lines += ['', 'The separately requested fourth R2 main_OURS run is a '
+              'confirmation, not part of the original three-run primary '
+              'median: TTFT '
+              f"{r2_confirmation['metrics']['TTFT']:.3f} s, TPOT "
+              f"{r2_confirmation['metrics']['TPOT']:.4f} s/token, E2E "
+              f"{r2_confirmation['metrics']['E2E']:.3f} s, TPS "
+              f"{r2_confirmation['metrics']['throughput']:.3f}. "
+              'Its raw receipt and exact comparison with the primary '
+              'median are in [RESULTS.json](RESULTS.json).', '',
+              'R8 main_OURS had one faster middle run. Its first and third '
+              'runs differed by 0.27% in TPOT and 0.43% in E2E; the '
+              'three-run median is close to those two, while the full range '
+              'remains shown above.', '',
+              'All target repeats are preserved without outlier selection '
               'in [RESULTS.json](RESULTS.json). '
               'The quality flag uses the relative difference of the first two '
               'TPOT and E2E values; '
@@ -178,8 +218,8 @@ def main():
               'main_OURS has the lowest E2E in both rank counts. At R2, '
               'llama.cpp has the lowest TPOT but its approximately 74-second '
               'TTFT makes its E2E longer than main_OURS. At R8, main_OURS '
-              'has the lowest TPOT as well, while its E2E pair is marked '
-              'unstable rather than treated as a precise point estimate.', '']
+              'has the lowest TPOT as well; its initial E2E pair exceeded '
+              '5%, so the three-repeat median must retain its full range.', '']
     (HERE / 'RESULTS.md').write_text('\n'.join(lines))
 
 

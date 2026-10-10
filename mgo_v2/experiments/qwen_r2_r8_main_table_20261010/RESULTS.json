@@ -70,6 +70,21 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.392475282683476,
         "E2E": 3.3460355918865448
+      },
+      "confirmation": {
+        "path": "/home/hwlee/mgo-results/qwen_r2_sharegpt_b16_l512_20261010/jobs/ours_full_v3",
+        "source_commit": "533e67e1872f09db24755f6184041e8f2a26a018",
+        "metrics": {
+          "TTFT": 3.9392433,
+          "TPOT": 0.6598004953650795,
+          "E2E": 45.506674508,
+          "throughput": 45.00438720566067
+        },
+        "relative_to_primary_median_pct": {
+          "TTFT": 0.9125009170616032,
+          "TPOT": 0.8759167381841781,
+          "E2E": 1.3669184459147943
+        }
       }
     },
     "deepspeed": {
@@ -136,7 +151,8 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.5546644056752968,
         "E2E": 0.3090070079756834
-      }
+      },
+      "confirmation": null
     },
     "infinity": {
       "paths": [
@@ -202,7 +218,8 @@
       "pair_relative_ranges_pct": {
         "TPOT": 1.7697644573591111,
         "E2E": 1.8167642066416163
-      }
+      },
+      "confirmation": null
     },
     "llama": {
       "paths": [
@@ -268,16 +285,19 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.08002189620258565,
         "E2E": 0.1333153608702681
-      }
+      },
+      "confirmation": null
     }
   },
   "8": {
     "ours": {
       "paths": [
-        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_full_v2"
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_full_v2",
+        "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/ours_full_v3"
       ],
       "source_commits": [
-        "60d270001da277d129815cc55bc0431f1b5473a3"
+        "60d270001da277d129815cc55bc0431f1b5473a3",
+        "533e67e1872f09db24755f6184041e8f2a26a018"
       ],
       "workload_sha256": "83e7055e4120c74d571af4fb5f740e4c92ddd355b319bce42763992f50c34072",
       "physical_gpus": [
@@ -295,54 +315,59 @@
         "TTFT": {
           "samples": [
             3.127230655,
-            1.816110473
+            1.816110473,
+            3.181136785
           ],
-          "mean": 2.471670564,
-          "reported": 2.471670564,
+          "mean": 2.7081593043333334,
+          "reported": 3.127230655,
           "minimum": 1.816110473,
-          "maximum": 3.127230655,
-          "relative_range_pct": 53.04591158289976
+          "maximum": 3.181136785,
+          "relative_range_pct": 50.40421033636455
         },
         "TPOT": {
           "samples": [
             0.3912419037142857,
-            0.3820021732539683
+            0.3820021732539683,
+            0.3923047782222222
           ],
-          "mean": 0.386622038484127,
-          "reported": 0.386622038484127,
+          "mean": 0.38851628506349206,
+          "reported": 0.3912419037142857,
           "minimum": 0.3820021732539683,
-          "maximum": 0.3912419037142857,
-          "relative_range_pct": 2.389861296201494
+          "maximum": 0.3923047782222222,
+          "relative_range_pct": 2.651782013865968
         },
         "E2E": {
           "samples": [
             27.775470589,
-            25.882247388
+            25.882247388,
+            27.896337813
           ],
-          "mean": 26.828858988500002,
-          "reported": 26.828858988500002,
+          "mean": 27.184685263333332,
+          "reported": 27.775470589,
           "minimum": 25.882247388,
-          "maximum": 27.775470589,
-          "relative_range_pct": 7.0566668594125375
+          "maximum": 27.896337813,
+          "relative_range_pct": 7.408915738732505
         },
         "throughput": {
           "samples": [
             294.93649707034314,
-            316.5103816988522
+            316.5103816988522,
+            293.6586176620803
           ],
-          "mean": 305.72343938459767,
-          "reported": 305.72343938459767,
-          "minimum": 294.93649707034314,
+          "mean": 301.70183214375857,
+          "reported": 294.93649707034314,
+          "minimum": 293.6586176620803,
           "maximum": 316.5103816988522,
-          "relative_range_pct": 7.056666859412531
+          "relative_range_pct": 7.574287459375855
         }
       },
       "unstable": true,
-      "third_repeat_used": false,
+      "third_repeat_used": true,
       "pair_relative_ranges_pct": {
         "TPOT": 2.389861296201494,
         "E2E": 7.0566668594125375
-      }
+      },
+      "confirmation": null
     },
     "deepspeed": {
       "paths": [
@@ -414,7 +439,8 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.46117249781059994,
         "E2E": 0.8501413001572219
-      }
+      },
+      "confirmation": null
     },
     "infinity": {
       "paths": [
@@ -486,7 +512,8 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.05863210393642136,
         "E2E": 0.7391719151405732
-      }
+      },
+      "confirmation": null
     },
     "llama": {
       "paths": [
@@ -558,7 +585,8 @@
       "pair_relative_ranges_pct": {
         "TPOT": 0.16272558993394115,
         "E2E": 0.04308676061013678
-      }
+      },
+      "confirmation": null
     }
   }
 }

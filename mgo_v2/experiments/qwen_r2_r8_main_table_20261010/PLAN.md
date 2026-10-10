@@ -25,9 +25,16 @@ balanced expert-layer placement before timing.
 
 Run a bounded functional smoke first for each worker and rank count. Then
 use two unfiltered clean target repeats per cell after disjoint warmup and
-cache reset. If TPOT or E2E differs by >2% but ≤5%, add exactly one third
-repeat; above 5%, mark unstable rather than repeat indefinitely. Keep raw
-receipts outside Git and commit only a provenance-backed summary.
+cache reset. The 2026-10-10 follow-up requests exactly one third repeat for
+any cell whose first-pair TPOT or E2E differs by >2%, including pairs above
+5%; stable cells stop after two. Report the median of three, preserve the
+full range, and flag any >5% initial-pair gap rather than treating the
+median as a stable point estimate. Keep raw receipts outside Git and commit
+only a provenance-backed summary.
+
+The same follow-up requested one additional R2 main_OURS check after its
+original three-run primary result. Preserve that fourth run as an explicit
+confirmation receipt; do not silently change the original three-run median.
 
 The R8 MoE-Infinity long target stalled after four tokens while the warmup
 completed. An eight-token diagnostic target queued 591,448 EAM speculative

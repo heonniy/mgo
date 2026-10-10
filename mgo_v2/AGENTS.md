@@ -4,8 +4,11 @@ ShareGPT Qwen3/input512/output64/C30/local-B16 was measured on R2 GPUs0/1
 and R8 GPUs0–7 for main_OURS, DeepSpeed, repaired MoE-Infinity, and
 synchronous balanced llama.cpp. Two unfiltered target repeats per cell
 passed; R2 main_OURS added exactly one third target because its first-pair
-E2E differed by 3.35%, and reports the median. R8 main_OURS E2E differed by
-7.06% and is marked unstable, with no open-ended repeats. R8 MoE-Infinity
+E2E differed by 3.35%, and reports the median. A later user-requested
+fourth R2 main_OURS run is recorded separately as confirmation. R8
+main_OURS first-pair E2E differed by 7.06%; one third run was added and
+the three-run median and full range are reported, with the original
+instability flag retained. R8 MoE-Infinity
 native wait stalled when target speculative admission was enabled; both
 rank counts use unchanged C30/EAM eviction priorities with speculative
 transfer admission disabled. The final spec-off full jobs passed, with zero
