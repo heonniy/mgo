@@ -156,3 +156,17 @@ def test_fast_random_policy_is_seeded_per_event():
         outs.append([f[:2] for f in r[5]])
         assert np.array_equal(np.bincount([f[0] for f in r[5]], minlength=8), quota[12])
     assert outs[0] == outs[1]
+
+
+def test_random_quota_near_is_unbalanced_seeded_and_complete():
+    sim = np.zeros((48, 128, 128), np.float32)
+    selected = np.repeat(np.arange(64, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((64, 2), .5, dtype=np.float32)
+    origins = np.arange(64, dtype=np.int64) % 8
+    counts = []
+    for _ in range(2):
+        p = Policy([16] * 8, sim, False, 24)
+        r = p.apply(0, selected, weights, origins, np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+        counts.append(np.bincount([f[0] for f in r[5]], minlength=8))
+    assert counts[0].sum() == 64 and np.array_equal(counts[0], counts[1])
+    assert counts[0].max() - counts[0].min() > 1

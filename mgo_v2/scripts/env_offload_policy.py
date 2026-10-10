@@ -91,6 +91,12 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=np.empty(len(misses),np.int64)
         for i in range(len(misses)):
             assignment[i]=random_owners[layer*experts+misses[i]]
+    elif policy==24:
+        # RANDOM_QUOTA_NEAR: unbalanced quota from i.i.d. uniform rank draws per
+        # miss (seeded per event), then the unchanged Near placement inside it.
+        assert 1<=world<=8 and not substitution
+        quota=np.bincount(np.random.randint(0,world,len(misses)),minlength=world).astype(np.int64)
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota)
     elif policy==22 or policy==23:
         # FAST quota row with a stage-2 placement control: 22 = worst
         # (max compute imbalance, then min locality), 23 = uniform random.
@@ -120,7 +126,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=balanced_assignment(demand,misses,world,policy==0)
     for i in range(len(misses)):rank_fetches[assignment[i]]+=1
     row[44]=rank_fetches.max();row[45]=rank_fetches.min()
-    if policy!=9 and policy!=10 and policy!=16 and policy!=18 and policy!=19 and policy!=20 and policy!=21:assert row[44]-row[45]<=1
+    if policy!=9 and policy!=10 and policy!=16 and policy!=18 and policy!=19 and policy!=20 and policy!=21 and policy!=24:assert row[44]-row[45]<=1
     for i in range(len(misses)):
         e=misses[i];r=assignment[i];key=layer*experts+e
         slot=choose_slot(r,layer,active,slots,capacities,last,gates,gate_eviction,experts);assert slot>=0
@@ -192,7 +198,7 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        if self.policy==19 or self.policy==23:
+        if self.policy==19 or self.policy==23 or self.policy==24:
             # Stateless per-event draw: identical on every rank, independent
             # of earlier RNG use; MGO_RANDOM_SALT varies it across rounds.
             seed_rng(self.random_salt*1000003+event)

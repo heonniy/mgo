@@ -244,7 +244,7 @@ class DecodePrefetchController:
    # Stage-2 controls reuse the FAST quota rows.
    table_key='NEAR_FAST' if policy in ('FAST_WORST','FAST_RANDOM') else policy
    quota_lut=np.asarray(data['quota_lut'][table_key],dtype=np.int64)
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10,'NEAR_PCIE':11,'NEAR_FAST':12,'MISS_BAL_COMM':13,'BW':14,'MISS_CAP_COMM':15,'HAQ':16,'HAQ_WORST':17,'STATIC_BLOCK':18,'RANDOM':19,'NEAR_SPLIT':20,'HAQ_FAST':21,'FAST_WORST':22,'FAST_RANDOM':23}[policy],seed,quota_lut)
+  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10,'NEAR_PCIE':11,'NEAR_FAST':12,'MISS_BAL_COMM':13,'BW':14,'MISS_CAP_COMM':15,'HAQ':16,'HAQ_WORST':17,'STATIC_BLOCK':18,'RANDOM':19,'NEAR_SPLIT':20,'HAQ_FAST':21,'FAST_WORST':22,'FAST_RANDOM':23,'RANDOM_QUOTA_NEAR':24}[policy],seed,quota_lut)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):
@@ -266,7 +266,7 @@ class DecodePrefetchController:
   self.pending.clear()
   out=m.apply(event,selected,weights,origins,gates,np.zeros((128,self.world),np.int32));fetches=out[5]
   quotas=np.bincount([f[0] for f in fetches],minlength=self.world)
-  if self.policy_name not in ('STATIC_MOD','RANDOM_HASH','HAQ','HAQ_FAST','STATIC_BLOCK','RANDOM','NEAR_SPLIT'):assert quotas.max()-quotas.min()<=1
+  if self.policy_name not in ('STATIC_MOD','RANDOM_HASH','HAQ','HAQ_FAST','STATIC_BLOCK','RANDOM','NEAR_SPLIT','RANDOM_QUOTA_NEAR'):assert quotas.max()-quotas.min()<=1
   if self.policy_name=='NEAR_SPLIT':assert np.array_equal(quotas,self.main.quota_lut[len(fetches)])
   if self.policy_name in ('HAQ','HAQ_FAST'):assert quotas.max()<=-(-len(fetches)//self.world)
   for rank,key,slot,victim,rep in fetches:

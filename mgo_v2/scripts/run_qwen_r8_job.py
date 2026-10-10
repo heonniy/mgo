@@ -136,7 +136,7 @@ def main():
     parser.add_argument('--repeats', type=int, choices=(1, 2, 3), default=2)
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--ours-mode', choices=('A', 'B', 'C', 'N'))
-    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM'),
+    parser.add_argument('--ours-policy', choices=('LA_CA_NEAR','NEAR_FAST','NEAR_PCIE','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM','RANDOM_QUOTA_NEAR'),
                         default='LA_CA_NEAR')
     parser.add_argument('--quota-table', type=Path)
     parser.add_argument('--teacher-tokens', type=Path)
