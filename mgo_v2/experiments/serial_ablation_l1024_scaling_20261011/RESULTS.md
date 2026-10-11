@@ -1,8 +1,11 @@
 # Serial ablation: OURS (HAQ) vs OURS-random across datasets, models, input lengths and GPU counts
 
 OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mode of
-`../cache_size_sweep_ablation`. All 40 jobs passed; they ran at f3d69b3 (`run.sh`) and 254c6bd
-(`run_lmsys.sh`). The two commits differ only in driver logging and the summarizer.
+`../cache_size_sweep_ablation`. All 56 jobs passed. They ran at three commits that differ only in driver logging, drivers and the
+summarizer:
+- f3d69b3: `run.sh`
+- 254c6bd: `run_lmsys.sh`
+- a1bc375: `run_b64_random.sh`
 
 **Main result:**
 - **Every R4 cell:** RANDOM's TPOT is 11.0–12.4% higher than OURS on Qwen3 and 15.5–15.7% higher
@@ -27,7 +30,11 @@ OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mod
   - Manifests: `qwen_r2_sharegpt_b16_l512_20261010`, `qwen_cache_ablation_20261009` (C30),
     `qwen_r8_sharegpt_b16_l512_20261009`.
   - R4 was rerun at f3d69b3 rather than reused.
-- **Order:** each cell runs HAQ r1, RANDOM r1, RANDOM r2, HAQ r2. `MGO_RANDOM_SALT` = round.
+- **Part C:** the Part A matrix at local B64 (256 global requests), OURS-random only, two rounds
+  per cell (`MGO_RANDOM_SALT` = round).
+  - There is no serial-mode OURS (HAQ) B64 run, so Part C has no TPOT gap column.
+  - The main-table B64 OURS rows use the default overlap mode and are not comparable.
+- **Order (Parts A and B):** each cell runs HAQ r1, RANDOM r1, RANDOM r2, HAQ r2. `MGO_RANDOM_SALT` = round.
 - **Samples:** every target is kept (repeat 0 is the in-job warmup).
   - Qwen3: 2 jobs × 3 targets = 6.
   - DeepSeek: 2 jobs × 2 targets = 4.
@@ -65,6 +72,19 @@ OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mod
 | ShareGPT | Qwen3 | 512 | 8 | OURS (HAQ) | 286.01 [270.08, 287.39] | 1.844 [1.807, 3.156] | 0.4258 [0.4233, 0.4313] | 6 | — |
 | ShareGPT | Qwen3 | 512 | 8 | OURS-random | 252.25 [240.15, 253.26] | 1.822 [1.818, 3.134] | 0.4866 [0.4846, 0.4919] | 6 | +14.3% |
 
+## Part C: R4 (GPUs 0/1/4/5), C30, B64, OURS-random only (median [min, max], n)
+
+| Dataset | Model | Input | GPUs | Method | TPS ↑ | TTFT (s) ↓ | TPOT (s/token) ↓ | n | TPOT vs OURS |
+|---|---|---:|---:|---|---|---|---|---:|---:|
+| ShareGPT | Qwen3 | 512 | 4 | OURS-random | 319.78 [304.26, 322.80] | 4.162 [4.137, 5.534] | 0.7472 [0.7400, 0.7669] | 6 | — |
+| ShareGPT | Qwen3 | 1024 | 4 | OURS-random | 301.30 [293.83, 301.64] | 7.643 [7.582, 8.481] | 0.7423 [0.7416, 0.7505] | 6 | — |
+| ShareGPT | DeepSeekV2Lite | 512 | 4 | OURS-random | 598.49 [594.46, 601.57] | 2.059 [2.012, 2.118] | 0.4021 [0.3999, 0.4039] | 4 | — |
+| ShareGPT | DeepSeekV2Lite | 1024 | 4 | OURS-random | 535.97 [528.52, 538.72] | 3.945 [3.843, 4.286] | 0.4229 [0.4212, 0.4240] | 4 | — |
+| LMSYS-Chat-1M | Qwen3 | 512 | 4 | OURS-random | 308.89 [297.88, 310.43] | 4.189 [4.154, 5.542] | 0.7757 [0.7716, 0.7851] | 6 | — |
+| LMSYS-Chat-1M | Qwen3 | 1024 | 4 | OURS-random | 288.27 [285.67, 289.96] | 7.842 [7.659, 8.325] | 0.7778 [0.7719, 0.7798] | 6 | — |
+| LMSYS-Chat-1M | DeepSeekV2Lite | 512 | 4 | OURS-random | 598.65 [595.86, 601.09] | 2.106 [2.058, 2.173] | 0.4008 [0.3997, 0.4026] | 4 | — |
+| LMSYS-Chat-1M | DeepSeekV2Lite | 1024 | 4 | OURS-random | 533.10 [521.03, 543.21] | 4.043 [3.825, 4.361] | 0.4237 [0.4180, 0.4299] | 4 | — |
+
 ## Notes
 
 - **Reproduces the cache sweep:** R4 ShareGPT 512 matches `../cache_size_sweep_ablation` C30.
@@ -82,13 +102,13 @@ OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mod
   - The whole cell was rerun from HAQ r1 (`run_lmsys.log`, after the "relaunch" line).
 - **Driver exit codes before 254c6bd were unreliable:** `$(date)` inside the echo reset `$?`, so
   every job logged rc=0. Each raw job here was checked for `status.json` status PASS instead.
-- **Uncommitted working-tree change during `run_lmsys.sh`:** another session edited
+- **Uncommitted working-tree change during `run_lmsys.sh` and `run_b64_random.sh`:** another session edited
   `scripts/env_offload_policy.py` at 10:05:40, before `run_lmsys.sh` started at 10:07:13. The
   edit was not committed here.
   - It replaces the hard-coded Stage-II near tolerance 200 with `MGO_NEAR_BPS` (default 200).
     `near_assignment_with_quota` already defaults to `near_bps=200`.
   - `MGO_NEAR_BPS` was unset in these runs, so the HAQ path is unchanged. RANDOM (code 19) is untouched.
-  - The `source_commit` recorded by those 20 jobs therefore describes their behaviour.
+  - The `source_commit` recorded by those 36 jobs therefore describes their behaviour.
 - **TTFT maximums of 3–4.4 s** on Qwen3 come from the first target of each job. The other targets
   sit at the median. The median is the reported value, and the range keeps every sample.
 - **Tokens differ between policies, so routes diverge.** This is the same caveat as the cache sweep:
@@ -103,4 +123,5 @@ OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mod
   (DeepSeek ShareGPT 512, LMSYS both models and inputs) are the exact drivers as run.
   - Their logs are `run.log` and `run_lmsys.log`.
   - Output root: `/home/hwlee/mgo-results/serial_ablation_l1024_scaling_20261011`.
+- `run_b64_random.sh` (Part C) is the B64 OURS-random driver, logged in `run_b64_random.log`.
 - `python summarize.py` rebuilds `SUMMARY.json` and the tables from `raw/`.

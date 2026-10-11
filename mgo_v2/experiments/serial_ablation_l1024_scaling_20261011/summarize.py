@@ -2,7 +2,7 @@
 and Qwen3 ShareGPT input 512 at R2/R4/R8.
 Rebuilds SUMMARY.json and prints the RESULTS tables from raw/.
 
-Every target repeat k>=1 is kept (repeat0 is the in-job warmup). TPS = global requests x 64 / E2E,
+Parts A and B use local B16; part C uses local B64. Every target repeat k>=1 is kept (repeat0 is the in-job warmup). TPS = global requests x 64 / E2E,
 the main-table definition.
 """
 import json, statistics as st
@@ -13,6 +13,9 @@ CELLS = {  # (part, dataset, model, input, gpus) -> raw glob prefix; Qwen3 Share
     **{('A', d, m, n, 4): f'{t}_{tag}l{n}_r4' for d, tag in (('ShareGPT', ''), ('LMSYS-Chat-1M', 'lmsys_'))
        for m, t in (('Qwen3', 'qwen'), ('DeepSeekV2Lite', 'ds')) for n in (512, 1024)},
     **{('B', 'ShareGPT', 'Qwen3', 512, g): f'qwen_l512_r{g}' for g in (2, 4, 8)},
+    # Part C: local B64, RANDOM only (no serial-mode HAQ B64 run exists yet)
+    **{('C', d, m, n, 4): f'{t}_{tag}l{n}_b64_r4' for d, tag in (('ShareGPT', ''), ('LMSYS-Chat-1M', 'lmsys_'))
+       for m, t in (('Qwen3', 'qwen'), ('DeepSeekV2Lite', 'ds')) for n in (512, 1024)},
 }
 POLICIES = ('HAQ', 'RANDOM')
 NAMES = {'HAQ': 'OURS (HAQ)', 'RANDOM': 'OURS-random'}
@@ -49,12 +52,13 @@ for (part, dataset, model, length, gpus), prefix in CELLS.items():
 (HERE / 'SUMMARY.json').write_text(json.dumps(out, indent=2) + '\n')
 
 fmt = lambda c, k, d: f"{c[k]['median']:.{d}f} [{c[k]['min']:.{d}f}, {c[k]['max']:.{d}f}]"
-for part, title in (('A', 'Part A: R4 (GPUs 0/1/4/5), C30, B16'), ('B', 'Part B: Qwen3, ShareGPT, C30, B16, input 512, by GPU count')):
+for part, title in (('A', 'Part A: R4 (GPUs 0/1/4/5), C30, B16'), ('B', 'Part B: Qwen3, ShareGPT, C30, B16, input 512, by GPU count'),
+                    ('C', 'Part C: R4 (GPUs 0/1/4/5), C30, B64, OURS-random only')):
     print(f'\n### {title} (median [min, max], n)\n')
     print('| Dataset | Model | Input | GPUs | Method | TPS ↑ | TTFT (s) ↓ | TPOT (s/token) ↓ | n | TPOT vs OURS |')
     print('|---|---|---:|---:|---|---|---|---|---:|---:|')
     cells = [c for c in out['cells'] if c['part'] == part]
     for c in cells:
-        base = next(b for b in cells if (b['dataset'], b['model'], b['input_tokens'], b['gpus']) == (c['dataset'], c['model'], c['input_tokens'], c['gpus']) and b['policy'] == 'HAQ')
-        delta = '—' if c is base else f"{100 * (c['TPOT']['median'] / base['TPOT']['median'] - 1):+.1f}%"
+        base = next((b for b in cells if (b['dataset'], b['model'], b['input_tokens'], b['gpus']) == (c['dataset'], c['model'], c['input_tokens'], c['gpus']) and b['policy'] == 'HAQ'), None)
+        delta = '—' if base is None or c is base else f"{100 * (c['TPOT']['median'] / base['TPOT']['median'] - 1):+.1f}%"
         print(f"| {c['dataset']} | {c['model']} | {c['input_tokens']} | {c['gpus']} | {NAMES[c['policy']]} | {fmt(c, 'TPS', 2)} | {fmt(c, 'TTFT', 3)} | {fmt(c, 'TPOT', 4)} | {c['n']} | {delta} |")
