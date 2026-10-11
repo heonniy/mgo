@@ -2,7 +2,7 @@
 import json, statistics as st
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-POLICIES = ('BW', 'BR', 'STATIC_BLOCK', 'LA_CA_NEAR', 'HAQ')
+POLICIES = ('BW', 'RANDOM', 'STATIC_BLOCK', 'BR', 'LA_CA_NEAR', 'HAQ')
 out = dict(status='PASS', units='TPOT seconds/token', cells={})
 for C in (50, 30):
     pol = {p: [] for p in POLICIES}

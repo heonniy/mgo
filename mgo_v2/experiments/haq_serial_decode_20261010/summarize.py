@@ -2,7 +2,7 @@
 import json, statistics as st
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-POLICIES = ('BW', 'BR', 'LA_CA_NEAR', 'HAQ')
+POLICIES = ('BW', 'RANDOM', 'STATIC_BLOCK', 'BR', 'LA_CA_NEAR', 'HAQ')
 out = dict(status='PASS', units='TPOT seconds/token', cells={})
 for C in (50, 30):
     cell = {}
@@ -10,6 +10,9 @@ for C in (50, 30):
         rounds = []
         for rnd in (1, 2):
             d = HERE / 'raw' / f'c{C}_{pol}_r{rnd}'
+            # Only completed (PASS) jobs are summarized; interrupted jobs live in raw_interrupted/.
+            if not d.exists() or json.loads((d / 'status.json').read_text()).get('status') != 'PASS':
+                continue
             reps = []
             for k in (1, 2, 3):
                 summary = json.loads((d / f'repeat{k}.json').read_text())
@@ -27,17 +30,18 @@ for C in (50, 30):
         c = cell[pol]
         c['vs_BW_pct'] = (c['median'] / bw['median'] - 1) * 100
         c['vs_BW_ms'] = (c['median'] - bw['median']) * 1000
-        c['round_vs_BW_pct'] = [(c['rounds'][i]['median_TPOT'] / bw['rounds'][i]['median_TPOT'] - 1) * 100 for i in range(2)]
+        c['round_vs_BW_pct'] = [(rd['median_TPOT'] / bw['rounds'][rd['round'] - 1]['median_TPOT'] - 1) * 100 for rd in c['rounds']]
     out['cells'][f'Qwen3_ShareGPT_R4_C{C}_B16_L512_O64'] = cell
 (HERE / 'SUMMARY.json').write_text(json.dumps(out, indent=1) + '\n')
 for name, cell in out['cells'].items():
     print(f'### {name}\n')
-    print('| Policy | R1 t1 / t2 / t3 | R2 t1 / t2 / t3 | Median (6) | vs BW | R1 / R2 vs BW |')
+    print('| Policy | R1 t1 / t2 / t3 | R2 t1 / t2 / t3 | Median | vs BW | R1 / R2 vs BW |')
     print('|---|---|---|---|---|---|')
     for pol in POLICIES:
         c = cell[pol]
-        r = [' / '.join(f"{t['TPOT']:.4f}" for t in rd['targets']) for rd in c['rounds']]
-        print(f"| {pol} | {r[0]} | {r[1]} | {c['median']:.4f} | {c['vs_BW_pct']:+.2f}% ({c['vs_BW_ms']:+.1f} ms) | {c['round_vs_BW_pct'][0]:+.2f}% / {c['round_vs_BW_pct'][1]:+.2f}% |")
+        r = {rd['round']: ' / '.join(f"{t['TPOT']:.4f}" for t in rd['targets']) for rd in c['rounds']}
+        rv = ' / '.join(f'{x:+.2f}%' for x in c['round_vs_BW_pct'])
+        print(f"| {pol} | {r.get(1, '—')} | {r.get(2, '— (interrupted)')} | {c['median']:.4f} | {c['vs_BW_pct']:+.2f}% ({c['vs_BW_ms']:+.1f} ms) | {rv} |")
     print('\n| Policy | Copies/token by rank (R1 t2) | Experts/token by rank (R1 t2) |')
     print('|---|---|---|')
     for pol in POLICIES:

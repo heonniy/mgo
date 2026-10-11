@@ -1,0 +1,56 @@
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=0 split_controller
+BR event=768 split_controller
+BR event=768 split_controllerBR event=768 split_controllerBR event=768 split_controller
+
+
+BR event=1536 split_controllerBR event=1536 split_controller
+BR event=1536 split_controller
+
+BR event=1536 split_controller
+BR event=2304 split_controller
+BR event=2304 split_controller
+BR event=2304 split_controller
+BR event=2304 split_controller
+{"status": "PASS", "expert_executor": "native", "repeat": 0, "TTFT": 1.808629426, "TPOT": 0.7887459513650794, "E2E": 51.499624362, "throughput": 79.53456070297696, "output_tokens": 64, "global_requests": 64, "smoke": false}
+{"status": "PASS", "expert_executor": "native", "repeat": 1, "TTFT": 3.710472887, "TPOT": 0.586473549968254, "E2E": 40.658306535, "throughput": 100.74202171883448, "output_tokens": 64, "global_requests": 64, "smoke": false}
+W1010 20:08:39.201000 3564165 site-packages/torch/distributed/elastic/agent/server/api.py:739] Received 15 death signal, shutting down workers
+W1010 20:08:39.206000 3564165 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 3564212 closing signal SIGTERM
+W1010 20:08:39.208000 3564165 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 3564213 closing signal SIGTERM
+W1010 20:08:39.208000 3564165 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 3564214 closing signal SIGTERM
+W1010 20:08:39.208000 3564165 site-packages/torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 3564215 closing signal SIGTERM
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 994, in <module>
+    main()
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 3564165 got signal: 15

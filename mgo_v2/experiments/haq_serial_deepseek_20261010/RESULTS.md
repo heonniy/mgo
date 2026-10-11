@@ -2,7 +2,8 @@
 
 On DeepSeek-V2-Lite, hit-aware quota (HAQ) lowers decode TPOT by **4.32% (C50)**
 and **2.64% (C30)** versus BW. These are medians of 4 unfiltered targets. Both
-cache sizes show the order BW ≈ BR ≈ STATIC_BLOCK > LA_CA_NEAR > HAQ. It is the
+cache sizes show the order RANDOM > BW ≈ BR ≈ STATIC_BLOCK > LA_CA_NEAR > HAQ, where
+RANDOM is a fully random fetch-rank control added later (+10.1% / +10.9% vs BW). It is the
 same mechanism as in the Qwen3 result (`../haq_serial_decode_20261010`): HAQ
 flattens the rank-0 copy gradient left by the balanced quota.
 
@@ -34,8 +35,9 @@ flattens the rank-0 copy gradient left by the balanced quota.
 | Policy | Targets (job: order → TPOT) | n | Median | vs BW | Decode copies by rank (first target) |
 |---|---|---|---|---|---|
 | BW | haq_serial_c50:1→0.3187, haq_serial_c50:8→0.3158, static_c50:1→0.3181, static_c50:6→0.3183 | 4 | 0.3182 | +0.00% (+0.0 ms) | [14271, 13860, 13458, 13018] |
-| BR | haq_serial_c50:2→0.3201, haq_serial_c50:7→0.3151 | 2 | 0.3176 | -0.19% (-0.6 ms) | [14245, 13825, 13413, 13010] |
+| RANDOM | random_c50:1→0.3493, random_c50:2→0.3517 | 2 | 0.3505 | +10.14% (+32.3 ms) | [14032, 13479, 13787, 13801] |
 | STATIC_BLOCK | static_c50:2→0.3202, static_c50:5→0.3164 | 2 | 0.3183 | +0.02% (+0.1 ms) | [13711, 13907, 12896, 14237] |
+| BR | haq_serial_c50:2→0.3201, haq_serial_c50:7→0.3151 | 2 | 0.3176 | -0.19% (-0.6 ms) | [14245, 13825, 13413, 13010] |
 | LA_CA_NEAR | haq_serial_c50:4→0.3100, haq_serial_c50:5→0.3089 | 2 | 0.3094 | -2.76% (-8.8 ms) | [14247, 13809, 13420, 13006] |
 | HAQ | haq_serial_c50:3→0.3035, haq_serial_c50:6→0.3030, static_c50:3→0.3054, static_c50:4→0.3071 | 4 | 0.3045 | -4.32% (-13.8 ms) | [13695, 13642, 13601, 13537] |
 
@@ -44,8 +46,9 @@ flattens the rank-0 copy gradient left by the balanced quota.
 | Policy | Targets (job: order → TPOT) | n | Median | vs BW | Decode copies by rank (first target) |
 |---|---|---|---|---|---|
 | BW | haq_serial_c30:1→0.3491, haq_serial_c30:8→0.3433, static_c30:1→0.3431, static_c30:6→0.3454 | 4 | 0.3444 | +0.00% (+0.0 ms) | [19637, 19229, 18836, 18417] |
-| BR | haq_serial_c30:2→0.3454, haq_serial_c30:7→0.3461 | 2 | 0.3458 | +0.41% (+1.4 ms) | [19603, 19181, 18772, 18396] |
+| RANDOM | random_c30:1→0.3827, random_c30:2→0.3809 | 2 | 0.3818 | +10.88% (+37.5 ms) | [19577, 18893, 19257, 19158] |
 | STATIC_BLOCK | static_c30:2→0.3431, static_c30:5→0.3413 | 2 | 0.3422 | -0.63% (-2.2 ms) | [19308, 19249, 18772, 18924] |
+| BR | haq_serial_c30:2→0.3454, haq_serial_c30:7→0.3461 | 2 | 0.3458 | +0.41% (+1.4 ms) | [19603, 19181, 18772, 18396] |
 | LA_CA_NEAR | haq_serial_c30:4→0.3404, haq_serial_c30:5→0.3413 | 2 | 0.3409 | -1.01% (-3.5 ms) | [19606, 19198, 18804, 18430] |
 | HAQ | haq_serial_c30:3→0.3349, haq_serial_c30:6→0.3351, static_c30:3→0.3378, static_c30:4→0.3354 | 4 | 0.3353 | -2.64% (-9.1 ms) | [19106, 19040, 18973, 18887] |
 
@@ -64,6 +67,19 @@ Each target is written as `job:order→TPOT`. "Decode copies by rank" is rank
 - **Earlier DeepSeek runs showed no policy effect** because they used the
   overlapped default runtime, where demand H2D is hidden. There, TPOT barely
   changed from C20 to C50.
+
+## Added control: RANDOM (2026-10-11)
+
+RANDOM (code 19) sends every miss to a uniformly random rank, with no quota.
+It ran later as one job per cell (`ds_random_c{50,30}_v1`, schedule
+RANDOM,RANDOM, `MGO_RANDOM_SALT`=1).
+
+- **Against BW, RANDOM is slower** by +10.1% (C50) and +10.9% (C30).
+- **Against RANDOM, HAQ is faster** by 13.1% (C50) and 12.2% (C30).
+- **Both targets in a job share one salt.** They therefore saw the same random
+  stream and produced identical tokens.
+
+`run_random.sh` holds the exact commands.
 
 ## Caveats
 
