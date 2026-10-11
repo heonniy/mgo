@@ -82,6 +82,13 @@ OURS (HAQ, code 16) and OURS-random (RANDOM, code 19) in the serial ablation mod
   - The whole cell was rerun from HAQ r1 (`run_lmsys.log`, after the "relaunch" line).
 - **Driver exit codes before 254c6bd were unreliable:** `$(date)` inside the echo reset `$?`, so
   every job logged rc=0. Each raw job here was checked for `status.json` status PASS instead.
+- **Uncommitted working-tree change during `run_lmsys.sh`:** another session edited
+  `scripts/env_offload_policy.py` at 10:05:40, before `run_lmsys.sh` started at 10:07:13. The
+  edit was not committed here.
+  - It replaces the hard-coded Stage-II near tolerance 200 with `MGO_NEAR_BPS` (default 200).
+    `near_assignment_with_quota` already defaults to `near_bps=200`.
+  - `MGO_NEAR_BPS` was unset in these runs, so the HAQ path is unchanged. RANDOM (code 19) is untouched.
+  - The `source_commit` recorded by those 20 jobs therefore describes their behaviour.
 - **TTFT maximums of 3–4.4 s** on Qwen3 come from the first target of each job. The other targets
   sit at the median. The median is the reported value, and the range keeps every sample.
 - **Tokens differ between policies, so routes diverge.** This is the same caveat as the cache sweep:
