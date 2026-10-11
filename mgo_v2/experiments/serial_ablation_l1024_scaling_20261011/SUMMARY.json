@@ -9,6 +9,185 @@
   "cells": [
     {
       "part": "A",
+      "dataset": "ShareGPT",
+      "model": "Qwen3",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 6,
+      "jobs": [
+        "qwen_l512_r4_HAQ_r1",
+        "qwen_l512_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_l512_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 3.717322225,
+          "TPOT": 0.5526898363333334,
+          "E2E": 38.536781914,
+          "TPS": 106.28806549391626,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 1.731114209,
+          "TPOT": 0.5506298356349206,
+          "E2E": 36.420793854,
+          "TPS": 112.46322681541844,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_HAQ_r1",
+          "target": 3,
+          "TTFT": 1.739176401,
+          "TPOT": 0.5509263215079365,
+          "E2E": 36.447534656,
+          "TPS": 112.38071487300762,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 3.744225296,
+          "TPOT": 0.5501157228095238,
+          "E2E": 38.401515833,
+          "TPS": 106.66245618565242,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 1.73889592,
+          "TPOT": 0.5517611578253968,
+          "E2E": 36.499848863,
+          "TPS": 112.21964275452459,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_HAQ_r2",
+          "target": 3,
+          "TTFT": 1.751572906,
+          "TPOT": 0.5508647901428572,
+          "E2E": 36.456054685,
+          "TPS": 112.35445073230365,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 112.28704674341412,
+        "min": 106.28806549391626,
+        "max": 112.46322681541844
+      },
+      "TTFT": {
+        "median": 1.7453746534999999,
+        "min": 1.731114209,
+        "max": 3.744225296
+      },
+      "TPOT": {
+        "median": 0.5508955558253968,
+        "min": 0.5501157228095238,
+        "max": 0.5526898363333334
+      },
+      "E2E": {
+        "median": 36.477951774,
+        "min": 36.420793854,
+        "max": 38.536781914
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "ShareGPT",
+      "model": "Qwen3",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 6,
+      "jobs": [
+        "qwen_l512_r4_RANDOM_r1",
+        "qwen_l512_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_l512_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 3.697736117,
+          "TPOT": 0.6113103046190476,
+          "E2E": 42.210285308,
+          "TPS": 97.03796053763456,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 1.733449108,
+          "TPOT": 0.6133300468412698,
+          "E2E": 40.373242059,
+          "TPS": 101.45333372074141,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_RANDOM_r1",
+          "target": 3,
+          "TTFT": 1.738638899,
+          "TPOT": 0.6146248136984127,
+          "E2E": 40.460002162,
+          "TPS": 101.2357830234364,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 3.680484453,
+          "TPOT": 0.615955595047619,
+          "E2E": 42.485686941,
+          "TPS": 96.40893898427787,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 1.739739402,
+          "TPOT": 0.6135870714285714,
+          "E2E": 40.395724902,
+          "TPS": 101.39686835517604,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_l512_r4_RANDOM_r2",
+          "target": 3,
+          "TTFT": 1.741970684,
+          "TPOT": 0.6114731915396825,
+          "E2E": 40.264781751,
+          "TPS": 101.72661621090926,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 101.31632568930621,
+        "min": 96.40893898427787,
+        "max": 101.72661621090926
+      },
+      "TTFT": {
+        "median": 1.740855043,
+        "min": 1.733449108,
+        "max": 3.697736117
+      },
+      "TPOT": {
+        "median": 0.6134585591349206,
+        "min": 0.6113103046190476,
+        "max": 0.615955595047619
+      },
+      "E2E": {
+        "median": 40.427863532,
+        "min": 40.264781751,
+        "max": 42.485686941
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 1024,
       "gpus": 4,
@@ -97,6 +276,7 @@
     },
     {
       "part": "A",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 1024,
       "gpus": 4,
@@ -185,6 +365,149 @@
     },
     {
       "part": "A",
+      "dataset": "ShareGPT",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 4,
+      "jobs": [
+        "ds_l512_r4_HAQ_r1",
+        "ds_l512_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_l512_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 0.858517366,
+          "TPOT": 0.33334694555555555,
+          "E2E": 21.859374936,
+          "TPS": 187.37955737491544,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 0.596344585,
+          "TPOT": 0.3327376922857143,
+          "E2E": 21.558819199,
+          "TPS": 189.9918526238205,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 0.871200413,
+          "TPOT": 0.33177907815873015,
+          "E2E": 21.773282337,
+          "TPS": 188.12046510045676,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 0.596714938,
+          "TPOT": 0.3316679975396825,
+          "E2E": 21.491798783,
+          "TPS": 190.58432667068953,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 189.05615886213863,
+        "min": 187.37955737491544,
+        "max": 190.58432667068953
+      },
+      "TTFT": {
+        "median": 0.727616152,
+        "min": 0.596344585,
+        "max": 0.871200413
+      },
+      "TPOT": {
+        "median": 0.33225838522222223,
+        "min": 0.3316679975396825,
+        "max": 0.33334694555555555
+      },
+      "E2E": {
+        "median": 21.666050767999998,
+        "min": 21.491798783,
+        "max": 21.859374936
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "ShareGPT",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 4,
+      "jobs": [
+        "ds_l512_r4_RANDOM_r1",
+        "ds_l512_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_l512_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 0.860647578,
+          "TPOT": 0.38555343188888885,
+          "E2E": 25.150513787,
+          "TPS": 162.8594960202035,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 0.640259549,
+          "TPOT": 0.3841821686984127,
+          "E2E": 24.843736177,
+          "TPS": 164.87053198512154,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 0.852992072,
+          "TPOT": 0.3834489222222222,
+          "E2E": 25.010274172,
+          "TPS": 163.77269484656972,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_l512_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 0.606662708,
+          "TPOT": 0.3849801812698413,
+          "E2E": 24.860414128,
+          "TPS": 164.7599263194382,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 164.26631058300396,
+        "min": 162.8594960202035,
+        "max": 164.87053198512154
+      },
+      "TTFT": {
+        "median": 0.7466258105000001,
+        "min": 0.606662708,
+        "max": 0.860647578
+      },
+      "TPOT": {
+        "median": 0.384581174984127,
+        "min": 0.3834489222222222,
+        "max": 0.38555343188888885
+      },
+      "E2E": {
+        "median": 24.93534415,
+        "min": 24.843736177,
+        "max": 25.150513787
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "ShareGPT",
       "model": "DeepSeekV2Lite",
       "input_tokens": 1024,
       "gpus": 4,
@@ -255,6 +578,7 @@
     },
     {
       "part": "A",
+      "dataset": "ShareGPT",
       "model": "DeepSeekV2Lite",
       "input_tokens": 1024,
       "gpus": 4,
@@ -324,7 +648,648 @@
       }
     },
     {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "Qwen3",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 6,
+      "jobs": [
+        "qwen_lmsys_l512_r4_HAQ_r1",
+        "qwen_lmsys_l512_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 3.776892398,
+          "TPOT": 0.5648651085714286,
+          "E2E": 39.363394238,
+          "TPS": 104.05606730036176,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 1.759039143,
+          "TPOT": 0.5665603907301587,
+          "E2E": 37.452343759,
+          "TPS": 109.36565215670139,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r1",
+          "target": 3,
+          "TTFT": 1.748300746,
+          "TPOT": 0.5654801098571428,
+          "E2E": 37.373547667,
+          "TPS": 109.5962319792476,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 3.754890287,
+          "TPOT": 0.5644486713968254,
+          "E2E": 39.315156585,
+          "TPS": 104.18373868470758,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 1.754773794,
+          "TPOT": 0.5627410219047619,
+          "E2E": 37.207458174,
+          "TPS": 110.08545600844676,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_HAQ_r2",
+          "target": 3,
+          "TTFT": 1.745697273,
+          "TPOT": 0.5628486727619048,
+          "E2E": 37.205163657,
+          "TPS": 110.0922451991245,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 109.4809420679745,
+        "min": 104.05606730036176,
+        "max": 110.0922451991245
+      },
+      "TTFT": {
+        "median": 1.7569064685,
+        "min": 1.745697273,
+        "max": 3.776892398
+      },
+      "TPOT": {
+        "median": 0.564656889984127,
+        "min": 0.5627410219047619,
+        "max": 0.5665603907301587
+      },
+      "E2E": {
+        "median": 37.412945713,
+        "min": 37.205163657,
+        "max": 39.363394238
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "Qwen3",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 6,
+      "jobs": [
+        "qwen_lmsys_l512_r4_RANDOM_r1",
+        "qwen_lmsys_l512_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 3.751470231,
+          "TPOT": 0.6320104178730159,
+          "E2E": 43.568126557,
+          "TPS": 94.01368210407716,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 1.757365931,
+          "TPOT": 0.6329279413809524,
+          "E2E": 41.631826238,
+          "TPS": 98.38626767377602,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r1",
+          "target": 3,
+          "TTFT": 1.759521829,
+          "TPOT": 0.633572860079365,
+          "E2E": 41.674612014,
+          "TPS": 98.28525814767049,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 3.760201624,
+          "TPOT": 0.6358047412063492,
+          "E2E": 43.81590032,
+          "TPS": 93.4820457889886,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 1.744060296,
+          "TPOT": 0.6392594423333333,
+          "E2E": 42.017405163,
+          "TPS": 97.48341155552572,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l512_r4_RANDOM_r2",
+          "target": 3,
+          "TTFT": 1.757467175,
+          "TPOT": 0.638434022936508,
+          "E2E": 41.97881062,
+          "TPS": 97.57303600327684,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 97.52822377940129,
+        "min": 93.4820457889886,
+        "max": 98.38626767377602
+      },
+      "TTFT": {
+        "median": 1.758494502,
+        "min": 1.744060296,
+        "max": 3.760201624
+      },
+      "TPOT": {
+        "median": 0.634688800642857,
+        "min": 0.6320104178730159,
+        "max": 0.6392594423333333
+      },
+      "E2E": {
+        "median": 41.9981078915,
+        "min": 41.631826238,
+        "max": 43.81590032
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "Qwen3",
+      "input_tokens": 1024,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 6,
+      "jobs": [
+        "qwen_lmsys_l1024_r4_HAQ_r1",
+        "qwen_lmsys_l1024_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 4.405503991,
+          "TPOT": 0.5609289429523809,
+          "E2E": 39.744027397,
+          "TPS": 103.05951027774246,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 2.5123804,
+          "TPOT": 0.5614275992063492,
+          "E2E": 37.88231915,
+          "TPS": 108.12432004971375,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r1",
+          "target": 3,
+          "TTFT": 2.49952207,
+          "TPOT": 0.5600649711269842,
+          "E2E": 37.783615251,
+          "TPS": 108.40677825004036,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 4.431868743,
+          "TPOT": 0.5613324372539682,
+          "E2E": 39.79581229,
+          "TPS": 102.92540255621957,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 2.495129519,
+          "TPOT": 0.5636831072539682,
+          "E2E": 38.007165276,
+          "TPS": 107.76915274411321,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_HAQ_r2",
+          "target": 3,
+          "TTFT": 2.499572772,
+          "TPOT": 0.5687636468888889,
+          "E2E": 38.331682526,
+          "TPS": 106.85677565083984,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 107.31296419747653,
+        "min": 102.92540255621957,
+        "max": 108.40677825004036
+      },
+      "TTFT": {
+        "median": 2.505976586,
+        "min": 2.495129519,
+        "max": 4.431868743
+      },
+      "TPOT": {
+        "median": 0.5613800182301587,
+        "min": 0.5600649711269842,
+        "max": 0.5687636468888889
+      },
+      "E2E": {
+        "median": 38.169423901,
+        "min": 37.783615251,
+        "max": 39.79581229
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "Qwen3",
+      "input_tokens": 1024,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 6,
+      "jobs": [
+        "qwen_lmsys_l1024_r4_RANDOM_r1",
+        "qwen_lmsys_l1024_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 4.391362857,
+          "TPOT": 0.6306923030793651,
+          "E2E": 44.124977951,
+          "TPS": 92.82724185264263,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 2.537878875,
+          "TPOT": 0.6291702795079366,
+          "E2E": 42.175606484,
+          "TPS": 97.11774984323898,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r1",
+          "target": 3,
+          "TTFT": 2.527815842,
+          "TPOT": 0.6266478784126984,
+          "E2E": 42.006632182,
+          "TPS": 97.50841205868323,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 4.400150187,
+          "TPOT": 0.6229754773492063,
+          "E2E": 43.64760526,
+          "TPS": 93.84249091332623,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 2.52396902,
+          "TPOT": 0.6255445374920634,
+          "E2E": 41.933274882,
+          "TPS": 97.6789914817319,
+          "global_requests": 64
+        },
+        {
+          "job": "qwen_lmsys_l1024_r4_RANDOM_r2",
+          "target": 3,
+          "TTFT": 2.502516519,
+          "TPOT": 0.6240071343333333,
+          "E2E": 41.814965982,
+          "TPS": 97.95535889621904,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 97.31308095096111,
+        "min": 92.82724185264263,
+        "max": 97.95535889621904
+      },
+      "TTFT": {
+        "median": 2.5328473584999998,
+        "min": 2.502516519,
+        "max": 4.400150187
+      },
+      "TPOT": {
+        "median": 0.6260962079523809,
+        "min": 0.6229754773492063,
+        "max": 0.6306923030793651
+      },
+      "E2E": {
+        "median": 42.091119332999995,
+        "min": 41.814965982,
+        "max": 44.124977951
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 4,
+      "jobs": [
+        "ds_lmsys_l512_r4_HAQ_r1",
+        "ds_lmsys_l512_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_lmsys_l512_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 0.871187143,
+          "TPOT": 0.33378299998412697,
+          "E2E": 21.899516142,
+          "TPS": 187.03609584069687,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 0.563819997,
+          "TPOT": 0.3340181646666667,
+          "E2E": 21.606964371,
+          "TPS": 189.56850808239804,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 0.870621413,
+          "TPOT": 0.33478970268253966,
+          "E2E": 21.962372682,
+          "TPS": 186.50079658091832,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 0.588699103,
+          "TPOT": 0.3327373634126984,
+          "E2E": 21.551152998,
+          "TPS": 190.0594367447588,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 188.30230196154747,
+        "min": 186.50079658091832,
+        "max": 190.0594367447588
+      },
+      "TTFT": {
+        "median": 0.729660258,
+        "min": 0.563819997,
+        "max": 0.871187143
+      },
+      "TPOT": {
+        "median": 0.3339005823253968,
+        "min": 0.3327373634126984,
+        "max": 0.33478970268253966
+      },
+      "E2E": {
+        "median": 21.7532402565,
+        "min": 21.551152998,
+        "max": 21.962372682
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 512,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 4,
+      "jobs": [
+        "ds_lmsys_l512_r4_RANDOM_r1",
+        "ds_lmsys_l512_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_lmsys_l512_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 0.863378385,
+          "TPOT": 0.38497121012698415,
+          "E2E": 25.116564623,
+          "TPS": 163.0796273885788,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 0.590137243,
+          "TPOT": 0.38583962198412697,
+          "E2E": 24.898033428,
+          "TPS": 164.5109848472487,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 0.873905659,
+          "TPOT": 0.3861231217936508,
+          "E2E": 25.199662332,
+          "TPS": 162.54186052321268,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l512_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 0.602958527,
+          "TPOT": 0.3857279736031746,
+          "E2E": 24.903820864,
+          "TPS": 164.47275389460495,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 163.77619064159188,
+        "min": 162.54186052321268,
+        "max": 164.5109848472487
+      },
+      "TTFT": {
+        "median": 0.733168456,
+        "min": 0.590137243,
+        "max": 0.873905659
+      },
+      "TPOT": {
+        "median": 0.3857837977936508,
+        "min": 0.38497121012698415,
+        "max": 0.3861231217936508
+      },
+      "E2E": {
+        "median": 25.0101927435,
+        "min": 24.898033428,
+        "max": 25.199662332
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 1024,
+      "gpus": 4,
+      "policy": "HAQ",
+      "n": 4,
+      "jobs": [
+        "ds_lmsys_l1024_r4_HAQ_r1",
+        "ds_lmsys_l1024_r4_HAQ_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_lmsys_l1024_r4_HAQ_r1",
+          "target": 1,
+          "TTFT": 1.185976813,
+          "TPOT": 0.3333928295238095,
+          "E2E": 22.189725073,
+          "TPS": 184.5899391058219,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_HAQ_r1",
+          "target": 2,
+          "TTFT": 0.944442819,
+          "TPOT": 0.33565071611111114,
+          "E2E": 22.090437934,
+          "TPS": 185.41959250593823,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_HAQ_r2",
+          "target": 1,
+          "TTFT": 1.150302624,
+          "TPOT": 0.33365828420634924,
+          "E2E": 22.170774529,
+          "TPS": 184.7477179763078,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_HAQ_r2",
+          "target": 2,
+          "TTFT": 0.930905812,
+          "TPOT": 0.3330936448730159,
+          "E2E": 21.915805439,
+          "TPS": 186.89707806545016,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 185.083655241123,
+        "min": 184.5899391058219,
+        "max": 186.89707806545016
+      },
+      "TTFT": {
+        "median": 1.0473727215,
+        "min": 0.930905812,
+        "max": 1.185976813
+      },
+      "TPOT": {
+        "median": 0.33352555686507934,
+        "min": 0.3330936448730159,
+        "max": 0.33565071611111114
+      },
+      "E2E": {
+        "median": 22.1306062315,
+        "min": 21.915805439,
+        "max": 22.189725073
+      }
+    },
+    {
+      "part": "A",
+      "dataset": "LMSYS-Chat-1M",
+      "model": "DeepSeekV2Lite",
+      "input_tokens": 1024,
+      "gpus": 4,
+      "policy": "RANDOM",
+      "n": 4,
+      "jobs": [
+        "ds_lmsys_l1024_r4_RANDOM_r1",
+        "ds_lmsys_l1024_r4_RANDOM_r2"
+      ],
+      "samples": [
+        {
+          "job": "ds_lmsys_l1024_r4_RANDOM_r1",
+          "target": 1,
+          "TTFT": 1.163303613,
+          "TPOT": 0.3872544346190476,
+          "E2E": 25.560332994,
+          "TPS": 160.24830353194108,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_RANDOM_r1",
+          "target": 2,
+          "TTFT": 0.966802398,
+          "TPOT": 0.38506183488888884,
+          "E2E": 25.225697996,
+          "TPS": 162.3740996443189,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_RANDOM_r2",
+          "target": 1,
+          "TTFT": 1.162206476,
+          "TPOT": 0.3863672072063492,
+          "E2E": 25.50334053,
+          "TPS": 160.6064113515564,
+          "global_requests": 64
+        },
+        {
+          "job": "ds_lmsys_l1024_r4_RANDOM_r2",
+          "target": 2,
+          "TTFT": 0.965926554,
+          "TPOT": 0.38472040703174604,
+          "E2E": 25.203312197,
+          "TPS": 162.5183217183476,
+          "global_requests": 64
+        }
+      ],
+      "TPS": {
+        "median": 161.49025549793765,
+        "min": 160.24830353194108,
+        "max": 162.5183217183476
+      },
+      "TTFT": {
+        "median": 1.064504437,
+        "min": 0.965926554,
+        "max": 1.163303613
+      },
+      "TPOT": {
+        "median": 0.38571452104761905,
+        "min": 0.38472040703174604,
+        "max": 0.3872544346190476
+      },
+      "E2E": {
+        "median": 25.364519263,
+        "min": 25.203312197,
+        "max": 25.560332994
+      }
+    },
+    {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 2,
@@ -413,6 +1378,7 @@
     },
     {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 2,
@@ -501,6 +1467,7 @@
     },
     {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 4,
@@ -589,6 +1556,7 @@
     },
     {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 4,
@@ -677,6 +1645,7 @@
     },
     {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 8,
@@ -765,6 +1734,7 @@
     },
     {
       "part": "B",
+      "dataset": "ShareGPT",
       "model": "Qwen3",
       "input_tokens": 512,
       "gpus": 8,
