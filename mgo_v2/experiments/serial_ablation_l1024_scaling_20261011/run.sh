@@ -17,7 +17,7 @@ headline() { # label, then run_headline_job args
  L=$1; shift
  [ -f $R/$L/result.json ] && return
  [ -d $R/$L ] && mv $R/$L $R/failed_${L}.$(date +%s)
- echo "$(date +%T) start $L"; "$@" > $R/$L.driver.log 2>&1; echo "$(date +%T) done $L rc=$?"
+ echo "$(date +%T) start $L"; "$@" > $R/$L.driver.log 2>&1; rc=$?; echo "$(date +%T) done $L rc=$rc"
 }
 
 stop() { [ -f $R/STOP ] && { echo STOPPED; exit 1; }; }
@@ -47,8 +47,8 @@ for G in 2 8; do
   lab=sab_$(echo $P | tr A-Z a-z); out=$ROOT/jobs/${lab}_full_v$r
   [ -f $out/result.json ] && continue
   echo "$(date +%T) start r$G $lab v$r"
-  MGO_RANDOM_SALT=$r timeout 3600 $PY -u $PKG/scripts/run_qwen_r${G}_job.py --system ours --ours-mode A --ours-policy BR --decode-policy $P --h2d-serial-ablation --repeats 3 --attempt $r --job-label $lab > $R/qwen_l512_r${G}_${P}_r$r.driver.log 2>&1
-  echo "$(date +%T) done r$G $lab v$r rc=$?"
+  MGO_RANDOM_SALT=$r timeout 3600 $PY -u $PKG/scripts/run_qwen_r${G}_job.py --system ours --ours-mode A --ours-policy BR --decode-policy $P --h2d-serial-ablation --repeats 3 --attempt $r --job-label $lab > $R/qwen_l512_r${G}_${P}_r$r.driver.log 2>&1; rc=$?
+  echo "$(date +%T) done r$G $lab v$r rc=$rc"
  done
 done
 echo ALLDONE

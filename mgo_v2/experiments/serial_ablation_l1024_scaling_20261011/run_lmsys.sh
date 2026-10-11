@@ -15,7 +15,7 @@ headline() { # label, then the command
  L=$1; shift
  [ -f $R/$L/result.json ] && return
  [ -d $R/$L ] && mv $R/$L $R/failed_${L}.$(date +%s)
- echo "$(date +%T) start $L"; "$@" > $R/$L.driver.log 2>&1; echo "$(date +%T) done $L rc=$?"
+ echo "$(date +%T) start $L"; "$@" > $R/$L.driver.log 2>&1; rc=$?; echo "$(date +%T) done $L rc=$rc"
 }
 stop() { [ -f $R/STOP ] && { echo STOPPED; exit 1; }; }
 
