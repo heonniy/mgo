@@ -66,7 +66,7 @@ EXPERT = re.compile(r'^model\.layers\.(\d+)\.mlp\.experts\.(\d+)\.(gate_proj|up_
 PARTS = {'gate_proj': (0, 2883584), 'up_proj': (2883584, 2883584),
          'down_proj': (5767168, 2883584)}
 DIAG = os.environ.get('MGO_DEEPSEEK_CACHE_DIAG') == '1'
-POLICY_CODES = {'BR': 0, 'LA_CA_NEAR': 7, 'NEAR_FAST': 12, 'BW': 14, 'HAQ': 16, 'HAQ_WORST': 17,
+POLICY_CODES = {'BR': 0, 'LA_CA_NEAR': 7, 'NEAR_FAST': 12, 'BW': 14, 'HAQ': 16, 'HAQ_WORST': 17, 'HAQ_FAST': 21,
                 'STATIC_BLOCK': 18, 'RANDOM': 19, 'FAST_WORST': 22, 'FAST_RANDOM': 23,
                 'RANDOM_QUOTA_NEAR': 24}
 QUOTA_TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM')
