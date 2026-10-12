@@ -60,7 +60,7 @@ Same SUMMARY.json. Figure `stage_breakdown.png` / `.pdf` from `figure.py`: rows 
 | Qwen3 | FAST+Random | 2.20 ± 0.00 | 8.45 ± 0.04 | 10.79 ± 0.03 | +14% | 0.4407 | +2.4% |
 | Qwen3 | FAST+Near | 1.31 ± 0.04 | 7.96 ± 0.13 | 9.43 ± 0.19 | 0 | 0.4303 | 0 |
 | Qwen3 | HAQ_FAST | **1.05 ± 0.02** | **7.58 ± 0.09** | **8.67 ± 0.12** | **-8%** | 0.4264 | -0.9% |
-| DeepSeek | FAST+Worst | 1.73 ± 0.03 | 4.35 ± 0.11 | 6.14 ± 0.14 | +28% | 0.2791 | +8.5% |
+| DeepSeek | FAST+Worst | 1.73 ± 0.03 | 4.35 ± 0.11 | 6.14 ± 0.14 | +27% | 0.2791 | +8.5% |
 | DeepSeek | FAST+Random | 0.90 ± 0.02 | 4.03 ± 0.06 | 5.02 ± 0.07 | +4% | 0.2610 | +1.5% |
 | DeepSeek | FAST+Near | 0.71 ± 0.01 | 3.99 ± 0.01 | 4.81 ± 0.01 | 0 | 0.2572 | 0 |
 | DeepSeek | HAQ_FAST | **0.61 ± 0.02** | 3.96 ± 0.02 | **4.64 ± 0.04** | **-4%** | 0.2529 | -1.7% |
@@ -84,3 +84,6 @@ Notes:
 - HAQ_FAST's copy-cost constants (250/230 us) were calibrated on Qwen 9 MiB experts and reused for DeepSeek.
 - The breakdown is span-based: comm cost is net of the wait for the busiest rank. Read the relative
   changes, not exact wire time.
+
+Two-column variant: `stage_breakdown_ep.png` / `.pdf` (`figure_ep.py`). (a) H2D imbalance NEAR vs FAST;
+(b) EP cost as one stacked bar = load imbalance (compute + H2D wait) + communication cost.
