@@ -60,9 +60,11 @@ def metrics(comp, wait, comm, tpot):
 
 
 def main():
-    status = json.loads((HERE / 'STATUS.json').read_text())
+    jobs = json.loads((HERE / 'STATUS.json').read_text())['jobs']
+    if (HERE / 'STATUS_extra.json').exists():
+        jobs += json.loads((HERE / 'STATUS_extra.json').read_text())['jobs']  # unconstrained-quota arms
     cells = defaultdict(list)
-    for job in status['jobs']:
+    for job in jobs:
         path = Path(job['output'])
         fn = qwen_arrays if job['model'] == 'qwen' else deepseek_arrays
         cells[(job['model'], job['arm'])].append(dict(rep=job['rep'], **metrics(*fn(path))))
