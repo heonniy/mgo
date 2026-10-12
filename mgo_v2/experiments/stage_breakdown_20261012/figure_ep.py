@@ -13,9 +13,9 @@ from matplotlib.patches import Patch
 HERE = Path(__file__).resolve().parent
 S = json.loads((HERE / 'SUMMARY.json').read_text())
 INK, INK2, GRID, SURF = '#0b0b0b', '#52514e', '#e4e3df', '#fcfcfb'
-ARM = {'near': '#9a9893', 'fast': '#2a78d6'}
+ARM = {'rquota': '#eb6834', 'near': '#9a9893', 'fast': '#2a78d6'}
 COMP, COMM = '#4a3aa7', '#b9b2ee'  # stacked components: compute imbalance (dark), comm cost (light)
-SHORT = {'near': 'NEAR', 'fast': 'FAST+Near', 'rand': 'FAST+Random', 'worst': 'FAST+Worst', 'haqf': 'HAQ_FAST'}
+SHORT = {'rquota': 'Random quota', 'near': 'NEAR', 'fast': 'FAST+Near', 'rand': 'FAST+Random', 'worst': 'FAST+Worst', 'haqf': 'HAQ_FAST'}
 EP_ARMS = ['rand', 'fast']
 MODELS = [('qwen', 'Qwen3'), ('deepseek', 'DeepSeek')]
 STEPS = 63  # decode steps per run (both models); values are converted to ms per decode step
@@ -28,14 +28,14 @@ fig, axes = plt.subplots(2, 2, figsize=(10.5, 4.3), facecolor=SURF, gridspec_kw=
 for row, (mk, name) in enumerate(MODELS):
     # (a) H2D imbalance
     ax = axes[row, 0]; ax.set_facecolor(SURF)
-    arms = ['near', 'fast']; y = [1, 0]
+    arms = ['rquota', 'near', 'fast']; y = [2, 1, 0]
     vals = [m(mk, a, 'h2d_imbalance') for a in arms]; errs = [sd(mk, a, 'h2d_imbalance') for a in arms]
     ax.barh(y, vals, height=0.6, color=[ARM[a] for a in arms], edgecolor=SURF, linewidth=2, zorder=2)
     ax.errorbar(vals, y, xerr=errs, fmt='none', ecolor=INK2, elinewidth=1, capsize=2.5, zorder=3)
     for yi, v, a in zip(y, vals, arms):
-        rel = '' if a == 'near' else f'  ({100 * (v / vals[0] - 1):+.0f}%)'
+        rel = '' if a == 'near' else f'  ({100 * (v / vals[1] - 1):+.0f}%)'
         ax.text(v + errs[arms.index(a)] + max(vals) * 0.03, yi, f'{v:.1f}{rel}', va='center', fontsize=8, color=INK)
-    ax.set_yticks(y); ax.set_yticklabels([SHORT[a] for a in arms]); ax.set_xlim(0, max(vals) * 1.55)
+    ax.set_yticks(y); ax.set_yticklabels([SHORT[a] for a in arms]); ax.set_xlim(0, max(vals) * 1.45)
     # (b) EP cost stacked
     bx = axes[row, 1]; bx.set_facecolor(SURF)
     y = list(range(len(EP_ARMS)))[::-1]
@@ -71,7 +71,8 @@ for row, (mk, name) in enumerate(MODELS):
                 fontsize=10, color=INK, fontweight='bold')
 fig.suptitle('Stage-wise cost breakdown: R8, serial expert execution, inline H2D (per decode step, mean ± std, 3 runs)',
              x=0.01, ha='left', fontsize=10.5, color=INK)
-fig.text(0.01, 0.005, '(a) relative to NEAR; (b) relative to FAST+Near (same FAST quota, stage-2 placement only).',
+fig.text(0.01, 0.005, '(a) relative to NEAR. Random quota: unbalanced (i.i.d. random rank per miss) + Near placement. '
+         '(b) relative to FAST+Near (same FAST quota, stage-2 placement only).',
          fontsize=8, color=INK2)
 fig.tight_layout(rect=(0.04, 0.03, 1, 0.94))
 fig.savefig(HERE / 'stage_breakdown_ep.png', dpi=200, facecolor=SURF)

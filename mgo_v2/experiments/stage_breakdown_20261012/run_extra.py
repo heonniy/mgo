@@ -1,7 +1,7 @@
 """Add unconstrained-quota arms to the stage breakdown (same environment, 3 interleaved reps, both models).
 
 - rquota = RANDOM_QUOTA_NEAR: i.i.d. uniform rank per miss -> unbalanced quota, Near placement inside it.
-- random = RANDOM (policy 19): i.i.d. uniform rank per miss, no quota and no placement rule.
+(A RANDOM / policy-19 arm was dropped at the owner's request before any RANDOM job started.)
 Reuses run.py's job launchers. STATUS_extra.json is separate so the 30-job STATUS.json stays unchanged.
 """
 import json, time
@@ -10,8 +10,8 @@ from pathlib import Path
 import run as base
 
 HERE = Path(__file__).resolve().parent
-base.ARMS.update({'rquota': 'RANDOM_QUOTA_NEAR', 'random': 'RANDOM'})
-ORDERS = (('rquota', 'random'), ('random', 'rquota'), ('rquota', 'random'))
+base.ARMS.update({'rquota': 'RANDOM_QUOTA_NEAR'})
+ORDERS = (('rquota',), ('rquota',), ('rquota',))
 
 
 def write(data):

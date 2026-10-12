@@ -96,3 +96,24 @@ FAST+Random and FAST+Near (same FAST quota).
 
 Per-decode-step versions (decode sums / 63 steps, in ms; TPOT in ms): `RUNS_per_step.csv` (per round) and
 `SUMMARY_per_step.csv` (mean/std per cell). `stage_breakdown_ep.png` is now plotted in ms per decode step.
+
+## Added arm: unconstrained random quota (RANDOM_QUOTA_NEAR), 3 reps per model
+
+Run with `run_extra.py` (STATUS_extra.json). A planned RANDOM (policy 19) arm was dropped at the owner's
+request before any RANDOM job started. The first runner was stopped on STOP after its first job and
+restarted rquota-only, reusing that job (`run_extra_first.log`). Same environment as above.
+
+ms per decode step (mean of 3):
+
+| Model | Arm | H2D imbalance | load imbalance | comm cost | EP cost | TPOT |
+|---|---|---:|---:|---:|---:|---:|
+| Qwen3 | Random quota | **38.0** | 79.7 | 160.7 | 240.4 | 484.6 |
+| Qwen3 | NEAR | 10.4 | 26.2 | 132.4 | 158.7 | 433.3 |
+| Qwen3 | FAST | 7.0 | 23.4 | 126.3 | 149.7 | 430.3 |
+| DeepSeek | Random quota | **31.6** | 51.9 | 70.4 | 122.3 | 299.6 |
+| DeepSeek | NEAR | 8.7 | 17.8 | 62.8 | 80.6 | 262.1 |
+| DeepSeek | FAST | 4.3 | 13.1 | 63.3 | 76.4 | 257.2 |
+
+Dropping the balanced quota multiplies the H2D imbalance by ~3.6x vs NEAR (+266% / +263%) and inflates
+EP cost by ~50%. TPOT is +11.8% (Qwen) and +14.3% (DeepSeek), consistent with the timed runs (+11.4%, +14.7%).
+Figure (a) now includes it. RUNS.csv / RUNS_per_step.csv / SUMMARY_per_step.csv include the 6 new runs.
