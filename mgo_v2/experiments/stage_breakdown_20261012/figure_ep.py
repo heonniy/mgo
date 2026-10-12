@@ -16,14 +16,14 @@ INK, INK2, GRID, SURF = '#0b0b0b', '#52514e', '#e4e3df', '#fcfcfb'
 ARM = {'near': '#9a9893', 'fast': '#2a78d6'}
 COMP, COMM = '#4a3aa7', '#b9b2ee'  # stacked components: compute imbalance (dark), comm cost (light)
 SHORT = {'near': 'NEAR', 'fast': 'FAST+Near', 'rand': 'FAST+Random', 'worst': 'FAST+Worst', 'haqf': 'HAQ_FAST'}
-EP_ARMS = ['worst', 'rand', 'fast', 'haqf']
-MODELS = [('qwen', 'Qwen3-30B-A3B'), ('deepseek', 'DeepSeek-V2-Lite')]
+EP_ARMS = ['rand', 'fast']
+MODELS = [('qwen', 'Qwen3'), ('deepseek', 'DeepSeek')]
 m = lambda mk, a, k: S[f'{mk}/{a}'][k]['mean']
 sd = lambda mk, a, k: S[f'{mk}/{a}'][k]['std']
 
 plt.rcParams.update({'font.size': 9, 'axes.edgecolor': GRID, 'axes.labelcolor': INK2, 'xtick.color': INK2,
                      'ytick.color': INK, 'font.family': 'DejaVu Sans'})
-fig, axes = plt.subplots(2, 2, figsize=(10.5, 4.8), facecolor=SURF, gridspec_kw=dict(width_ratios=[1, 1.6]))
+fig, axes = plt.subplots(2, 2, figsize=(10.5, 4.3), facecolor=SURF, gridspec_kw=dict(width_ratios=[1, 1.6]))
 for row, (mk, name) in enumerate(MODELS):
     # (a) H2D imbalance
     ax = axes[row, 0]; ax.set_facecolor(SURF)
@@ -70,8 +70,8 @@ for row, (mk, name) in enumerate(MODELS):
                 fontsize=10, color=INK, fontweight='bold')
 fig.suptitle('Stage-wise cost breakdown: R8, serial expert execution, inline H2D (decode sums, mean ± std, 3 runs)',
              x=0.01, ha='left', fontsize=10.5, color=INK)
-fig.text(0.01, 0.005, '(a) relative to NEAR; (b) relative to FAST+Near. HAQ_FAST uses a hit-aware quota; its H2D '
-         'imbalance stays near FAST (Qwen 0.46 vs 0.44 s, DeepSeek 0.32 vs 0.27 s).', fontsize=8, color=INK2)
+fig.text(0.01, 0.005, '(a) relative to NEAR; (b) relative to FAST+Near (same FAST quota, stage-2 placement only).',
+         fontsize=8, color=INK2)
 fig.tight_layout(rect=(0.04, 0.03, 1, 0.94))
 fig.savefig(HERE / 'stage_breakdown_ep.png', dpi=200, facecolor=SURF)
 fig.savefig(HERE / 'stage_breakdown_ep.pdf', facecolor=SURF)

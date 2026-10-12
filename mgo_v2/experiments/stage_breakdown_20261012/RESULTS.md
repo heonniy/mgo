@@ -87,3 +87,9 @@ Notes:
 
 Two-column variant: `stage_breakdown_ep.png` / `.pdf` (`figure_ep.py`). (a) H2D imbalance NEAR vs FAST;
 (b) EP cost as one stacked bar = load imbalance (compute + H2D wait) + communication cost.
+
+Per-round raw values: `RUNS.csv`, one row per measured run (model, arm, policy, round, job), in decode-sum
+seconds: h2d_straggler, h2d_imbalance, mean_wait, mean_compute, compute_imbalance, own_imbalance
+(compute + H2D wait), comm_cost, ep_cost (= own_imbalance + comm_cost), and TPOT (s/token). The cell means
+and stds in the tables above are the mean/stdev of these rows. Two-column figure (b) now shows only
+FAST+Random and FAST+Near (same FAST quota).
