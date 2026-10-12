@@ -13,3 +13,9 @@ Arms (Near placement in all):
 
 3 reps; each rep runs both levels and both models with rotated arm order (36 jobs). Metrics as in
 stage_breakdown (H2D straggler/imbalance, load imbalance, comm cost, EP cost, TPOT).
+
+## Status (2026-10-13)
+- Campaign 1 (run.py, STATUS.json): PASS, 36/36 + Qwen smoke. DeepSeek l13 FAST rep 2 and SPLIT rep 3 are whole-run slow outliers
+  (comm +20 ms/step, compute imbalance +6 ms/step, H2D wait lower, hogs normal); medians reported alongside means.
+- Campaign 2 (run2.py, STATUS2.json): stopped by the owner after 9 of 36 jobs (rep 1: l00 all four arms both models,
+  l13 brand Qwen). The interrupted job was kept as icdl13brand_full_v1_STOPPED_by_owner (status FAIL) and is not analyzed.

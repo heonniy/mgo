@@ -1,0 +1,26 @@
+PASS qwen l00 near 1
+PASS qwen l00 fast 1
+PASS qwen l00 split 1
+PASS qwen l00 brand 1
+PASS deepseek l00 near 1
+PASS deepseek l00 fast 1
+PASS deepseek l00 split 1
+PASS deepseek l00 brand 1
+PASS qwen l13 brand 1
+Traceback (most recent call last):
+  File "/home/hwlee/mgo-haq/mgo_v2/scripts/run_deepseek_r8_job.py", line 164, in <module>
+    main()
+  File "/home/hwlee/mgo-haq/mgo_v2/scripts/run_deepseek_r8_job.py", line 134, in main
+    time.sleep(1)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/hwlee/mgo-haq/mgo_v2/experiments/induced_contention_20261012/run2.py", line 32, in <module>
+    main()
+  File "/home/hwlee/mgo-haq/mgo_v2/experiments/induced_contention_20261012/run2.py", line 21, in main
+    out = job(model, level, arm, rep)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hwlee/mgo-haq/mgo_v2/experiments/induced_contention_20261012/run.py", line 44, in job
+    subprocess.run(cmd, check=True, cwd=PKG.parent, env=env)
+  File "/home/hwlee/anaconda3/envs/qwen3-gemm/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/hwlee/sub-moe/phase01/.venv/bin/python', '-u', '/home/hwlee/mgo-haq/mgo_v2/scripts/run_deepseek_r8_job.py', '--decode-policy', 'BALANCED_RANDOM_NEAR', '--repeats', '1', '--attempt', '1', '--inline-demand-h2d', '--h2d-serial-ablation', '--job-label', 'icdl13brand', '--hog-gpus', '0,1,2,3', '--hog-streams', '1', '--hog-gibps', '0', '--teacher-tokens', '/home/hwlee/mgo-haq/mgo_v2/experiments/deepseek_r8_sharegpt_b16_l512_20261012/FROZEN_TOKENS.json']' died with <Signals.SIGINT: 2>.

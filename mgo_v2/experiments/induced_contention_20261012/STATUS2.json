@@ -1,0 +1,71 @@
+{
+  "status": "FAIL",
+  "started": 1791820566.478874,
+  "jobs": [
+    {
+      "model": "qwen",
+      "level": "l00",
+      "arm": "near",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/icql00near_full_v1"
+    },
+    {
+      "model": "qwen",
+      "level": "l00",
+      "arm": "fast",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/icql00fast_full_v1"
+    },
+    {
+      "model": "qwen",
+      "level": "l00",
+      "arm": "split",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/icql00split_full_v1"
+    },
+    {
+      "model": "qwen",
+      "level": "l00",
+      "arm": "brand",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/icql00brand_full_v1"
+    },
+    {
+      "model": "deepseek",
+      "level": "l00",
+      "arm": "near",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/deepseek_r8_sharegpt_b16_l512_20261012/jobs/icdl00near_full_v1"
+    },
+    {
+      "model": "deepseek",
+      "level": "l00",
+      "arm": "fast",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/deepseek_r8_sharegpt_b16_l512_20261012/jobs/icdl00fast_full_v1"
+    },
+    {
+      "model": "deepseek",
+      "level": "l00",
+      "arm": "split",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/deepseek_r8_sharegpt_b16_l512_20261012/jobs/icdl00split_full_v1"
+    },
+    {
+      "model": "deepseek",
+      "level": "l00",
+      "arm": "brand",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/deepseek_r8_sharegpt_b16_l512_20261012/jobs/icdl00brand_full_v1"
+    },
+    {
+      "model": "qwen",
+      "level": "l13",
+      "arm": "brand",
+      "rep": 1,
+      "output": "/home/hwlee/mgo-results/qwen_r8_sharegpt_b16_l512_20261009/jobs/icql13brand_full_v1"
+    }
+  ],
+  "error": "CalledProcessError(-2, ['/home/hwlee/sub-moe/phase01/.venv/bin/python', '-u', '/home/hwlee/mgo-haq/mgo_v2/scripts/run_deepseek_r8_job.py', '--decode-policy', 'BALANCED_RANDOM_NEAR', '--repeats', '1', '--attempt', '1', '--inline-demand-h2d', '--h2d-serial-ablation', '--job-label', 'icdl13brand', '--hog-gpus', '0,1,2,3', '--hog-streams', '1', '--hog-gibps', '0', '--teacher-tokens', '/home/hwlee/mgo-haq/mgo_v2/experiments/deepseek_r8_sharegpt_b16_l512_20261012/FROZEN_TOKENS.json'])",
+  "finished": 1791822629.8944166
+}
