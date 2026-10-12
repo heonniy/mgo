@@ -93,3 +93,6 @@ seconds: h2d_straggler, h2d_imbalance, mean_wait, mean_compute, compute_imbalanc
 (compute + H2D wait), comm_cost, ep_cost (= own_imbalance + comm_cost), and TPOT (s/token). The cell means
 and stds in the tables above are the mean/stdev of these rows. Two-column figure (b) now shows only
 FAST+Random and FAST+Near (same FAST quota).
+
+Per-decode-step versions (decode sums / 63 steps, in ms; TPOT in ms): `RUNS_per_step.csv` (per round) and
+`SUMMARY_per_step.csv` (mean/std per cell). `stage_breakdown_ep.png` is now plotted in ms per decode step.
