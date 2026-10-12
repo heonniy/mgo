@@ -67,9 +67,9 @@ PARTS = {'gate_proj': (0, 2883584), 'up_proj': (2883584, 2883584),
          'down_proj': (5767168, 2883584)}
 DIAG = os.environ.get('MGO_DEEPSEEK_CACHE_DIAG') == '1'
 POLICY_CODES = {'BR': 0, 'LA_CA_NEAR': 7, 'NEAR_FAST': 12, 'BW': 14, 'HAQ': 16, 'HAQ_WORST': 17, 'HAQ_FAST': 21,
-                'STATIC_BLOCK': 18, 'RANDOM': 19, 'FAST_WORST': 22, 'FAST_RANDOM': 23,
+                'STATIC_BLOCK': 18, 'RANDOM': 19, 'NEAR_SPLIT': 20, 'FAST_WORST': 22, 'FAST_RANDOM': 23,
                 'RANDOM_QUOTA_NEAR': 24}
-QUOTA_TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM')
+QUOTA_TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM', 'NEAR_SPLIT')
 WORLD = 8
 
 
@@ -391,9 +391,12 @@ def main(args):
     if args.decode_policy in QUOTA_TABLE_POLICIES:
         table = json.loads(args.quota_table.read_text())
         assert table['status'] == 'PASS' and table['physical_gpus'] == list(range(WORLD))
-        quota_lut = np.asarray(table['quota_lut']['NEAR_FAST'], dtype=np.int64)
+        # NEAR_SPLIT reads its own (possibly unbalanced) rows; the FAST-quota policies read NEAR_FAST.
+        key = 'NEAR_SPLIT' if args.decode_policy == 'NEAR_SPLIT' else 'NEAR_FAST'
+        quota_lut = np.asarray(table['quota_lut'][key], dtype=np.int64)
         assert quota_lut.shape == (129, WORLD)
-        assert all(quota_lut[n].sum() == n and quota_lut[n].max() - quota_lut[n].min() <= 1 for n in range(129))
+        assert all(quota_lut[n].sum() == n and quota_lut[n].min() >= 0 for n in range(129))
+        assert key == 'NEAR_SPLIT' or all(quota_lut[n].max() - quota_lut[n].min() <= 1 for n in range(129))
     forced = None
     if args.teacher_tokens is not None:
         teacher = json.loads(args.teacher_tokens.read_text())

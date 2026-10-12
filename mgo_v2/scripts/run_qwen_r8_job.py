@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 
 import run_full_pinned_r4 as owner
+import contention_hogs
 
 
 PKG = Path(__file__).resolve().parents[1]
@@ -151,6 +152,7 @@ def main():
     parser.add_argument('--decode-policy', choices=('HAQ', 'RANDOM'),
                         help='policy switched in at decode step 1 (serial cache ablation uses --ours-policy BR)')
     parser.add_argument('--job-label')
+    contention_hogs.add_arguments(parser)
     parser.add_argument('--quiet-2367', action='store_true',
                         help='Keep 2/3/6/7 idle and pause managed loads on 0/1/4/5')
     args = parser.parse_args()
@@ -217,6 +219,8 @@ def main():
         stopped = stop_owned_loads(args.quiet_2367)
         state['stopped_owned_load_gpus'] = stopped
         assert min(x['free_mib'] for x in gpu_state().values()) >= 2048
+        hogs = contention_hogs.start(args, PYTHON, env, output)
+        state['contention_hogs'] = dict(gpus=hogs['gpus'], streams=hogs['streams'], gibps=hogs['gibps'])
         with (output / 'run.log').open('w') as log, (output / 'resources.jsonl').open('w') as resources:
             process = subprocess.Popen(state['command'], env=env, stdout=log,
                                        stderr=subprocess.STDOUT, start_new_session=True)
@@ -267,6 +271,8 @@ def main():
                 process.wait()
         raise
     finally:
+        if 'hogs' in locals():
+            state['contention_hogs'] = contention_hogs.stop(hogs, output)
         deadline = time.monotonic() + 30
         while any(g in PHYSICAL for g, _ in apps()) and time.monotonic() < deadline:
             time.sleep(1)

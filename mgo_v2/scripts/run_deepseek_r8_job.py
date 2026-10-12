@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 
 import run_full_pinned_r4 as owner
+import contention_hogs
 from run_qwen_r8_job import apps, gpu_state, restore_owned_loads, stop_owned_loads, write
 
 PKG = Path(__file__).resolve().parents[1]
@@ -23,8 +24,8 @@ PHYSICAL = tuple(range(8))
 CELL = 'DeepSeekV2Lite_ShareGPT_R8_C30_B16_L512_O64'
 PYTHON = '/home/hwlee/sub-moe/phase01/.venv/bin/python'
 WORKER = 'headline_ours_deepseek_r8_worker.py'
-POLICIES = ('BR', 'LA_CA_NEAR', 'NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM', 'RANDOM_QUOTA_NEAR', 'HAQ', 'HAQ_FAST', 'RANDOM')
-TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM')
+POLICIES = ('BR', 'LA_CA_NEAR', 'NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM', 'RANDOM_QUOTA_NEAR', 'HAQ', 'HAQ_FAST', 'RANDOM', 'NEAR_SPLIT')
+TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM', 'NEAR_SPLIT')
 TIMEOUT = 7200
 
 
@@ -58,6 +59,7 @@ def main():
     p.add_argument('--inline-demand-h2d', action='store_true')
     p.add_argument('--h2d-serial-ablation', action='store_true')
     p.add_argument('--job-label', required=True)
+    contention_hogs.add_arguments(p)
     args = p.parse_args()
     assert (args.quota_table is not None) == (args.decode_policy in TABLE_POLICIES)
     assert args.teacher_tokens is None or not args.smoke
@@ -105,6 +107,8 @@ def main():
         stopped = stop_owned_loads(False)
         state['stopped_owned_load_gpus'] = stopped
         assert min(x['free_mib'] for x in gpu_state().values()) >= 2048
+        hogs = contention_hogs.start(args, PYTHON, env, output)
+        state['contention_hogs'] = dict(gpus=hogs['gpus'], streams=hogs['streams'], gibps=hogs['gibps'])
         with (output / 'run.log').open('w') as log, (output / 'resources.jsonl').open('w') as resources:
             process = subprocess.Popen(state['command'], env=env, stdout=log, stderr=subprocess.STDOUT,
                                        start_new_session=True)
@@ -145,6 +149,8 @@ def main():
                 process.wait()
         raise
     finally:
+        if 'hogs' in locals():
+            state['contention_hogs'] = contention_hogs.stop(hogs, output)
         deadline = time.monotonic() + 30
         while any(g in PHYSICAL for g, _ in apps()) and time.monotonic() < deadline:
             time.sleep(1)
