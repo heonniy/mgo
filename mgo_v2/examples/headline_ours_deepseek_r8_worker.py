@@ -3,7 +3,7 @@
 Copy of headline_ours_deepseek_multipolicy_worker.py (R4, GPUs 0/1/4/5), kept separate
 so earlier R4 results stay reproducible. R8 changes: physical GPUs 0-7, eight-rank
 slot split, --decode-policy (one policy for every repeat), the R8 quota policies
-NEAR_FAST (12, quota table), FAST_RANDOM (23, quota table) and RANDOM_QUOTA_NEAR (24),
+NEAR_FAST (12, quota table), FAST_WORST (22) and FAST_RANDOM (23) (quota table) and RANDOM_QUOTA_NEAR (24),
 --inline-demand-h2d (one-pass demand submission) and --teacher-tokens (forced
 continuation IDs; actual argmax is still recorded). Prefill uses --prefill-policy
 (default BR) for every arm. The decode policy switches at decode step 1.
@@ -67,8 +67,9 @@ PARTS = {'gate_proj': (0, 2883584), 'up_proj': (2883584, 2883584),
          'down_proj': (5767168, 2883584)}
 DIAG = os.environ.get('MGO_DEEPSEEK_CACHE_DIAG') == '1'
 POLICY_CODES = {'BR': 0, 'LA_CA_NEAR': 7, 'NEAR_FAST': 12, 'BW': 14, 'HAQ': 16, 'HAQ_WORST': 17,
-                'STATIC_BLOCK': 18, 'RANDOM': 19, 'FAST_RANDOM': 23, 'RANDOM_QUOTA_NEAR': 24}
-QUOTA_TABLE_POLICIES = ('NEAR_FAST', 'FAST_RANDOM')
+                'STATIC_BLOCK': 18, 'RANDOM': 19, 'FAST_WORST': 22, 'FAST_RANDOM': 23,
+                'RANDOM_QUOTA_NEAR': 24}
+QUOTA_TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM')
 WORLD = 8
 
 

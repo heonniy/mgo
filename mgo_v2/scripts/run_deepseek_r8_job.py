@@ -23,8 +23,8 @@ PHYSICAL = tuple(range(8))
 CELL = 'DeepSeekV2Lite_ShareGPT_R8_C30_B16_L512_O64'
 PYTHON = '/home/hwlee/sub-moe/phase01/.venv/bin/python'
 WORKER = 'headline_ours_deepseek_r8_worker.py'
-POLICIES = ('BR', 'LA_CA_NEAR', 'NEAR_FAST', 'FAST_RANDOM', 'RANDOM_QUOTA_NEAR', 'HAQ')
-TABLE_POLICIES = ('NEAR_FAST', 'FAST_RANDOM')
+POLICIES = ('BR', 'LA_CA_NEAR', 'NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM', 'RANDOM_QUOTA_NEAR', 'HAQ')
+TABLE_POLICIES = ('NEAR_FAST', 'FAST_WORST', 'FAST_RANDOM')
 TIMEOUT = 7200
 
 
