@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-RATIOS = {'r129': 1.29, 'r172': 1.72}
+RATIOS = {'r129': 1.29, 'r172': 1.72, 'r144': 1.44}  # r144: burst-profiled ratio (paper Table 1c), used without hogs
 ORDER_A, ORDER_B = [3, 2, 1, 0], [7, 4, 6, 5]
 
 

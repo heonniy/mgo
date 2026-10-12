@@ -97,6 +97,14 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assert 1<=world<=8 and not substitution
         quota=np.bincount(np.random.randint(0,world,len(misses)),minlength=world).astype(np.int64)
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota)
+    elif policy==25:
+        # BALANCED_RANDOM_NEAR: balanced quota (max-min<=1) whose remainder goes to
+        # uniformly random distinct ranks (seeded per event), then Near placement.
+        assert 1<=world<=8 and not substitution
+        quota=np.full(world,len(misses)//world,np.int64)
+        extra=np.random.permutation(world)[:len(misses)%world]
+        for r in extra:quota[r]+=1
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota)
     elif policy==22 or policy==23:
         # FAST quota row with a stage-2 placement control: 22 = worst
         # (max compute imbalance, then min locality), 23 = uniform random.
@@ -198,7 +206,7 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        if self.policy==19 or self.policy==23 or self.policy==24:
+        if self.policy==19 or self.policy==23 or self.policy==24 or self.policy==25:
             # Stateless per-event draw: identical on every rank, independent
             # of earlier RNG use; MGO_RANDOM_SALT varies it across rounds.
             seed_rng(self.random_salt*1000003+event)

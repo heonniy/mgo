@@ -170,3 +170,19 @@ def test_random_quota_near_is_unbalanced_seeded_and_complete():
         counts.append(np.bincount([f[0] for f in r[5]], minlength=8))
     assert counts[0].sum() == 64 and np.array_equal(counts[0], counts[1])
     assert counts[0].max() - counts[0].min() > 1
+
+
+def test_balanced_random_quota_is_balanced_with_varying_remainder():
+    similarity = np.zeros((48, 128, 128), np.float32)
+    selected = np.repeat(np.arange(12, dtype=np.int16)[:, None], 2, axis=1)
+    weights = np.full((12, 2), .5, dtype=np.float32)
+    origins = np.arange(12, dtype=np.int64) % 8
+    seen = set()
+    for event in range(48):
+        p = Policy([16] * 8, similarity, False, 25)
+        result = p.apply(event, selected, weights, origins,
+                         np.zeros(128, np.float32), np.zeros((128, 8), np.int32))
+        counts = np.bincount([row[0] for row in result[5]], minlength=8)
+        assert counts.sum() == 12 and counts.max() - counts.min() <= 1
+        seen.add(tuple(np.flatnonzero(counts == 2)))
+    assert len(seen) > 10
