@@ -156,7 +156,8 @@ class DeepSeekRuntime:
         self.ready_metrics = {'waits': 0, 'ready_before_first_wait': 0}
         self.diag = DIAG
         if self.diag:
-            self.diag_spans = {key: [] for key in ('dispatch', 'expert', 'return', 'h2d_wait')}
+            self.diag_spans = {key: [] for key in ('dispatch', 'expert', 'return', 'h2d_wait',
+                                                   'serial_wait', 'compute')}
             self.diag_route_host_s = 0.0
             self.diag_h2d_host_wait_s = 0.0
             original_wait_for_slot = self.h2d.wait_for_slot
@@ -264,12 +265,18 @@ class DeepSeekRuntime:
             self.h2d.wait_slots(my_slots, host=True)
             self.serial_wait_wall_ns += time.perf_counter_ns() - started
             self.serial_waited_copies += len(my_slots)
+        if diagnostic:
+            # Split the expert span: [start, mid) = serial H2D wait, [mid, end) = expert compute.
+            mid = torch.cuda.Event(enable_timing=True)
+            mid.record()
         parts = self.native_executor.compute(
             self, ('current', received, received_ids, received_weights), event, layer)
         if diagnostic:
             end = torch.cuda.Event(enable_timing=True)
             end.record()
             self.diag_spans['expert'].append((start, end))
+            self.diag_spans['serial_wait'].append((start, mid))
+            self.diag_spans['compute'].append((mid, end))
             start = torch.cuda.Event(enable_timing=True)
             start.record()
         result = combine_rank_partials(self.transport, hidden, parts, event, torch.bfloat16)
@@ -338,8 +345,9 @@ def generate(model, runtime, ids, count, forced_next_ids=None):
     if runtime.diag:
         for row, events in zip(diagnostic_steps, diagnostic_events):
             for name, pairs in events.items():
-                row[name + '_ms'] = sum(before.elapsed_time(after)
-                                        for before, after in pairs)
+                per_layer = [before.elapsed_time(after) for before, after in pairs]
+                row[name + '_ms'] = sum(per_layer)
+                row[name + '_layer_ms'] = per_layer
     result = dict(release_ns=start, first_ns=stamps[0], end_ns=stamps[-1],
                   output_tokens=count, finite_logits=True,
                   argmax_hash=hashlib.sha256(actual.tobytes()).hexdigest(),
