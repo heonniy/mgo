@@ -1,0 +1,741 @@
+{
+  "status": "PASS",
+  "script": "/home/hwlee/mgo-ferry-appendix/mgo_v2/scripts/ferry_eviction_sensitivity.py",
+  "script_sha256": "9753b1bb139be57d767b0455068b4d927f2446b41190189eebe511e556e7bf2d",
+  "reference_kernel": "/home/hwlee/mgo-ferry-appendix/mgo_v2/scripts/main_eviction_history_replay.py",
+  "reference_kernel_sha256": "5bd22b456fcb6a792913780e3db3fe4e88f8e41c257c8fa8511416045e2e89fe",
+  "deepseek_packer": "/home/hwlee/mgo-ferry-appendix/mgo_v2/scripts/replay_deepseek_eviction_hit.py",
+  "deepseek_packer_sha256": "24e6d9d98e5f0fd794b75d40ae25aeec0b7987070fb1d4e52e3088e634deab0e",
+  "command": "mgo_v2/../scripts/ferry_eviction_sensitivity.py --jobs 24",
+  "python": "/home/hwlee/sub-moe/phase01/.venv/bin/python",
+  "cuda_visible_devices": "",
+  "percents": [
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100
+  ],
+  "policies": [
+    "gate-score",
+    "LFU-reset",
+    "LFU-cumulative",
+    "LRU-reset",
+    "LRU-cumulative",
+    "random",
+    "OPT-BR (oracle)",
+    "OPT-pooled (oracle)"
+  ],
+  "br_seed": 42,
+  "random_seed": 1234,
+  "sources": {
+    "q8": {
+      "model": "Qwen3-30B-A3B",
+      "batch": 8,
+      "trace": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B8_L256_H256_v1/routing_trace.npz",
+      "file_sha256": "2bc2d9ee1c20b5de9dd8739ddea5000a743f05fa12e5e86013ae46430b8a2a63",
+      "content_sha256": "cea5f09139fd6ab72599110b26016a6378ae79e1b02ca0b963d40f4252eead8e",
+      "receipt": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B8_L256_H256_v1/trace_receipt.json",
+      "working_set": {
+        "per_step_distinct_min": 2214,
+        "per_step_distinct_mean": 4000.23046875,
+        "per_step_distinct_max": 4447,
+        "active_every_decode_step": 419,
+        "touched_in_decode": 6044,
+        "total_experts": 6144,
+        "per_layer_active_max": 112
+      }
+    },
+    "q16": {
+      "model": "Qwen3-30B-A3B",
+      "batch": 16,
+      "trace": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B16_L256_H256_v1/routing_trace.npz",
+      "file_sha256": "4f5dfa4be2fc4e2545680c18baaa55e6b96d19922d072d121514d0674461d415",
+      "content_sha256": "968cde90c46618b7bfbfb94470f2770182c0809f65b1b50650e4e836f55d6427",
+      "receipt": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B16_L256_H256_v1/trace_receipt.json",
+      "working_set": {
+        "per_step_distinct_min": 2705,
+        "per_step_distinct_mean": 4894.484375,
+        "per_step_distinct_max": 5290,
+        "active_every_decode_step": 1176,
+        "touched_in_decode": 6064,
+        "total_experts": 6144,
+        "per_layer_active_max": 123
+      }
+    },
+    "q64": {
+      "model": "Qwen3-30B-A3B",
+      "batch": 64,
+      "trace": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B64_L256_H256_v1/routing_trace.npz",
+      "file_sha256": "30f110b5a83f632a89801d9603a1d285cbc858c32c063b5b4cb2da4b63cbcca0",
+      "content_sha256": "91a643a072908102d519f2fd791f06b2601adef16cbcb59c8165ec5e258a1c37",
+      "receipt": "/home/hwlee/mgo-results/headline_r4_20261007/main_eviction_B64_L256_H256_v1/trace_receipt.json",
+      "working_set": {
+        "per_step_distinct_min": 3832,
+        "per_step_distinct_mean": 5768.79296875,
+        "per_step_distinct_max": 5950,
+        "active_every_decode_step": 3104,
+        "touched_in_decode": 6095,
+        "total_experts": 6144,
+        "per_layer_active_max": 128
+      }
+    },
+    "ds16": {
+      "model": "DeepSeek-V2-Lite",
+      "batch": 16,
+      "trace": [
+        "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank0.npz",
+        "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank1.npz",
+        "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank2.npz",
+        "/home/hwlee/mgo-results/deepseek_cache_ablation_20261009/critical_path_d1/route_capture_v1/route_rank3.npz"
+      ],
+      "file_sha256": [
+        "130f72517ea5e47dd877b77d9302d0de655f2315c13e9db03c18fb3d5b44cb9a",
+        "741f9af8df657ef2a330f4515cbfd2cbeeab09d516b13d99452cc1163c4654c9",
+        "4efac8769ff163ff0899adb60e98de893066ae16ecc7f9c81309d6ce69ccc515",
+        "0f29858783c55eed335c6ed92a84858c3617d8924cbc97ebd4719549cfd7f0ce"
+      ],
+      "content_sha256": "6258e4003ed5ac4ccdcd0013d178c6304ecf0dfb58bdbfe4c7eb810da36ddc7a",
+      "receipt": "/home/hwlee/mgo-results/headline_r4_20261007/dca_d1_fixedroute_c20_pair1_v1/status.json",
+      "working_set": {
+        "per_step_distinct_min": 1310,
+        "per_step_distinct_mean": 1632.031746031746,
+        "per_step_distinct_max": 1659,
+        "active_every_decode_step": 915,
+        "touched_in_decode": 1664,
+        "total_experts": 1664,
+        "per_layer_active_max": 64
+      }
+    }
+  },
+  "checks": {
+    "q8/C10": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C15": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C20": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C25": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C30": [
+      "gate-score: matches main_eviction_history_replay",
+      "gate-score: matches source capture reference_metrics and final_slots",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C35": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C40": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C45": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C50": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C55": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C60": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C65": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C70": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C75": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C80": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C85": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C90": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C95": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q8/C100": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C10": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C15": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C20": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C25": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C30": [
+      "gate-score: matches main_eviction_history_replay",
+      "gate-score: matches source capture reference_metrics and final_slots",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C35": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C40": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C45": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C50": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C55": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C60": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C65": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C70": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C75": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C80": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C85": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C90": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C95": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q16/C100": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C10": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C15": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C20": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C25": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C30": [
+      "gate-score: matches main_eviction_history_replay",
+      "gate-score: matches source capture reference_metrics and final_slots",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C35": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C40": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C45": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C50": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C55": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C60": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C65": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C70": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C75": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C80": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C85": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C90": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C95": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "q64/C100": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C10": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C15": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C20": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C25": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C30": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative",
+      "all 5 policies match deepseek_eviction_hit_20261009/RESULTS.json"
+    ],
+    "ds16/C35": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C40": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C45": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C50": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C55": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C60": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative",
+      "all 5 policies match deepseek_eviction_hit_20261009/RESULTS.json"
+    ],
+    "ds16/C65": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C70": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C75": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C80": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C85": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C90": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C95": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ],
+    "ds16/C100": [
+      "gate-score: matches main_eviction_history_replay",
+      "LFU-reset: matches main_eviction_history_replay",
+      "LFU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset: matches main_eviction_history_replay",
+      "LRU-cumulative: matches main_eviction_history_replay",
+      "LRU-reset == LRU-cumulative"
+    ]
+  },
+  "wall_seconds": 112.13359498977661
+}

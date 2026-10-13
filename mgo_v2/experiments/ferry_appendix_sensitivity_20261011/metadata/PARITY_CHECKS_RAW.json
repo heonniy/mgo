@@ -1,0 +1,5442 @@
+{
+ "status": "PASS",
+ "world": 4,
+ "backend": "gloo (CPU)",
+ "cuda_visible_devices": "",
+ "n_checks": 646,
+ "n_fail": 0,
+ "checks": [
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4184,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 600,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8344,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 792,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33304,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 66584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1560,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 67608,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 2584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 2120,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4216,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 376,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8408,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 472,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16792,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33560,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 34328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1816,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "controller_rerun_determinism_rank0",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 0,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 1,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 0,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 16,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 0,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 64,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 0,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 256,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4184,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 600,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8344,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 792,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33304,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 66584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1560,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 67608,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 2584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 2120,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4216,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 376,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8408,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 472,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16792,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33560,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 34328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1816,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 1,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 1,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 1,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 16,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 1,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 64,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 1,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 256,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4184,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 600,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8344,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 792,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33304,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 66584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1560,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 67608,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 2584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 2120,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4216,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 376,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8408,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 472,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16792,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33560,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 34328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1816,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 2,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 1,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 2,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 16,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 2,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 64,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 2,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 256,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 544,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 1,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4184,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 600,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 8,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8344,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 16,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16664,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 792,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 32,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33304,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 64,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 66584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1560,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 128,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 67608,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 2584,
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "Qwen3-30B-A3B",
+   "local_batch": 256,
+   "events": 144
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 286,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 1,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 2120,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 8,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 4216,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 376,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 16,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 8408,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 472,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 32,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 16792,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 664,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 64,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 33560,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1048,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 128,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E*min(B,128)",
+   "bytes": 34328,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "compact_record_bytes_formula",
+   "status": "PASS",
+   "formula": "24+B*k+4E",
+   "bytes": 1816,
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "live_bytes_on_wire_equal_record",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "header_event_drift_check (assert in collect)",
+   "status": "PASS",
+   "note": "collect() asserts all rank headers == [1,event,B]; reaching here means none drifted",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "routing_ids_roundtrip_rank_order",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "histogram_conservation_sum_d_eq_tokens_times_k",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_W128_equals_independent_tail_reference",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "gate_finite_and_normalized",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "missing_set_F_eq_required_minus_resident",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "balanced_quota_and_sum_q_eq_F",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "replicated_controller_state_identical_across_ranks",
+   "status": "PASS",
+   "model": "DeepSeek-V2-Lite",
+   "local_batch": 256,
+   "events": 78
+  },
+  {
+   "rank": 3,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 1,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 3,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 16,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 3,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 64,
+   "note": "W=128 global window, rank-order concatenation"
+  },
+  {
+   "rank": 3,
+   "check": "tail_cap_min_B_128_lossless_vs_full_rows",
+   "status": "PASS",
+   "local_batch": 256,
+   "note": "W=128 global window, rank-order concatenation"
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 """Compact exact routing-demand/Gate trace; no future routes or policy replay."""
-import hashlib,json
+import hashlib,json,os
 import numpy as np
 import torch.distributed as dist
 class RoutingCapture:
@@ -19,6 +19,11 @@ class RoutingCapture:
    self.seen.update(misses);self.n+=1
    return out,promotions,discards
   self.rt.controller.plan_current=call
+  # Opt-in FERRY W-sensitivity raw probability rows; default path unchanged.
+  self.probs=None
+  if os.environ.get('MGO_FERRY_WINDOW_PROBS')=='1':
+   from ferry_window_probs import ProbRecorder
+   self.probs=ProbRecorder(self.rt,len(self.counts));self.probs.install()
  def finish(self,path):
   assert self.n==len(self.counts)
   digest=hashlib.sha256(self.counts.tobytes()+self.gates.tobytes()+self.metrics.tobytes()).hexdigest();all_hashes=[None]*4;dist.all_gather_object(all_hashes,digest);assert len(set(all_hashes))==1
@@ -26,3 +31,4 @@ class RoutingCapture:
    np.savez(path/'routing_trace.npz',counts=self.counts,gates=self.gates,reference_metrics=self.metrics,final_slots=self.rt.policy.slots)
    (path/'trace_receipt.json').write_text(json.dumps(dict(status='PASS',events=self.n,prefill_forwards=1,decode_forwards=256,local_batch=self.rt.args.local_batch,capacities=list(map(int,self.rt.args.capacities)),policy='BR',eviction='gate-score',prefetch=False,seed=42,content_sha256=digest,all_rank_agreement=True),indent=2)+'\n')
   self.rt.controller.plan_current=self.original
+  if self.probs is not None:self.probs.finish(path,dist.get_rank())

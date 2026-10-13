@@ -1,0 +1,29 @@
+model,k,E,moe_layers,R,local_batch,path,ids_bytes,header_bytes,gate_bytes,per_rank_send_bytes,gathered_total_bytes,received_from_peers_bytes,per_step_per_rank_send_bytes,per_step_gathered_bytes,expert_weight_bytes,gathered_per_event_over_expert,gathered_per_step_over_expert,prob_rows_sent_global,prob_rows_used_by_W128,prob_row_redundancy,used_in_main_table,note
+Qwen3-30B-A3B,8,128,48,4,1,compact,8,24,512,544,2176,1632,26112,104448,9437184,0.000231,0.0111,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+Qwen3-30B-A3B,8,128,48,4,1,live,8,24,512,544,2176,1632,26112,104448,9437184,0.000231,0.0111,4,4,1.0,False,
+Qwen3-30B-A3B,8,128,48,4,8,compact,64,24,512,600,2400,1800,28800,115200,9437184,0.000254,0.0122,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+Qwen3-30B-A3B,8,128,48,4,8,live,64,24,4096,4184,16736,12552,200832,803328,9437184,0.001773,0.0851,32,32,1.0,False,
+Qwen3-30B-A3B,8,128,48,4,16,compact,128,24,512,664,2656,1992,31872,127488,9437184,0.000281,0.0135,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+Qwen3-30B-A3B,8,128,48,4,16,live,128,24,8192,8344,33376,25032,400512,1602048,9437184,0.003537,0.1698,64,64,1.0,True,
+Qwen3-30B-A3B,8,128,48,4,32,compact,256,24,512,792,3168,2376,38016,152064,9437184,0.000336,0.0161,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+Qwen3-30B-A3B,8,128,48,4,32,live,256,24,16384,16664,66656,49992,799872,3199488,9437184,0.007063,0.339,128,128,1.0,False,
+Qwen3-30B-A3B,8,128,48,4,64,compact,512,24,512,1048,4192,3144,50304,201216,9437184,0.000444,0.0213,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+Qwen3-30B-A3B,8,128,48,4,64,live,512,24,32768,33304,133216,99912,1598592,6394368,9437184,0.014116,0.6776,256,128,2.0,True,
+Qwen3-30B-A3B,8,128,48,4,128,compact,1024,24,512,1560,6240,4680,74880,299520,9437184,0.000661,0.0317,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B>=W: live tail mean of last rank"
+Qwen3-30B-A3B,8,128,48,4,128,live,1024,24,65536,66584,266336,199752,3196032,12784128,9437184,0.028222,1.3547,512,128,4.0,False,
+Qwen3-30B-A3B,8,128,48,4,256,compact,2048,24,512,2584,10336,7752,124032,496128,9437184,0.001095,0.0526,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B>=W: live tail mean of last rank"
+Qwen3-30B-A3B,8,128,48,4,256,live,2048,24,65536,67608,270432,202824,3245184,12980736,9437184,0.028656,1.3755,512,128,4.0,False,
+DeepSeek-V2-Lite,6,64,26,4,1,compact,6,24,256,286,1144,858,7436,29744,17301504,6.6e-05,0.0017,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+DeepSeek-V2-Lite,6,64,26,4,1,live,6,24,256,286,1144,858,7436,29744,17301504,6.6e-05,0.0017,4,4,1.0,False,
+DeepSeek-V2-Lite,6,64,26,4,8,compact,48,24,256,328,1312,984,8528,34112,17301504,7.6e-05,0.002,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+DeepSeek-V2-Lite,6,64,26,4,8,live,48,24,2048,2120,8480,6360,55120,220480,17301504,0.00049,0.0127,32,32,1.0,False,
+DeepSeek-V2-Lite,6,64,26,4,16,compact,96,24,256,376,1504,1128,9776,39104,17301504,8.7e-05,0.0023,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+DeepSeek-V2-Lite,6,64,26,4,16,live,96,24,4096,4216,16864,12648,109616,438464,17301504,0.000975,0.0253,64,64,1.0,True,
+DeepSeek-V2-Lite,6,64,26,4,32,compact,192,24,256,472,1888,1416,12272,49088,17301504,0.000109,0.0028,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+DeepSeek-V2-Lite,6,64,26,4,32,live,192,24,8192,8408,33632,25224,218608,874432,17301504,0.001944,0.0505,128,128,1.0,False,
+DeepSeek-V2-Lite,6,64,26,4,64,compact,384,24,256,664,2656,1992,17264,69056,17301504,0.000154,0.004,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B<W requires frozen_gate from trace (compact_metadata.py:26-27)"
+DeepSeek-V2-Lite,6,64,26,4,64,live,384,24,16384,16792,67168,50376,436592,1746368,17301504,0.003882,0.1009,256,128,2.0,True,
+DeepSeek-V2-Lite,6,64,26,4,128,compact,768,24,256,1048,4192,3144,27248,108992,17301504,0.000242,0.0063,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B>=W: live tail mean of last rank"
+DeepSeek-V2-Lite,6,64,26,4,128,live,768,24,32768,33560,134240,100680,872560,3490240,17301504,0.007759,0.2017,512,128,4.0,False,
+DeepSeek-V2-Lite,6,64,26,4,256,compact,1536,24,256,1816,7264,5448,47216,188864,17301504,0.00042,0.0109,,,,False,"frozen-trace path only; gate is a 1-row float32 summary (last rank only consumed, compact_metadata.py:53); B>=W: live tail mean of last rank"
+DeepSeek-V2-Lite,6,64,26,4,256,live,1536,24,32768,34328,137312,102984,892528,3570112,17301504,0.007936,0.2063,512,128,4.0,False,

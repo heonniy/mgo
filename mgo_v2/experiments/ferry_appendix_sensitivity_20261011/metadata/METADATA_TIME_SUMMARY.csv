@@ -1,0 +1,11 @@
+run,variant,local_batch,n_events,allgather_min_rank_median_us,allgather_min_rank_p95_us,allgather_max_rank_median_us,allgather_max_rank_p95_us,noncollective_median_us,noncollective_p95_us,lower_bound_per_step_ms,diag_step_median_ms,lower_bound_frac_of_step
+grouped_policy_scaling_20261009/jobs/r4_a_la_ca_near_8_diagnostic_v1,main_config_serial,8,3024,106.6,126.6,927.5,1565.6,470.3,510.6,29.0,490.3,0.0592
+grouped_policy_scaling_20261009/jobs/r4_a_la_ca_near_16_diagnostic_v1,main_config_serial,16,3024,105.9,125.3,1004.1,1575.9,509.4,551.8,30.97,549.1,0.0564
+expert_grouping_ablation_20261009/jobs/r4_a_diagnostic_v1,main_config_serial,16,3024,108.5,127.1,965.9,1604.8,590.6,634.8,35.1,558.3,0.0629
+expert_grouping_ablation_20261009/jobs/r4_a_diagnostic_v4,main_config_serial,16,3024,110.4,132.1,1091.8,1626.3,506.7,554.2,31.25,554.8,0.0563
+ep_overhead_r4_b64_20261009/jobs/r4_a_diagnostic_v1,main_config_serial,64,3024,109.7,129.2,1106.5,1580.5,590.0,647.7,35.64,648.1,0.055
+ep_overhead_r4_b64_20261009/jobs/r4_a_diagnostic_v3,main_config_serial,64,3024,110.7,129.5,1166.0,1583.3,585.7,646.2,35.41,640.0,0.0553
+expert_grouping_ablation_20261009/jobs/r4_a_diagnostic_v5,serial+compiled_dense,16,3024,108.4,126.4,1054.7,1629.3,512.6,560.2,31.48,539.3,0.0584
+grouped_policy_scaling_20261009/jobs/r4_n_la_ca_near_8_diagnostic_v1,grouped_hit_then_miss+compiled_dense,8,3024,107.8,126.8,529.8,1294.3,472.9,515.7,29.24,324.4,0.0901
+grouped_policy_scaling_20261009/jobs/r4_n_la_ca_near_16_diagnostic_v1,grouped_hit_then_miss+compiled_dense,16,3024,105.8,126.6,1145.5,1535.1,512.6,556.5,31.09,411.9,0.0755
+grouped_policy_scaling_20261009/jobs/r4_n_la_ca_near_64_diagnostic_v1,grouped_hit_then_miss+compiled_dense,64,3024,107.0,127.9,1324.3,1521.9,577.0,633.4,34.75,488.2,0.0712
