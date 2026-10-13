@@ -19,7 +19,7 @@ COLS = ('h2d_straggler', 'h2d_imbalance', 'own_imbalance', 'comm_cost', 'ep_cost
 
 
 def main():
-    jobs = [j for f in ('STATUS.json', 'STATUS2.json') if (HERE / f).exists() for j in json.loads((HERE / f).read_text())['jobs']]
+    jobs = [j for f in ('STATUS.json', 'STATUS2.json', 'STATUS3.json') if (HERE / f).exists() for j in json.loads((HERE / f).read_text())['jobs']]
     cells = defaultdict(list); rows = []
     for j in jobs:
         fn = qwen_arrays if j['model'] == 'qwen' else deepseek_arrays
