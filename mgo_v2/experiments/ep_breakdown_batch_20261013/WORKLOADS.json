@@ -1,0 +1,75 @@
+{
+ "status": "FROZEN",
+ "dataset": "ShareGPT",
+ "model_paths": {
+  "Qwen3": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+  "DeepSeekV2Lite": "/home/hwlee/model/DeepSeek-V2-Lite-Chat"
+ },
+ "selection": "First 512 distinct, non-redacted conversations with a final user turn and >=1024 rendered tokens under both model chat templates; target 0:256, disjoint warmup 256:512; use final exact 512/1024 tokens.",
+ "physical_gpus": [
+  0,
+  1,
+  4,
+  5
+ ],
+ "output_tokens": 64,
+ "scanned_source_rows": 844,
+ "eligible_conversations": 512,
+ "cells": [
+  {
+   "cell": "Qwen3_ShareGPT_R4_C30_B64_L512_O64",
+   "dataset": "ShareGPT",
+   "model": "Qwen3",
+   "model_path": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+   "local_batch": 64,
+   "global_requests": 256,
+   "input_tokens": 512,
+   "output_tokens": 64,
+   "cache_percent": 30,
+   "expert_slots": 1843,
+   "expert_slots_per_rank": [
+    461,
+    461,
+    461,
+    460
+   ],
+   "expert_budget_bytes": 17392730112,
+   "target": {
+    "path": "/home/hwlee/mgo-results/main_table_2x2_20261008/ShareGPT/Qwen3/manifests/Qwen3_ShareGPT_R4_C30_B64_L512_O64_target.json",
+    "sha256": "55174f55c1601ee70581861db092a872601bb3f1e03ce6f9798f6077d687fe68"
+   },
+   "warmup": {
+    "path": "/home/hwlee/mgo-results/main_table_2x2_20261008/ShareGPT/Qwen3/manifests/Qwen3_ShareGPT_R4_C30_B64_L512_O64_warmup.json",
+    "sha256": "17873f2f0e662fdc9353eec7100d9c1281599799e34bd89016c53149ba3048d0"
+   }
+  },
+  {
+   "cell": "Qwen3_ShareGPT_R4_C30_B32_L512_O64",
+   "dataset": "ShareGPT",
+   "model": "Qwen3",
+   "model_path": "/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507",
+   "local_batch": 32,
+   "global_requests": 128,
+   "input_tokens": 512,
+   "output_tokens": 64,
+   "cache_percent": 30,
+   "expert_slots": 1843,
+   "expert_slots_per_rank": [
+    461,
+    461,
+    461,
+    460
+   ],
+   "expert_budget_bytes": 17392730112,
+   "target": {
+    "path": "/home/hwlee/mgo-results/ep_breakdown_batch_20261013/manifests/Qwen3_ShareGPT_R4_C30_B32_L512_O64_target.json",
+    "sha256": "0778580a0c49bab2ca58220eda1a06aca7dff289e15d90f1e4809dfa428e2087"
+   },
+   "warmup": {
+    "path": "/home/hwlee/mgo-results/ep_breakdown_batch_20261013/manifests/Qwen3_ShareGPT_R4_C30_B32_L512_O64_warmup.json",
+    "sha256": "3ed92e7e1e74ce9ede429f3a9567462c1b2fb654ef531c68c48b4fa1e93c1cb3"
+   }
+  }
+ ],
+ "note": "B64 cell copied from main_table_2x2_20261008/ShareGPT; B32 derived rank-locally from it."
+}

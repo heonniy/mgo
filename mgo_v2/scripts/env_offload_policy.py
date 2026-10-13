@@ -9,6 +9,9 @@ from mgo_v2.fanout_admission import fanout_assignment as packet_fanout_assignmen
 from mgo_v2.miss_quota_placement import assign_miss_quota
 from placement_controls import worst_assignment_with_quota,random_assignment_with_quota
 from haq_placement import hit_aware_quota,worst_balanced_quota,near_assignment_with_quota,hit_aware_quota_rank_cost,H2D_US_BY_RANK_R8
+# Stage-II near-tie tolerance in basis points (default 2%). Numba freezes this
+# global at compile time, so sensitivity runs must use a per-value NUMBA_CACHE_DIR.
+NEAR_BPS=int(os.environ.get('MGO_NEAR_BPS','200'))
 @njit(cache=True)
 def seed_rng(seed):np.random.seed(seed)
 @njit(cache=True)
@@ -72,7 +75,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
             assert world==8
             quota=hit_aware_quota_rank_cost(hits,len(misses),world,H2D_US_BY_RANK_R8)
         else:quota=hit_aware_quota(hits,len(misses),world) if policy==16 else worst_balanced_quota(hits,len(misses),world)
-        assignment=near_assignment_with_quota(demand,misses,owner,layer,quota)
+        assignment=near_assignment_with_quota(demand,misses,owner,layer,quota,NEAR_BPS)
     elif policy==13 or policy==14 or policy==15:
         assert 1<=world<=8 and not substitution
         assignment=assign_miss_quota(demand,effective,lengths,org,primary,layer,experts,misses,world,policy-13)
@@ -97,6 +100,12 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assert 1<=world<=8 and not substitution
         quota=np.bincount(np.random.randint(0,world,len(misses)),minlength=world).astype(np.int64)
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota)
+    elif policy==26:
+        # BR_SALT: BR's balanced quota (remainder to the lowest ranks) with uniformly
+        # random placement inside it, redrawn per event from MGO_RANDOM_SALT.
+        quota=np.empty(world,np.int64)
+        for r in range(world):quota[r]=len(misses)//world+(r<len(misses)%world)
+        assignment=random_assignment_with_quota(misses,quota)
     elif policy==25:
         # BALANCED_RANDOM_NEAR: balanced quota (max-min<=1) whose remainder goes to
         # uniformly random distinct ranks (seeded per event), then Near placement.
@@ -117,7 +126,7 @@ def step(event,selected,weights,origins,gate_scores,similarity,capacities,substi
         assignment=load_locality_near_assignment(demand,misses,owner,layer,200,quota_lut[len(misses)])
     elif policy==7:
         assert 1<=world<=8 and not substitution
-        assignment=load_locality_near_assignment(demand,misses,owner,layer,200)
+        assignment=load_locality_near_assignment(demand,misses,owner,layer,NEAR_BPS)
     elif policy==6:
         assert 1<=world<=8 and not substitution
         assignment=load_fanout_assignment(demand,effective,lengths,org,owner,primary,layer,experts,misses,world)
@@ -206,7 +215,7 @@ class Policy:
             from native_ca_assignment import fast_ca_step
             planner=fast_ca_step(step)
         else:planner=step
-        if self.policy==19 or self.policy==23 or self.policy==24 or self.policy==25:
+        if self.policy==19 or self.policy==23 or self.policy==24 or self.policy==25 or self.policy==26:
             # Stateless per-event draw: identical on every rank, independent
             # of earlier RNG use; MGO_RANDOM_SALT varies it across rounds.
             seed_rng(self.random_salt*1000003+event)
