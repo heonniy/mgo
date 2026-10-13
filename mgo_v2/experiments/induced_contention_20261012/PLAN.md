@@ -19,3 +19,14 @@ stage_breakdown (H2D straggler/imbalance, load imbalance, comm cost, EP cost, TP
   (comm +20 ms/step, compute imbalance +6 ms/step, H2D wait lower, hogs normal); medians reported alongside means.
 - Campaign 2 (run2.py, STATUS2.json): stopped by the owner after 9 of 36 jobs (rep 1: l00 all four arms both models,
   l13 brand Qwen). The interrupted job was kept as icdl13brand_full_v1_STOPPED_by_owner (status FAIL) and is not analyzed.
+
+## Qwen follow-up (run3.py STATUS3.json, run4.py STATUS4.json; 2026-10-13)
+MB_BAL (no-hog microbench table), balanced random worst salt 406, balanced random ordinary salts 1/2/3, at 1.3x/1.7x;
+plus no-hog ordinary salts 2/3 (salt 1 = campaign 2). n=3 each, ms per decode step.
+| level | NEAR | FAST | MB_BAL | BRAND (salt=rep) | BRAND_W (406) | SPLIT |
+|---|---|---|---|---|---|---|
+| none* H2D imb / TPOT | 10.2 / 433.4 | 6.7 / 428.8 | 6.4 / 427.1 | 8.4 / 430.4 | 8.9 / 432.2 | — |
+| 1.3x | 27.0 / 465.1 | 20.5 / 454.4 | 19.7 / 452.6 | 24.4 / 461.0 | 24.9 / 468.0** | 10.8 / 450.3 |
+| 1.7x | 74.9 / 543.7 | 65.1 / 525.6 | 64.6 / 524.5 | 71.7 / 535.1 | 72.2 / 539.2 | 30.0 / 484.5 |
+* no-hog NEAR/FAST/MB_BAL/BRAND_W from microbench_quota_20261013; BRAND from this packet.
+** rep 1 is a whole-run TPOT outlier (478.9 ms with normal H2D imbalance 25.8); median 462.9.
