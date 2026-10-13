@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from collections import deque
 from itertools import islice
 from typing import Iterable
@@ -21,6 +22,29 @@ def _advance_gate_sum(total: np.ndarray, added: np.ndarray, removed: np.ndarray)
         if row >= first_eviction:
             for expert in range(len(total)):
                 total[expert] -= removed[row - first_eviction, expert]
+
+
+# FERRY Appendix C ablation (opt-in; defaults reproduce the production path).
+# MGO_FERRY_EVICT_SCORE selects the rows accumulated by GateHistory:
+#   full     router probabilities of all experts (FERRY)
+#   selected router probability kept only for each token's top-k experts
+#   count    top-k selection indicator (windowed selection count)
+#   lru      zeros, so victim choice falls through to the last-use tie-break
+FERRY_EVICT_SCORE = os.environ.get("MGO_FERRY_EVICT_SCORE", "full")
+FERRY_GATE_WINDOW = int(os.environ.get("MGO_FERRY_GATE_WINDOW", "128"))
+if FERRY_EVICT_SCORE not in ("full", "selected", "count", "lru"):
+    raise ValueError(f"MGO_FERRY_EVICT_SCORE={FERRY_EVICT_SCORE!r}")
+
+
+def ferry_score_rows(probs: np.ndarray, selected: np.ndarray) -> np.ndarray:
+    """Rows fed to GateHistory; ``selected`` is aligned row-for-row with ``probs``."""
+    if FERRY_EVICT_SCORE == "full":
+        return probs
+    if FERRY_EVICT_SCORE == "lru":
+        return np.zeros_like(probs)
+    mask = np.zeros(probs.shape, np.float32)
+    np.put_along_axis(mask, np.asarray(selected, np.int64), 1.0, axis=1)
+    return mask if FERRY_EVICT_SCORE == "count" else (probs * mask).astype(np.float32)
 
 
 class GateHistory:

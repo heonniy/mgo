@@ -11,6 +11,7 @@ from la_physical_worker import LiveRuntime,EB,device_layout,nvtx_phase,plan_layo
 from env_offload_layout import plan_rank_partial_layout
 from env_offload_tensors import pack_rank_partial_layout
 from .runtime import gather_global_routes
+from .eviction import ferry_score_rows,FERRY_GATE_WINDOW
 from .controller import DecodePrefetchController
 from .predictor import TransitionPredictor
 from .compact_metadata import CompactMetadata
@@ -27,9 +28,9 @@ class DecodeOffloadRuntime(LiveRuntime):
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"),cpu_team=getattr(self.args,"staging_cpu_team",None),direct_pinned=getattr(self.args,"direct_pinned_source",False))
   if getattr(a,'live_routes',False):
-   from .eviction import GateHistory
+   from .eviction import GateHistory,FERRY_GATE_WINDOW
    from .live_metadata import LiveMetadata
-   self.gate_history=GateHistory(48,128,128)
+   self.gate_history=GateHistory(48,128,FERRY_GATE_WINDOW)
    self.metadata=LiveMetadata(a.local_batch,self.gate_history)
    self.event_offset=0
   else:self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world,async_inputs=getattr(a,'async_metadata_inputs',False))
@@ -58,16 +59,16 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.metadata'):
    live=getattr(self.args,'live_routes',False)
    if self.index<48:
-    g=gather_global_routes(layer,selected,weights,probs,probability_tail=128 if live and getattr(self.args,'prefill_optimized',False) else None)
+    g=gather_global_routes(layer,selected,weights,probs,probability_tail=max(128,FERRY_GATE_WINDOW) if live and getattr(self.args,'prefill_optimized',False) else None)
     if live and getattr(self.args,'validate_prefill_optimized',False):
      ref=gather_global_routes(layer,selected,weights,probs)
      np.testing.assert_array_equal(g.routes.selected_experts,ref.routes.selected_experts)
      np.testing.assert_array_equal(g.routes.routing_weights,ref.routes.routing_weights)
      np.testing.assert_array_equal(g.routes.origin_ranks,ref.routes.origin_ranks)
-     np.testing.assert_array_equal(g.routes.full_router_probs,ref.routes.full_router_probs[-128:])
+     np.testing.assert_array_equal(g.routes.full_router_probs,ref.routes.full_router_probs[-max(128,FERRY_GATE_WINDOW):])
      self.prefill_metadata_checks=getattr(self,'prefill_metadata_checks',0)+1
     if live:
-     self.gate_history.update(layer,g.routes.full_router_probs)
+     fp=g.routes.full_router_probs;self.gate_history.update(layer,ferry_score_rows(fp,g.routes.selected_experts[len(g.routes.selected_experts)-len(fp):]))
      gate=(self.gate_history.sums[layer]/max(1,len(self.gate_history.rows[layer]))).astype(np.float32)
    elif live:
     g=self.metadata.collect(self.index,selected,probs);gate=g.gate_scores

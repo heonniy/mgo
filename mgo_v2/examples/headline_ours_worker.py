@@ -106,9 +106,9 @@ def main(a):
  torch.cuda.synchronize()
  def reset_live():
   rt.reset();rt.event_offset=0
-  from mgo_v2.eviction import GateHistory
+  from mgo_v2.eviction import GateHistory,FERRY_GATE_WINDOW
   from mgo_v2.live_metadata import LiveMetadata
-  rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
+  rt.gate_history=GateHistory(48,128,FERRY_GATE_WINDOW);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  if a.prefill_optimized and not a.prefill_diagnostic and not a.capture_eviction_trace:
   if rank==0:write(a.output/'phase.json',dict(phase='prefill_validation',cell=a.cell))
@@ -132,9 +132,9 @@ def main(a):
   # Owner amendment: retain compiled code/full pinned source, clear expert state.
   if repeat:
    rt.reset();rt.event_offset=0
-   from mgo_v2.eviction import GateHistory
+   from mgo_v2.eviction import GateHistory,FERRY_GATE_WINDOW
    from mgo_v2.live_metadata import LiveMetadata
-   rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
+   rt.gate_history=GateHistory(48,128,FERRY_GATE_WINDOW);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
    configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
   a.validate_decode_layout=a.decode_layout_fast and repeat==0
   rt.record_main_eviction_trace=bool(a.record_main_eviction_trace and repeat)
