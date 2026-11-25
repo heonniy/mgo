@@ -229,6 +229,7 @@ from br_carep_cpu import choose_slot, balanced_assignment
 from la_placement import load_assignment
 from .predictor import choose_candidates
 from .cache import SlotArena
+from .model_spec import SPEC
 
 class DecodePrefetchController:
  def __init__(self,capacities,budget,policy,seed,predictor,quota_table=None):
@@ -244,17 +245,18 @@ class DecodePrefetchController:
    # Stage-2 controls reuse the FAST quota rows.
    table_key='NEAR_FAST' if policy in ('FAST_WORST','FAST_RANDOM') else policy
    quota_lut=np.asarray(data['quota_lut'][table_key],dtype=np.int64)
-  self.main=Policy(capacities,np.zeros((48,128,128),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10,'NEAR_PCIE':11,'NEAR_FAST':12,'MISS_BAL_COMM':13,'BW':14,'MISS_CAP_COMM':15,'HAQ':16,'HAQ_WORST':17,'STATIC_BLOCK':18,'RANDOM':19,'NEAR_SPLIT':20,'HAQ_FAST':21,'FAST_WORST':22,'FAST_RANDOM':23,'RANDOM_QUOTA_NEAR':24}[policy],seed,quota_lut)
+  # The zero similarity tensor defines the policy key space (layers x experts).
+  self.main=Policy(capacities,np.zeros((SPEC.layers,SPEC.experts,SPEC.experts),np.float32),False,{'BR':0,'CA':1,'LA':4,'OLD_CA':3,'FCA':5,'LA_CA':6,'LA_CA_NEAR':7,'CA_NATIVE':8,'STATIC_MOD':9,'RANDOM_HASH':10,'NEAR_PCIE':11,'NEAR_FAST':12,'MISS_BAL_COMM':13,'BW':14,'MISS_CAP_COMM':15,'HAQ':16,'HAQ_WORST':17,'STATIC_BLOCK':18,'RANDOM':19,'NEAR_SPLIT':20,'HAQ_FAST':21,'FAST_WORST':22,'FAST_RANDOM':23,'RANDOM_QUOTA_NEAR':24}[policy],seed,quota_lut)
   self.arena=SlotArena(self.main,budget);self.pending=self.arena.reservations;self.counters=dict(issued=0,useful=0,wasted=0,promotions=0,promotion_evictions=0,promotion_victim_reloads=0,mandatory=0,quota_violations=0)
   self.promotion_victims=set();self.event=-1
  def plan_current(self,event,selected,weights,origins,gates):
-  self.event=event;layer=event%48;tick=event+1
+  self.event=event;layer=event%SPEC.layers;tick=event+1
   active=None
   if self.pending:
    active=np.zeros(128,np.bool_);active[np.unique(selected)]=True
   m=self.main;m.gates[layer]=gates;promotions=[];discard=[]
   for key,(rank,pfslot,target) in sorted(self.pending.items()):
-   assert target==layer and event>=48
+   assert target==layer and event>=SPEC.layers
    if active[key%128]:
     assert m.owner[key]==0
     slot=choose_slot(rank,layer,active,m.slots,m.capacities,m.last,m.gates,True,128);assert slot>=0
@@ -275,8 +277,8 @@ class DecodePrefetchController:
   self.counters['mandatory']+=len(fetches)
   return out,promotions,discard
  def plan_prefetch_next(self,per_rank_counts):
-  layer=self.event%48
-  if self.event<48 or layer==47 or self.budget==0:return []
+  layer=self.event%SPEC.layers
+  if self.event<SPEC.layers or layer==SPEC.layers-1 or self.budget==0:return []
   predicted=self.predictor.predict_next(layer,per_rank_counts)
   candidates=choose_candidates(predicted,self.main.slots.ravel(),self.pending.keys(),layer+1,self.budget,self.world)
   n=len(candidates)

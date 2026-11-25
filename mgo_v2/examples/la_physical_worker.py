@@ -8,9 +8,12 @@ class LiveRuntime(Runtime):
  def __init__(self,a,model,backing,experts):
   self.args=a;self.rank=dist.get_rank();self.world=dist.get_world_size();self.experts=experts;self.cpu_backing=backing
   self.cap=a.capacities[self.rank];self.execution_order='fetch-barrier';self.schedule_mode='live'
-  self.cache=torch.empty((self.cap,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap,-1,np.int32)
+  # Subclasses that own C+P physical slots set _physical_extra_slots so the
+  # arena is allocated once (a second full-size cache would not fit at 235B).
+  slots=self.cap+getattr(self,'_physical_extra_slots',0)
+  self.cache=torch.empty((slots,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(slots,-1,np.int32)
   self.h2d=PinnedH2DCache(self.cache,2);self.mismatch=torch.zeros((),dtype=torch.bool,device='cuda')
-  self.similarity=np.zeros((48,128,128),np.float32);self.policy_kind=0 if a.policy=='BR' else 4
+  self.similarity=np.zeros((SPEC.layers,SPEC.experts,SPEC.experts),np.float32);self.policy_kind=0 if a.policy=='BR' else 4
   if getattr(a,'live_routes',False):
    self.arrays={};self.ranges=[];self.reference=None;self.proof=None
   else:
@@ -31,14 +34,14 @@ class LiveRuntime(Runtime):
   rt=self
   def forward(module,hidden):
    shape=hidden.shape;flat=hidden.reshape(-1,shape[-1]);logits=module.gate(flat)
-   probs=torch.softmax(logits,dim=-1,dtype=torch.float32);native_weights,native_selected=torch.topk(probs,8,dim=-1)
+   probs=torch.softmax(logits,dim=-1,dtype=torch.float32);native_weights,native_selected=torch.topk(probs,SPEC.topk,dim=-1)
    native_weights=(native_weights/native_weights.sum(-1,keepdim=True)).to(flat.dtype)
    if rt.valid is not None:flat=flat.index_select(0,rt.valid);probs=probs[rt.valid]
    if getattr(rt.args,'live_routes',False):
     selected,weights=native_selected,native_weights
    else:
     # Fixed exact trace avoids policy-dependent route drift; router cost remains.
-    lo=int(rt.arrays['offsets'][rt.index]);start,end=rt.ranges[0 if rt.index<48 else 1]
+    lo=int(rt.arrays['offsets'][rt.index]);start,end=rt.ranges[0 if rt.index<SPEC.layers else 1]
     if hasattr(rt,'route_tensors'):selected,weights=rt.route_tensors[rt.index]
     else:
      selected=torch.tensor(rt.arrays['selected'][lo+start:lo+end],device='cuda',dtype=torch.int64)

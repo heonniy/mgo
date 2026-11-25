@@ -26,9 +26,11 @@ PKG=Path(__file__).resolve().parents[1]
 PACKET=PKG/'experiments/env_e2e_tpot_offload_20261003'
 ROOT=Path('/home/hwlee/mgo-results/env_e2e_tpot_offload_20261003')
 SOURCE=Path('/home/hwlee/mgo-results/br_ca_carep_cpu_headroom_20261003')
-MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+from mgo_v2.model_spec import SPEC
+# Defaults (no MGO_MODEL_PATH) are the Qwen3-30B values: path, archer store, EB=9437184.
+MODEL=SPEC.path
 STORE=Path('/home/hwlee/mgo-results/runtime_validation_20261001/expert_store')
-EB=9437184
+EB=SPEC.expert_bytes
 
 def digest(x):return hashlib.sha256(pickle.dumps(x,protocol=4)).hexdigest()
 def array_hash(x):return hashlib.sha256(np.ascontiguousarray(x).tobytes()).hexdigest()
@@ -50,8 +52,38 @@ def nvtx_phase(name):
 
 def expert_kernel(x,gate,up,down):return F.linear(F.silu(F.linear(x,gate))*F.linear(x,up),down)
 
-def load_model():
+def load_model(expert_source=None):
+ if expert_source=='shared_pinned':return load_model_shared_pinned()
+ assert SPEC.is_qwen3_30b,'non-30B models require the shared pinned expert store'
  manifest=prepare_checkpoint_store(MODEL,STORE)
+ model,wm,config=load_dense_model()
+ backing=torch.from_file(str(STORE/'archer_param_0'),shared=False,size=manifest['bytes'],dtype=torch.uint8)
+ _=backing[::4096].to(torch.int64).sum().item()  # untimed CPU residency preflight
+ index={}
+ with (STORE/'archer_index').open('rb') as f:
+  count=struct.unpack('<I',f.read(4))[0]
+  for _ in range(count):
+   tid,file_id,offset,size,ndim=struct.unpack('<IIqQq',f.read(32));shape=struct.unpack('<'+'q'*ndim,f.read(8*ndim));f.read(6)
+   assert file_id==0;index[tid]=(offset,size,shape)
+ experts=[]
+ for key in range(SPEC.layers*SPEC.experts):
+  tensors=[]
+  for i in range(3):
+   offset,size,shape=index[key*3+i];tensors.append(backing[offset:offset+size].view(torch.bfloat16).view(shape))
+  experts.append(tensors)
+ assert all(sum(t.numel()*2 for t in group)==EB and all(t.device.type=='cpu' for t in group) for group in experts)
+ model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
+ model.eval();return model,backing,experts
+
+def load_model_shared_pinned():
+ """Dense weights on this GPU; routed experts from the shared registered store."""
+ from mgo_v2.shared_expert_store import open_shared_store
+ model,_,_=load_dense_model()
+ store=open_shared_store(SPEC)
+ model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
+ model.eval();return model,store,store.sources
+
+def load_dense_model():
  config=AutoConfig.from_pretrained(MODEL,local_files_only=True);config._attn_implementation='sdpa'
  with init_empty_weights():model=AutoModelForCausalLM.from_config(config,dtype=torch.bfloat16)
  _,wm=checkpoint_identity(MODEL)
@@ -63,24 +95,7 @@ def load_model():
  for module in model.modules():
   if module.__class__.__name__=='Qwen3MoeRotaryEmbedding':
    inv,module.attention_scaling=module.rope_init_fn(config,device=torch.device('cuda:0'));module.register_buffer('inv_freq',inv,persistent=False);module.original_inv_freq=inv
- # Read-only use of a shared file-backed CPU pool; fault all pages in before execution.
- backing=torch.from_file(str(STORE/'archer_param_0'),shared=False,size=manifest['bytes'],dtype=torch.uint8)
- _=backing[::4096].to(torch.int64).sum().item()  # untimed CPU residency preflight
- index={}
- with (STORE/'archer_index').open('rb') as f:
-  count=struct.unpack('<I',f.read(4))[0]
-  for _ in range(count):
-   tid,file_id,offset,size,ndim=struct.unpack('<IIqQq',f.read(32));shape=struct.unpack('<'+'q'*ndim,f.read(8*ndim));f.read(6)
-   assert file_id==0;index[tid]=(offset,size,shape)
- experts=[]
- for key in range(48*128):
-  tensors=[]
-  for i in range(3):
-   offset,size,shape=index[key*3+i];tensors.append(backing[offset:offset+size].view(torch.bfloat16).view(shape))
-  experts.append(tensors)
- assert all(sum(t.numel()*2 for t in group)==EB and all(t.device.type=='cpu' for t in group) for group in experts)
- model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
- model.eval();return model,backing,experts
+ return model,wm,config
 
 from env_offload_layout import add_coslot_layout,plan_layout
 

@@ -67,9 +67,20 @@ def _create_runtime(args, model, backing, experts, options):
         setattr(args, name, value)
     from .decode_runtime import DecodeOffloadRuntime
     source = options.get('expert_source', 'staged')
-    args.direct_pinned_source = source == 'full_pinned'
+    args.direct_pinned_source = source in ('full_pinned', 'shared_pinned')
     pool = receipt = None
-    if args.direct_pinned_source:
+    if source == 'shared_pinned':
+        # One host-shared, cudaHostRegister'ed copy mapped by every rank (see
+        # shared_expert_store.py); the loader already opened and registered it.
+        from .shared_expert_store import SharedPinnedStore
+        if not isinstance(backing, SharedPinnedStore):
+            raise ValueError('shared_pinned source requires load_model(expert_source="shared_pinned")')
+        if len(experts) != backing.pool.shape[0] or any(e[0].data_ptr() != backing.pool[k].data_ptr() for k, e in ((0, experts[0]), (len(experts) - 1, experts[-1]))):
+            raise ValueError('expert sources are not rows of the shared pinned store')
+        pool = backing.pool
+        receipt = dict(backing.receipt, selection_expert_source=options.get('selection_expert_source'),
+                       override='expert_source=shared_pinned (approved host-memory deviation)')
+    elif args.direct_pinned_source:
         import time
         import torch.distributed as dist
         from .pinned_h2d import build_full_pinned_expert_store
@@ -110,7 +121,7 @@ def create_explicit_runtime(args, model, backing, experts, case):
     return _create_runtime(args, model, backing, experts, options)
 
 
-def create_selected_runtime(args, model, backing, experts, *, selection_path=None, arm=None):
+def create_selected_runtime(args, model, backing, experts, *, selection_path=None, arm=None, expert_source=None):
     """Use the measured default, or explicitly select either ablation mode.
 
     The caller supplies the existing physical harness's model, expert backing,
@@ -120,4 +131,11 @@ def create_selected_runtime(args, model, backing, experts, *, selection_path=Non
     """
     options = selected_options(selection_path, arm)
     options['expert_executor'] = getattr(args, 'expert_executor', 'h0')
+    if expert_source is not None:
+        # Explicit, recorded override of the frozen selection's expert source.
+        # Only the host-shared copy of the same direct-pinned source is allowed.
+        if expert_source not in ('full_pinned', 'shared_pinned') or options['expert_source'] != 'full_pinned':
+            raise ValueError('expert source override must keep a direct pinned source')
+        options['selection_expert_source'] = options['expert_source']
+        options['expert_source'] = expert_source
     return _create_runtime(args, model, backing, experts, options)

@@ -13,19 +13,32 @@ import time
 @lru_cache(None)
 def load_native_expert():
     from torch.utils.cpp_extension import load
+    from .model_spec import SPEC
     os.environ.setdefault('MAX_JOBS', '1')
     root = Path(__file__).parent / 'csrc'
-    return load(name='mgo_native_expert_v1',
-                sources=[str(root/'native_expert.cpp'), str(root/'native_expert.cu')],
-                extra_cflags=['-O2'], extra_cuda_cflags=['-O2'], verbose=False)
+    if SPEC.is_qwen3_30b:
+        # Unchanged audited Qwen3-30B build (source, name and flags).
+        return load(name='mgo_native_expert_v1',
+                    sources=[str(root/'native_expert.cpp'), str(root/'native_expert.cu')],
+                    extra_cflags=['-O2'], extra_cuda_cflags=['-O2'], verbose=False)
+    # Same algorithm, geometry from the model config, own extension name.
+    defines = [f'-DMGO_HIDDEN={SPEC.hidden}', f'-DMGO_INTER={SPEC.moe_intermediate}',
+               f'-DMGO_LAYERS={SPEC.layers}', f'-DMGO_EXPERTS={SPEC.experts}']
+    name = f'mgo_native_expert_h{SPEC.hidden}_i{SPEC.moe_intermediate}_l{SPEC.layers}_e{SPEC.experts}_v1'
+    return load(name=name,
+                sources=[str(root/'native_expert_shaped.cpp'), str(root/'native_expert.cu')],
+                extra_cflags=['-O2'] + defines, extra_cuda_cflags=['-O2'], verbose=False)
 
 
 class NativeExpertExecutor:
     def __init__(self, max_experts=128):
         if not 1 <= max_experts <= 128:
             raise ValueError('max_experts must be in [1,128]')
+        from .model_spec import SPEC
         self.native = load_native_expert()
         self.max_experts = max_experts
+        self.layers = SPEC.layers
+        self.experts = SPEC.experts
         self.waves = self.groups = self.waits = 0
         self.serial_wait_wall_ns = self.serial_waited_copies = 0
 
@@ -34,7 +47,7 @@ class NativeExpertExecutor:
         assert mode == 'current'
         groups = event['groups']
         args = getattr(rt, 'args', None)
-        if getattr(args, 'h2d_serial_ablation', False) and rt.index >= 48:
+        if getattr(args, 'h2d_serial_ablation', False) and rt.index >= self.layers:
             assert getattr(args, 'prefetch_off', False)
             fetch_slots = [slot for _, slot, _, _ in event['fetches']]
             if fetch_slots:
@@ -62,7 +75,7 @@ class NativeExpertExecutor:
             elif not waited:
                 before_wait += len(selected)
             slots = [int(groups[i][3]) for i in selected]
-            assert all(rt.keys[slot] == layer*128+groups[i][0]
+            assert all(rt.keys[slot] == layer*self.experts+groups[i][0]
                        for i, slot in zip(selected, slots))
             outputs = self.native.execute_wave(rt.cache, received, weights, slots,
                         [groups[i][1] for i in selected], [groups[i][2] for i in selected])

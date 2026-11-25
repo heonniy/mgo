@@ -18,19 +18,30 @@ from .pinned_h2d import PriorityH2DScheduler
 from .ready_compute import expert_order
 from .fused_transport import FusedTokenRankTransport
 from .coalesced_return import combine_rank_partials
+from .model_spec import SPEC
+L=SPEC.layers
+TRANSITION_30B='/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/predictor/transition.npy'
+
+def transition_table(args):
+ # The calibrated transition table exists only for Qwen3-30B. Other models run
+ # main_OURS with prefetch OFF, where the predictor is constructed but unused.
+ if SPEC.is_qwen3_30b:return np.load(TRANSITION_30B)
+ if not getattr(args,'prefetch_off',False):raise ValueError('prefetch requires a calibrated transition table for this model')
+ return np.zeros((L-1,SPEC.experts,SPEC.experts),np.float64)
 
 class DecodeOffloadRuntime(LiveRuntime):
  def __init__(self,a,model,backing,experts):
-  self.predictor=TransitionPredictor(np.load('/home/hwlee/mgo-results/decode_prefetch_runtime_refactoring_20261004/predictor/transition.npy'))
+  self.predictor=TransitionPredictor(transition_table(a))
+  self._physical_extra_slots=a.arena_budget
   super().__init__(a,model,backing,experts)
-  self.cache=torch.empty((self.cap+a.arena_budget,EB//2),dtype=torch.bfloat16,device='cuda');self.keys=np.full(self.cap+a.arena_budget,-1,np.int32)
+  assert tuple(self.cache.shape)==(self.cap+a.arena_budget,EB//2) and len(self.keys)==self.cap+a.arena_budget
   self.h2d=PinnedH2DCache(self.cache,2)
   if getattr(a,'physical_prefetch',False):self.h2d=PriorityH2DScheduler(self.cache,staging_backend=getattr(self.args,"staging_backend","torch"),cpu_team=getattr(self.args,"staging_cpu_team",None),direct_pinned=getattr(self.args,"direct_pinned_source",False))
   if getattr(a,'live_routes',False):
    from .eviction import GateHistory
    from .live_metadata import LiveMetadata
-   self.gate_history=GateHistory(48,128,128)
-   self.metadata=LiveMetadata(a.local_batch,self.gate_history)
+   self.gate_history=GateHistory(L,SPEC.experts,128)
+   self.metadata=LiveMetadata(a.local_batch,self.gate_history,SPEC.topk,SPEC.experts,L)
    self.event_offset=0
   else:self.metadata=CompactMetadata(len(self.arrays['decode_origins'])//self.world,async_inputs=getattr(a,'async_metadata_inputs',False))
  def stage_frozen_inputs(self,horizon):
@@ -38,8 +49,8 @@ class DecodeOffloadRuntime(LiveRuntime):
   # Only the current event is exposed to the runtime; prediction never reads
   # future routes even though the frozen input storage is device-resident.
   ids=[];weights=[];sizes=[]
-  for event in range((horizon+1)*48):
-   lo=int(self.arrays['offsets'][event]);start,end=self.ranges[0 if event<48 else 1]
+  for event in range((horizon+1)*L):
+   lo=int(self.arrays['offsets'][event]);start,end=self.ranges[0 if event<L else 1]
    ids.append(self.arrays['selected'][lo+start:lo+end]);weights.append(self.arrays['weights'][lo+start:lo+end]);sizes.append(end-start)
   all_ids=torch.tensor(np.concatenate(ids),device='cuda',dtype=torch.int64)
   all_weights=torch.tensor(np.concatenate(weights),device='cuda',dtype=torch.bfloat16)
@@ -57,7 +68,7 @@ class DecodeOffloadRuntime(LiveRuntime):
  def plan_event(self,layer,selected,weights,probs):
   with nvtx_phase('moe.metadata'):
    live=getattr(self.args,'live_routes',False)
-   if self.index<48:
+   if self.index<L:
     g=gather_global_routes(layer,selected,weights,probs,probability_tail=128 if live and getattr(self.args,'prefill_optimized',False) else None)
     if live and getattr(self.args,'validate_prefill_optimized',False):
      ref=gather_global_routes(layer,selected,weights,probs)
@@ -83,7 +94,7 @@ class DecodeOffloadRuntime(LiveRuntime):
   with nvtx_phase('moe.current_controller'):
    start=time.perf_counter()
    out,promotions,discards=self.controller.plan_current(self.index+getattr(self,'event_offset',0),r.selected_experts,r.routing_weights,r.origin_ranks,gate)
-   if self.index>=48 and self.args.phase!='MEASURE':self.controller_times.append((time.perf_counter()-start)*1000)
+   if self.index>=L and self.args.phase!='MEASURE':self.controller_times.append((time.perf_counter()-start)*1000)
    targets,effective,masses,lengths,destinations,fetches,row=out
    if getattr(self.args,'physical_prefetch',False):
     for promotion in promotions:
@@ -99,8 +110,8 @@ class DecodeOffloadRuntime(LiveRuntime):
     assert not promotions and not discards
     assert [list(f) for f in fetches]==self.reference[self.index]
    self.current_global_fetch_count=len(fetches)
-   decode_fast=self.index>=48 and getattr(self.args,'decode_layout_fast',False)
-   fast=(self.index<48 and getattr(self.args,'prefill_layout_fast',False)) or decode_fast
+   decode_fast=self.index>=L and getattr(self.args,'decode_layout_fast',False)
+   fast=(self.index<L and getattr(self.args,'prefill_layout_fast',False)) or decode_fast
    if fast:
     assert getattr(self.args,'partial_precision',None)=='bf16'
     assert getattr(self.args,'fused',False)
@@ -112,7 +123,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    if not fast:e['selected']=selected.cpu().numpy()
    e.update(layer=layer,targets=targets,fetches=[(key,int(self.arena.main_physical[rank][slot]),victim,rep) for rank,key,slot,victim,rep in fetches if rank==self.rank])
    native=getattr(self,'native_executor',None)
-   native_for_phase=native is not None and (self.index>=48 or getattr(self.args,'native_prefill',False))
+   native_for_phase=native is not None and (self.index>=L or getattr(self.args,'native_prefill',False))
    if native_for_phase:
     slots=native.native.bind_layer_slots(self.policy.slots[self.rank],self.arena.main_physical[self.rank],layer,[group[0] for group in e['groups']])
     e['groups']=[(expert,rows,cols,slot) for (expert,rows,cols),slot in zip(e['groups'],slots)]
@@ -129,8 +140,8 @@ class DecodeOffloadRuntime(LiveRuntime):
    tensor=torch.tensor(digest,device='cuda');all_hashes=torch.empty((self.world,32),dtype=torch.uint8,device='cuda')
    dist.all_gather_into_tensor(all_hashes.view(-1),tensor);assert bool((all_hashes==all_hashes[0]).all())
    self.debug_plan_checks+=1
-  if self.args.phase!='MEASURE' and self.index%768==0:print(f'{self.args.policy} event={self.index} split_controller',flush=True)
-  if getattr(self.args,'unique_combine',False) and self.index>=48:
+  if self.args.phase!='MEASURE' and self.index%(16*L)==0:print(f'{self.args.policy} event={self.index} split_controller',flush=True)
+  if getattr(self.args,'unique_combine',False) and self.index>=L:
    from .unique_combine import validate_unique_layout
    e['unique_combine_validated']=validate_unique_layout(e,self.metadata.batch)
    self.unique_combine_layers+=int(e['unique_combine_validated'])
@@ -152,7 +163,7 @@ class DecodeOffloadRuntime(LiveRuntime):
    return packed
   return device_layout(e)
  def prefetch_next(self):
-  if self.index<48 or getattr(self.args,'prefetch_off',False):return
+  if self.index<L or getattr(self.args,'prefetch_off',False):return
   with nvtx_phase('moe.prefetch_controller'):
    reservations=self.controller.plan_prefetch_next(self.current_histogram)
   for rank,key,pfslot in reservations:
@@ -173,11 +184,11 @@ class DecodeOffloadRuntime(LiveRuntime):
    assert not rep and self.keys[slot]==victim,(self.index,key,slot,victim,self.keys[slot])
    self.h2d.enqueue_demand(slot,key,self.experts[key],event_index=self.index);self.keys[slot]=key
  def compute(self,packet,e,layer):
-  if (self.index<48 and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
+  if (self.index<L and not getattr(self.args,'prefill_optimized',False)) or not (getattr(self.args,'streaming',False) or getattr(self.args,'fused',False)):return super().compute(packet,e,layer)
   grouped=getattr(self,'grouped_executor',None)
-  if grouped is not None and self.index>=48:return grouped.compute(self,packet,e,layer)
+  if grouped is not None and self.index>=L:return grouped.compute(self,packet,e,layer)
   native=getattr(self,'native_executor',None)
-  if native is not None and (self.index>=48 or getattr(self.args,'native_prefill',False)):return native.compute(self,packet,e,layer)
+  if native is not None and (self.index>=L or getattr(self.args,'native_prefill',False)):return native.compute(self,packet,e,layer)
   if grouped is not None:return grouped.compute(self,packet,e,layer)
   mode,received,_,rw=packet;assert mode=='current'
   groups=e['groups'];parts=[None]*len(groups)
@@ -186,18 +197,18 @@ class DecodeOffloadRuntime(LiveRuntime):
    if getattr(self.args,'fused',False) and self.args.phase!='MEASURE':self.mismatch.logical_or_((packet[2][rows,cols]!=expert).any())
    executor=getattr(self,'graph_executor',None)
    if executor is None:
-    w=self.cache[slot];part=self.kernel(received[rows],w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+    w=self.cache[slot];part=self.kernel(received[rows],*SPEC.expert_views(w))
     self.h2d.record_slot_use(slot);parts[i]=part*rw[rows,cols,None]
     continue
    consolidated=executor.wrapper and executor.mode=='replay'
-   check=getattr(self,'graph_check',False) and self.index<96
+   check=getattr(self,'graph_check',False) and self.index<2*L
    if consolidated:
     executor.gather(slot,received,rows,check);part=executor.launch(slot,len(rows),check)
    else:part=executor(slot,received[rows],check=check)
    self.h2d.record_slot_use(slot)
    parts[i]=executor.weight(slot,part,rw,rows,cols) if consolidated else part*rw[rows,cols,None]
-  if getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False)):return parts
-  return torch.cat(parts) if parts else received.new_empty((0,2048))
+  if getattr(self.args,'fused',False) and (self.index>=L or getattr(self.args,'prefill_optimized',False)):return parts
+  return torch.cat(parts) if parts else received.new_empty((0,SPEC.hidden))
  def close(self):
   if isinstance(self.h2d,PriorityH2DScheduler):self.h2d.close()
  def execute(self,*args):
@@ -205,17 +216,17 @@ class DecodeOffloadRuntime(LiveRuntime):
   else:
    layer,hidden,selected,weights,probs=args
    e=self.plan_event(layer,selected,weights,probs)
-   if self.index>=48 and getattr(self.args,'compiled_dense',False):
+   if self.index>=L and getattr(self.args,'compiled_dense',False):
     from .dense_routing import dense_decode_weights
-    shape=(hidden.shape[0],128)
+    shape=(hidden.shape[0],SPEC.experts)
     if getattr(self,'decode_dense_scratch',None) is None or self.decode_dense_scratch.shape!=shape:
      self.decode_dense_scratch=torch.empty(shape,device=hidden.device,dtype=weights.dtype)
     with nvtx_phase('moe.dense_weights'):
      dense=dense_decode_weights(selected,weights,e['targets'],self.decode_dense_scratch)
    else:
-    dense=torch.zeros((hidden.shape[0],128),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
-   fused=getattr(self.args,'fused',False) and (self.index>=48 or getattr(self.args,'prefill_optimized',False))
-   overlap=getattr(self.args,'streaming',False) and self.index>=48
+    dense=torch.zeros((hidden.shape[0],SPEC.experts),device='cuda',dtype=torch.float32).scatter_add_(1,e['targets'][selected],weights.float()).to(weights.dtype)
+   fused=getattr(self.args,'fused',False) and (self.index>=L or getattr(self.args,'prefill_optimized',False))
+   overlap=getattr(self.args,'streaming',False) and self.index>=L
    if getattr(self.args,'strict_serialized_phases',False):
     # Characterization substrate:
     # required H2D -> all-rank H2D barrier -> forward dispatch -> expert compute
@@ -257,13 +268,13 @@ class DecodeOffloadRuntime(LiveRuntime):
      self.arena.assert_consistent()
      assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
      self.actual_h2d_bytes=self.h2d.metrics['bytes'] if hasattr(self.h2d,'metrics') else self.actual_h2d_bytes
-    if self.index==48:
+    if self.index==L:
      self.arena.assert_consistent();assert not self.arena.reservations and np.all(self.keys[self.cap:]<0)
      self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
     return result
    if fused:
     before=self.transport.calls;trigger=getattr(self.args,'trigger','T1')
-    sync_ablation=self.index>=48 and getattr(self.args,'collective_barrier_ablation',False)
+    sync_ablation=self.index>=L and getattr(self.args,'collective_barrier_ablation',False)
     if sync_ablation:
      assert overlap and getattr(self.args,'prefetch_off',False) and self.native_executor is not None
      assert self.transport.before_exchange is None and not getattr(self.args,'post_expert_barrier',False)
@@ -304,7 +315,7 @@ class DecodeOffloadRuntime(LiveRuntime):
      dist.barrier();torch.cuda.current_stream().synchronize()
    if not fused:self.prefetch_next()
    with nvtx_phase('moe.expert_compute'):values=self.compute(packet,e,layer)
-   if fused and self.index>=48 and getattr(self.args,'post_expert_barrier',False):
+   if fused and self.index>=L and getattr(self.args,'post_expert_barrier',False):
     # Diagnostic isolation mode: make every rank finish its current-layer
     # required H2D dependencies and expert/weight work before the return A2A.
     # Future speculative prefetch on the dedicated H2D stream is intentionally
@@ -322,7 +333,7 @@ class DecodeOffloadRuntime(LiveRuntime):
      else:result=self.transport.combine(hidden,values,e)
     assert self.transport.calls-before==2
     if sync_ablation:self.transport.before_exchange=None
-    if self.index<48 and getattr(self.args,'validate_prefill_optimized',False):
+    if self.index<L and getattr(self.args,'validate_prefill_optimized',False):
      reference=self.transport.combine(hidden,values,e)
      diff=result.float()-reference.float()
      assert bool(torch.isfinite(result).all()) and bool(torch.isfinite(reference).all())
@@ -336,7 +347,7 @@ class DecodeOffloadRuntime(LiveRuntime):
     self.arena.assert_consistent()
     assert np.array_equal(self.keys[self.arena.main_physical[self.rank]],self.policy.slots[self.rank,:self.cap])
     self.actual_h2d_bytes=self.h2d.metrics['bytes']
-  if self.index==48:
+  if self.index==L:
    self.arena.assert_consistent();assert not self.arena.reservations
    if not getattr(self.args,'live_routes',False):assert np.all(self.keys[self.cap:]<0)
    self.prefill_boundary=dict(main_roles=self.cap,prefetch_roles=self.args.arena_budget,prefetch_empty=True,main_resident=int(np.count_nonzero(self.keys[:self.cap]>=0)))
