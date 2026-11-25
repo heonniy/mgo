@@ -16,10 +16,11 @@ while true; do
   lg=$(ls -t $R/jobs/*/run.log 2>/dev/null | head -1); lgage=$([ -n "$lg" ] && echo $((now-$(stat -c %Y "$lg"))) || echo 99999)
   ph=$(ls -t $R/jobs/*/phase.json $R/jobs/*/progress_repeat*.json 2>/dev/null | head -1); phage=$([ -n "$ph" ] && echo $((now-$(stat -c %Y "$ph"))) || echo 99999)
   store=$(du -sb $ST 2>/dev/null | cut -f1); store=${store:-0}
-  if [ "$procs" -eq 0 ] || [ "$util" -gt 0 ] || [ "$phage" -lt 600 ] || [ "$lgage" -lt 600 ] || [ "$store" -gt "$prev_store" ]; then busy=$now; stall_sent=0; fi
-  prev_store=$store
+  io=0; for q in $(nvidia-smi --query-compute-apps=pid --format=csv,noheader | sort -u); do v=$(awk '/^read_bytes/{print $2}' /proc/$q/io 2>/dev/null); io=$((io+${v:-0})); done
+  if [ "$procs" -eq 0 ] || [ "$util" -gt 0 ] || [ "$phage" -lt 600 ] || [ "$lgage" -lt 600 ] || [ "$store" -gt "$prev_store" ] || [ "$io" -gt "${prev_io:-0}" ]; then busy=$now; stall_sent=0; fi
+  prev_store=$store; prev_io=$io
   if [ $((now-busy)) -ge 600 ] && [ $stall_sent = 0 ]; then
-    echo "STALL? $(date +%T) gpu procs=$procs, GPUs 0%, no progress file, run.log or store growth for $(( (now-busy)/60 )) min; last=$(tail -1 $R/orchestrator.log | cut -c12-)"
+    echo "STALL? $(date +%T) gpu procs=$procs, GPUs 0%, no progress file, run.log, store growth or disk reads for $(( (now-busy)/60 )) min; last=$(tail -1 $R/orchestrator.log | cut -c12-)"
     stall_sent=1
   fi
   if [ $((now-last)) -ge 900 ]; then

@@ -16,7 +16,8 @@ say() { echo "$(date +%F' '%T) $*" >> $LOG; }
 mkdir -p $R/jobs
 
 say "STEP gguf WAIT pid=$GGUF_PID"
-while kill -0 $GGUF_PID 2>/dev/null; do sleep 15; done
+# PID 0 or empty means nothing to wait for (kill -0 0 would target our own process group).
+[ "${GGUF_PID:-0}" -gt 0 ] && while kill -0 $GGUF_PID 2>/dev/null; do sleep 15; done
 if grep -q "Model successfully exported" $T/gguf-convert-qwen235.log && [ -s $G ]; then
   say "STEP gguf DONE bytes=$(stat -c %s $G)"
   [ -s $PKG/experiments/qwen235_main_table_20261125/QWEN235_GGUF_RECEIPT.json ] || {
