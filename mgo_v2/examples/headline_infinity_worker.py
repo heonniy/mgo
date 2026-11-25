@@ -9,6 +9,11 @@ MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
 QWEN235='/home/hwlee/model/Qwen3-235B-A22B-Instruct-2507'
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
+def kv_bytes(kv,world):
+ out=[0]*world
+ for layer in kv.layers:
+  for t in (layer.keys,layer.values):out[t.device.index]+=t.numel()*t.element_size()
+ return out
 def sync():
  for gpu in range(torch.cuda.device_count()):torch.cuda.synchronize(gpu)
 class FiniteLogits:
@@ -220,9 +225,8 @@ def main(a):
    output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
   kv=output.past_key_values
   assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in kv.layers)
-  kv_bytes_per_gpu=[0]*world
-  for layer in kv.layers:
-   for t in (layer.keys,layer.values):kv_bytes_per_gpu[t.device.index]+=t.numel()*t.element_size()
+  # Count KV bytes in a helper so no loop variable keeps a KV tensor alive past the release check.
+  kv_bytes_per_gpu=kv_bytes(kv,world)
   output=output.sequences
   sync();assert finite.flag is not None and finite.flag.item()
   assert len(streamer.stamps)==n and output.shape==(len(rows),ids.shape[1]+n)
