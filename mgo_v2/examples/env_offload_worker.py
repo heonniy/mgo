@@ -79,13 +79,20 @@ def load_model_shared_pinned():
  """Dense weights on this GPU; routed experts from the shared registered store."""
  from mgo_v2.shared_expert_store import open_shared_store
  model,_,_=load_dense_model()
+ assert all(p.is_cuda for n,p in model.named_parameters() if not EXPERT.fullmatch(n)) and all(b.is_cuda for b in model.buffers()),'non-expert weight left off the GPU'
  store=open_shared_store(SPEC)
  model.generation_config=GenerationConfig.from_pretrained(MODEL,local_files_only=True)
  model.eval();return model,store,store.sources
 
 def load_dense_model():
  config=AutoConfig.from_pretrained(MODEL,local_files_only=True);config._attn_implementation='sdpa'
- with init_empty_weights():model=AutoModelForCausalLM.from_config(config,dtype=torch.bfloat16)
+ # Under torch.use_deterministic_algorithms(True) every temporary CPU parameter
+ # that init_empty_weights creates is NaN-filled (touched) before it moves to
+ # meta; at 235B that is ~470 GB of transient host memory per rank. Non-30B
+ # models are therefore constructed directly on meta (the only buffer,
+ # rotary inv_freq, is recomputed on the GPU below). The 30B path is unchanged.
+ import contextlib
+ with init_empty_weights(),(contextlib.nullcontext() if SPEC.is_qwen3_30b else torch.device('meta')):model=AutoModelForCausalLM.from_config(config,dtype=torch.bfloat16)
  _,wm=checkpoint_identity(MODEL)
  for shard in sorted(set(wm.values())):
   names=[k for k,v in wm.items() if v==shard and not EXPERT.fullmatch(k)]
