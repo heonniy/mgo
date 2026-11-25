@@ -1,0 +1,53 @@
+{
+  "configure_command": [
+    "/home/hwlee/mgo-tools/headline-r4/base-env/bin/cmake",
+    "-S",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp",
+    "-B",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build",
+    "-DGGML_CUDA_GRAPHS=ON"
+  ],
+  "backend_build_command": [
+    "/home/hwlee/mgo-tools/headline-r4/base-env/bin/cmake",
+    "--build",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build",
+    "--config",
+    "Release",
+    "--parallel",
+    "16"
+  ],
+  "command": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "/home/hwlee/mgo-qwen235/mgo_v2/examples/headline_llama_qwen235_sync.cpp",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/ggml/include",
+    "-I/home/hwlee/mgo-tools/headline-r4/llama.cpp/vendor/nlohmann",
+    "-L/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-Wl,-rpath,/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin",
+    "-lllama",
+    "-lggml",
+    "-lggml-base",
+    "-lggml-cpu",
+    "-o",
+    "/home/hwlee/mgo-tools/headline-r4/llama.cpp/build/bin/headline-llama-qwen235-sync"
+  ],
+  "source_sha256": "686c750a6e7a7452204785252b46cefb29ac6a98f1b95344c68151ecb35b23cc",
+  "binary_sha256": "db8d16fa0525a6b62b7943bc5e2fc4778fead85edc4e62a4c75bffb7e28df18a",
+  "llama_commit": "3109914090564b4c5280f30896369d55b86bbdbf",
+  "cmake_flags": {
+    "GGML_CUDA:BOOL": "ON",
+    "GGML_CUDA_GRAPHS:BOOL": "ON",
+    "GGML_NATIVE:BOOL": "ON",
+    "GGML_OPENMP:BOOL": "ON"
+  },
+  "cuda_graph_support": true,
+  "headline_cuda_graph_runtime": "OFF via GGML_CUDA_DISABLE_GRAPHS=1",
+  "llama_graph_reuse": false,
+  "headline_llama_graph_reuse": "OFF via LLAMA_GRAPH_REUSE_DISABLE=1",
+  "headline_expert_placement": "balanced7 (Qwen3-235B, 7 whole expert layers per GPU, C30)",
+  "baseline_policy_eligible": true,
+  "thread_policy": "headline fixed 32/32 with deterministic affinity",
+  "note": "Qwen3-235B-A22B runner: headline_llama_sync.cpp with 94 layers, 36 MiB experts, balanced7 over llama.cpp LAYER split {0,24,48,72}; same llama.cpp build and flags as the main table."
+}

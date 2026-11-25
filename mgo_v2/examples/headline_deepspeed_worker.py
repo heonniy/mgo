@@ -8,6 +8,7 @@ from transformers.integrations import HfDeepSpeedConfig
 from deepspeed.runtime.zero.partition_parameters import ZeroParamStatus
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+QWEN235='/home/hwlee/model/Qwen3-235B-A22B-Instruct-2507'
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
 def release():
@@ -28,7 +29,8 @@ def generate(engine,ids,n,progress=None):
    ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
  assert finite.item()
  assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in past.layers)
- return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,tokens=torch.stack(tokens,1).cpu().tolist(),finite_logits=True)
+ kv=sum(layer.keys.numel()*layer.keys.element_size()+layer.values.numel()*layer.values.element_size() for layer in past.layers)
+ return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,tokens=torch.stack(tokens,1).cpu().tolist(),finite_logits=True,kv_cache_bytes=kv)
 
 def main(a):
  rank=int(os.environ['RANK']);local=int(os.environ['LOCAL_RANK']);world=int(os.environ['WORLD_SIZE'])
@@ -46,21 +48,22 @@ def main(a):
  deepspeed.init_distributed();assert dist.get_world_size()==world
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)
- assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
+ assert model_path in (MODEL,QWEN235,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
  model_family=spec.get('model','Qwen3')
- assert (model_family=='Qwen3')==(model_path==MODEL)
+ assert (model_family=='Qwen3')==(model_path==MODEL) and (model_family=='Qwen3-235B')==(model_path==QWEN235)
+ qwen=model_family in ('Qwen3','Qwen3-235B')
  batch=1 if a.smoke else spec['local_batch'];n=2 if a.smoke else 64
  scale=spec.get('expert_budget_bytes',17392730112)/17392730112
  cfg=dict(train_batch_size=batch*world,train_micro_batch_size_per_gpu=batch,gradient_accumulation_steps=1,bf16={'enabled':True},zero_optimization=dict(stage=3,offload_param={'device':'cpu','pin_memory':True},stage3_max_live_parameters=int(1_500_000_000*scale*4/world),stage3_prefetch_bucket_size=int(1_000_000_000*scale*4/world),stage3_max_reuse_distance=1_000_000_000,stage3_param_persistence_threshold=100_000),steps_per_print=1000000,wall_clock_breakdown=False)
  dschf=HfDeepSpeedConfig(cfg)
  model=AutoModelForCausalLM.from_pretrained(model_path,torch_dtype=torch.bfloat16,attn_implementation='sdpa',local_files_only=True)
- if model_family!='Qwen3':
+ if not qwen:
   from deepseek_moe_loop import install_compact_deepseek_moe
   assert install_compact_deepseek_moe(model)==26
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='engine_initialization',cell=a.cell))
  model.eval();engine,_,_,_=deepspeed.initialize(model=model,config=cfg);engine.eval()
  if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase='budget_calibration',cell=a.cell))
- if a.smoke and model_family!='Qwen3':
+ if a.smoke and not qwen:
   # Smoke-only layer checkpoints separate slow forward progress from a wait.
   for layer_index,layer in enumerate(engine.module.model.layers):
    def mark_layer(module,args,layer_index=layer_index):
@@ -70,6 +73,11 @@ def main(a):
  assert all(p.dtype==torch.bfloat16 for _,p in params)
  pinned=sum(p.ds_tensor.numel()*p.ds_tensor.element_size() for _,p in params if p.ds_tensor.device.type=='cpu' and p.ds_tensor.is_pinned())
  coordinator=engine.optimizer.get_param_coordinator()
+ # Memory footprint inputs: ZeRO-3 keeps only persistent (small) parameters on GPU;
+ # everything else, experts included, is gathered per module and released.
+ expert_total=sum(p.ds_numel*p.element_size() for name,p in params if '.experts.' in name)
+ dense_total=sum(p.ds_numel*p.element_size() for name,p in params if '.experts.' not in name)
+ persistent=sum(p.ds_numel*p.element_size() for _,p in params if getattr(p,'ds_persist',False))
  budget=spec.get('expert_budget_bytes',17392730112)//world;peak=[0];all_peak=[0];samples=[0];full_scans=[0]
  records=[(('.experts.' in name),p,p.ds_numel*p.element_size()) for name,p in params]
  def scan_residency():
@@ -87,6 +95,7 @@ def main(a):
   # The native counter is O(1) at every fetch. DeepSeek has thousands of
   # expert parameters; a complete Python scan at every fetch adds substantial
   # host work to the two-token calibration. Cross-check periodically.
+  # Qwen3-235B has ~36k parameters: scan periodically like DeepSeek.
   if model_family=='Qwen3' or samples[0]==1 or samples[0]%64==0:
    charged,all_charged=scan_residency()
    assert all_charged==native_charged,(all_charged,native_charged)
@@ -105,7 +114,7 @@ def main(a):
  calibration_seconds=time.perf_counter()-calibration_start
  coordinator.fetch_sub_module=original_fetch
  assert 0<all_peak[0]<=budget and 0<=peak[0]<=all_peak[0],(peak,all_peak,budget)
- write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],expert_peak_sampled=model_family!='Qwen3',all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],full_scans=full_scans[0],calibration_seconds=calibration_seconds,pinned_host_bytes=pinned,config=cfg))
+ write(a.output/f'calibration_rank{rank}.json',dict(status='PASS',model_path=model_path,expert_peak_bytes=peak[0],expert_peak_sampled=model_family!='Qwen3',expert_total_bytes=expert_total,dense_total_bytes=dense_total,gpu_persistent_param_bytes=persistent,all_parameter_peak_bytes=all_peak[0],budget_bytes=budget,samples=samples[0],full_scans=full_scans[0],calibration_seconds=calibration_seconds,pinned_host_bytes=pinned,config=cfg))
  # Validate the native live-parameter counter against the complete scan above,
  # then sample that O(1) counter at fetch boundaries in primary execution.
  live_peak=[0];live_samples=[0];counter_offset=[0];counter_corrections=[0];counter_full_scans=[0]
@@ -134,7 +143,7 @@ def main(a):
   gc.collect();torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats()
   if rank==0:write(a.output/'phase.json',dict(system='DeepSpeed-ZeRO-Inference',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   live_peak[0]=0
-  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,parameter_counter_offset_bytes=counter_offset[0],parameter_counter_corrections=counter_corrections[0],parameter_counter_full_scans=counter_full_scans[0],kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
+  row=generate(engine,ids,n);row.update(rank=rank,repeat=repeat,phase=phase,smoke=a.smoke,all_parameter_peak_bytes=live_peak[0],parameter_budget_bytes=budget,parameter_counter_offset_bytes=counter_offset[0],parameter_counter_corrections=counter_corrections[0],parameter_counter_full_scans=counter_full_scans[0],kv_gpu_resident=True,cpu_affinity=sorted(os.sched_getaffinity(0)),cache_start='all parameters NOT_AVAILABLE',pinned_host_bytes=pinned,gpu_persistent_param_bytes=persistent,expert_total_bytes=expert_total,dense_total_bytes=dense_total,host_rss_bytes=psutil.Process().memory_info().rss,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),request_ids=[r['request_id'] for r in local_rows])
   write(a.output/f'repeat{repeat}_rank{rank}.json',row);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(r['release_ns'] for r in rr))==1

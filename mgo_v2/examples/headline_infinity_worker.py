@@ -6,6 +6,7 @@ from moe_infinity import MoE
 from transformers import LogitsProcessorList
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
 MODEL='/home/hwlee/model/Qwen3-30B-A3B-Instruct-2507'
+QWEN235='/home/hwlee/model/Qwen3-235B-A22B-Instruct-2507'
 def write(p,v):
  q=p.with_suffix('.tmp');q.write_text(json.dumps(v,indent=2));q.replace(p)
 def sync():
@@ -48,7 +49,7 @@ def main(a):
  torch.set_num_threads(8);torch.manual_seed(42)
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
  model_path=spec.get('model_path',MODEL)
- assert model_path in (MODEL,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
+ assert model_path in (MODEL,QWEN235,'/home/hwlee/model/DeepSeek-V2-Lite-Chat')
  model_family=spec.get('model','Qwen3')
  diagnostic_mode=os.environ.get('MGO_INFINITY_TRACE')=='1'
  disable_speculative=os.environ.get('MGO_INFINITY_DISABLE_SPECULATIVE')=='1'
@@ -57,17 +58,19 @@ def main(a):
  assert diagnostic_mode or debug_output_tokens==64
  stack_log=(a.output/'signal_stacks.txt').open('a')
  faulthandler.register(signal.SIGUSR1,file=stack_log,all_threads=True)
- assert (model_family=='Qwen3')==(model_path==MODEL)
- expert_bytes=9*2**20 if model_family=='Qwen3' else 3*2048*1408*2
- routed_layers=48 if model_family=='Qwen3' else 26
- attention_layers=48 if model_family=='Qwen3' else 27
- offload_path='/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store' if model_family=='Qwen3' else '/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store'
+ assert (model_family=='Qwen3')==(model_path==MODEL) and (model_family=='Qwen3-235B')==(model_path==QWEN235)
+ # Qwen3-235B uses the Qwen3 treatment throughout (SDPA, default speculative EAM).
+ qwen=model_family in ('Qwen3','Qwen3-235B')
+ expert_bytes={'Qwen3':9*2**20,'Qwen3-235B':3*4096*1536*2}.get(model_family,3*2048*1408*2)
+ routed_layers={'Qwen3':48,'Qwen3-235B':94}.get(model_family,26)
+ attention_layers={'Qwen3':48,'Qwen3-235B':94}.get(model_family,27)
+ offload_path={'Qwen3':'/home/hwlee/mgo-tools/headline-r4/infinity-bf16-store','Qwen3-235B':'/home/hwlee/mgo-tools/headline-r4/infinity-qwen235-bf16-store'}.get(model_family,'/home/hwlee/mgo-tools/headline-r4/infinity-deepseek-bf16-store')
  cfg=dict(offload_path=offload_path,device_memory_ratio=.25,host_memory_ratio=.2,prefetch=True,use_native_engine=False,enable_attention_offload=False,enable_kv_cache_offload=False,speculative_prefetch=False,gpu_only_expert_routing=True,num_threads=4)
  # Eager is faster on DeepSeek cells that fit. Full B64/L1024 prefill needs
  # SDPA to avoid allocating the dense attention softmax matrix.
- use_sdpa=model_family=='Qwen3' or (spec['local_batch']==64 and spec['input_tokens']==1024)
+ use_sdpa=qwen or (spec['local_batch']==64 and spec['input_tokens']==1024)
  attention_backend='sdpa' if use_sdpa else 'eager'
- trim_floor_bytes=16*2**30 if model_family!='Qwen3' and use_sdpa else 0
+ trim_floor_bytes=16*2**30 if not qwen and use_sdpa else 0
  write(a.output/'config.json',dict(cfg,attention_backend=attention_backend,allocator_trim_floor_bytes=trim_floor_bytes,
                                    diagnostic_trace=diagnostic_mode,
                                    debug_output_tokens=debug_output_tokens,
@@ -84,6 +87,10 @@ def main(a):
  # DeepSeek prefill softmax OOMs, so select SDPA only for that cell. Qwen
  # already uses SDPA for every table cell.
  attention_modules=[m for name,m in model.model.named_modules() if name.endswith('.self_attn')]
+ dense_per_gpu=[0]*world
+ for name,t in list(model.model.named_parameters())+list(model.model.named_buffers()):
+  if t.is_cuda and '.experts.' not in name:dense_per_gpu[t.device.index]+=t.numel()*t.element_size()
+ write(a.output/'dense_placement.json',dict(dense_param_bytes_per_gpu=dense_per_gpu))
  assert len(attention_modules)==attention_layers
  model.model.config._attn_implementation=attention_backend
  for module in attention_modules:
@@ -94,12 +101,12 @@ def main(a):
  assert set(p.expert_nbytes_map.values())=={expert_bytes},set(p.expert_nbytes_map.values())
  budgets=[x*expert_bytes for x in spec.get('expert_slots_per_rank',[461,461,461,460])]
  p.configure_eam_budget(budgets,expert_bytes)
- if disable_speculative and model_family=='Qwen3':
+ if disable_speculative and qwen:
   p.eam_min_free_expert_slots=sum(budgets)//expert_bytes+1
   write(a.output/'eam_policy.json',dict(speculative_admission='disabled',
         eviction_priorities='enabled',expert_budget_per_gpu=budgets,
         reason='R8 target native dispatch stall isolation'))
- if model_family!='Qwen3':
+ if not qwen:
   # DeepSeek's 16.5 MiB experts made the former full-budget speculative
   # admission submit >11,000 transfers during a 26-layer two-token probe.
   # Keep C30 residency and the full soft priority ranking; bound only the
@@ -116,7 +123,7 @@ def main(a):
        min_free_expert_slots=min_free_slots,
        expert_budget_per_gpu=budgets,expert_bytes=expert_bytes,
        scope='DeepSeek only; EAM scores remain eviction priorities; default speculative admission is disabled after native wait stall'))
- if a.smoke and model_family!='Qwen3':
+ if a.smoke and not qwen:
   # Diagnose first-use DeepSeek EAM without adding probes to table timing.
   faulthandler.dump_traceback_later(45,repeat=True)
   trace_path=a.output/'deepseek_eam_trace.jsonl';trace_phase={'repeat':-1}
@@ -192,7 +199,7 @@ def main(a):
  warmup_only=a.smoke and os.environ.get('MGO_DIAG_WARMUP_ONLY')=='1'
  assert not warmup_only or diag_full_prefill
  for repeat in range(1 if warmup_only else repeats+1):
-  if a.smoke and model_family!='Qwen3':trace_phase['repeat']=repeat
+  if a.smoke and not qwen:trace_phase['repeat']=repeat
   phase='warmup' if repeat==0 else 'target'
   rows=json.loads(Path(spec[phase]['path']).read_text())['requests']
   if a.smoke and not diag_full_prefill:rows=rows[:4]
@@ -203,6 +210,7 @@ def main(a):
   assert not tracer.trace
   before=p.reset_eam_residency();sync()
   for gpu in range(world):torch.cuda.reset_peak_memory_stats(gpu)
+  static_allocated=[torch.cuda.memory_allocated(g) for g in range(world)]
   write(a.output/'phase.json',dict(system='MoE-Infinity-repaired',phase=phase,repeat=repeat,cell=a.cell,smoke=a.smoke))
   streamer=ClockStreamer(trim_floor_bytes,a.output/'allocator_trims.jsonl',
                          a.output/f'progress_repeat{repeat}.json',
@@ -212,6 +220,9 @@ def main(a):
    output=model.generate(ids,attention_mask=torch.ones_like(ids),max_new_tokens=n,min_new_tokens=n,do_sample=False,eos_token_id=None,pad_token_id=0,streamer=streamer,logits_to_keep=1,logits_processor=LogitsProcessorList([finite]),return_dict_in_generate=True)
   kv=output.past_key_values
   assert all(layer.keys.is_cuda and layer.values.is_cuda for layer in kv.layers)
+  kv_bytes_per_gpu=[0]*world
+  for layer in kv.layers:
+   for t in (layer.keys,layer.values):kv_bytes_per_gpu[t.device.index]+=t.numel()*t.element_size()
   output=output.sequences
   sync();assert finite.flag is not None and finite.flag.item()
   assert len(streamer.stamps)==n and output.shape==(len(rows),ids.shape[1]+n)
@@ -244,7 +255,7 @@ def main(a):
   assert stats['peak_accounted_bytes'] <= sum(budgets)
   assert stats['resident_bytes']+stats['transition_reserved_bytes']+stats['workspace_bytes']<=sum(budgets)
   first,end=streamer.stamps[0],streamer.stamps[-1]
-  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(world)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(world)],host_rss_bytes=psutil.Process().memory_info().rss)
+  result=dict(status='PASS',system='MoE-Infinity-repaired',cell=a.cell,repeat=repeat,phase=phase,smoke=a.smoke,TTFT=(first-start)/1e9,TPOT=(end-first)/1e9/(n-1),E2E=(end-start)/1e9,throughput=len(rows)*n/((end-start)/1e9),global_requests=len(rows),output_tokens=n,request_ids=[r['request_id'] for r in rows],tokens=tokens,token_ready_ns=streamer.stamps,release_ns=start,cache_before=before,cache_after=stats,expert_budget_per_gpu=budgets,eam_calls=p.eam_calls,eam_candidates=p.eam_candidates,kv_released=True,allocated_after_kv_release=live_after_kv_release,peak_allocated_bytes=[torch.cuda.max_memory_allocated(g) for g in range(world)],peak_reserved_bytes=[torch.cuda.max_memory_reserved(g) for g in range(world)],kv_cache_bytes_per_gpu=kv_bytes_per_gpu,static_allocated_bytes=static_allocated,dense_param_bytes_per_gpu=dense_per_gpu,expert_total_bytes=routed_layers*128*expert_bytes,host_rss_bytes=psutil.Process().memory_info().rss)
   write(a.output/f'repeat{repeat}.json',result)
   print(json.dumps({k:result[k] for k in ['repeat','TTFT','TPOT','E2E','eam_calls','eam_candidates']}),flush=True)
   if repeat==0:
