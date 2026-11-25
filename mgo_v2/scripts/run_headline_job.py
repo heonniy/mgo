@@ -11,7 +11,8 @@ def wait_for_gpu_release(seconds=30):
   if not occupants or time.monotonic()>=deadline:return occupants,observed
   observed.append(dict(unix=time.time(),occupants=occupants));time.sleep(1)
 def main(a):
- llama_workers=('headline_llama_sync_worker.py','headline_llama_deepseek_sync_worker.py')
+ llama_workers=('headline_llama_sync_worker.py','headline_llama_deepseek_sync_worker.py','headline_llama_qwen235_sync_worker.py')
+ ours_workers=('headline_ours_worker.py','headline_ours_multipolicy_worker.py')
  if a.ours_final:
   assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py') and a.ranks==4
   assert a.expert_executor in (None,'native') and a.policy in (None,'LA_CA_NEAR')
@@ -56,7 +57,12 @@ def main(a):
    # With P2P off, this host selects a failing NET/IB path. Keep the
    # established same-host env2 transport on SHM by disabling IB as well.
    env['NCCL_P2P_DISABLE']='1';env['NCCL_IB_DISABLE']='1'
-  if a.workloads:env['MGO_HEADLINE_WORKLOADS']=str(Path(a.workloads).resolve())
+  if a.workloads:
+   env['MGO_HEADLINE_WORKLOADS']=str(Path(a.workloads).resolve())
+   # Model geometry (layers/hidden/expert bytes) follows the cell checkpoint.
+   cell=next((x for x in json.loads(Path(a.workloads).read_text()).get('cells',[]) if x.get('cell')==a.cell),None)
+   if cell is not None and cell.get('model_path'):env['MGO_MODEL_PATH']=str(Path(cell['model_path']).resolve())
+  state['model_path']=env.get('MGO_MODEL_PATH')
   command=[a.python,'-u']
   if a.ranks>1:command+=['-m','torch.distributed.run','--standalone',f'--nproc_per_node={a.ranks}']
   command +=[str(c.P/'examples'/a.worker),'--cell',a.cell,'--output',str(out)]+(['--smoke'] if a.smoke else [])
@@ -103,6 +109,9 @@ def main(a):
    assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--decode-layout-fast']
   if a.policy:
    assert a.worker in ('headline_ours_worker.py','headline_ours_multipolicy_worker.py');command+=['--policy',a.policy]
+  if a.expert_source:
+   assert a.worker=='headline_ours_worker.py';command+=['--expert-source',a.expert_source]
+   if a.expert_source=='shared_pinned' and os.environ.get('MGO_SHARED_EXPERT_STORE'):state['shared_expert_store']=os.environ['MGO_SHARED_EXPERT_STORE']
   if a.teacher_tokens:
    assert a.worker=='headline_ours_multipolicy_worker.py';command+=['--teacher-tokens',str(Path(a.teacher_tokens).resolve())]
   if a.decode_policy_schedule:
@@ -158,10 +167,11 @@ if __name__=='__main__':
  p.add_argument('--llama-threads',type=int,choices=(16,32,64))
  p.add_argument('--llama-cuda-graphs',choices=('on','off'))
  p.add_argument('--llama-graph-reuse',choices=('on','off'))
- p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced2','balanced3','balanced4','balanced6','balanced8','balanced12'))
+ p.add_argument('--llama-expert-placement',choices=('legacy_tail','balanced2','balanced3','balanced4','balanced6','balanced7','balanced8','balanced12'))
  p.add_argument('--prefill-optimized',action='store_true');p.add_argument('--prefill-diagnostic',action='store_true');p.add_argument('--prefill-layout-fast',action='store_true');p.add_argument('--post-prefill-diagnostic',action='store_true')
  p.add_argument('--capture-eviction-trace',action='store_true')
- p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR'))
+ p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR','RANDOM'))
+ p.add_argument('--expert-source',choices=('full_pinned','shared_pinned'),help='explicit, recorded override of the frozen selection expert source')
  p.add_argument('--decode-policy',choices=('BR','LA_CA','CA_NATIVE','LA_CA_NEAR','MISS_BAL_COMM','BW','MISS_CAP_COMM','HAQ','HAQ_WORST','STATIC_BLOCK','RANDOM'))
  p.add_argument('--decode-policy-schedule');p.add_argument('--teacher-tokens')
  p.add_argument('--expert-executor',choices=('h0','native'))

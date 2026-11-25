@@ -3,11 +3,34 @@ from refactor_measure_worker import *
 from mgo_v2.selected_runtime import create_selected_runtime,selected_options
 import psutil,hashlib
 ROOT=Path('/home/hwlee/mgo-results/headline_r4_20261007')
+L=SPEC.layers
+
+def dense_weight_bytes(model):
+ # Every GPU-resident parameter/buffer of the model (routed experts stay on
+ # the meta device; they live only in the expert cache arena).
+ seen=set();total=0
+ for t in list(model.parameters())+list(model.buffers()):
+  if t.is_cuda:
+   key=(t.untyped_storage().data_ptr(),t.storage_offset(),t.numel())
+   if key not in seen:seen.add(key);total+=t.numel()*t.element_size()
+ return total
+
+def kv_cache_receipt(past):
+ if hasattr(past,'layers'):tensors=[x for layer in past.layers for x in (getattr(layer,'keys',None),getattr(layer,'values',None))]
+ else:tensors=list(past.key_cache)+list(past.value_cache)
+ tensors=[t for t in tensors if t is not None and t.numel()]
+ assert len(tensors)==2*L,('unexpected KV cache layout',len(tensors))
+ return dict(kv_cache_bytes=sum(t.numel()*t.element_size() for t in tensors),kv_positions=int(tensors[0].shape[-2]),kv_batch=int(tensors[0].shape[0]),kv_dtype=str(tensors[0].dtype))
+
+def resident_experts(rt):
+ # Physical slots (MAIN + PREFETCH arena) whose copy was issued and consumed;
+ # with prefetch off every assigned slot was waited on by its layer's compute.
+ return int(np.count_nonzero(rt.keys>=0))
 
 def begin(rt):
  rt.h2d.synchronize();assert not rt.controller.pending
  rt.event_offset+=rt.index;rt.index=0;rt.mismatch.zero_();rt.valid=None
- assert rt.event_offset%48==0
+ assert rt.event_offset%L==0
 
 def generate_live(model,rt,ids,n,forced_next_ids=None):
  dist.barrier();torch.cuda.synchronize()
@@ -28,14 +51,16 @@ def generate_live(model,rt,ids,n,forced_next_ids=None):
    out=model(input_ids=ids,attention_mask=mask,position_ids=pos,past_key_values=past,use_cache=True,logits_to_keep=1)
    past=out.past_key_values;predicted=out.logits[:,-1].argmax(-1);tokens.append(predicted);finite.logical_and_(torch.isfinite(out.logits).all())
    torch.cuda.synchronize();stamps.append(time.perf_counter_ns())
+   if step==0:prefill_resident=resident_experts(rt)
    if getattr(rt,'phase_diagnostic',None) and hasattr(rt.phase_diagnostic,'token_ready'):
     rt.phase_diagnostic.token_ready(step)
    if step<n-1:
     next_ids=forced_next_ids[:,step] if forced_next_ids is not None else predicted
     ids=next_ids[:,None];mask=torch.cat((mask,mask.new_ones((len(ids),1))),1)
  if getattr(rt,'phase_diagnostic',None):rt.phase_diagnostic.stop()
- actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==48*n
- return dict(release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist(),forced_continuation=forced_next_ids is not None)
+ actual=torch.stack(tokens,dim=1).cpu().numpy();assert bool(finite) and rt.index==L*n
+ memory=dict(resident_expert_count_prefill=prefill_resident,resident_expert_count_decode=resident_experts(rt) if n>1 else None,**kv_cache_receipt(past))
+ return dict(memory=memory,release_ns=start,first_ns=stamps[0],end_ns=stamps[-1],token_ready_ns=stamps,finite_logits=True,output_tokens=n,argmax_hash=array_hash(actual),tokens=actual.tolist(),forced_continuation=forced_next_ids is not None)
 
 def validate_state(rt):
  rt.h2d.synchronize();rt.arena.assert_consistent();assert not rt.controller.pending and not rt.mismatch.item()
@@ -68,6 +93,10 @@ def main(a):
  torch.set_num_threads(2);torch.cuda.set_device(0);torch.cuda.set_per_process_memory_fraction(.85);torch.manual_seed(42);torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False
  dist.init_process_group('nccl',device_id=torch.device('cuda:0'))
  spec=next(x for x in json.loads(Path(os.environ.get('MGO_HEADLINE_WORKLOADS',str(ROOT/'WORKLOADS.json'))).read_text())['cells'] if x['cell']==a.cell)
+ # The active model geometry (MGO_MODEL_PATH) must be the cell's checkpoint.
+ assert Path(spec.get('model_path',SPEC.path)).resolve()==Path(SPEC.path).resolve(),('cell model_path disagrees with MGO_MODEL_PATH',spec.get('model_path'),SPEC.path)
+ assert spec.get('layers',L)==L and spec.get('expert_bytes',EB)==EB
+ assert SPEC.is_qwen3_30b or a.expert_source=='shared_pinned','non-30B main_OURS requires --expert-source shared_pinned'
  a.local_batch=1 if a.smoke else spec['local_batch'];a.capacities=[x-(0 if a.capture_eviction_trace else 2) for x in spec.get('expert_slots_per_rank',[461,461,461,460])];a.seed=42;a.phase='COUNTERS';a.comm_mode='current';a.staging_cpu_team=cpus[1:3];a.debug_plan=False;a.live_routes=True
  forced_tokens=None
  if a.teacher_tokens is not None:
@@ -77,38 +106,42 @@ def main(a):
   assert teacher['output_tokens']==64 and teacher['local_batch']==a.local_batch
   forced_tokens=torch.tensor(teacher['rank_tokens'][str(rank)],device='cuda',dtype=torch.int64)
   assert tuple(forced_tokens.shape)==(a.local_batch,64)
- model,backing,experts=load_model();rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None)
+ load_started=time.perf_counter()
+ model,backing,experts=load_model(a.expert_source);loaded=time.perf_counter()
+ rt=create_selected_runtime(a,model,backing,experts,arm='V1_OPT_NOPF_BARRIER' if a.capture_eviction_trace else None,expert_source=a.expert_source)
+ load_receipt=dict(model_load_seconds=loaded-load_started,runtime_create_seconds=time.perf_counter()-loaded,expert_source=a.expert_source or 'selection')
+ dense_bytes=dense_weight_bytes(model)
  if a.grouped_decode_mode!='off':
   from mgo_v2.grouped_expert import GroupedExpertExecutor
   rt.grouped_executor=GroupedExpertExecutor(rt.cache,rt.kernel,a.local_batch*world*8,schedule=a.grouped_decode_mode)
  assert not (a.capture_decode_routes and a.frozen_decode_routes)
  if a.frozen_decode_routes is not None:
   saved=torch.load(a.frozen_decode_routes/f'decode_routes_rank{rank}.pt',map_location='cpu',weights_only=True)
-  assert saved['cell']==a.cell and saved['rank']==rank and len(saved['routes'])==48
+  assert saved['cell']==a.cell and saved['rank']==rank and len(saved['routes'])==L
   frozen=[tuple(t.to(device='cuda') for t in route) for route in saved['routes']]
   original_execute=rt.execute
   def replay_execute(layer,hidden,selected,weights,probs):
-   if rt.index>=48:
+   if rt.index>=L:
     selected,weights,probs=frozen[layer]
    return original_execute(layer,hidden,selected,weights,probs)
   rt.execute=replay_execute
  assert rt.cache.numel()*rt.cache.element_size()==(a.capacities[rank]+a.arena_budget)*EB
  from refactor_thread_affinity import configure
  configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
- write(a.output/f'pinned_rank{rank}.json',rt.pinned_expert_store_receipt)
+ write(a.output/f'pinned_rank{rank}.json',dict(rt.pinned_expert_store_receipt,**load_receipt,model=SPEC.receipt(),dense_weight_bytes=dense_bytes))
  # Match normal cache tensor dispatch keys and both storage-offset classes.
  # Synthetic inference tensors do not cover views of the persistent arena.
  for row_count in [1,2]:
   for slot in [0,1]:
    with torch.inference_mode():
     w=rt.cache[slot];w.zero_()
-    rt.kernel(torch.zeros((row_count,2048),device='cuda',dtype=torch.bfloat16),w[:1572864].view(768,2048),w[1572864:3145728].view(768,2048),w[3145728:].view(2048,768))
+    rt.kernel(torch.zeros((row_count,SPEC.hidden),device='cuda',dtype=torch.bfloat16),*SPEC.expert_views(w))
  torch.cuda.synchronize()
  def reset_live():
   rt.reset();rt.event_offset=0
   from mgo_v2.eviction import GateHistory
   from mgo_v2.live_metadata import LiveMetadata
-  rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
+  rt.gate_history=GateHistory(L,SPEC.experts,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history,SPEC.topk,SPEC.experts,L)
   configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
  if a.prefill_optimized and not a.prefill_diagnostic and not a.capture_eviction_trace:
   if rank==0:write(a.output/'phase.json',dict(phase='prefill_validation',cell=a.cell))
@@ -117,9 +150,9 @@ def main(a):
   ids=torch.tensor([r['input_ids'][-32:] if a.smoke else r['input_ids'] for r in local],device='cuda')
   a.validate_prefill_optimized=True;begin(rt)
   check=generate_live(model,rt,ids,1);state=validate_state(rt)
-  assert rt.prefill_metadata_checks==48 and len(rt.prefill_numerics)==48
-  assert not a.prefill_layout_fast or rt.prefill_layout_checks==48
-  assert rt.transport.calls==48*3
+  assert rt.prefill_metadata_checks==L and len(rt.prefill_numerics)==L
+  assert not a.prefill_layout_fast or rt.prefill_layout_checks==L
+  assert rt.transport.calls==L*3
   write(a.output/f'prefill_validation_rank{rank}.json',dict(status='PASS',metadata_exact_checks=rt.prefill_metadata_checks,layout_exact_checks=getattr(rt,'prefill_layout_checks',0),per_layer_numerics=rt.prefill_numerics,state=state,output=check,semantics='Exact metadata and same-part expert-order versus BF16 rank-partial numerical comparison; not bitwise parity'))
   a.validate_prefill_optimized=False;reset_live()
  n=257 if a.capture_eviction_trace else (1 if a.prefill_diagnostic else (2 if a.smoke or a.single_decode_step else 64));repeats=1 if a.prefill_diagnostic or a.smoke else a.repeats
@@ -134,7 +167,7 @@ def main(a):
    rt.reset();rt.event_offset=0
    from mgo_v2.eviction import GateHistory
    from mgo_v2.live_metadata import LiveMetadata
-   rt.gate_history=GateHistory(48,128,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history)
+   rt.gate_history=GateHistory(L,SPEC.experts,128);rt.metadata=LiveMetadata(a.local_batch,rt.gate_history,SPEC.topk,SPEC.experts,L)
    configure(cpus,rt.h2d.thread.native_id,True,rt.h2d.cpu_team_receipt)
   a.validate_decode_layout=a.decode_layout_fast and repeat==0
   rt.record_main_eviction_trace=bool(a.record_main_eviction_trace and repeat)
@@ -153,7 +186,7 @@ def main(a):
    rt.phase_diagnostic=PrefillDiagnostics(rt);rt.phase_diagnostic.install(model)
   if a.capture_eviction_trace:
    from main_eviction_trace import RoutingCapture
-   capture=RoutingCapture(rt,n*48);capture.install()
+   capture=RoutingCapture(rt,n*L);capture.install()
    result=generate_live(model,rt,ids,n)
    capture.finish(a.output)
   elif repeat:
@@ -163,14 +196,14 @@ def main(a):
    diagnostic=rt.phase_diagnostic.finish((result['end_ns']-result['release_ns'])/1e9)
    write(a.output/f'diagnostic_rank{rank}.json',diagnostic);rt.phase_diagnostic=None
   if a.validate_decode_layout:
-   assert rt.decode_layout_checks==(n-1)*48
+   assert rt.decode_layout_checks==(n-1)*L
    write(a.output/f'decode_layout_validation_rank{rank}.json',dict(status='PASS',exact_checks=rt.decode_layout_checks,scope='all warmup decode layers; integer indices and physical slot parity'))
   if rt.record_main_eviction_trace:
    hist=np.stack(rt.main_eviction_trace_histograms).astype(np.int32)
    gates=np.stack(rt.main_eviction_trace_gates).astype(np.float32)
    events=np.asarray(rt.main_eviction_trace_events,dtype=np.int32)
-   assert hist.shape==(48*n,world,128) and gates.shape==(48*n,128)
-   assert np.array_equal(events,np.arange(48*n,dtype=np.int32))
+   assert hist.shape==(L*n,world,128) and gates.shape==(L*n,128)
+   assert np.array_equal(events,np.arange(L*n,dtype=np.int32))
    raw=hist.tobytes()+gates.tobytes()+events.tobytes()
    digest=np.frombuffer(hashlib.sha256(raw).digest(),np.uint8).copy()
    d=torch.tensor(digest,device='cuda');all_d=torch.empty((world,32),dtype=torch.uint8,device='cuda')
@@ -179,13 +212,13 @@ def main(a):
     np.savez_compressed(a.output/'main_eviction_trace.npz',histograms=hist,gates=gates,events=events)
     write(a.output/'main_eviction_trace_meta.json',dict(
      status='PASS',cell=a.cell,source_policy=a.policy,local_batch=a.local_batch,global_requests=world*a.local_batch,
-     input_tokens=int(ids.shape[1]),output_tokens=n,events=int(len(events)),prefill_events=48,
-     decode_events=int((n-1)*48),main_capacities=list(map(int,a.capacities)),
+     input_tokens=int(ids.shape[1]),output_tokens=n,events=int(len(events)),prefill_events=L,
+     decode_events=int((n-1)*L),main_capacities=list(map(int,a.capacities)),
      captured_runtime_prefetch_P=int(a.arena_budget),captured_runtime_trigger=a.trigger,
      simulator_scope='MAIN-only P0 eviction replay; frozen raw demand/gate stream',
      trace_sha256=hashlib.sha256(raw).hexdigest()))
    rt.record_main_eviction_trace=False
-  validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*48*2
+  validation=validate_state(rt);assert rt.transport.calls-calls==(n-1+int(a.prefill_optimized))*L*2
   no_compile=before==dict(counters['stats']);assert a.capture_eviction_trace or not repeat or no_compile
   native_counts=None
   if native_before is not None:
@@ -196,13 +229,37 @@ def main(a):
    grouped_after=rt.grouped_executor.receipt()
    grouped_counts={key:grouped_after[key]-grouped_before[key] for key in ('events','waves','first_wave_groups','second_wave_groups','hit_first_groups','miss_second_groups','no_ready_events','serial_wait_wall_ns')}
   result.update(inline_demand_h2d=a.inline_demand_h2d,expert_executor=a.expert_executor,native_prefill=a.native_prefill,prefetch_off=a.prefetch_off,decode_layout_fast=a.decode_layout_fast,prefill_layout_fast=a.prefill_layout_fast,prefill_optimized=a.prefill_optimized,expert_cache_start='empty',system='Ours',policy=a.policy,rank=rank,physical_gpu=physical[rank],repeat=repeat,phase=phase,smoke=a.smoke,validation=validation,cache_before=cache_before,no_compile=no_compile,peak_allocated_bytes=torch.cuda.max_memory_allocated(),peak_reserved_bytes=torch.cuda.max_memory_reserved(),host_rss_bytes=psutil.Process().memory_info().rss,pinned_host_bytes=rt.pinned_expert_store_receipt['bytes'],request_ids=[r['request_id'] for r in local])
+  cache_capacity=rt.cache.numel()*rt.cache.element_size();cache_slots=int(rt.cache.shape[0])
+  peak=result['peak_allocated_bytes'];mem=result.pop('memory');kv=mem['kv_cache_bytes']
+  result.update(memory_footprint=dict(
+   dense_weight_bytes=dense_bytes,expert_cache_capacity_bytes=cache_capacity,expert_cache_slots=cache_slots,expert_bytes=EB,
+   resident_expert_count_prefill=mem['resident_expert_count_prefill'],resident_expert_bytes_prefill=mem['resident_expert_count_prefill']*EB,
+   resident_expert_count_decode=mem['resident_expert_count_decode'],resident_expert_bytes_decode=None if mem['resident_expert_count_decode'] is None else mem['resident_expert_count_decode']*EB,
+   resident_over_capacity_prefill=mem['resident_expert_count_prefill']/cache_slots,
+   resident_over_capacity_decode=None if mem['resident_expert_count_decode'] is None else mem['resident_expert_count_decode']/cache_slots,
+   kv_cache_bytes=kv,kv_positions=mem['kv_positions'],kv_batch=mem['kv_batch'],kv_dtype=mem['kv_dtype'],
+   kv_cache_bytes_analytic=SPEC.kv_bytes(mem['kv_batch'],mem['kv_positions']),
+   kv_cache_analytic_formula=f"2*{L}*{SPEC.kv_heads}*{SPEC.head_dim}*2B*{mem['kv_batch']}*{mem['kv_positions']}",
+   workspace_bytes_derived=peak-dense_bytes-cache_capacity-kv,
+   workspace_definition='derived: peak_allocated - dense - expert_cache_capacity - kv',
+   peak_allocated_bytes=peak,peak_reserved_bytes=result['peak_reserved_bytes'],
+   scope='this rank; peak since torch.cuda.reset_peak_memory_stats() before this repeat'))
   result.update(h2d_serial_ablation=a.h2d_serial_ablation,native_executor_counts=native_counts,grouped_decode_mode=a.grouped_decode_mode,grouped_executor_counts=grouped_counts,compiled_dense=a.compiled_dense,teacher_tokens_path=str(a.teacher_tokens) if a.teacher_tokens else None,decode_policy=a.decode_policy,single_decode_step=a.single_decode_step)
   write(a.output/f'repeat{repeat}_rank{rank}.json',result);dist.barrier()
   if rank==0:
    rr=[json.loads((a.output/f'repeat{repeat}_rank{r}.json').read_text()) for r in range(world)];assert len(set(x['release_ns'] for x in rr))==1
    release=rr[0]['release_ns'];first=max(x['first_ns'] for x in rr);end=max(x['end_ns'] for x in rr)
    row=dict(status='PASS',expert_executor=a.expert_executor,repeat=repeat,TTFT=(first-release)/1e9,TPOT=(end-first)/1e9/(n-1) if n>1 else None,E2E=(end-release)/1e9,throughput=world*a.local_batch*n/((end-release)/1e9),output_tokens=n,global_requests=world*a.local_batch,smoke=a.smoke)
-   write(a.output/f'repeat{repeat}.json',row);print(json.dumps(row),flush=True)
+   fp=[x['memory_footprint'] for x in rr]
+   def total(k):return None if any(x[k] is None for x in fp) else sum(x[k] for x in fp)
+   row['memory']=dict(
+    resident_expert_count_prefill=total('resident_expert_count_prefill'),resident_expert_count_decode=total('resident_expert_count_decode'),
+    expert_keys=SPEC.keys,expert_cache_slots=total('expert_cache_slots'),
+    expert_cache_residency_ratio_prefill=total('resident_expert_count_prefill')/SPEC.keys,
+    expert_cache_residency_ratio_decode=None if total('resident_expert_count_decode') is None else total('resident_expert_count_decode')/SPEC.keys,
+    resident_over_capacity_decode=None if total('resident_expert_count_decode') is None else total('resident_expert_count_decode')/total('expert_cache_slots'),
+    per_rank={str(x['rank']):x['memory_footprint'] for x in rr})
+   write(a.output/f'repeat{repeat}.json',row);print(json.dumps({k:v for k,v in row.items() if k!='memory'}),flush=True)
   dist.barrier()
  if a.post_generation_diagnostic:
   from generation_phase_diagnostics import GenerationDiagnostics
@@ -213,7 +270,7 @@ def main(a):
   if a.capture_decode_routes:
    original_execute=rt.execute
    def capture_execute(layer,hidden,selected,weights,probs):
-    if rt.index>=48:
+    if rt.index>=L:
      captured.append((selected.detach().cpu().clone(),weights.detach().cpu().clone(),probs.detach().cpu().clone()))
     return original_execute(layer,hidden,selected,weights,probs)
    rt.execute=capture_execute
@@ -222,7 +279,7 @@ def main(a):
   diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9);rt.phase_diagnostic=None
   if a.capture_decode_routes:
    rt.execute=original_execute
-   assert len(captured)==48
+   assert len(captured)==L
    torch.save(dict(cell=a.cell,rank=rank,routes=captured),a.output/f'decode_routes_rank{rank}.pt')
   state=validate_state(rt)
   assert check['tokens']==expected_tokens and state['state_hash']==expected_state['state_hash'] and state['role_hash']==expected_state['role_hash']
@@ -240,11 +297,17 @@ def main(a):
   with torch._dynamo.config.patch(error_on_recompile=True):check=generate_live(model,rt,ids,1)
   diagnostic=rt.phase_diagnostic.finish((check['end_ns']-check['release_ns'])/1e9);rt.phase_diagnostic=None
   assert before==dict(counters['stats']) and [t[0] for t in check['tokens']]==expected_first
-  assert rt.transport.calls==96
+  assert rt.transport.calls==2*L
   diagnostic.update(validation=validate_state(rt),first_token_parity=True,no_compile=True)
   write(a.output/f'post_diagnostic_rank{rank}.json',diagnostic)
  rt.close()
- if rank==0:write(a.output/'result.json',dict(status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,decode_policy=a.decode_policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,compiled_dense=a.compiled_dense,headline_eligible=not (a.single_decode_step or a.decode_policy or a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
+ memory_by_repeat={}
+ if rank==0:
+  for k in range(1,repeats+1):
+   if (a.output/f'repeat{k}.json').exists():
+    m=json.loads((a.output/f'repeat{k}.json').read_text()).get('memory')
+    if m:memory_by_repeat[str(k)]={x:m[x] for x in m if x!='per_rank'}
+ if rank==0:write(a.output/'result.json',dict(model=SPEC.receipt(),expert_source=a.expert_source or 'selection',h2d_serial_ablation=a.h2d_serial_ablation,memory_by_repeat=memory_by_repeat,status='PASS',system='Ours',expert_executor=a.expert_executor,policy=a.policy,decode_policy=a.decode_policy,cell=a.cell,smoke=a.smoke,primary_repeats=repeats,prefill_optimized=a.prefill_optimized,compiled_dense=a.compiled_dense,headline_eligible=not (a.single_decode_step or a.decode_policy or a.prefill_diagnostic or a.capture_eviction_trace or a.record_main_eviction_trace)))
  dist.barrier();dist.destroy_process_group()
 if __name__=='__main__':
  p=argparse.ArgumentParser()
@@ -264,6 +327,7 @@ if __name__=='__main__':
  p.add_argument('--policy',choices=('BR','CA','CA_NATIVE','LA_CA_NEAR',
                 'NEAR_PCIE','NEAR_FAST','NEAR_SPLIT','HAQ','HAQ_FAST','FAST_WORST','FAST_RANDOM','RANDOM_QUOTA_NEAR','RANDOM'),default='LA_CA_NEAR')
  p.add_argument('--quota-table',type=Path)
+ p.add_argument('--expert-source',choices=('full_pinned','shared_pinned'),help='explicit override of the frozen selection expert source (shared_pinned = approved host-memory deviation)')
  p.add_argument('--teacher-tokens',type=Path)
  p.add_argument('--cell',required=True)
  p.add_argument('--output',type=Path,required=True)
