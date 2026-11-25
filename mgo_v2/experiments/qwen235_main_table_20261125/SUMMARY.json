@@ -1,0 +1,471 @@
+{
+  "timing": [
+    {
+      "system": "DeepSpeed ZeRO-Inference",
+      "jobs": [
+        "q235_deepspeed_r3",
+        "q235_deepspeed_r3_ext2"
+      ],
+      "n": 5,
+      "samples": [
+        {
+          "job": "q235_deepspeed_r3",
+          "repeat": 1,
+          "TTFT": 16.325244575,
+          "TPOT": 11.691228687031746,
+          "E2E": 752.872651858,
+          "TPS": 5.440495135387851
+        },
+        {
+          "job": "q235_deepspeed_r3",
+          "repeat": 2,
+          "TTFT": 15.451355569,
+          "TPOT": 11.68672764079365,
+          "E2E": 751.715196939,
+          "TPS": 5.448872148227145
+        },
+        {
+          "job": "q235_deepspeed_r3",
+          "repeat": 3,
+          "TTFT": 15.631001333,
+          "TPOT": 10.319656192555554,
+          "E2E": 665.769341464,
+          "TPS": 6.152280895051521
+        },
+        {
+          "job": "q235_deepspeed_r3_ext2",
+          "repeat": 1,
+          "TTFT": 15.066745048,
+          "TPOT": 11.738140769174603,
+          "E2E": 754.569613506,
+          "TPS": 5.428259933458651
+        },
+        {
+          "job": "q235_deepspeed_r3_ext2",
+          "repeat": 2,
+          "TTFT": 15.316774865,
+          "TPOT": 11.63971390563492,
+          "E2E": 748.61875092,
+          "TPS": 5.471409839743265
+        }
+      ],
+      "TTFT": {
+        "median": 15.451355569,
+        "min": 15.066745048,
+        "max": 16.325244575
+      },
+      "TPOT": {
+        "median": 11.68672764079365,
+        "min": 10.319656192555554,
+        "max": 11.738140769174603
+      },
+      "E2E": {
+        "median": 751.715196939,
+        "min": 665.769341464,
+        "max": 754.569613506
+      },
+      "throughput": {
+        "median": 5.448872148227145,
+        "min": 5.428259933458651,
+        "max": 6.152280895051521
+      }
+    },
+    {
+      "system": "llama.cpp",
+      "jobs": [
+        "q235_llama_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q235_llama_r3",
+          "repeat": 1,
+          "TTFT": 1023.321825874,
+          "TPOT": 3.3372577739365092,
+          "E2E": 1233.569065632,
+          "TPS": 3.3204464298895804
+        },
+        {
+          "job": "q235_llama_r3",
+          "repeat": 2,
+          "TTFT": 1020.902662134,
+          "TPOT": 3.3352641325079353,
+          "E2E": 1231.024302482,
+          "TPS": 3.327310428999343
+        },
+        {
+          "job": "q235_llama_r3",
+          "repeat": 3,
+          "TTFT": 1022.055443414,
+          "TPOT": 3.2381341236190484,
+          "E2E": 1226.057893202,
+          "TPS": 3.3407884103276686
+        }
+      ],
+      "TTFT": {
+        "median": 1022.055443414,
+        "min": 1020.902662134,
+        "max": 1023.321825874
+      },
+      "TPOT": {
+        "median": 3.3352641325079353,
+        "min": 3.2381341236190484,
+        "max": 3.3372577739365092
+      },
+      "E2E": {
+        "median": 1231.024302482,
+        "min": 1226.057893202,
+        "max": 1233.569065632
+      },
+      "throughput": {
+        "median": 3.327310428999343,
+        "min": 3.3204464298895804,
+        "max": 3.3407884103276686
+      }
+    },
+    {
+      "system": "MoE-Infinity (repaired)",
+      "jobs": [
+        "q235_infinity_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q235_infinity_r3",
+          "repeat": 1,
+          "TTFT": 13.462251327,
+          "TPOT": 5.871582454222223,
+          "E2E": 383.371945943,
+          "TPS": 10.68414119328647
+        },
+        {
+          "job": "q235_infinity_r3",
+          "repeat": 2,
+          "TTFT": 12.602595416,
+          "TPOT": 6.084395442222222,
+          "E2E": 395.919508276,
+          "TPS": 10.345537197284635
+        },
+        {
+          "job": "q235_infinity_r3",
+          "repeat": 3,
+          "TTFT": 12.899574756,
+          "TPOT": 5.993626449920635,
+          "E2E": 390.498041101,
+          "TPS": 10.489169135013903
+        }
+      ],
+      "TTFT": {
+        "median": 12.899574756,
+        "min": 12.602595416,
+        "max": 13.462251327
+      },
+      "TPOT": {
+        "median": 5.993626449920635,
+        "min": 5.871582454222223,
+        "max": 6.084395442222222
+      },
+      "E2E": {
+        "median": 390.498041101,
+        "min": 383.371945943,
+        "max": 395.919508276
+      },
+      "throughput": {
+        "median": 10.489169135013903,
+        "min": 10.345537197284635,
+        "max": 10.68414119328647
+      }
+    },
+    {
+      "system": "main_OURS",
+      "jobs": [
+        "q235_main_OURS_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q235_main_OURS_r3",
+          "repeat": 1,
+          "TTFT": 7.659575583,
+          "TPOT": 1.2993548122380951,
+          "E2E": 89.518928754,
+          "TPS": 45.75568605446451
+        },
+        {
+          "job": "q235_main_OURS_r3",
+          "repeat": 2,
+          "TTFT": 5.760537451,
+          "TPOT": 1.2952632762857141,
+          "E2E": 87.362123857,
+          "TPS": 46.885307031965006
+        },
+        {
+          "job": "q235_main_OURS_r3",
+          "repeat": 3,
+          "TTFT": 5.756148906,
+          "TPOT": 1.2964482577619048,
+          "E2E": 87.432389145,
+          "TPS": 46.847627521731035
+        }
+      ],
+      "TTFT": {
+        "median": 5.760537451,
+        "min": 5.756148906,
+        "max": 7.659575583
+      },
+      "TPOT": {
+        "median": 1.2964482577619048,
+        "min": 1.2952632762857141,
+        "max": 1.2993548122380951
+      },
+      "E2E": {
+        "median": 87.432389145,
+        "min": 87.362123857,
+        "max": 89.518928754
+      },
+      "throughput": {
+        "median": 46.847627521731035,
+        "min": 45.75568605446451,
+        "max": 46.885307031965006
+      }
+    },
+    {
+      "system": "OURS-random (overlap)",
+      "jobs": [
+        "q235_OURS_random_overlap_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q235_OURS_random_overlap_r3",
+          "repeat": 1,
+          "TTFT": 8.002001915,
+          "TPOT": 1.4555582200952382,
+          "E2E": 99.702169781,
+          "TPS": 41.08235566986191
+        },
+        {
+          "job": "q235_OURS_random_overlap_r3",
+          "repeat": 2,
+          "TTFT": 6.074120434,
+          "TPOT": 1.456636889015873,
+          "E2E": 97.842244442,
+          "TPS": 41.86330785193784
+        },
+        {
+          "job": "q235_OURS_random_overlap_r3",
+          "repeat": 3,
+          "TTFT": 6.068630621,
+          "TPOT": 1.455983118873016,
+          "E2E": 97.79556711,
+          "TPS": 41.8832889980876
+        }
+      ],
+      "TTFT": {
+        "median": 6.074120434,
+        "min": 6.068630621,
+        "max": 8.002001915
+      },
+      "TPOT": {
+        "median": 1.455983118873016,
+        "min": 1.4555582200952382,
+        "max": 1.456636889015873
+      },
+      "E2E": {
+        "median": 97.842244442,
+        "min": 97.79556711,
+        "max": 99.702169781
+      },
+      "throughput": {
+        "median": 41.86330785193784,
+        "min": 41.08235566986191,
+        "max": 41.8832889980876
+      }
+    },
+    {
+      "system": "OURS-random (serial, def. B)",
+      "jobs": [
+        "q235_OURS_random_serial_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q235_OURS_random_serial_r3",
+          "repeat": 1,
+          "TTFT": 7.98405273,
+          "TPOT": 2.0889715114126983,
+          "E2E": 139.589257949,
+          "TPS": 29.343232138224455
+        },
+        {
+          "job": "q235_OURS_random_serial_r3",
+          "repeat": 2,
+          "TTFT": 6.101208023,
+          "TPOT": 2.086021159047619,
+          "E2E": 137.520541043,
+          "TPS": 29.784641399274747
+        },
+        {
+          "job": "q235_OURS_random_serial_r3",
+          "repeat": 3,
+          "TTFT": 6.085857729,
+          "TPOT": 2.084420343,
+          "E2E": 137.404339338,
+          "TPS": 29.8098300223567
+        }
+      ],
+      "TTFT": {
+        "median": 6.101208023,
+        "min": 6.085857729,
+        "max": 7.98405273
+      },
+      "TPOT": {
+        "median": 2.086021159047619,
+        "min": 2.084420343,
+        "max": 2.0889715114126983
+      },
+      "E2E": {
+        "median": 137.520541043,
+        "min": 137.404339338,
+        "max": 139.589257949
+      },
+      "throughput": {
+        "median": 29.784641399274747,
+        "min": 29.343232138224455,
+        "max": 29.8098300223567
+      }
+    },
+    {
+      "system": "Qwen3-30B main_OURS (reference)",
+      "jobs": [
+        "q30b_main_OURS_memory_r3"
+      ],
+      "n": 3,
+      "samples": [
+        {
+          "job": "q30b_main_OURS_memory_r3",
+          "repeat": 1,
+          "TTFT": 3.553236027,
+          "TPOT": 0.47097671288888887,
+          "E2E": 33.224768939,
+          "TPS": 123.28151950492637
+        },
+        {
+          "job": "q30b_main_OURS_memory_r3",
+          "repeat": 2,
+          "TTFT": 1.655081096,
+          "TPOT": 0.4688096998571429,
+          "E2E": 31.190092187,
+          "TPS": 131.32375420510007
+        },
+        {
+          "job": "q30b_main_OURS_memory_r3",
+          "repeat": 3,
+          "TTFT": 1.664119626,
+          "TPOT": 0.46698813841269843,
+          "E2E": 31.084372346,
+          "TPS": 131.7703942806837
+        }
+      ],
+      "TTFT": {
+        "median": 1.664119626,
+        "min": 1.655081096,
+        "max": 3.553236027
+      },
+      "TPOT": {
+        "median": 0.4688096998571429,
+        "min": 0.46698813841269843,
+        "max": 0.47097671288888887
+      },
+      "E2E": {
+        "median": 31.190092187,
+        "min": 31.084372346,
+        "max": 33.224768939
+      },
+      "throughput": {
+        "median": 131.32375420510007,
+        "min": 123.28151950492637,
+        "max": 131.7703942806837
+      }
+    }
+  ],
+  "memory": [
+    {
+      "system": "DeepSpeed ZeRO-Inference",
+      "dense": "0.55\u20130.55 (gathered; persistent 0.0015)",
+      "experts": "21.35\u201321.35 (gathered per MoE block, transient)",
+      "kv": "1.65\u20131.65",
+      "workspace": "21.92\u201321.93",
+      "alloc": "45.47\u201345.47",
+      "reserved": "48.67\u201348.67",
+      "residency": "5.05% of routed-expert bytes at peak (transient)",
+      "smi": "51.88"
+    },
+    {
+      "system": "llama.cpp",
+      "dense": "3.24\u20134.12 (layer-split, not replicated)",
+      "experts": "31.50 (7 whole layers/GPU; 0.88 GiB budget unused)",
+      "kv": "2.06\u20132.25 (buffer)",
+      "workspace": "0.16\u20130.30 (compute buffer)",
+      "alloc": "n/a (no torch)",
+      "reserved": "n/a (no torch)",
+      "residency": "29.79% (28 x 128 / 12032, static)",
+      "smi": "38.74"
+    },
+    {
+      "system": "MoE-Infinity (repaired)",
+      "dense": "5.63\u20136.75 (native allocator; est. = smi - experts - torch reserved, incl. CUDA context)",
+      "experts": "31.71\u201331.75 (EAM peak charged)",
+      "kv": "1.61\u20131.68",
+      "workspace": "in torch peak (KV + activations); native buffers in dense estimate",
+      "alloc": "5.20\u20135.45 (torch only)",
+      "reserved": "12.75\u201314.40 (torch only)",
+      "residency": "30.00% (resident bytes / all routed experts)",
+      "smi": "52.78"
+    },
+    {
+      "system": "main_OURS",
+      "dense": "14.90\u201314.90",
+      "experts": "31.64\u201331.68 (capacity 31.71\u201331.75)",
+      "kv": "1.65\u20131.65",
+      "workspace": "1.58\u20131.72",
+      "alloc": "49.84\u201350.01",
+      "reserved": "51.73\u201355.60",
+      "residency": "29.93% (3601/12032)",
+      "smi": "59.50"
+    },
+    {
+      "system": "OURS-random (overlap)",
+      "dense": "14.90\u201314.90",
+      "experts": "31.64\u201331.68 (capacity 31.71\u201331.75)",
+      "kv": "1.65\u20131.65",
+      "workspace": "1.68\u20131.86",
+      "alloc": "49.94\u201350.12",
+      "reserved": "53.20\u201356.33",
+      "residency": "29.93% (3601/12032)",
+      "smi": "60.28"
+    },
+    {
+      "system": "OURS-random (serial, def. B)",
+      "dense": "14.90\u201314.90",
+      "experts": "31.64\u201331.68 (capacity 31.71\u201331.75)",
+      "kv": "1.65\u20131.65",
+      "workspace": "1.68\u20131.86",
+      "alloc": "49.94\u201350.12",
+      "reserved": "53.20\u201356.33",
+      "residency": "29.93% (3601/12032)",
+      "smi": "60.28"
+    },
+    {
+      "system": "Qwen3-30B main_OURS (reference)",
+      "dense": "2.87\u20132.87",
+      "experts": "4.03\u20134.03 (capacity 4.04\u20134.05)",
+      "kv": "0.84\u20130.84",
+      "workspace": "0.80\u20130.89",
+      "alloc": "8.56\u20138.65",
+      "reserved": "9.89\u201310.79",
+      "residency": "29.87% (1835/6144)",
+      "smi": "14.04"
+    }
+  ]
+}

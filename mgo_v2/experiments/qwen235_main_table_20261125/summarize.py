@@ -28,6 +28,8 @@ SYSTEMS = [  # name, jobs
     ('main_OURS', ['q235_main_OURS_r3', 'q235_main_OURS_r3_ext2']),
     ('OURS-random (overlap)', ['q235_OURS_random_overlap_r3', 'q235_OURS_random_overlap_r3_ext2']),
     ('OURS-random (serial, def. B)', ['q235_OURS_random_serial_r3', 'q235_OURS_random_serial_r3_ext2']),
+    # Reference: Qwen3-30B-A3B main_OURS on the main-table cell (rank-private full pinned source), current code.
+    ('Qwen3-30B main_OURS (reference)', ['q30b_main_OURS_memory_r3']),
 ]
 
 
@@ -65,7 +67,7 @@ def span(v):
 
 def memory(name, jobs):
     m = {}
-    if name.startswith(('main_OURS', 'OURS')):
+    if 'OURS' in name:
         f = [json.loads((R / j / f'repeat{k}_rank{r}.json').read_text())['memory_footprint']
              for j in jobs for k, _ in repeats(j) for r in range(4)]
         res = json.loads((R / jobs[0] / 'result.json').read_text())['memory_by_repeat']['1']
@@ -75,7 +77,7 @@ def memory(name, jobs):
                  workspace=span([x['workspace_bytes_derived'] / G for x in f]),
                  alloc=span([x['peak_allocated_bytes'] / G for x in f]),
                  reserved=span([x['peak_reserved_bytes'] / G for x in f]),
-                 residency=f"{res['expert_cache_residency_ratio_decode']:.2%} ({res['resident_expert_count_decode']}/{TOTAL_EXPERTS})")
+                 residency=f"{res['expert_cache_residency_ratio_decode']:.2%} ({res['resident_expert_count_decode']}/{res['expert_keys']})")
     elif name.startswith('DeepSpeed'):
         rows = [json.loads((R / j / f'repeat{k}_rank{r}.json').read_text()) for j in jobs for k, _ in repeats(j) for r in range(4)]
         cal = [json.loads((R / j / f'calibration_rank{r}.json').read_text()) for j in jobs for r in range(4)]
@@ -103,10 +105,19 @@ def memory(name, jobs):
         rows = [r for j in jobs for _, r in repeats(j)]
         stats = [r['cache_after'] for r in rows]
         peak_charged = [s[f'gpu_{g}_peak_charged_bytes'] / G for s in stats for g in range(4)]
-        m.update(dense=span([d / G for r in rows for d in r['dense_param_bytes_per_gpu']]),
+        # Dense weights live in MoE-Infinity's native allocator (torch sees 0 B of CUDA parameters), so estimate
+        # them per GPU as nvidia-smi max - EAM peak-charged experts - torch peak reserved (an upper bound that
+        # also contains the CUDA context and any native staging buffers).
+        smi_g = [0.0] * 4
+        for j in jobs:
+            for line in open(R / j / 'resources.jsonl'):
+                for i, gpu in enumerate(json.loads(line)['gpus']):
+                    smi_g[i] = max(smi_g[i], gpu['used_mib'] / 1024)
+        est = [smi_g[g] - max(s[f'gpu_{g}_peak_charged_bytes'] for s in stats) / G - max(r['peak_reserved_bytes'][g] for r in rows) / G for g in range(4)]
+        m.update(dense=span(est) + ' (native allocator; est. = smi - experts - torch reserved, incl. CUDA context)',
                  experts=span(peak_charged) + ' (EAM peak charged)',
                  kv=span([d / G for r in rows for d in r['kv_cache_bytes_per_gpu']]),
-                 workspace='see note (native expert pool outside torch)',
+                 workspace='in torch peak (KV + activations); native buffers in dense estimate',
                  alloc=span([d / G for r in rows for d in r['peak_allocated_bytes']]) + ' (torch only)',
                  reserved=span([d / G for r in rows for d in r['peak_reserved_bytes']]) + ' (torch only)',
                  residency=f"{max(s['resident_bytes'] for s in stats) / (TOTAL_EXPERTS * EB):.2%} (resident bytes / all routed experts)")
